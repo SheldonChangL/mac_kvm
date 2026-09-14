@@ -1,0 +1,19 @@
+{
+  "status": "UNRESOLVED_UNTIL_M4-001",
+  "windows": {
+    "source_root": "",
+    "test_root": "",
+    "source_ext": "",
+    "test_ext": "",
+    "verify_command": ""
+  },
+  "linux": {
+    "source_root": "",
+    "test_root": "",
+    "source_ext": "",
+    "test_ext": "",
+    "verify_command": ""
+  },
+  "approved_by": null,
+  "approved_at": null
+}

@@ -1,0 +1,20 @@
+{
+  "issue_id": "M1-068",
+  "commit": "<git sha>",
+  "started_at": "<ISO-8601>",
+  "finished_at": "<ISO-8601>",
+  "environment": {
+    "local_os": "macOS",
+    "local_build": "",
+    "peer_os": "Windows",
+    "peer_build": "",
+    "network": "LAN",
+    "keyboard_layout": "English US",
+    "displays": []
+  },
+  "cases": [
+    {"id": "mouse-move", "result": "pass", "evidence": "manual.md#mouse-move"}
+  ],
+  "result": "pass",
+  "reviewer": ""
+}
