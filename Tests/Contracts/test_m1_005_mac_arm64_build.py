@@ -1,3 +1,4 @@
+import os
 import subprocess
 import tempfile
 import unittest
@@ -11,14 +12,23 @@ BUILD_DOCUMENT = REPOSITORY_ROOT / "docs/build/M1-005-mac-arm64-build.md"
 
 
 class M1005MacArm64BuildTests(unittest.TestCase):
-    def run_verifier(self, *arguments):
+    def run_verifier(self, *arguments, environment=None):
         return subprocess.run(
             [str(VERIFIER), *map(str, arguments)],
             cwd=REPOSITORY_ROOT,
             capture_output=True,
             text=True,
             check=False,
+            env=environment,
         )
+
+    def environment_with_stub(self, directory, command, output):
+        stub = Path(directory) / command
+        stub.write_text(f"#!/bin/sh\nprintf '%s\\n' '{output}'\n")
+        stub.chmod(0o755)
+        environment = os.environ.copy()
+        environment["PATH"] = f"{directory}:{environment['PATH']}"
+        return environment
 
     def test_manifest_declares_macos_14(self):
         manifest = PACKAGE_MANIFEST.read_text()
@@ -38,6 +48,30 @@ class M1005MacArm64BuildTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 66)
         self.assertIn("repository root does not exist", result.stderr)
+
+    def test_non_arm64_host_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            environment = self.environment_with_stub(
+                temporary_directory,
+                "uname",
+                "x86_64",
+            )
+            result = self.run_verifier(environment=environment)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("native Apple Silicon host required", result.stderr)
+
+    def test_rosetta_translation_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            environment = self.environment_with_stub(
+                temporary_directory,
+                "sysctl",
+                "1",
+            )
+            result = self.run_verifier(environment=environment)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Rosetta-translated execution is not allowed", result.stderr)
 
     def test_verifier_checks_rosetta_manifest_and_binary_architecture(self):
         verifier = VERIFIER.read_text()
