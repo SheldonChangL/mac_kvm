@@ -22,6 +22,18 @@
 | Production TLS default ON | [§63 Decision 6](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md#decision-6)、[§64](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md#64-recommended-mvp) | Frozen Decision 6 | `docs/adr/M1-001-product-contract.md` | `Tests/Contracts/test_m1_001_product_contract.py` |
 | 1.0 以第一方 Server／Client＋Native Protocol 為主路徑 | [§60](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md#60-long-term-protocol-architecture)、[§64](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md#64-recommended-mvp) | Frozen Decision 1 | `docs/adr/M1-001-product-contract.md` | `Tests/Contracts/test_m1_001_product_contract.py` |
 
+## M1-003 Direct Traceability
+
+M1-003 的 canonical source 是 [`docs/spec/CANONICAL_SPEC_SECTION_55.md` §55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy)。Frozen Decision 9 與 `PROTOCOL_EVIDENCE_POLICY.md` 細化執行方式，但不取代 §55。
+
+| Requirement | Canonical source | Frozen refinement | Decision record | Verification |
+|---|---|---|---|---|
+| 不直接 fork Barrier／Deskflow | [§55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy) | Frozen Decision 9 | `docs/adr/M1-003-independent-implementation-policy.md` | `Tests/Contracts/test_m1_003_independent_implementation_policy.py` |
+| 不複製 Barrier／Deskflow source 到第一方 implementation | [§55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy) | Frozen Decision 9 | `docs/adr/M1-003-independent-implementation-policy.md` | `Tests/Contracts/test_m1_003_independent_implementation_policy.py` |
+| 只依公開 protocol specification、黑箱行為與 sanitized fixtures 自行實作 codec | [§55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy) | Protocol Evidence Policy | `docs/adr/M1-003-independent-implementation-policy.md` | `Tests/Contracts/test_m1_003_independent_implementation_policy.py` |
+| macOS input engine 必須自行實作 | [§55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy) | Frozen Decisions 5、9 | `docs/adr/M1-003-independent-implementation-policy.md` | `Tests/Contracts/test_m1_003_independent_implementation_policy.py` |
+| 直接修改、引用或連結 GPL implementation 前必須停止並重新評估 | [§55](../docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy) | Protocol Evidence Policy | `docs/adr/M1-003-independent-implementation-policy.md` | `Tests/Contracts/test_m1_003_independent_implementation_policy.py` |
+
 本包以使用者提供的 `macOS Barrier-Compatible KVM App` 規格為基礎，保留下列核心：
 
 - Apple Silicon 原生、Client/Server、mouse/keyboard/clipboard/TLS。
