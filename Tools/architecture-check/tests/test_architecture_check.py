@@ -65,6 +65,7 @@ class ArchitectureCheckTests(unittest.TestCase):
             "ApplicationServices",
             "IOKit",
             "Network",
+            "WinSDK",
         ):
             with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
                 root = self.make_repository(temporary_directory)
@@ -111,6 +112,7 @@ class ArchitectureCheckTests(unittest.TestCase):
                 "CoreGraphics",
                 "ApplicationServices",
                 "IOKit",
+                "WinSDK",
             ):
                 with self.subTest(
                     protocol_root=protocol_root, module=module
@@ -147,6 +149,10 @@ class ArchitectureCheckTests(unittest.TestCase):
             "NWListener",
             "NWTCPConnection",
             "CFSocket",
+            "CFReadStream",
+            "CFWriteStream",
+            "CFStreamCreatePairWithSocket",
+            "CFStreamCreatePairWithSocketToHost",
             "URLSession",
             "URLSessionTask",
             "URLSessionWebSocketTask",
@@ -190,6 +196,7 @@ class ArchitectureCheckTests(unittest.TestCase):
             "ApplicationServices",
             "IOKit",
             "Network",
+            "WinSDK",
             "BarrierCompatibility",
             "NativeProtocol",
         ):
@@ -233,6 +240,7 @@ class ArchitectureCheckTests(unittest.TestCase):
             "KEY_ENTER",
             "BTN_LEFT",
             "XK_Return",
+            "XF86XK_AudioMute",
         ):
             with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
                 root = self.make_repository(temporary_directory)

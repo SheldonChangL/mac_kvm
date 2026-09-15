@@ -30,6 +30,7 @@ FORBIDDEN_KVMCORE_IMPORTS = (
     "NativeProtocol",
     "Network",
     "NetworkExtension",
+    "WinSDK",
 )
 FORBIDDEN_CONTRACT_IMPORTS = (
     "ApplicationServices",
@@ -42,6 +43,7 @@ FORBIDDEN_CONTRACT_IMPORTS = (
     "NativeProtocol",
     "Network",
     "NetworkExtension",
+    "WinSDK",
 )
 PROTOCOL_PLATFORM_IMPORTS = (
     "ApplicationServices",
@@ -49,6 +51,7 @@ PROTOCOL_PLATFORM_IMPORTS = (
     "CoreGraphics",
     "IOKit",
     "MacPlatform",
+    "WinSDK",
 )
 CONCRETE_NETWORK_IMPORTS = (
     "CFNetwork",
@@ -70,7 +73,11 @@ CONTRACT_PLATFORM_TYPES = (
     "xkb_keycode_t",
 )
 CONCRETE_TRANSPORT_TYPES = (
+    "CFReadStream",
     "CFSocket",
+    "CFStreamCreatePairWithSocket",
+    "CFStreamCreatePairWithSocketToHost",
+    "CFWriteStream",
     "InputStream",
     "NWConnection",
     "NWConnectionGroup",
@@ -100,7 +107,7 @@ CONTRACT_PLATFORM_TYPE_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, CONTRACT_PLATFORM_TYPES)) + r")\b"
 )
 CONTRACT_PLATFORM_CODE_PATTERN = re.compile(
-    r"\b((?:kVK|VK|KEY|BTN|XK)_[A-Za-z0-9_]+)\b"
+    r"\b((?:XF86XK|kVK|VK|KEY|BTN|XK)_[A-Za-z0-9_]+)\b"
 )
 CONCRETE_TRANSPORT_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, CONCRETE_TRANSPORT_TYPES)) + r")\b"
