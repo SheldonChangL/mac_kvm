@@ -51,5 +51,5 @@ Revert the M1-008 PR and remove its required status check from branch protection
 
 - GitHub runner images: `https://github.com/actions/runner-images`
 - macOS 15 arm64 installed software: `https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md`
-- Checkout v4.4.0 immutable ref: `11d5960a326750d5838078e36cf38b85af677262`
-- Upload Artifact v4.6.2 immutable ref: `ea165f8d65b6e75b540449e92b4886f43607fa02`
+- Checkout v7.0.1 (`node24`) immutable ref: `3d3c42e5aac5ba805825da76410c181273ba90b1`
+- Upload Artifact v7.0.1 (`node24`) immutable ref: `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`
