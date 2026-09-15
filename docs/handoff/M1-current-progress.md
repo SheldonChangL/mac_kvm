@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-15 08:37 Asia/Taipei
+Updated: 2026-09-15 09:26 Asia/Taipei
 
 ## Objective and authorization
 
@@ -30,7 +30,7 @@ Canonical architecture that must remain true:
 
 ## Completed progress
 
-M1 progress: **6 of 70 Issues merged and closed; 64 open**.
+M1 progress: **7 of 70 Issues merged and closed; 63 open**.
 
 | Issue | GitHub Issue | PR | Merge commit | Review result |
 |---|---:|---:|---|---|
@@ -40,6 +40,7 @@ M1 progress: **6 of 70 Issues merged and closed; 64 open**.
 | M1-004 | #4 | [#221](https://github.com/SheldonChangL/mac_kvm/pull/221) | `64b5cd5460b229de8ebda0b7d9682d1a529fb4da` | Critical 0 / High 0; one Medium resolved by M1-005 |
 | M1-005 | #6 | [#222](https://github.com/SheldonChangL/mac_kvm/pull/222) | `469f02e94a1d9bde07aafb36829c95d0cc0651dd` | Critical 0 / High 0 / Medium 0 |
 | M1-006 | #7 | [#223](https://github.com/SheldonChangL/mac_kvm/pull/223) | `20380eca4d8865c234c5d4b28451fa30fd2092aa` | Critical 0 / High 0 / Medium 0 |
+| M1-007 | #9 | [#224](https://github.com/SheldonChangL/mac_kvm/pull/224) | `edb95b5bdfc2e7c81aca0e514273c02ca477891b` | Critical 0 / High 0 / Medium 0 / Low 0 |
 
 Five-axis review evidence:
 
@@ -49,6 +50,7 @@ Five-axis review evidence:
 - PR #221: https://github.com/SheldonChangL/mac_kvm/pull/221#issuecomment-5660176702
 - PR #222: https://github.com/SheldonChangL/mac_kvm/pull/222#issuecomment-5660279559
 - PR #223: https://github.com/SheldonChangL/mac_kvm/pull/223#issuecomment-5672809595
+- PR #224: https://github.com/SheldonChangL/mac_kvm/pull/224#issuecomment-5672910546
 
 Current merged repository capabilities:
 
@@ -61,55 +63,61 @@ Current merged repository capabilities:
 - executed x86_64-host and Rosetta fail-closed test simulations
 - five comment-only Swift module boundaries with exact one-way manifest dependencies
 - M1-006 fail-closed graph verifier and evidence package
+- Unit, Integration, and explicitly opt-in System Swift test targets
+- privacy-safe Barrier/Native fixture roots and schema validation
 
-Last merged full results at M1-006:
+Last merged full results at M1-007:
 
-- contract tests: 30/30 passed
-- reference KVMContracts Swift tests: 3/3 passed
+- contract tests: 39/39 passed
+- Swift targets: Unit 1 passed, Integration 1 passed, System 1 skipped with explicit opt-in reason
 - package validator: `PACKAGE OK: 217 issues, 5 milestones, 17 epics`
 - native build verifier: passed
 - diff check and targeted secret scan: passed
 
-## Active work: M1-007
+## Active work: M1-008
 
-- GitHub Issue: [#9](https://github.com/SheldonChangL/mac_kvm/issues/9)
-- Branch: `feat/m1-007-test-targets`
-- Base/current merged HEAD: `20380eca4d8865c234c5d4b28451fa30fd2092aa`
-- Implementation commit: `6f2a5b4e5db5d38e81c559634c7517ec6dbecfd1`
+- GitHub Issue: [#11](https://github.com/SheldonChangL/mac_kvm/issues/11)
+- Branch: `feat/m1-008-ci-gates`
+- Base/current merged HEAD: `edb95b5bdfc2e7c81aca0e514273c02ca477891b`
+- Implementation commits: `f1e1ec6f4b1970ec18c870dbb2a1b80c4407b013`, `7226c7770c0482083c8a19f74b5a3cb0959aef30`
 - PR: not created yet
-- Current targeted tests: **9/9 passed**
+- CI-gate unit tests: **10/10 passed**
 - Current full contract suite: **39/39 passed**
+- Local `make verify`: **5/5 gates passed** at `7226c7770c0482083c8a19f74b5a3cb0959aef30`
+- Repository visibility: public; branch-protection API available, `main` not yet protected
 
-Committed M1-007 implementation:
+Committed M1-008 implementation:
 
-- add Unit, Integration, and explicitly skippable System SwiftPM test targets
-- prohibit OS permission framework imports throughout the Unit test tree
-- add empty Barrier/Native fixture roots
-- add fixture metadata schema version 1 with provenance, SHA-256/length, relative-path, and privacy constraints
-- add fail-closed verifier, contract tests, architecture docs, and evidence
+- add a fail-fast Python gate for manifest validation, CI tests, repository contracts, Swift test targets, and native arm64 build
+- add an atomic privacy-safe JSON report with exit, timing, toolchain, hashes, and line counts
+- clean up child process groups on timeout, keyboard interruption, and runner `SIGTERM`
+- add root `make verify` and the canonical `Tools/Backlog/validate_package.py` path
+- add a read-only, SHA-pinned GitHub Actions workflow on native `macos-15` arm64 with Xcode 26.2
 
-Latest M1-007 validation:
+Latest M1-008 validation:
 
 ```text
-python3 -m unittest Tests.Contracts.test_m1_007_test_targets -v
-exit 0; 9/9 passed
+python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v
+exit 0; 10/10 passed
 
-python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v
-exit 0; 39/39 passed
+make verify REPORT=artifacts/ci/m1-008-report.json
+exit 0; manifest, CI-unit, repository-contract, Swift-target, and native-arm64 gates passed
 
-Tools/verify/M1-007-test-targets.sh
-exit 0; Unit 1 passed, Integration 1 passed, System 1 skipped with explicit reason
+python3 Tools/Backlog/validate_package.py
+exit 0; PACKAGE OK: 217 issues, 5 milestones, 17 epics
 ```
 
-No actual protocol fixture or wire byte was added. Barrier captures remain owned by M1-024/M1-040; Native encoding remains blocked on its owning decisions and Issues.
+One restricted-sandbox `make verify` attempt failed because SwiftPM could not start its nested macOS sandbox (`sandbox_apply: Operation not permitted`). The identical commit passed outside that environment restriction; GitHub-hosted CI is still required before merge.
 
 ## Immediate handoff checklist
 
-1. Stage and commit `evidence/issues/M1-007/` plus this owner-requested handoff update; preserve the Product Owner's untracked artifacts listed below.
-2. Push and create a Draft PR referencing Issue #9, and record the source/fixture/test/evidence scope expansions.
-3. Re-read the remote PR head/diff, perform the five-axis review, and require Critical=0 and High=0.
-4. If mergeable and all current gates pass, mark Ready and merge through the PR only.
-5. Record merge/review/test results in Issue #9, close it, then continue with M1-008.
+1. Commit `evidence/issues/M1-008/` plus this handoff update; preserve the Product Owner's untracked artifacts listed below.
+2. Push and create a Draft PR referencing Issue #11.
+3. Wait for the real GitHub-hosted check and obtain its exact check-run context.
+4. Configure strict `main` branch protection to require that context, prohibit force pushes/deletion, enforce administrators, and require resolved conversations.
+5. Re-read the remote PR head/diff, perform the five-axis review, and require Critical=0 and High=0.
+6. Mark Ready and merge only if branch protection and the real check are both satisfied; then verify the push-to-main run.
+7. Record merge/review/test results in Issue #11 and continue with M1-009 (#15).
 
 ## Next tooling-bootstrap order
 
@@ -117,7 +125,6 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-007 test targets/fixtures | #9 | depends on M1-006 |
 | M1-008 PR CI gate | #11 | depends on M1-005 and M1-007 |
 | M1-009 format/lint/warnings | #15 | depends on M1-008 |
 | M1-010 architecture checker | #16 | depends on M1-006 and M1-008 |

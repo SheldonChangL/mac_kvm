@@ -1,0 +1,36 @@
+{
+  "issue": "M1-008",
+  "implementationCommit": "7226c7770c0482083c8a19f74b5a3cb0959aef30",
+  "ciGateUnitTests": {
+    "testsRun": 10,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "repositoryContractTests": {
+    "testsRun": 39,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "swiftTestTargets": {
+    "unitPassed": 1,
+    "integrationPassed": 1,
+    "systemSkipped": 1,
+    "systemSkipReason": "Requires explicit system-test opt-in",
+    "failures": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": {
+    "test": "M1-008 gate suite before implementation",
+    "result": "failed import because Tools/cigates/cigates.py did not exist"
+  },
+  "failureAndCleanupCoverage": [
+    "first failed gate blocks and marks remaining gates not-run",
+    "timeout terminates the spawned process group",
+    "keyboard cancellation terminates the process group, writes a report, and returns 130",
+    "SIGTERM is installed and restored around the CLI pipeline",
+    "missing root returns 66",
+    "non-positive timeout returns 64"
+  ]
+}

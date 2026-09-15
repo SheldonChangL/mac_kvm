@@ -1,0 +1,49 @@
+name: M1 CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: m1-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-manifest:
+    name: build-test-manifest
+    runs-on: macos-15
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Show pinned environment
+        run: |
+          uname -m
+          xcodebuild -version
+          swift --version
+          python3 --version
+
+      - name: Run blocking build, test, and manifest gates
+        run: make verify REPORT=artifacts/ci/m1-008-report.json
+
+      - name: Upload machine-readable gate report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: m1-ci-report-${{ github.run_id }}
+          path: artifacts/ci/m1-008-report.json
+          if-no-files-found: error
+          retention-days: 14
