@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-009",
+  "invocation": "make verify REPORT=artifacts/ci/m1-009-report.json",
+  "commit": "2eb3d08c0f6f114900e0d2941d2b62566350789f",
+  "status": "passed",
+  "startedAt": "2026-09-15T07:02:12.512+00:00",
+  "endedAt": "2026-09-15T07:02:24.233+00:00",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "gates": [
+    {
+      "name": "manifest-validation",
+      "command": ["python3", "Tools/Backlog/validate_package.py"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:12.904+00:00",
+      "endedAt": "2026-09-15T07:02:12.957+00:00",
+      "durationMs": 54,
+      "stdoutLineCount": 1,
+      "stderrLineCount": 0,
+      "stdoutSha256": "40169b112b0d6c7ba5b7c35c41122e9649b1eca18d33c169d28d7b0c5ce7aec1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "code-quality",
+      "command": ["python3", "Tools/code-quality/code-quality.py"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:12.957+00:00",
+      "endedAt": "2026-09-15T07:02:14.413+00:00",
+      "durationMs": 1456,
+      "stdoutLineCount": 3,
+      "stderrLineCount": 0,
+      "stdoutSha256": "697c770da6f67a0daed18056ee78557fac438e38ebc3ecbb04ab334e08f4c3d1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ci-gate-unit-tests",
+      "command": ["python3", "-m", "unittest", "discover", "-s", "Tools/cigates/tests", "-p", "test_*.py", "-v"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:14.413+00:00",
+      "endedAt": "2026-09-15T07:02:14.499+00:00",
+      "durationMs": 86,
+      "stdoutLineCount": 15,
+      "stderrLineCount": 17,
+      "stdoutSha256": "f707e41aa40d022b41a60ff7fe6e2a79b9729e2ccb49038015e1527d0a68d4bb",
+      "stderrSha256": "cc7712bc80394d880ac27764910f136b528f20627b1ca77bb45ddd71dca5b679"
+    },
+    {
+      "name": "repository-contract-tests",
+      "command": ["python3", "-m", "unittest", "discover", "-s", "Tests/Contracts", "-p", "test_*.py", "-v"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:14.499+00:00",
+      "endedAt": "2026-09-15T07:02:22.139+00:00",
+      "durationMs": 7640,
+      "stdoutLineCount": 0,
+      "stderrLineCount": 44,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "c2a406af84a1f9a961caf44cdcf2ab58b0bd5efa9bc01cc30f369f2e84c724a6"
+    },
+    {
+      "name": "swift-test-targets",
+      "command": ["./Tools/verify/M1-007-test-targets.sh"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:22.139+00:00",
+      "endedAt": "2026-09-15T07:02:23.271+00:00",
+      "durationMs": 1131,
+      "stdoutLineCount": 13,
+      "stderrLineCount": 4,
+      "stdoutSha256": "35772007196b2ae31116ba0e61b185ec537e4f6ceca4842c2b17d25150f14ad2",
+      "stderrSha256": "1541ffe5808f3c38ba513a92d66aa8f33c3c9654570c91b918cbc962c3ab5a55"
+    },
+    {
+      "name": "native-arm64-build",
+      "command": ["./Tools/verify/M1-005-mac-arm64-build.sh"],
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-15T07:02:23.271+00:00",
+      "endedAt": "2026-09-15T07:02:24.233+00:00",
+      "durationMs": 962,
+      "stdoutLineCount": 5,
+      "stderrLineCount": 0,
+      "stdoutSha256": "e271fadae2e40e5b21c3a00b7f87a250f3d8f8426e8bebc6b9b645a8b5339d17",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

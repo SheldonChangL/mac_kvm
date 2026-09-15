@@ -1,0 +1,46 @@
+{
+  "issue": "M1-009",
+  "implementationCommit": "2eb3d08c0f6f114900e0d2941d2b62566350789f",
+  "codeQualityUnitTests": {
+    "testsRun": 9,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "ciGateUnitTests": {
+    "testsRun": 10,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "repositoryContractTests": {
+    "testsRun": 39,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "swiftTestTargets": {
+    "unitPassed": 1,
+    "integrationPassed": 1,
+    "systemSkipped": 1,
+    "systemSkipReason": "Requires explicit system-test opt-in",
+    "warningsAsErrors": true,
+    "failures": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": [
+    "initial suite failed import because Tools/code-quality/code-quality.py did not exist",
+    "Make/CI integration test failed before the canonical entrypoint was wired",
+    "full repository suite exposed exact-text and incomplete temporary-package fixture assumptions after canonical formatting"
+  ],
+  "failureAndCleanupCoverage": [
+    "formatter version mismatch blocks lint and build",
+    "lint failure blocks warnings-as-errors build",
+    "compiler warning/build failure is not ignored",
+    "timeout terminates the spawned process group",
+    "keyboard cancellation terminates the process group",
+    "SIGTERM is installed and restored around the CLI",
+    "missing root returns 66",
+    "non-positive timeout returns 64"
+  ]
+}
