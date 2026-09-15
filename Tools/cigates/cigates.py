@@ -160,6 +160,24 @@ def build_gate_specs() -> List[GateSpec]:
             ("python3", "Tools/Backlog/validate_package.py"),
         ),
         GateSpec(
+            "docs-check",
+            ("python3", "Tools/docs-check/docs-check.py"),
+        ),
+        GateSpec(
+            "docs-check-unit-tests",
+            (
+                "python3",
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                "Tools/docs-check/tests",
+                "-p",
+                "test_*.py",
+                "-v",
+            ),
+        ),
+        GateSpec(
             "architecture-check",
             ("python3", "Tools/architecture-check/architecture-check.py"),
         ),

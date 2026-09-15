@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-15 15:25 Asia/Taipei
+Updated: 2026-09-16 07:23 Asia/Taipei
 
 ## Objective and authorization
 
@@ -30,7 +30,7 @@ Canonical architecture that must remain true:
 
 ## Completed progress
 
-M1 progress: **9 of 70 planned Issues merged and closed; 61 planned Issues open**. One corrective M1 CI Issue (#227) is active and is not part of the original 70-count backlog.
+M1 progress: **10 of 70 planned Issues merged and closed; 60 planned Issues open**. Corrective tooling Issues #227 and #230 are not part of the original 70-count backlog.
 
 | Issue | GitHub Issue | PR | Merge commit | Review result |
 |---|---:|---:|---|---|
@@ -43,6 +43,7 @@ M1 progress: **9 of 70 planned Issues merged and closed; 61 planned Issues open*
 | M1-007 | #9 | [#224](https://github.com/SheldonChangL/mac_kvm/pull/224) | `edb95b5bdfc2e7c81aca0e514273c02ca477891b` | Critical 0 / High 0 / Medium 0 / Low 0 |
 | M1-008 | #11 | [#225](https://github.com/SheldonChangL/mac_kvm/pull/225) | `4203d242548085a3651da5f7de0d53fcf8fc5632` | Critical 0 / High 0; two Medium tracked by M1-009/M1-010 |
 | M1-009 | #15 | [#226](https://github.com/SheldonChangL/mac_kvm/pull/226) | `35ae3e390616af983c83f5cb8141bd18c342167f` | Critical 0 / High 0; architecture Medium tracked by M1-010 |
+| M1-010 | #16 | [#229](https://github.com/SheldonChangL/mac_kvm/pull/229) | `ff8982663f46c3cce2ee83624c492715da732049` | Critical 0 / High 0 / Medium 0 / Low 0 |
 
 Five-axis review evidence:
 
@@ -55,6 +56,7 @@ Five-axis review evidence:
 - PR #224: https://github.com/SheldonChangL/mac_kvm/pull/224#issuecomment-5672910546
 - PR #225: https://github.com/SheldonChangL/mac_kvm/pull/225#issuecomment-5673322040
 - PR #226: https://github.com/SheldonChangL/mac_kvm/pull/226#issuecomment-5676222992
+- PR #229: https://github.com/SheldonChangL/mac_kvm/pull/229#issuecomment-5676486302
 
 Current merged repository capabilities:
 
@@ -70,65 +72,68 @@ Current merged repository capabilities:
 - Unit, Integration, and explicitly opt-in System Swift test targets
 - privacy-safe Barrier/Native fixture roots and schema validation
 - fail-fast local/GitHub manifest, test, and native-build gate with machine-readable reports
+- pinned formatter and warnings-as-errors code-quality gate
+- fail-closed source-level architecture boundary gate
 - strict `main` protection requiring GitHub Actions `build-test-manifest`
 
-Last merged full results at M1-008:
+Last merged full results at M1-010:
 
 - contract tests: 39/39 passed
+- architecture checker unit tests: 14/14 passed
+- code-quality unit tests: 9/9 passed
 - CI gate unit tests: 10/10 passed
 - Swift targets: Unit 1 passed, Integration 1 passed, System 1 skipped with explicit opt-in reason
 - package validator: `PACKAGE OK: 217 issues, 5 milestones, 17 epics`
 - native build verifier: passed
-- PR-head and post-merge GitHub Actions: passed
+- PR-head and post-merge GitHub Actions: passed with zero annotations
 - strict branch protection and targeted secret scan: verified
 
 Corrective M1-CI-001 was merged through [PR #228](https://github.com/SheldonChangL/mac_kvm/pull/228) as `f31a06cfe5a74f4c8a8397cf4e284d45d04883b5`. Its PR-head and post-merge GitHub runs both passed with check-run annotations count 0.
 
-## Active work: M1-010
+## Active work: M1-DOCS-001
 
-- GitHub Issue: [#16](https://github.com/SheldonChangL/mac_kvm/issues/16)
-- Branch: `feat/m1-010-architecture-check`
-- Base/current merged HEAD: `f31a06cfe5a74f4c8a8397cf4e284d45d04883b5`
-- Implementation commit: `6a86e21e5887924a08bc37166d611adc57a9c584`
+- GitHub Issue: [#230](https://github.com/SheldonChangL/mac_kvm/issues/230)
+- Branch: `feat/m1-docs-001-docs-check`
+- Base/current merged HEAD: `ff8982663f46c3cce2ee83624c492715da732049`
+- Implementation commit: `18587b7a7478608e92b12e0168a767d7c263ca8f`
 - PR: not created yet
-- Architecture-check unit tests: **14/14 passed**
-- Code-quality unit tests: **9/9 passed**
-- CI-gate unit tests: **10/10 passed**
-- Repository contracts: **39/39 passed**
-- Local `make verify`: **9/9 gates passed** at `6a86e21e5887924a08bc37166d611adc57a9c584`
+- Docs-check unit tests: **12/12 passed**
+- Local `make docs-check`: **passed**
+- Local `make verify`: **11/11 gates passed** at `18587b7a7478608e92b12e0168a767d7c263ca8f`
 - Repository visibility: public; strict branch protection active
 
-Committed M1-010 implementation:
+Committed M1-DOCS-001 implementation:
 
-- reject plain/attributed BarrierCompatibility, NativeProtocol, and platform input imports in KVMCore
-- reject canonical Barrier tokens outside the sole `Packages/BarrierCompatibility` allowlist
-- fail closed on missing KVMCore, invalid UTF-8, and file/directory symlinks
-- expose identical `make architecture-check` locally and in GitHub CI
-- add both architecture-check and code-quality tooling unit suites to the cumulative CI gate
+- deterministically validate Git-tracked Markdown and JSON only
+- enforce UTF-8, LF-only, no trailing whitespace, exactly one final newline, balanced fences, JSON syntax, and duplicate-key rejection
+- fail closed on Git/file errors, timeouts, symlinks, and cancellation without logging document content
+- expose identical `make docs-check` locally and in GitHub CI
+- add the docs-check unit/integration suite to the cumulative CI gate
+- remove the lone unmatched opening fence in `MacKVM_Implementation_Package_v2/MILESTONES.md`
 
-Latest M1-010 validation:
+Latest M1-DOCS-001 validation:
 
 ```text
-python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' -v
-exit 0; 14/14 passed
+python3 -m unittest discover -s Tools/docs-check/tests -p 'test_*.py' -v
+exit 0; 12/12 passed
 
-make architecture-check
-exit 0; architecture check OK
+make docs-check
+exit 0; docs check OK
 
-make verify REPORT=artifacts/ci/m1-010-report.json
-exit 0; all 9 gates passed
+make verify REPORT=artifacts/ci/m1-docs-001-report.json
+exit 0; all 11 gates passed
 ```
 
-No runtime feature or public contract changed. The initial token catalog is intentionally the four canonical Issue/guardrail examples and must be explicitly extended by later Barrier-token PRs.
+No runtime feature or public contract changed. Protected PR-head CI, five-axis review, protected merge, and post-merge main CI remain pending.
 
 ## Immediate handoff checklist
 
-1. Commit `evidence/issues/M1-010/` plus this handoff update.
-2. Push and create a Draft PR referencing #16 with Make/CI/evidence/handoff additions disclosed.
-3. Require the protected GitHub check and all nine machine-report gates to pass with zero annotations.
+1. Commit `evidence/issues/M1-DOCS-001/` plus this handoff update.
+2. Push and create a Draft PR referencing #230 with Make/CI/docs repair/evidence/handoff additions disclosed.
+3. Require the protected GitHub check and all eleven machine-report gates to pass with zero annotations.
 4. Perform current-head five-axis review; Tier B requires complete review and Critical=0/High=0.
-5. Merge only through the protected PR path, verify post-merge main CI, and audit Issue #16.
-6. Establish the remaining `make docs-check` command if no later owning Issue exists, then begin formal bootstrap backfill before proceeding with the next dependency-eligible product Issue.
+5. Merge only through the protected PR path, verify post-merge main CI, and audit Issue #230.
+6. Begin formal bootstrap backfill and then proceed with M1-011 in dependency order.
 
 ## Next tooling-bootstrap order
 
@@ -136,7 +141,8 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-010 architecture checker | #16 | depends on M1-006 and M1-008 |
+| M1-DOCS-001 docs checker | #230 | unblocks formal bootstrap backfill and documentation Issues |
+| M1-011 next planned Issue | #18 | proceed after docs gate and applicable backfill sequencing |
 
 Use the Standing Authorization to create the real tools, not a long-lived waiver. A reasonable end state is:
 
@@ -146,6 +152,7 @@ Use the Standing Authorization to create the real tools, not a long-lived waiver
 - CI gate that fails merge on build/test/manifest failure and emits machine-readable reports
 - code-quality gate with pinned tool behavior and warnings-as-errors
 - source-level architecture checker with tested allowlist and violations
+- canonical docs checker with tracked-file selection and tested fail-closed behavior
 
 After these exist, backfill PRs #218–#222 and any other bootstrap PR merged before the formal gates.
 

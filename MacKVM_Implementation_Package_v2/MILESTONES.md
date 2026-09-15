@@ -1,5 +1,3 @@
-```
-
 ## M1 — Mac Client MVP（Barrier 驗證）
 
 使用既有 Windows/Linux Barrier Server 驗證第一方 macOS Client、KVM Core、Input Injection、Clipboard、TLS 與 Fail-safe。
