@@ -50,7 +50,7 @@ class M1004RepositorySkeletonTests(unittest.TestCase):
 
         self.assertEqual(
             source,
-            "@main\nstruct MacKVMApplication {\n    static func main() {}\n}\n",
+            "@main\nstruct MacKVMApplication {\n  static func main() {}\n}\n",
         )
         self.assertNotIn("import ", source)
 
