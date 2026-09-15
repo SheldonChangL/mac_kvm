@@ -12,10 +12,10 @@ The source checker now fails closed when it finds:
 
 - `KVMCore` importing protocol adapters, concrete Apple networking modules, or macOS input frameworks;
 - `KVMContracts` importing protocol, platform, or concrete networking modules;
-- `KVMContracts` naming reviewed macOS, Windows, X11, evdev, or Wayland key/input types;
+- `KVMContracts` naming reviewed macOS, Windows, X11, evdev, or Wayland key/input types and key-code constants;
 - Barrier or Native protocol modules importing `MacPlatform` or macOS input frameworks;
 - Barrier or Native protocol modules importing concrete Apple networking modules;
-- Barrier or Native protocol modules naming reviewed concrete stream/socket types or calling POSIX `socket` directly;
+- Barrier or Native protocol modules naming reviewed Network/Core Foundation/Foundation concrete stream/socket types or calling POSIX `socket` directly;
 - platform backends importing protocol implementation modules; or
 - Barrier wire identifiers outside `BarrierCompatibility`, including platform backends.
 

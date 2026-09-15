@@ -63,6 +63,7 @@ class ArchitectureCheckTests(unittest.TestCase):
             "AppKit",
             "CoreGraphics",
             "ApplicationServices",
+            "IOKit",
             "Network",
         ):
             with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
@@ -104,7 +105,13 @@ class ArchitectureCheckTests(unittest.TestCase):
             "Packages/BarrierCompatibility/Sources/BarrierCompatibility",
             "Packages/NativeProtocol/Sources/NativeProtocol",
         ):
-            for module in ("MacPlatform", "AppKit", "CoreGraphics", "ApplicationServices"):
+            for module in (
+                "MacPlatform",
+                "AppKit",
+                "CoreGraphics",
+                "ApplicationServices",
+                "IOKit",
+            ):
                 with self.subTest(
                     protocol_root=protocol_root, module=module
                 ), tempfile.TemporaryDirectory() as temporary_directory:
@@ -140,6 +147,9 @@ class ArchitectureCheckTests(unittest.TestCase):
             "NWListener",
             "NWTCPConnection",
             "CFSocket",
+            "URLSession",
+            "URLSessionTask",
+            "URLSessionWebSocketTask",
             "URLSessionStreamTask",
             "InputStream",
             "OutputStream",
@@ -178,6 +188,7 @@ class ArchitectureCheckTests(unittest.TestCase):
             "AppKit",
             "CoreGraphics",
             "ApplicationServices",
+            "IOKit",
             "Network",
             "BarrierCompatibility",
             "NativeProtocol",
@@ -213,6 +224,25 @@ class ArchitectureCheckTests(unittest.TestCase):
 
             self.assertEqual(len(violations), 1)
             self.assertEqual(violations[0].rule, "contracts-platform-type")
+            self.assertEqual(violations[0].detail, symbol)
+
+    def test_contracts_reject_platform_key_code_constants(self):
+        for symbol in (
+            "kVK_Return",
+            "VK_RETURN",
+            "KEY_ENTER",
+            "BTN_LEFT",
+            "XK_Return",
+        ):
+            with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"let platformCode = {symbol}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-platform-code")
             self.assertEqual(violations[0].detail, symbol)
 
     def test_platform_backend_rejects_barrier_wire_identifiers(self):

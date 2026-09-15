@@ -26,6 +26,7 @@ FORBIDDEN_KVMCORE_IMPORTS = (
     "BarrierCompatibility",
     "CFNetwork",
     "CoreGraphics",
+    "IOKit",
     "NativeProtocol",
     "Network",
     "NetworkExtension",
@@ -36,6 +37,7 @@ FORBIDDEN_CONTRACT_IMPORTS = (
     "BarrierCompatibility",
     "CFNetwork",
     "CoreGraphics",
+    "IOKit",
     "MacPlatform",
     "NativeProtocol",
     "Network",
@@ -45,6 +47,7 @@ PROTOCOL_PLATFORM_IMPORTS = (
     "ApplicationServices",
     "AppKit",
     "CoreGraphics",
+    "IOKit",
     "MacPlatform",
 )
 CONCRETE_NETWORK_IMPORTS = (
@@ -74,7 +77,13 @@ CONCRETE_TRANSPORT_TYPES = (
     "NWListener",
     "NWTCPConnection",
     "OutputStream",
+    "URLSession",
+    "URLSessionDataTask",
+    "URLSessionDownloadTask",
     "URLSessionStreamTask",
+    "URLSessionTask",
+    "URLSessionUploadTask",
+    "URLSessionWebSocketTask",
 )
 BARRIER_TOKENS = ("CINN", "COUT", "DKDN", "DMMV")
 
@@ -89,6 +98,9 @@ TOKEN_PATTERN = re.compile(
 )
 CONTRACT_PLATFORM_TYPE_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, CONTRACT_PLATFORM_TYPES)) + r")\b"
+)
+CONTRACT_PLATFORM_CODE_PATTERN = re.compile(
+    r"\b((?:kVK|VK|KEY|BTN|XK)_[A-Za-z0-9_]+)\b"
 )
 CONCRETE_TRANSPORT_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, CONCRETE_TRANSPORT_TYPES)) + r")\b"
@@ -223,6 +235,15 @@ def scan_repository(repository_root: Path) -> List[Violation]:
                                 line=line_number,
                                 rule="contracts-platform-type",
                                 detail=type_match.group(1),
+                            )
+                        )
+                    for code_match in CONTRACT_PLATFORM_CODE_PATTERN.finditer(line):
+                        violations.append(
+                            Violation(
+                                path=relative_path,
+                                line=line_number,
+                                rule="contracts-platform-code",
+                                detail=code_match.group(1),
                             )
                         )
 
