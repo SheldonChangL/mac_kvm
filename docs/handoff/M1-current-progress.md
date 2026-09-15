@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-16 07:23 Asia/Taipei
+Updated: 2026-09-16 07:42 Asia/Taipei
 
 ## Objective and authorization
 
@@ -74,6 +74,7 @@ Current merged repository capabilities:
 - fail-fast local/GitHub manifest, test, and native-build gate with machine-readable reports
 - pinned formatter and warnings-as-errors code-quality gate
 - fail-closed source-level architecture boundary gate
+- canonical tracked Markdown/JSON docs gate
 - strict `main` protection requiring GitHub Actions `build-test-manifest`
 
 Last merged full results at M1-010:
@@ -90,50 +91,53 @@ Last merged full results at M1-010:
 
 Corrective M1-CI-001 was merged through [PR #228](https://github.com/SheldonChangL/mac_kvm/pull/228) as `f31a06cfe5a74f4c8a8397cf4e284d45d04883b5`. Its PR-head and post-merge GitHub runs both passed with check-run annotations count 0.
 
-## Active work: M1-DOCS-001
+Corrective M1-DOCS-001 was merged through [PR #231](https://github.com/SheldonChangL/mac_kvm/pull/231) as `2e8ba3085d2b6a319a93c84081a9989b7a1ff97d`. Its PR-head and post-merge GitHub runs both passed all eleven gates with check-run annotations count 0.
 
-- GitHub Issue: [#230](https://github.com/SheldonChangL/mac_kvm/issues/230)
-- Branch: `feat/m1-docs-001-docs-check`
-- Base/current merged HEAD: `ff8982663f46c3cce2ee83624c492715da732049`
-- Implementation commit: `18587b7a7478608e92b12e0168a767d7c263ca8f`
+## Active work: M1-ARCH-001
+
+- GitHub Issue: [#234](https://github.com/SheldonChangL/mac_kvm/issues/234)
+- Branch: `fix/m1-arch-001-complete-boundaries`
+- Base/current merged HEAD: `2e8ba3085d2b6a319a93c84081a9989b7a1ff97d`
+- Implementation commits: `45fccf31c64ebae40c4a20a9ed6944745ffdba4b`, `7ca7b7a2e78a74c18597078a3e7ad7508b17b481`, `24860cc81894bf0d77e6c1bbef063ab8d95b045b`
 - PR: not created yet
-- Docs-check unit tests: **12/12 passed**
-- Local `make docs-check`: **passed**
-- Local `make verify`: **11/11 gates passed** at `18587b7a7478608e92b12e0168a767d7c263ca8f`
+- Architecture-check unit tests: **26/26 passed** after the initial 8-failure TDD red run and 5-case independent re-review red probe
+- Independent corrective re-review: **Critical 0 / High 0 / Medium 0 / Low 0** at `24860cc81894bf0d77e6c1bbef063ab8d95b045b`
+- Local `make architecture-check`: **passed**
+- Local `make verify`: **11/11 gates passed** at `24860cc81894bf0d77e6c1bbef063ab8d95b045b`
 - Repository visibility: public; strict branch protection active
 
-Committed M1-DOCS-001 implementation:
+Committed M1-ARCH-001 implementation:
 
-- deterministically validate Git-tracked Markdown and JSON only
-- enforce UTF-8, LF-only, no trailing whitespace, exactly one final newline, balanced fences, JSON syntax, and duplicate-key rejection
-- fail closed on Git/file errors, timeouts, symlinks, and cancellation without logging document content
-- expose identical `make docs-check` locally and in GitHub CI
-- add the docs-check unit/integration suite to the cumulative CI gate
-- remove the lone unmatched opening fence in `MacKVM_Implementation_Package_v2/MILESTONES.md`
+- reject KVMCore concrete networking imports, including scoped/access-controlled imports
+- reject protocol-to-platform and platform-to-protocol imports
+- reject protocol concrete-network imports, socket/stream ownership, and direct `socket` calls
+- reject KVMContracts protocol/platform/network imports and reviewed platform key/input types/codes
+- include previously missed IOKit and Foundation URLSession transport paths
+- preserve Barrier token containment and require the future Native wire-defining Issue to extend the explicit catalog
+- preserve all existing UTF-8, symlink, missing-root, cancellation, Make, and CI checks
 
-Latest M1-DOCS-001 validation:
+Latest M1-ARCH-001 validation:
 
 ```text
-python3 -m unittest discover -s Tools/docs-check/tests -p 'test_*.py' -v
-exit 0; 12/12 passed
+python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' -v
+exit 0; 26/26 passed
 
-make docs-check
-exit 0; docs check OK
+make architecture-check
+exit 0; architecture check OK
 
-make verify REPORT=artifacts/ci/m1-docs-001-report.json
+make verify REPORT=artifacts/ci/m1-arch-001-report.json
 exit 0; all 11 gates passed
 ```
 
-No runtime feature or public contract changed. Protected PR-head CI, five-axis review, protected merge, and post-merge main CI remain pending.
+No runtime feature or public contract changed. The original M1-002 High is independently verified as fully resolved. Protected PR-head CI, merge review, protected merge, and post-merge main CI remain pending.
 
 ## Immediate handoff checklist
 
-1. Commit `evidence/issues/M1-DOCS-001/` plus this handoff update.
-2. Push and create a Draft PR referencing #230 with Make/CI/docs repair/evidence/handoff additions disclosed.
+1. Commit `evidence/issues/M1-ARCH-001/` plus this handoff update.
+2. Push and create a Draft PR referencing #234 and blocking backfill Issue #232.
 3. Require the protected GitHub check and all eleven machine-report gates to pass with zero annotations.
-4. Perform current-head five-axis review; Tier B requires complete review and Critical=0/High=0.
-5. Merge only through the protected PR path, verify post-merge main CI, and audit Issue #230.
-6. Begin formal bootstrap backfill and then proceed with M1-011 in dependency order.
+4. Perform current-head five-axis merge review; merge only with Critical=0/High=0.
+5. Verify post-merge main CI, audit Issue #234, then resume #232.
 
 ## Next tooling-bootstrap order
 
@@ -141,8 +145,10 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-DOCS-001 docs checker | #230 | unblocks formal bootstrap backfill and documentation Issues |
-| M1-011 next planned Issue | #18 | proceed after docs gate and applicable backfill sequencing |
+| M1-ARCH-001 complete boundaries | #234 | blocks M1-002 backfill because independent review found High 1 |
+| M1-BACKFILL-001 | #232 | resumes after #234; records formal gates and independent reviews |
+| M1-CONTRACT-001 test hardening | #233 | resolves two tracked Medium findings before M1 completion |
+| M1-011 next planned Issue | #18 | proceeds after formal backfill is clean |
 
 Use the Standing Authorization to create the real tools, not a long-lived waiver. A reasonable end state is:
 

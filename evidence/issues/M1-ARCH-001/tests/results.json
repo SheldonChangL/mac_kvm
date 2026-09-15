@@ -1,0 +1,59 @@
+{
+  "issue": "M1-ARCH-001",
+  "implementationCommit": "24860cc81894bf0d77e6c1bbef063ab8d95b045b",
+  "architectureCheckUnitTests": {
+    "testsRun": 26,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "fullVerify": {
+    "gatesRun": 11,
+    "failures": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": {
+    "testsRun": 23,
+    "expectedFailures": 8,
+    "coveredMissingRules": [
+      "KVMCore Network import",
+      "scoped Network import",
+      "protocol platform import",
+      "protocol concrete networking import",
+      "protocol concrete transport type",
+      "direct POSIX socket call",
+      "KVMContracts forbidden import",
+      "KVMContracts platform key/input type"
+    ]
+  },
+  "independentReReviewRedEvidence": {
+    "expectedFailures": 5,
+    "coveredRemainingRules": [
+      "KVMCore IOKit import",
+      "protocol IOKit import",
+      "Foundation URLSession concrete transport",
+      "Windows VK constant in KVMContracts",
+      "Linux evdev constant in KVMContracts"
+    ]
+  },
+  "secondIndependentReReviewRedEvidence": {
+    "highCases": [
+      "CFReadStream and CFWriteStream ownership",
+      "Core Foundation socket stream-pair creation"
+    ],
+    "mediumCases": [
+      "WinSDK import in KVMContracts/Core/protocol modules",
+      "XF86XK media-key constant in KVMContracts"
+    ]
+  },
+  "coverage": [
+    "plain, attributed, scoped, and access-controlled Swift imports",
+    "KVMCore protocol, networking, and input-framework isolation",
+    "protocol module platform and concrete-network isolation",
+    "concrete socket/stream ownership and direct socket calls",
+    "KVMContracts import, platform-type, and platform key-code isolation",
+    "platform backend protocol imports and Barrier wire identifiers",
+    "allowed Foundation, KVMContracts, KVMEvent, and abstract Transport vocabulary",
+    "existing fail-closed UTF-8, symlink, missing-root, and cancellation behavior"
+  ]
+}

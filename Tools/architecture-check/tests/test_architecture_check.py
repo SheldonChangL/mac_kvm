@@ -18,9 +18,14 @@ class ArchitectureCheckTests(unittest.TestCase):
     def make_repository(self, temporary_directory):
         root = Path(temporary_directory)
         (root / "Packages/KVMCore/Sources/KVMCore").mkdir(parents=True)
+        (root / "Packages/KVMContracts/Sources/KVMContracts").mkdir(parents=True)
         (root / "Packages/BarrierCompatibility/Sources/BarrierCompatibility").mkdir(
             parents=True
         )
+        (root / "Packages/NativeProtocol/Sources/NativeProtocol").mkdir(
+            parents=True
+        )
+        (root / "Packages/MacPlatform/Sources/MacPlatform").mkdir(parents=True)
         (root / "Packages/KVMCore/Sources/KVMCore/Core.swift").write_text(
             "import Foundation\n"
         )
@@ -53,7 +58,15 @@ class ArchitectureCheckTests(unittest.TestCase):
         self.assertEqual(violations[0].rule, "kvmcore-forbidden-import")
 
     def test_other_kvmcore_forbidden_imports_are_rejected(self):
-        for module in ("NativeProtocol", "AppKit", "CoreGraphics", "ApplicationServices"):
+        for module in (
+            "NativeProtocol",
+            "AppKit",
+            "CoreGraphics",
+            "ApplicationServices",
+            "IOKit",
+            "Network",
+            "WinSDK",
+        ):
             with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
                 root = self.make_repository(temporary_directory)
                 source = root / "Packages/KVMCore/Sources/KVMCore/Core.swift"
@@ -63,6 +76,224 @@ class ArchitectureCheckTests(unittest.TestCase):
 
             self.assertEqual(len(violations), 1)
             self.assertEqual(violations[0].rule, "kvmcore-forbidden-import")
+
+    def test_scoped_network_import_in_kvmcore_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            source = root / "Packages/KVMCore/Sources/KVMCore/Core.swift"
+            source.write_text("@_implementationOnly import class Network.NWConnection\n")
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0].rule, "kvmcore-forbidden-import")
+        self.assertEqual(violations[0].detail, "Network")
+
+    def test_access_controlled_network_import_in_kvmcore_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            source = root / "Packages/KVMCore/Sources/KVMCore/Core.swift"
+            source.write_text("public import Network\n")
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0].rule, "kvmcore-forbidden-import")
+        self.assertEqual(violations[0].detail, "Network")
+
+    def test_protocol_modules_cannot_import_platform_implementations(self):
+        for protocol_root in (
+            "Packages/BarrierCompatibility/Sources/BarrierCompatibility",
+            "Packages/NativeProtocol/Sources/NativeProtocol",
+        ):
+            for module in (
+                "MacPlatform",
+                "AppKit",
+                "CoreGraphics",
+                "ApplicationServices",
+                "IOKit",
+                "WinSDK",
+            ):
+                with self.subTest(
+                    protocol_root=protocol_root, module=module
+                ), tempfile.TemporaryDirectory() as temporary_directory:
+                    root = self.make_repository(temporary_directory)
+                    source = root / protocol_root / "Codec.swift"
+                    source.write_text(f"import {module}\n")
+
+                    violations = architecture_check.scan_repository(root)
+
+                self.assertEqual(len(violations), 1)
+                self.assertEqual(violations[0].rule, "protocol-platform-import")
+                self.assertEqual(violations[0].detail, module)
+
+    def test_protocol_modules_cannot_import_concrete_networking(self):
+        for module in ("Network", "NetworkExtension", "CFNetwork"):
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = (
+                    root
+                    / "Packages/NativeProtocol/Sources/NativeProtocol/Codec.swift"
+                )
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "protocol-concrete-network-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_protocol_modules_cannot_own_concrete_transport_types(self):
+        for symbol in (
+            "NWConnection",
+            "NWListener",
+            "NWTCPConnection",
+            "CFSocket",
+            "CFReadStream",
+            "CFWriteStream",
+            "CFStreamCreatePairWithSocket",
+            "CFStreamCreatePairWithSocketToHost",
+            "URLSession",
+            "URLSessionTask",
+            "URLSessionWebSocketTask",
+            "URLSessionStreamTask",
+            "InputStream",
+            "OutputStream",
+        ):
+            with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = (
+                    root
+                    / "Packages/BarrierCompatibility/Sources/BarrierCompatibility/Codec.swift"
+                )
+                source.write_text(f"private var transport: {symbol}?\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "protocol-concrete-transport")
+            self.assertEqual(violations[0].detail, symbol)
+
+    def test_protocol_modules_cannot_call_posix_socket_directly(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            source = (
+                root
+                / "Packages/NativeProtocol/Sources/NativeProtocol/Codec.swift"
+            )
+            source.write_text("let descriptor = socket(AF_INET, SOCK_STREAM, 0)\n")
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0].rule, "protocol-concrete-transport")
+        self.assertEqual(violations[0].detail, "socket")
+
+    def test_contracts_reject_platform_and_network_imports(self):
+        for module in (
+            "AppKit",
+            "CoreGraphics",
+            "ApplicationServices",
+            "IOKit",
+            "Network",
+            "WinSDK",
+            "BarrierCompatibility",
+            "NativeProtocol",
+        ):
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-forbidden-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_contracts_reject_platform_key_and_input_types(self):
+        for symbol in (
+            "CGKeyCode",
+            "CGEvent",
+            "NSEvent",
+            "KEYBDINPUT",
+            "KeySym",
+            "xkb_keycode_t",
+            "input_event",
+            "wl_keyboard",
+        ):
+            with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"struct Event {{ let raw: {symbol} }}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-platform-type")
+            self.assertEqual(violations[0].detail, symbol)
+
+    def test_contracts_reject_platform_key_code_constants(self):
+        for symbol in (
+            "kVK_Return",
+            "VK_RETURN",
+            "KEY_ENTER",
+            "BTN_LEFT",
+            "XK_Return",
+            "XF86XK_AudioMute",
+        ):
+            with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"let platformCode = {symbol}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-platform-code")
+            self.assertEqual(violations[0].detail, symbol)
+
+    def test_platform_backend_rejects_barrier_wire_identifiers(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            source = root / "Packages/MacPlatform/Sources/MacPlatform/Input.swift"
+            source.write_text('let wireIdentifier = "DKDN"\n')
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0].rule, "barrier-token-outside-adapter")
+
+    def test_platform_backend_cannot_import_protocol_implementations(self):
+        for module in ("BarrierCompatibility", "NativeProtocol"):
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_repository(temporary_directory)
+                source = root / "Packages/MacPlatform/Sources/MacPlatform/Input.swift"
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "platform-protocol-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_allowed_boundary_imports_and_abstract_transport_names_pass(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            (root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift").write_text(
+                "import Foundation\nstruct KVMEvent {}\n"
+            )
+            (
+                root
+                / "Packages/BarrierCompatibility/Sources/BarrierCompatibility/Codec.swift"
+            ).write_text("import KVMContracts\nstruct Codec { let transport: Transport }\n")
+            (root / "Packages/MacPlatform/Sources/MacPlatform/Input.swift").write_text(
+                "import KVMContracts\n"
+            )
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(violations, [])
 
     def test_barrier_tokens_outside_adapter_are_rejected(self):
         for token in ("DKDN", "DMMV", "CINN", "COUT"):
