@@ -12,7 +12,7 @@ M1-008 adds one fail-fast build/test/manifest gate used locally by `make verify`
 4. Swift Unit/Integration/System test-target verifier.
 5. Native macOS 14 arm64 build verifier.
 
-The first non-passing gate stops execution, marks later gates `not-run`, writes the report, and returns non-zero. A timeout terminates the spawned process group; cancellation terminates it and returns exit 130 after writing evidence.
+The first non-passing gate stops execution, marks later gates `not-run`, writes the report, and returns non-zero. A timeout terminates the spawned process group. Keyboard interruption and runner `SIGTERM` use the same cleanup path, return exit 130, and make a best-effort report write before the runner's forced-termination grace period ends.
 
 ## Report contract
 
@@ -46,3 +46,10 @@ M1-008 does not add format/lint policy or the architecture checker. M1-009 and M
 ## Rollback
 
 Revert the M1-008 PR and remove its required status check from branch protection in the same rollback operation. Do not leave a required context that no workflow can produce. No production runtime or user data is affected.
+
+## Verified upstream references
+
+- GitHub runner images: `https://github.com/actions/runner-images`
+- macOS 15 arm64 installed software: `https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md`
+- Checkout v4.4.0 immutable ref: `11d5960a326750d5838078e36cf38b85af677262`
+- Upload Artifact v4.6.2 immutable ref: `ea165f8d65b6e75b540449e92b4886f43607fa02`

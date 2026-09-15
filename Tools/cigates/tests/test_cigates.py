@@ -151,6 +151,34 @@ class CIGateTests(unittest.TestCase):
             all(gate["status"] == "not-run" for gate in payload["gates"][1:])
         )
 
+    def test_main_routes_sigterm_through_cancellation_cleanup(self):
+        previous_handler = object()
+
+        with mock.patch.object(
+            cigates.signal,
+            "signal",
+            side_effect=[previous_handler, previous_handler],
+        ) as install_handler, mock.patch.object(
+            cigates, "run_pipeline", return_value=0
+        ):
+            exit_code = cigates.main(
+                [
+                    "--repository-root",
+                    str(REPOSITORY_ROOT),
+                    "--report",
+                    "artifacts/ci/test-report.json",
+                ]
+            )
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(
+            install_handler.call_args_list,
+            [
+                mock.call(signal.SIGTERM, cigates.handle_termination_signal),
+                mock.call(signal.SIGTERM, previous_handler),
+            ],
+        )
+
     def test_missing_repository_root_returns_typed_exit(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             missing = Path(temporary_directory) / "missing"

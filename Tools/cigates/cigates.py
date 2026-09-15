@@ -22,6 +22,11 @@ EXIT_NOT_FOUND = 66
 EXIT_CANCELLED = 130
 
 
+def handle_termination_signal(signum, frame) -> None:
+    del signum, frame
+    raise KeyboardInterrupt
+
+
 def utc_now() -> str:
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds")
 
@@ -351,11 +356,17 @@ def main(arguments=None) -> int:
     report_path = Path(options.report)
     if not report_path.is_absolute():
         report_path = repository_root / report_path
-    return run_pipeline(
-        repository_root,
-        report_path,
-        timeout_seconds=options.timeout_seconds,
+    previous_sigterm_handler = signal.signal(
+        signal.SIGTERM, handle_termination_signal
     )
+    try:
+        return run_pipeline(
+            repository_root,
+            report_path,
+            timeout_seconds=options.timeout_seconds,
+        )
+    finally:
+        signal.signal(signal.SIGTERM, previous_sigterm_handler)
 
 
 if __name__ == "__main__":
