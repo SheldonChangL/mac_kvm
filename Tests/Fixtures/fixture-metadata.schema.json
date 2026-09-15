@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mackvm.invalid/schemas/fixture-metadata-v1.json",
+  "title": "MacKVM Fixture Metadata",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "fixtureId",
+    "protocol",
+    "provenance",
+    "payload",
+    "sanitization"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"
+    },
+    "protocol": {
+      "enum": [
+        "barrier",
+        "native"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "sourceKind",
+        "reference"
+      ],
+      "properties": {
+        "sourceKind": {
+          "enum": [
+            "public-specification",
+            "black-box-capture",
+            "synthetic"
+          ]
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "capturedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "byteLength"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9][A-Za-z0-9._/-]{0,255}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "sanitization": {
+      "type": "object",
+      "required": [
+        "status",
+        "containsSensitiveData",
+        "removedCategories"
+      ],
+      "properties": {
+        "status": {
+          "const": "sanitized"
+        },
+        "containsSensitiveData": {
+          "const": false
+        },
+        "removedCategories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "hostname",
+              "ip-address",
+              "typed-text",
+              "clipboard-payload",
+              "credential",
+              "key-material",
+              "other-private-data"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

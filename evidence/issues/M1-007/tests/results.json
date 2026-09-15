@@ -1,0 +1,41 @@
+{
+  "issue": "M1-007",
+  "implementationCommit": "6f2a5b4e5db5d38e81c559634c7517ec6dbecfd1",
+  "targetedContractTests": {
+    "testsRun": 9,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "repositoryContractSuite": {
+    "testsRun": 39,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "swiftTestTargets": {
+    "unitPassed": 1,
+    "integrationPassed": 1,
+    "systemSkipped": 1,
+    "systemSkipReason": "Requires explicit system-test opt-in",
+    "failures": 0,
+    "result": "passed"
+  },
+  "referenceKVMContracts": {
+    "testsRun": 3,
+    "failures": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": [
+    {
+      "test": "M1-007 scaffold suite before implementation",
+      "result": "1 failure and 7 errors because required targets, files, schema, and verifier did not exist"
+    },
+    {
+      "test": "test_nested_unit_permission_framework_import_is_rejected",
+      "observedReturnCode": 0,
+      "expectedReturnCode": 1,
+      "result": "failed before recursive import-scan fix as expected"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "issue": "M1-007",
+  "implementationCommit": "6f2a5b4e5db5d38e81c559634c7517ec6dbecfd1",
+  "commands": [
+    {
+      "command": "Tools/verify/M1-007-test-targets.sh",
+      "startedAt": "2026-09-15T00:37:11.525+00:00",
+      "endedAt": "2026-09-15T00:37:12.967+00:00",
+      "exitCode": 0,
+      "result": "Unit 1 passed; Integration 1 passed; System 1 skipped with explicit opt-in reason; verifier OK"
+    },
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_007_test_targets -v",
+      "startedAt": "2026-09-15T00:37:12.967+00:00",
+      "endedAt": "2026-09-15T00:37:15.901+00:00",
+      "exitCode": 0,
+      "result": "9 tests passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "startedAt": "2026-09-15T00:37:15.901+00:00",
+      "endedAt": "2026-09-15T00:37:23.075+00:00",
+      "exitCode": 0,
+      "result": "39 tests passed"
+    },
+    {
+      "command": "Tools/verify/M1-006-package-boundaries.sh",
+      "startedAt": "2026-09-15T00:37:23.075+00:00",
+      "endedAt": "2026-09-15T00:37:23.782+00:00",
+      "exitCode": 0,
+      "result": "M1-006 package boundaries OK"
+    },
+    {
+      "command": "Tools/verify/M1-005-mac-arm64-build.sh",
+      "startedAt": "2026-09-15T00:37:23.782+00:00",
+      "endedAt": "2026-09-15T00:37:24.795+00:00",
+      "exitCode": 0,
+      "result": "M1-005 macOS 14 arm64 build OK"
+    },
+    {
+      "command": "swift test --package-path MacKVM_Implementation_Package_v2/reference/KVMContracts",
+      "startedAt": "2026-09-15T00:37:24.795+00:00",
+      "endedAt": "2026-09-15T00:37:26.489+00:00",
+      "exitCode": 0,
+      "result": "3 tests passed"
+    },
+    {
+      "command": "python3 MacKVM_Implementation_Package_v2/tools/validate_package.py",
+      "startedAt": "2026-09-15T00:37:26.489+00:00",
+      "endedAt": "2026-09-15T00:37:26.564+00:00",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "bash -n Tools/verify/M1-007-test-targets.sh",
+      "startedAt": "2026-09-15T00:37:26.564+00:00",
+      "endedAt": "2026-09-15T00:37:26.569+00:00",
+      "exitCode": 0,
+      "result": "syntax valid"
+    },
+    {
+      "command": "python3 -m json.tool Tests/Fixtures/fixture-metadata.schema.json",
+      "startedAt": "2026-09-15T00:37:26.569+00:00",
+      "endedAt": "2026-09-15T00:37:26.604+00:00",
+      "exitCode": 0,
+      "result": "JSON valid"
+    },
+    {
+      "command": "git diff --check 20380eca4d8865c234c5d4b28451fa30fd2092aa..6f2a5b4",
+      "startedAt": "2026-09-15T00:37:26.604+00:00",
+      "endedAt": "2026-09-15T00:37:26.619+00:00",
+      "exitCode": 0,
+      "result": "no whitespace errors"
+    }
+  ]
+}
