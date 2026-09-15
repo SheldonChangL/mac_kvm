@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-010",
+  "commit": "6a86e21e5887924a08bc37166d611adc57a9c584",
+  "invocation": "make verify REPORT=artifacts/ci/m1-010-report.json",
+  "startedAt": "2026-09-15T07:25:22.493+00:00",
+  "endedAt": "2026-09-15T07:25:35.916+00:00",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "gates": [
+    {"name": "manifest-validation", "status": "passed", "exitCode": 0, "durationMs": 52},
+    {"name": "architecture-check", "status": "passed", "exitCode": 0, "durationMs": 41},
+    {"name": "architecture-check-unit-tests", "status": "passed", "exitCode": 0, "durationMs": 105},
+    {"name": "code-quality", "status": "passed", "exitCode": 0, "durationMs": 2660},
+    {"name": "code-quality-unit-tests", "status": "passed", "exitCode": 0, "durationMs": 61},
+    {"name": "ci-gate-unit-tests", "status": "passed", "exitCode": 0, "durationMs": 69},
+    {"name": "repository-contract-tests", "status": "passed", "exitCode": 0, "durationMs": 8102},
+    {"name": "swift-test-targets", "status": "passed", "exitCode": 0, "durationMs": 1035},
+    {"name": "native-arm64-build", "status": "passed", "exitCode": 0, "durationMs": 883}
+  ]
+}
