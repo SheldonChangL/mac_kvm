@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-15 15:12 Asia/Taipei
+Updated: 2026-09-15 15:25 Asia/Taipei
 
 ## Objective and authorization
 
@@ -82,42 +82,53 @@ Last merged full results at M1-008:
 - PR-head and post-merge GitHub Actions: passed
 - strict branch protection and targeted secret scan: verified
 
-## Active corrective work: M1-CI-001
+Corrective M1-CI-001 was merged through [PR #228](https://github.com/SheldonChangL/mac_kvm/pull/228) as `f31a06cfe5a74f4c8a8397cf4e284d45d04883b5`. Its PR-head and post-merge GitHub runs both passed with check-run annotations count 0.
 
-- GitHub Issue: [#227](https://github.com/SheldonChangL/mac_kvm/issues/227)
-- Branch: `fix/m1-ci-node24-actions`
-- Base/current merged HEAD: `35ae3e390616af983c83f5cb8141bd18c342167f`
-- Implementation commit: `17470abd101001264ae9ab94eda44989b8808125`
+## Active work: M1-010
+
+- GitHub Issue: [#16](https://github.com/SheldonChangL/mac_kvm/issues/16)
+- Branch: `feat/m1-010-architecture-check`
+- Base/current merged HEAD: `f31a06cfe5a74f4c8a8397cf4e284d45d04883b5`
+- Implementation commit: `6a86e21e5887924a08bc37166d611adc57a9c584`
 - PR: not created yet
+- Architecture-check unit tests: **14/14 passed**
+- Code-quality unit tests: **9/9 passed**
 - CI-gate unit tests: **10/10 passed**
-- Local `make verify`: **6/6 gates passed** at `17470abd101001264ae9ab94eda44989b8808125`
+- Repository contracts: **39/39 passed**
+- Local `make verify`: **9/9 gates passed** at `6a86e21e5887924a08bc37166d611adc57a9c584`
 - Repository visibility: public; strict branch protection active
 
-Committed corrective implementation:
+Committed M1-010 implementation:
 
-- replace the two Node 20 action refs with official v7.0.1 Node 24 commits
-- preserve immutable SHA pinning and all workflow permissions/security behavior
-- update the CI contract test and tooling documentation
+- reject plain/attributed BarrierCompatibility, NativeProtocol, and platform input imports in KVMCore
+- reject canonical Barrier tokens outside the sole `Packages/BarrierCompatibility` allowlist
+- fail closed on missing KVMCore, invalid UTF-8, and file/directory symlinks
+- expose identical `make architecture-check` locally and in GitHub CI
+- add both architecture-check and code-quality tooling unit suites to the cumulative CI gate
 
-Latest corrective validation:
+Latest M1-010 validation:
 
 ```text
-python3 -m unittest Tools/cigates/tests/test_cigates.py -v
-exit 0; 10/10 passed
+python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' -v
+exit 0; 14/14 passed
 
-make verify REPORT=artifacts/ci/m1-ci-node24-report.json
-exit 0; all 6 gates passed
+make architecture-check
+exit 0; architecture check OK
+
+make verify REPORT=artifacts/ci/m1-010-report.json
+exit 0; all 9 gates passed
 ```
 
-The correction was triggered by the Node 20 deprecation annotation on successful M1-009 post-merge run 34940209487. PR-head and post-merge GitHub runs must show no such annotation before #227 closes.
+No runtime feature or public contract changed. The initial token catalog is intentionally the four canonical Issue/guardrail examples and must be explicitly extended by later Barrier-token PRs.
 
 ## Immediate handoff checklist
 
-1. Commit `evidence/issues/M1-CI-001/` plus this handoff update.
-2. Push and create a Draft PR referencing #227.
-3. Require the protected GitHub check to pass and verify no Node 20 annotation exists.
-4. Perform current-head five-axis review, mark Ready only with Critical=0/High=0, and merge through the protected PR path.
-5. Verify post-merge main CI also has no Node 20 annotation, close/audit #227, then continue M1-010 (#16).
+1. Commit `evidence/issues/M1-010/` plus this handoff update.
+2. Push and create a Draft PR referencing #16 with Make/CI/evidence/handoff additions disclosed.
+3. Require the protected GitHub check and all nine machine-report gates to pass with zero annotations.
+4. Perform current-head five-axis review; Tier B requires complete review and Critical=0/High=0.
+5. Merge only through the protected PR path, verify post-merge main CI, and audit Issue #16.
+6. Establish the remaining `make docs-check` command if no later owning Issue exists, then begin formal bootstrap backfill before proceeding with the next dependency-eligible product Issue.
 
 ## Next tooling-bootstrap order
 
@@ -125,7 +136,6 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-009 format/lint/warnings | #15 | depends on M1-008 |
 | M1-010 architecture checker | #16 | depends on M1-006 and M1-008 |
 
 Use the Standing Authorization to create the real tools, not a long-lived waiver. A reasonable end state is:

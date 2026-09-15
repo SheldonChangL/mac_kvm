@@ -1,0 +1,47 @@
+{
+  "issue": "M1-010",
+  "implementationCommit": "6a86e21e5887924a08bc37166d611adc57a9c584",
+  "architectureCheckUnitTests": {
+    "testsRun": 14,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "ciGateUnitTests": {
+    "testsRun": 10,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "codeQualityUnitTests": {
+    "testsRun": 9,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "repositoryContractTests": {
+    "testsRun": 39,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": [
+    "initial suite failed import because the architecture checker did not exist",
+    "Make/CI integration assertion failed before the canonical command was wired",
+    "attributed Swift import escaped the first import regex",
+    "directory symlink escaped the first file-only symlink check",
+    "tooling unit suites were absent from the cumulative CI gate"
+  ],
+  "coverage": [
+    "current repository happy path",
+    "plain and attributed forbidden imports",
+    "canonical Barrier tokens outside adapter",
+    "explicit adapter allowlist",
+    "token word boundary",
+    "missing repository and KVMCore roots",
+    "invalid UTF-8",
+    "file and directory symlinks",
+    "SIGTERM/cancellation",
+    "Make/CI command identity"
+  ]
+}
