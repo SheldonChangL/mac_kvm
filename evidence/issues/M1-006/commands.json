@@ -1,0 +1,63 @@
+{
+  "issue": "M1-006",
+  "implementationCommit": "f687b268467dd46ab3001ba2f1d406e09e49de6a",
+  "recordedAt": "2026-09-15T08:24:08+08:00",
+  "commands": [
+    {
+      "command": "Tools/verify/M1-006-package-boundaries.sh",
+      "startedAt": "2026-09-15T00:25:39.722+00:00",
+      "endedAt": "2026-09-15T00:25:41.275+00:00",
+      "exitCode": 0,
+      "result": "Build complete; M1-006 package boundaries OK"
+    },
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_006_package_boundaries -v",
+      "startedAt": "2026-09-15T00:25:41.275+00:00",
+      "endedAt": "2026-09-15T00:25:43.762+00:00",
+      "exitCode": 0,
+      "result": "8 tests passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "startedAt": "2026-09-15T00:25:43.762+00:00",
+      "endedAt": "2026-09-15T00:25:48.170+00:00",
+      "exitCode": 0,
+      "result": "30 tests passed"
+    },
+    {
+      "command": "Tools/verify/M1-005-mac-arm64-build.sh",
+      "startedAt": "2026-09-15T00:25:48.170+00:00",
+      "endedAt": "2026-09-15T00:25:49.097+00:00",
+      "exitCode": 0,
+      "result": "M1-005 macOS 14 arm64 build OK"
+    },
+    {
+      "command": "swift test --package-path MacKVM_Implementation_Package_v2/reference/KVMContracts",
+      "startedAt": "2026-09-15T00:25:49.097+00:00",
+      "endedAt": "2026-09-15T00:25:55.035+00:00",
+      "exitCode": 0,
+      "result": "3 tests passed"
+    },
+    {
+      "command": "python3 MacKVM_Implementation_Package_v2/tools/validate_package.py",
+      "startedAt": "2026-09-15T00:25:55.035+00:00",
+      "endedAt": "2026-09-15T00:25:55.087+00:00",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "bash -n Tools/verify/M1-006-package-boundaries.sh",
+      "startedAt": "2026-09-15T00:26:04.079+00:00",
+      "endedAt": "2026-09-15T00:26:04.082+00:00",
+      "exitCode": 0,
+      "result": "syntax valid"
+    },
+    {
+      "command": "git diff --check 469f02e94a1d9bde07aafb36829c95d0cc0651dd..f687b268467dd46ab3001ba2f1d406e09e49de6a",
+      "startedAt": "2026-09-15T00:26:04.082+00:00",
+      "endedAt": "2026-09-15T00:26:04.098+00:00",
+      "exitCode": 0,
+      "result": "no whitespace errors"
+    }
+  ]
+}

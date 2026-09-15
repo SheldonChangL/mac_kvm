@@ -1,0 +1,30 @@
+{
+  "issue": "M1-006",
+  "implementationCommit": "f687b268467dd46ab3001ba2f1d406e09e49de6a",
+  "targeted": {
+    "framework": "python unittest",
+    "testsRun": 8,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "repositoryContractSuite": {
+    "framework": "python unittest",
+    "testsRun": 30,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "referenceKVMContracts": {
+    "framework": "Swift Testing",
+    "testsRun": 3,
+    "failures": 0,
+    "result": "passed"
+  },
+  "tddRedEvidence": {
+    "test": "test_extra_app_dependency_is_rejected",
+    "observedReturnCode": 0,
+    "expectedReturnCode": 1,
+    "result": "failed before verifier fix as expected"
+  }
+}
