@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-15 08:24 Asia/Taipei
+Updated: 2026-09-15 08:37 Asia/Taipei
 
 ## Objective and authorization
 
@@ -30,7 +30,7 @@ Canonical architecture that must remain true:
 
 ## Completed progress
 
-M1 progress: **5 of 70 Issues merged and closed; 65 open**.
+M1 progress: **6 of 70 Issues merged and closed; 64 open**.
 
 | Issue | GitHub Issue | PR | Merge commit | Review result |
 |---|---:|---:|---|---|
@@ -39,6 +39,7 @@ M1 progress: **5 of 70 Issues merged and closed; 65 open**.
 | M1-003 | #3 | [#220](https://github.com/SheldonChangL/mac_kvm/pull/220) | `e35988a3b508d405f18bc4dea1d171e855f58d15` | Critical 0 / High 0; canonical §55 added; formal backfill pending |
 | M1-004 | #4 | [#221](https://github.com/SheldonChangL/mac_kvm/pull/221) | `64b5cd5460b229de8ebda0b7d9682d1a529fb4da` | Critical 0 / High 0; one Medium resolved by M1-005 |
 | M1-005 | #6 | [#222](https://github.com/SheldonChangL/mac_kvm/pull/222) | `469f02e94a1d9bde07aafb36829c95d0cc0651dd` | Critical 0 / High 0 / Medium 0 |
+| M1-006 | #7 | [#223](https://github.com/SheldonChangL/mac_kvm/pull/223) | `20380eca4d8865c234c5d4b28451fa30fd2092aa` | Critical 0 / High 0 / Medium 0 |
 
 Five-axis review evidence:
 
@@ -47,6 +48,7 @@ Five-axis review evidence:
 - PR #220: https://github.com/SheldonChangL/mac_kvm/pull/220#issuecomment-5660072578
 - PR #221: https://github.com/SheldonChangL/mac_kvm/pull/221#issuecomment-5660176702
 - PR #222: https://github.com/SheldonChangL/mac_kvm/pull/222#issuecomment-5660279559
+- PR #223: https://github.com/SheldonChangL/mac_kvm/pull/223#issuecomment-5672809595
 
 Current merged repository capabilities:
 
@@ -57,68 +59,57 @@ Current merged repository capabilities:
 - macOS 14+ / native arm64 / non-Rosetta build verifier
 - Mach-O verification for exact `arm64` and `LC_BUILD_VERSION minos 14.0`
 - executed x86_64-host and Rosetta fail-closed test simulations
+- five comment-only Swift module boundaries with exact one-way manifest dependencies
+- M1-006 fail-closed graph verifier and evidence package
 
-Last merged full results at M1-005:
+Last merged full results at M1-006:
 
-- contract tests: 22/22 passed
+- contract tests: 30/30 passed
 - reference KVMContracts Swift tests: 3/3 passed
 - package validator: `PACKAGE OK: 217 issues, 5 milestones, 17 epics`
 - native build verifier: passed
 - diff check and targeted secret scan: passed
 
-## Active work: M1-006
+## Active work: M1-007
 
-- GitHub Issue: [#7](https://github.com/SheldonChangL/mac_kvm/issues/7)
-- Branch: `feat/m1-006-package-boundaries`
-- Base/current committed HEAD: `469f02e94a1d9bde07aafb36829c95d0cc0651dd`
-- Implementation commit: `f687b268467dd46ab3001ba2f1d406e09e49de6a`
+- GitHub Issue: [#9](https://github.com/SheldonChangL/mac_kvm/issues/9)
+- Branch: `feat/m1-007-test-targets`
+- Base/current merged HEAD: `20380eca4d8865c234c5d4b28451fa30fd2092aa`
+- Implementation commit: `6f2a5b4e5db5d38e81c559634c7517ec6dbecfd1`
 - PR: not created yet
-- Current targeted tests: **8/8 passed**
-- Current full contract suite: **30/30 passed**
+- Current targeted tests: **9/9 passed**
+- Current full contract suite: **39/39 passed**
 
-Committed M1-006 implementation:
+Committed M1-007 implementation:
 
-- modify `Package.swift`
-- delete `Packages/.gitkeep`
-- add empty-source module roots:
-  - `Packages/KVMContracts/Sources/KVMContracts/KVMContracts.swift`
-  - `Packages/KVMCore/Sources/KVMCore/KVMCore.swift`
-  - `Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierCompatibility.swift`
-  - `Packages/MacPlatform/Sources/MacPlatform/MacPlatform.swift`
-  - `Packages/NativeProtocol/Sources/NativeProtocol/NativeProtocol.swift`
-- add `Tests/Contracts/test_m1_006_package_boundaries.py`
-- add executable `Tools/verify/M1-006-package-boundaries.sh`
-- add `docs/build/M1-006-package-boundaries.md`
-- add this owner-requested handoff document; keep its scope expansion explicit in the M1-006 PR or commit it separately before the PR
+- add Unit, Integration, and explicitly skippable System SwiftPM test targets
+- prohibit OS permission framework imports throughout the Unit test tree
+- add empty Barrier/Native fixture roots
+- add fixture metadata schema version 1 with provenance, SHA-256/length, relative-path, and privacy constraints
+- add fail-closed verifier, contract tests, architecture docs, and evidence
 
-Intended dependency graph:
+Latest M1-007 validation:
 
 ```text
-MacKVM app shell
-├── KVMCore ───────────────→ KVMContracts
-├── BarrierCompatibility ──→ KVMContracts
-├── MacPlatform ───────────→ KVMContracts
-└── NativeProtocol ────────→ KVMContracts
+python3 -m unittest Tests.Contracts.test_m1_007_test_targets -v
+exit 0; 9/9 passed
+
+python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v
+exit 0; 39/39 passed
+
+Tools/verify/M1-007-test-targets.sh
+exit 0; Unit 1 passed, Integration 1 passed, System 1 skipped with explicit reason
 ```
 
-Module source files contain comments only. Do not add `KVMEvent`, Transport, session behavior, protocol bytes, platform APIs, or public symbols in M1-006; later Issues own those contracts.
-
-Latest M1-006 targeted validation:
-
-```text
-python3 -m unittest Tests.Contracts.test_m1_006_package_boundaries -v
-exit 0; 8/8 passed
-```
-
-Negative tests create temporary packages and verify that a `KVMCore` → `BarrierCompatibility` edge and an extra App dependency are rejected. Temporary content is automatically cleaned up.
+No actual protocol fixture or wire byte was added. Barrier captures remain owned by M1-024/M1-040; Native encoding remains blocked on its owning decisions and Issues.
 
 ## Immediate handoff checklist
 
-1. Stage and commit `evidence/issues/M1-006/` plus this explicitly requested handoff document; preserve the Product Owner's untracked artifacts listed below.
-2. Push and create a Draft PR referencing Issue #7, and record the evidence/handoff scope expansions.
+1. Stage and commit `evidence/issues/M1-007/` plus this owner-requested handoff update; preserve the Product Owner's untracked artifacts listed below.
+2. Push and create a Draft PR referencing Issue #9, and record the source/fixture/test/evidence scope expansions.
 3. Re-read the remote PR head/diff, perform the five-axis review, and require Critical=0 and High=0.
 4. If mergeable and all current gates pass, mark Ready and merge through the PR only.
-5. Record merge/review/test results in Issue #7, close it, then continue dependency order.
+5. Record merge/review/test results in Issue #9, close it, then continue with M1-008.
 
 ## Next tooling-bootstrap order
 
