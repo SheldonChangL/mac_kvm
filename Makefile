@@ -1,7 +1,7 @@
 PYTHON ?= python3
 REPORT ?= artifacts/ci/m1-008-report.json
 
-.PHONY: verify backlog-check ci-gate-tests code-quality-check architecture-check
+.PHONY: verify backlog-check ci-gate-tests code-quality-check architecture-check docs-check
 
 verify:
 	$(PYTHON) Tools/cigates/cigates.py --repository-root . --report "$(REPORT)"
@@ -17,3 +17,6 @@ code-quality-check:
 
 architecture-check:
 	$(PYTHON) Tools/architecture-check/architecture-check.py --repository-root .
+
+docs-check:
+	$(PYTHON) Tools/docs-check/docs-check.py --repository-root .
