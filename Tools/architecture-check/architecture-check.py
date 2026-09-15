@@ -15,24 +15,84 @@ EXIT_CANCELLED = 130
 
 SOURCE_SCAN_ROOTS = ("Apps", "Packages", "reference")
 KVMCORE_ROOT = "Packages/KVMCore"
+KVMCONTRACTS_ROOT = "Packages/KVMContracts"
+PROTOCOL_ROOTS = ("Packages/BarrierCompatibility", "Packages/NativeProtocol")
+PLATFORM_ROOTS = ("Packages/MacPlatform",)
 BARRIER_TOKEN_ALLOWED_ROOTS = ("Packages/BarrierCompatibility",)
 
 FORBIDDEN_KVMCORE_IMPORTS = (
     "ApplicationServices",
     "AppKit",
     "BarrierCompatibility",
+    "CFNetwork",
     "CoreGraphics",
     "NativeProtocol",
+    "Network",
+    "NetworkExtension",
+)
+FORBIDDEN_CONTRACT_IMPORTS = (
+    "ApplicationServices",
+    "AppKit",
+    "BarrierCompatibility",
+    "CFNetwork",
+    "CoreGraphics",
+    "MacPlatform",
+    "NativeProtocol",
+    "Network",
+    "NetworkExtension",
+)
+PROTOCOL_PLATFORM_IMPORTS = (
+    "ApplicationServices",
+    "AppKit",
+    "CoreGraphics",
+    "MacPlatform",
+)
+CONCRETE_NETWORK_IMPORTS = (
+    "CFNetwork",
+    "Network",
+    "NetworkExtension",
+)
+PLATFORM_PROTOCOL_IMPORTS = (
+    "BarrierCompatibility",
+    "NativeProtocol",
+)
+CONTRACT_PLATFORM_TYPES = (
+    "CGEvent",
+    "CGKeyCode",
+    "KEYBDINPUT",
+    "KeySym",
+    "NSEvent",
+    "input_event",
+    "wl_keyboard",
+    "xkb_keycode_t",
+)
+CONCRETE_TRANSPORT_TYPES = (
+    "CFSocket",
+    "InputStream",
+    "NWConnection",
+    "NWConnectionGroup",
+    "NWListener",
+    "NWTCPConnection",
+    "OutputStream",
+    "URLSessionStreamTask",
 )
 BARRIER_TOKENS = ("CINN", "COUT", "DKDN", "DMMV")
 
 IMPORT_PATTERN = re.compile(
-    r"^\s*(?:@[A-Za-z_][A-Za-z0-9_]*(?:\([^)]*\))?\s+)*import\s+("
-    + "|".join(map(re.escape, FORBIDDEN_KVMCORE_IMPORTS))
-    + r")\b"
+    r"^\s*(?:@[A-Za-z_][A-Za-z0-9_]*(?:\([^)]*\))?\s+)*"
+    r"(?:(?:private|fileprivate|internal|package|public|open)\s+)?"
+    r"import\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\s+)?"
+    r"([A-Za-z_][A-Za-z0-9_]*)\b"
 )
 TOKEN_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, BARRIER_TOKENS)) + r")\b"
+)
+CONTRACT_PLATFORM_TYPE_PATTERN = re.compile(
+    r"\b(" + "|".join(map(re.escape, CONTRACT_PLATFORM_TYPES)) + r")\b"
+)
+CONCRETE_TRANSPORT_PATTERN = re.compile(
+    r"\b(" + "|".join(map(re.escape, CONCRETE_TRANSPORT_TYPES)) + r")\b"
+    r"|\b(socket)\s*\("
 )
 
 
@@ -121,19 +181,91 @@ def scan_repository(repository_root: Path) -> List[Violation]:
             for allowed_root in BARRIER_TOKEN_ALLOWED_ROOTS
         )
         path_is_kvmcore = is_within(relative_path, KVMCORE_ROOT)
+        path_is_contracts = is_within(relative_path, KVMCONTRACTS_ROOT)
+        path_is_protocol = any(
+            is_within(relative_path, protocol_root)
+            for protocol_root in PROTOCOL_ROOTS
+        )
+        path_is_platform = any(
+            is_within(relative_path, platform_root)
+            for platform_root in PLATFORM_ROOTS
+        )
 
         for line_number, line in enumerate(source.splitlines(), start=1):
-            if path_is_kvmcore:
-                import_match = IMPORT_PATTERN.match(line)
-                if import_match is not None:
+            import_match = IMPORT_PATTERN.match(line)
+            imported_module = import_match.group(1) if import_match else None
+
+            if path_is_kvmcore and imported_module in FORBIDDEN_KVMCORE_IMPORTS:
+                violations.append(
+                    Violation(
+                        path=relative_path,
+                        line=line_number,
+                        rule="kvmcore-forbidden-import",
+                        detail=imported_module,
+                    )
+                )
+
+            if path_is_contracts:
+                if imported_module in FORBIDDEN_CONTRACT_IMPORTS:
                     violations.append(
                         Violation(
                             path=relative_path,
                             line=line_number,
-                            rule="kvmcore-forbidden-import",
-                            detail=import_match.group(1),
+                            rule="contracts-forbidden-import",
+                            detail=imported_module,
                         )
                     )
+                if import_match is None:
+                    for type_match in CONTRACT_PLATFORM_TYPE_PATTERN.finditer(line):
+                        violations.append(
+                            Violation(
+                                path=relative_path,
+                                line=line_number,
+                                rule="contracts-platform-type",
+                                detail=type_match.group(1),
+                            )
+                        )
+
+            if path_is_protocol:
+                if imported_module in PROTOCOL_PLATFORM_IMPORTS:
+                    violations.append(
+                        Violation(
+                            path=relative_path,
+                            line=line_number,
+                            rule="protocol-platform-import",
+                            detail=imported_module,
+                        )
+                    )
+                elif imported_module in CONCRETE_NETWORK_IMPORTS:
+                    violations.append(
+                        Violation(
+                            path=relative_path,
+                            line=line_number,
+                            rule="protocol-concrete-network-import",
+                            detail=imported_module,
+                        )
+                    )
+                elif import_match is None:
+                    for transport_match in CONCRETE_TRANSPORT_PATTERN.finditer(line):
+                        detail = transport_match.group(1) or transport_match.group(2)
+                        violations.append(
+                            Violation(
+                                path=relative_path,
+                                line=line_number,
+                                rule="protocol-concrete-transport",
+                                detail=detail,
+                            )
+                        )
+
+            if path_is_platform and imported_module in PLATFORM_PROTOCOL_IMPORTS:
+                violations.append(
+                    Violation(
+                        path=relative_path,
+                        line=line_number,
+                        rule="platform-protocol-import",
+                        detail=imported_module,
+                    )
+                )
 
             if not token_is_allowed:
                 for token_match in TOKEN_PATTERN.finditer(line):
