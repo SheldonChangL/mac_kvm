@@ -27,6 +27,18 @@ class M1006PackageBoundaryTests(unittest.TestCase):
             check=False,
         )
 
+    def copy_package_fixture(self, temporary_root):
+        shutil.copy2(PACKAGE_MANIFEST, temporary_root / "Package.swift")
+        shutil.copytree(REPOSITORY_ROOT / "Apps", temporary_root / "Apps")
+        shutil.copytree(REPOSITORY_ROOT / "Packages", temporary_root / "Packages")
+        shutil.copytree(REPOSITORY_ROOT / "Tests", temporary_root / "Tests")
+
+    def replace_manifest_once(self, temporary_root, original, replacement):
+        manifest_path = temporary_root / "Package.swift"
+        manifest = manifest_path.read_text()
+        self.assertEqual(manifest.count(original), 1)
+        manifest_path.write_text(manifest.replace(original, replacement, 1))
+
     def test_package_boundary_verifier_passes(self):
         result = self.run_verifier()
 
@@ -72,15 +84,12 @@ class M1006PackageBoundaryTests(unittest.TestCase):
     def test_kvm_core_protocol_dependency_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             temporary_root = Path(temporary_directory)
-            shutil.copy2(PACKAGE_MANIFEST, temporary_root / "Package.swift")
-            shutil.copytree(REPOSITORY_ROOT / "Apps", temporary_root / "Apps")
-            shutil.copytree(REPOSITORY_ROOT / "Packages", temporary_root / "Packages")
-            manifest = (temporary_root / "Package.swift").read_text()
-            manifest = manifest.replace(
-                'name: "KVMCore",\n            dependencies: ["KVMContracts"]',
-                'name: "KVMCore",\n            dependencies: ["KVMContracts", "BarrierCompatibility"]',
+            self.copy_package_fixture(temporary_root)
+            self.replace_manifest_once(
+                temporary_root,
+                'name: "KVMCore",\n      dependencies: ["KVMContracts"]',
+                'name: "KVMCore",\n      dependencies: ["KVMContracts", "BarrierCompatibility"]',
             )
-            (temporary_root / "Package.swift").write_text(manifest)
 
             result = self.run_verifier(temporary_root)
 
@@ -90,16 +99,12 @@ class M1006PackageBoundaryTests(unittest.TestCase):
     def test_extra_app_dependency_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             temporary_root = Path(temporary_directory)
-            shutil.copy2(PACKAGE_MANIFEST, temporary_root / "Package.swift")
-            shutil.copytree(REPOSITORY_ROOT / "Apps", temporary_root / "Apps")
-            shutil.copytree(REPOSITORY_ROOT / "Packages", temporary_root / "Packages")
-            manifest = (temporary_root / "Package.swift").read_text()
-            manifest = manifest.replace(
-                '"NativeProtocol",\n            ],',
-                '"NativeProtocol",\n                "KVMContracts",\n            ],',
-                1,
+            self.copy_package_fixture(temporary_root)
+            self.replace_manifest_once(
+                temporary_root,
+                '"MacPlatform",\n        "NativeProtocol",\n      ],\n      path: "Apps/macOS/MacKVM"',
+                '"MacPlatform",\n        "NativeProtocol",\n        "KVMContracts",\n      ],\n      path: "Apps/macOS/MacKVM"',
             )
-            (temporary_root / "Package.swift").write_text(manifest)
 
             result = self.run_verifier(temporary_root)
 

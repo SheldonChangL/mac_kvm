@@ -1,4 +1,4 @@
 @main
 struct MacKVMApplication {
-    static func main() {}
+  static func main() {}
 }

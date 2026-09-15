@@ -4,5 +4,5 @@ private let unitTargetRequiresOSPermission = false
 
 @Test("Unit test target requires no OS permission")
 func unitTestTargetRequiresNoOSPermission() {
-    #expect(unitTargetRequiresOSPermission == false)
+  #expect(unitTargetRequiresOSPermission == false)
 }

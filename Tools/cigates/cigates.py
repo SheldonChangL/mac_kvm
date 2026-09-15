@@ -160,6 +160,10 @@ def build_gate_specs() -> List[GateSpec]:
             ("python3", "Tools/Backlog/validate_package.py"),
         ),
         GateSpec(
+            "code-quality",
+            ("python3", "Tools/code-quality/code-quality.py"),
+        ),
+        GateSpec(
             "ci-gate-unit-tests",
             (
                 "python3",
