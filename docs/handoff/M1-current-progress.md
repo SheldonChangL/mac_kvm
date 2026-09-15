@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-15 15:02 Asia/Taipei
+Updated: 2026-09-15 15:12 Asia/Taipei
 
 ## Objective and authorization
 
@@ -30,7 +30,7 @@ Canonical architecture that must remain true:
 
 ## Completed progress
 
-M1 progress: **8 of 70 Issues merged and closed; 62 open**.
+M1 progress: **9 of 70 planned Issues merged and closed; 61 planned Issues open**. One corrective M1 CI Issue (#227) is active and is not part of the original 70-count backlog.
 
 | Issue | GitHub Issue | PR | Merge commit | Review result |
 |---|---:|---:|---|---|
@@ -42,6 +42,7 @@ M1 progress: **8 of 70 Issues merged and closed; 62 open**.
 | M1-006 | #7 | [#223](https://github.com/SheldonChangL/mac_kvm/pull/223) | `20380eca4d8865c234c5d4b28451fa30fd2092aa` | Critical 0 / High 0 / Medium 0 |
 | M1-007 | #9 | [#224](https://github.com/SheldonChangL/mac_kvm/pull/224) | `edb95b5bdfc2e7c81aca0e514273c02ca477891b` | Critical 0 / High 0 / Medium 0 / Low 0 |
 | M1-008 | #11 | [#225](https://github.com/SheldonChangL/mac_kvm/pull/225) | `4203d242548085a3651da5f7de0d53fcf8fc5632` | Critical 0 / High 0; two Medium tracked by M1-009/M1-010 |
+| M1-009 | #15 | [#226](https://github.com/SheldonChangL/mac_kvm/pull/226) | `35ae3e390616af983c83f5cb8141bd18c342167f` | Critical 0 / High 0; architecture Medium tracked by M1-010 |
 
 Five-axis review evidence:
 
@@ -53,6 +54,7 @@ Five-axis review evidence:
 - PR #223: https://github.com/SheldonChangL/mac_kvm/pull/223#issuecomment-5672809595
 - PR #224: https://github.com/SheldonChangL/mac_kvm/pull/224#issuecomment-5672910546
 - PR #225: https://github.com/SheldonChangL/mac_kvm/pull/225#issuecomment-5673322040
+- PR #226: https://github.com/SheldonChangL/mac_kvm/pull/226#issuecomment-5676222992
 
 Current merged repository capabilities:
 
@@ -80,52 +82,42 @@ Last merged full results at M1-008:
 - PR-head and post-merge GitHub Actions: passed
 - strict branch protection and targeted secret scan: verified
 
-## Active work: M1-009
+## Active corrective work: M1-CI-001
 
-- GitHub Issue: [#15](https://github.com/SheldonChangL/mac_kvm/issues/15)
-- Branch: `feat/m1-009-code-quality`
-- Base/current merged HEAD: `4203d242548085a3651da5f7de0d53fcf8fc5632`
-- Implementation commits: `4b0c8c41016cf772d3cc1ef1f7ed01386efdb18c`, `2eb3d08c0f6f114900e0d2941d2b62566350789f`
+- GitHub Issue: [#227](https://github.com/SheldonChangL/mac_kvm/issues/227)
+- Branch: `fix/m1-ci-node24-actions`
+- Base/current merged HEAD: `35ae3e390616af983c83f5cb8141bd18c342167f`
+- Implementation commit: `17470abd101001264ae9ab94eda44989b8808125`
 - PR: not created yet
-- Code-quality unit tests: **9/9 passed**
 - CI-gate unit tests: **10/10 passed**
-- Current full contract suite: **39/39 passed**
-- Local `make verify`: **6/6 gates passed** at `2eb3d08c0f6f114900e0d2941d2b62566350789f`
+- Local `make verify`: **6/6 gates passed** at `17470abd101001264ae9ab94eda44989b8808125`
 - Repository visibility: public; strict branch protection active
 
-Committed M1-009 implementation:
+Committed corrective implementation:
 
-- pin bundled `swift format` to exact version 6.2.3 under the CI-pinned Xcode 26.2 toolchain
-- run recursive strict Swift format lint across Package/Apps/Packages/Tests/reference
-- run all Swift targets/tests with compiler warnings promoted to errors
-- expose the same entrypoint through `make code-quality-check` and the GitHub CI pipeline
-- fail fast and clean process groups on timeout/cancellation/SIGTERM
-- mechanically normalize existing Swift scaffold formatting
-- harden prior negative contract fixtures so mutations are unique and temporary SwiftPM paths are complete
+- replace the two Node 20 action refs with official v7.0.1 Node 24 commits
+- preserve immutable SHA pinning and all workflow permissions/security behavior
+- update the CI contract test and tooling documentation
 
-Latest M1-009 validation:
+Latest corrective validation:
 
 ```text
-python3 -m unittest discover -s Tools/code-quality/tests -p 'test_*.py' -v
-exit 0; 9/9 passed
+python3 -m unittest Tools/cigates/tests/test_cigates.py -v
+exit 0; 10/10 passed
 
-make code-quality-check
-exit 0; formatter version, strict lint, and warnings-as-errors Swift tests passed
-
-make verify REPORT=artifacts/ci/m1-009-report.json
+make verify REPORT=artifacts/ci/m1-ci-node24-report.json
 exit 0; all 6 gates passed
 ```
 
-The first full run correctly failed three old contract tests after canonical formatting. The fixes preserve and strengthen the original assertions: M1-004 expects canonical formatting, and M1-006 confirms each manifest mutation is unique while copying all current SwiftPM target paths.
+The correction was triggered by the Node 20 deprecation annotation on successful M1-009 post-merge run 34940209487. PR-head and post-merge GitHub runs must show no such annotation before #227 closes.
 
 ## Immediate handoff checklist
 
-1. Commit `evidence/issues/M1-009/` plus this handoff update; preserve the Product Owner's untracked artifacts listed below.
-2. Push and create a Draft PR referencing Issue #15 with all non-Exact-File mechanical/tooling additions disclosed.
-3. Require the protected GitHub `build-test-manifest` check to pass with the new code-quality gate.
-4. Re-read the remote PR head/diff, perform the five-axis review, and require Critical=0 and High=0.
-5. Mark Ready and merge only through the protected PR path; verify the post-merge main run.
-6. Record completion audit on Issue #15 and continue with M1-010 (#16).
+1. Commit `evidence/issues/M1-CI-001/` plus this handoff update.
+2. Push and create a Draft PR referencing #227.
+3. Require the protected GitHub check to pass and verify no Node 20 annotation exists.
+4. Perform current-head five-axis review, mark Ready only with Critical=0/High=0, and merge through the protected PR path.
+5. Verify post-merge main CI also has no Node 20 annotation, close/audit #227, then continue M1-010 (#16).
 
 ## Next tooling-bootstrap order
 

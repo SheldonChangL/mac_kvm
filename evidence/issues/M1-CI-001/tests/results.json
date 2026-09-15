@@ -1,0 +1,21 @@
+{
+  "issue": "M1-CI-001",
+  "implementationCommit": "17470abd101001264ae9ab94eda44989b8808125",
+  "tddRed": {
+    "testsRun": 10,
+    "failures": 1,
+    "failedTest": "test_workflow_is_arm64_read_only_and_uses_node24_actions",
+    "reason": "workflow still referenced Node 20 action commits"
+  },
+  "tddGreen": {
+    "testsRun": 10,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "fullLocalGate": {
+    "gatesRun": 6,
+    "failures": 0,
+    "result": "passed"
+  }
+}

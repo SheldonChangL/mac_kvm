@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CI-001",
+  "githubIssue": 227,
+  "commit": "17470abd101001264ae9ab94eda44989b8808125",
+  "invocation": "make verify REPORT=artifacts/ci/m1-ci-node24-report.json",
+  "startedAt": "2026-09-15T07:12:23.274+00:00",
+  "endedAt": "2026-09-15T07:12:36.959+00:00",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "gates": [
+    {"name": "manifest-validation", "status": "passed", "exitCode": 0, "durationMs": 53},
+    {"name": "code-quality", "status": "passed", "exitCode": 0, "durationMs": 2584},
+    {"name": "ci-gate-unit-tests", "status": "passed", "exitCode": 0, "durationMs": 87},
+    {"name": "repository-contract-tests", "status": "passed", "exitCode": 0, "durationMs": 8462},
+    {"name": "swift-test-targets", "status": "passed", "exitCode": 0, "durationMs": 1085},
+    {"name": "native-arm64-build", "status": "passed", "exitCode": 0, "durationMs": 991}
+  ]
+}
