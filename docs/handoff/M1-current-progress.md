@@ -103,7 +103,7 @@ Corrective M1-BACKFILL-001 was merged through [PR #236](https://github.com/Sheld
 - Branch: `fix/m1-contract-001-strengthen-contract-tests`
 - Base/current merged HEAD: `1ccad42a262b8e8c7b731b51b7a88f31df572285`
 - Implementation commit: `e3f2cbea03d69293860a0e6b96c01255e0831acc`
-- PR: not created yet
+- PR: Draft [#237](https://github.com/SheldonChangL/mac_kvm/pull/237)
 - Initial TDD red run: **15 tests, 4 expected errors**
 - Final targeted M1-001/M1-003 suite: **23/23 passed**
 - Committed-head `make verify`: **11/11 gates passed**
@@ -122,7 +122,7 @@ Implemented contract enforcement:
 ## Immediate handoff checklist
 
 1. Commit #233 evidence, traceability/audit disposition, and this handoff.
-2. Push and create the #233 Draft PR.
+2. Validate Draft PR #237 against #233.
 3. Require protected CI 11/11 with zero annotations.
 4. Perform current-head five-axis review; merge only with Critical=0/High=0.
 5. Verify post-merge `main` CI and link the final disposition to #218, #220, #1, and #3.
