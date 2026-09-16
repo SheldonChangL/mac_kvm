@@ -109,11 +109,11 @@ Domains and minimum codes are:
 | inputSafety | cleanupRequired, cleanupPartial, cleanupFailed, localStateRestoreFailed |
 | clipboard | unsupportedType, invalidUTF8, oversized, loopRejected |
 | lifecycle | sleep, wake, termination, subsystemUnavailable |
-| internal | preconditionFailed, stateInvariantViolation |
+| internal | unclassified, preconditionFailed, stateInvariantViolation |
 
 Severity is `debug`, `info`, `notice`, `warning`, or `error`; it does not authorize more metadata. Retry disposition is `never`, `userActionRequired`, `backoff`, or `immediateAfterStateChange`. Cleanup disposition is `notRequired`, `completed`, `partial`, or `failed`.
 
-Underlying operating-system or library errors may be mapped to a reviewed code and bounded numeric status only when the event catalog explicitly permits that numeric field. `localizedDescription`, reflection output, debug dumps, stack arguments, and raw error strings are never emitted. An unmapped error becomes `internal.preconditionFailed` or the narrowest safe domain code with no source text; it is not silently treated as success.
+Underlying operating-system or library errors may be mapped to a reviewed code and bounded numeric status only when the event catalog explicitly permits that numeric field. `localizedDescription`, reflection output, debug dumps, stack arguments, and raw error strings are never emitted. An unmapped error becomes `internal.unclassified` with no source text; it must not be mislabeled as a precondition or invariant failure and is not silently treated as success.
 
 ### Emission, sinks, and failure behavior
 
