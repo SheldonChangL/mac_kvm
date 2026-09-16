@@ -33,39 +33,39 @@ def product_contract_drift_violations(
             (
                 (
                     "frozen decision 1: first-party native product path",
-                    "正式產品的 Server 與 Client 都必須使用第一方應用與 Native Protocol 工作",
+                    "1. **產品終局：** 正式產品的 Server 與 Client 都必須使用第一方應用與 Native Protocol 工作；Barrier 僅用於 M1/M2 的前期驗證，以及正式版中的可選相容模組。",
                 ),
                 (
                     "frozen decision 2: client first",
-                    "Client-first 是驗證策略，不是產品縮限。",
+                    "2. **Client-first 是驗證策略，不是產品縮限。**",
                 ),
                 (
                     "frozen decision 3: KVMEvent boundary",
-                    "KVMEvent 是唯一 Core event language。",
+                    "3. **KVMEvent 是唯一 Core event language。** Barrier/Native/platform code 必須在 adapter 邊界轉換。",
                 ),
                 (
                     "frozen decision 4: Barrier tokens stay out of Core",
-                    "Barrier-specific tokens/types 不可進 KVMCore。",
+                    "4. **Barrier-specific tokens/types 不可進 KVMCore。**",
                 ),
                 (
                     "frozen decision 5: native Swift stack",
-                    "macOS M1～M3 使用 Swift／SwiftUI+AppKit／Network.framework／CGEvent／NSPasteboard／Keychain。",
+                    "5. **macOS M1～M3 使用 Swift／SwiftUI+AppKit／Network.framework／CGEvent／NSPasteboard／Keychain。**",
                 ),
                 (
                     "frozen decision 6: TLS and identity fail closed",
-                    "TLS/security 預設 fail closed。",
+                    "6. **TLS/security 預設 fail closed。** 未知或變更 identity 不得自動接受。",
                 ),
                 (
                     "frozen decision 7: terminal cleanup",
-                    "任何 terminal path 必須釋放 keys/buttons、停止 suppression、恢復 local state。",
+                    "7. **Fail-safe 高於功能完整度。** 任何 terminal path 必須釋放 keys/buttons、停止 suppression、恢復 local state。",
                 ),
                 (
                     "frozen decision 8: privacy-safe logging",
-                    "不記錄 typed text、clipboard payload、password、private key 或可重建內容。",
+                    "8. **Privacy-safe logging。** 不記錄 typed text、clipboard payload、password、private key 或可重建內容。",
                 ),
                 (
                     "frozen decision 9: independent implementation",
-                    "不複製 Barrier/Deskflow GPL implementation 到第一方核心。",
+                    "9. **獨立實作。** 不複製 Barrier/Deskflow GPL implementation 到第一方核心。",
                 ),
             ),
         )

@@ -39,7 +39,7 @@ def independent_policy_drift_violations(
             (
                 (
                     "frozen decision 9: independent implementation",
-                    "不複製 Barrier/Deskflow GPL implementation 到第一方核心。",
+                    "9. **獨立實作。** 不複製 Barrier/Deskflow GPL implementation 到第一方核心。",
                 ),
             ),
         )
@@ -148,9 +148,22 @@ class M1003IndependentImplementationPolicyTests(unittest.TestCase):
 
     def test_authoritative_dependency_documents_preserve_identity_markers(self):
         reviewed_documents = (
-            (self.m1_001_contract, "# M1-001 Product Contract and Barrier Exit Criteria"),
-            (self.m1_002_boundary, "# M1-002 KVMEvent, Adapter and Core Architecture Boundary"),
-            (self.evidence_standard, "# Evidence Standard"),
+            (
+                self.m1_001_contract,
+                "Barrier exists only inside an independently implemented Protocol Adapter.",
+            ),
+            (
+                self.m1_002_boundary,
+                "`KVMEvent` is the only event language accepted by KVM Core.",
+            ),
+            (
+                self.evidence_standard,
+                "不包含 typed text、clipboard payload、password、private key、token。",
+            ),
+            (
+                self.evidence_standard,
+                "失敗 evidence 不可刪除，只能附 remediation/retest。",
+            ),
             (
                 self.traceability,
                 "Tests/Contracts/test_m1_003_independent_implementation_policy.py",
