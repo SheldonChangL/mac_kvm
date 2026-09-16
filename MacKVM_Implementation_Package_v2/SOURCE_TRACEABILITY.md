@@ -10,7 +10,7 @@ M1-001、M1-002、M1-003 的正式 gate 與獨立 Critical／High review 補驗�
 - [`evidence/issues/M1-002/`](../evidence/issues/M1-002/summary.md)
 - [`evidence/issues/M1-003/`](../evidence/issues/M1-003/summary.md)
 
-M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 re-review 歸零。M1-001 與 M1-003 的兩個 Medium test-depth finding 由 Issue #233 追蹤；該 Issue 有 owner、P1、M1 milestone，並阻擋 M1 completion declaration。
+M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 re-review 歸零。M1-001 與 M1-003 的兩個 Medium test-depth finding 由 Issue #233 實作 explicit source-integrity、frozen/policy drift 與 fail-closed negative regression tests；合併前仍阻擋 M1 completion declaration。其 evidence 位於 [`evidence/issues/M1-CONTRACT-001/`](../evidence/issues/M1-CONTRACT-001/summary.md)。
 
 ## Source Precedence for M1-001
 

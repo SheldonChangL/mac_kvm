@@ -73,7 +73,7 @@ The initial High showed `KVMCore import Network` and other ADR-required coupling
 
 ## Remaining risks and blocking relations
 
-- #233 tracks the two Medium contract-test strength findings with owner, P1 priority, M1 milestone, and an explicit block on declaring M1 complete. The reviewed current documents are consistent; these are test-depth gaps, not current C/H contract defects.
+- #233 implements regression coverage for the two Medium contract-test strength findings. Until its protected PR merges, it retains owner, P1 priority, M1 milestone, and an explicit block on declaring M1 complete. The reviewed current documents are consistent; these are test-depth gaps, not current C/H contract defects.
 - The architecture checker is an explicit lexical catalog, not a semantic Swift proof. Defining Issues must add new platform frameworks, transports, Barrier tokens, and the first canonical Native identifiers with negative tests.
 - This audit does not implement M1-011 or any later feature.
 

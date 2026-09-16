@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-16 13:33 Asia/Taipei
+Updated: 2026-09-16 13:46 Asia/Taipei
 
 ## Objective and authorization
 
@@ -30,13 +30,13 @@ Canonical architecture that must remain true:
 
 ## Completed progress
 
-M1 progress: **10 of 70 planned Issues merged and closed; 60 planned Issues open**. Corrective tooling Issues #227 and #230 are not part of the original 70-count backlog.
+M1 progress: **10 of 70 planned Issues merged and closed; 60 planned Issues open**. Corrective tooling/backfill Issues #227, #230, #232, and #234 are not part of the original 70-count backlog.
 
 | Issue | GitHub Issue | PR | Merge commit | Review result |
 |---|---:|---:|---|---|
-| M1-001 | #1 | [#218](https://github.com/SheldonChangL/mac_kvm/pull/218) | `5cbd04ad26363ac77af58db5198d2aa17c954e22` | Critical 0 / High 0; formal backfill pending |
-| M1-002 | #2 | [#219](https://github.com/SheldonChangL/mac_kvm/pull/219) | `3db17c19081432ab4ba0c642b96e37524c99ff67` | Critical 0 / High 0; formal backfill pending |
-| M1-003 | #3 | [#220](https://github.com/SheldonChangL/mac_kvm/pull/220) | `e35988a3b508d405f18bc4dea1d171e855f58d15` | Critical 0 / High 0; canonical §55 added; formal backfill pending |
+| M1-001 | #1 | [#218](https://github.com/SheldonChangL/mac_kvm/pull/218) | `5cbd04ad26363ac77af58db5198d2aa17c954e22` | Independent Critical 0 / High 0; formal backfill complete; Medium test hardening active in #233 |
+| M1-002 | #2 | [#219](https://github.com/SheldonChangL/mac_kvm/pull/219) | `3db17c19081432ab4ba0c642b96e37524c99ff67` | Independent Critical 0 / High 0; enforcement High fixed; formal backfill complete |
+| M1-003 | #3 | [#220](https://github.com/SheldonChangL/mac_kvm/pull/220) | `e35988a3b508d405f18bc4dea1d171e855f58d15` | Independent Critical 0 / High 0; formal backfill complete; Medium test hardening active in #233 |
 | M1-004 | #4 | [#221](https://github.com/SheldonChangL/mac_kvm/pull/221) | `64b5cd5460b229de8ebda0b7d9682d1a529fb4da` | Critical 0 / High 0; one Medium resolved by M1-005 |
 | M1-005 | #6 | [#222](https://github.com/SheldonChangL/mac_kvm/pull/222) | `469f02e94a1d9bde07aafb36829c95d0cc0651dd` | Critical 0 / High 0 / Medium 0 |
 | M1-006 | #7 | [#223](https://github.com/SheldonChangL/mac_kvm/pull/223) | `20380eca4d8865c234c5d4b28451fa30fd2092aa` | Critical 0 / High 0 / Medium 0 |
@@ -95,47 +95,38 @@ Corrective M1-DOCS-001 was merged through [PR #231](https://github.com/SheldonCh
 
 Corrective M1-ARCH-001 was merged through [PR #235](https://github.com/SheldonChangL/mac_kvm/pull/235) as `b1c3fa5a6013b2cf482d2175e3d16d01a8000e97`. It resolved the M1-002 independent-review High finding. Its final independent re-review was Critical 0 / High 0 / Medium 0 / Low 0; architecture tests passed 26/26; PR-head run `35037739952` and post-merge `main` run `35037917261` both passed all eleven gates with zero annotations.
 
-## Active work: M1-BACKFILL-001
+Corrective M1-BACKFILL-001 was merged through [PR #236](https://github.com/SheldonChangL/mac_kvm/pull/236) as `1ccad42a262b8e8c7b731b51b7a88f31df572285`. Independent final results for M1-001 through M1-003 are Critical 0 / High 0. PR-head run `35060279641` and post-merge `main` run `35060468551` passed 11/11 with zero annotations. The merged audit is linked from the original PRs #218–#220, Issues #1–#3, and source traceability.
 
-- GitHub Issue: [#232](https://github.com/SheldonChangL/mac_kvm/issues/232)
-- Branch: `feat/m1-backfill-001-formal-gates`
-- Base/current merged HEAD: `b1c3fa5a6013b2cf482d2175e3d16d01a8000e97`
-- PR: Draft [#236](https://github.com/SheldonChangL/mac_kvm/pull/236)
-- `make docs-check`: **passed**
-- `make architecture-check`: **passed**
-- `python3 Tools/Backlog/validate_package.py`: **passed**, `PACKAGE OK: 217 issues, 5 milestones, 17 epics`
-- Local `make verify REPORT=artifacts/ci/m1-001-003-backfill-final-report.json`: **11/11 gates passed**
-- Protected `main` run `35037917261`: **11/11 gates passed**, zero annotations
+## Active work: M1-CONTRACT-001
+
+- GitHub Issue: [#233](https://github.com/SheldonChangL/mac_kvm/issues/233)
+- Branch: `fix/m1-contract-001-strengthen-contract-tests`
+- Base/current merged HEAD: `1ccad42a262b8e8c7b731b51b7a88f31df572285`
+- Implementation commit: `e3f2cbea03d69293860a0e6b96c01255e0831acc`
+- PR: not created yet
+- Initial TDD red run: **15 tests, 4 expected errors**
+- Final targeted M1-001/M1-003 suite: **23/23 passed**
+- Committed-head `make verify`: **11/11 gates passed**
+- Canonical/frozen documents changed: **none**
+- Runtime/product behavior changed: **none**
 - Repository visibility: public; strict branch protection active
 
-Independent review results:
+Implemented contract enforcement:
 
-| Original Issue | Critical | High | Medium | Resolution |
-|---|---:|---:|---:|---|
-| M1-001 | 0 | 0 | 1 | Contract-test hardening tracked by [#233](https://github.com/SheldonChangL/mac_kvm/issues/233) |
-| M1-002 | 0 | 0 | 0 | Initial High fixed by [#234](https://github.com/SheldonChangL/mac_kvm/issues/234) / PR #235 and independently re-reviewed |
-| M1-003 | 0 | 0 | 1 | Contract-test hardening tracked by [#233](https://github.com/SheldonChangL/mac_kvm/issues/233) |
-
-Backfill evidence is recorded in:
-
-- `docs/audits/M1-001-003-formal-backfill.md`
-- `evidence/issues/M1-001/`
-- `evidence/issues/M1-002/`
-- `evidence/issues/M1-003/`
-- `evidence/issues/M1-BACKFILL-001/`
-- `MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md`
-
-The original same-executor reviews remain identified as bootstrap reviews, not as the required independent review. No runtime feature or public contract changed in the backfill work. Draft PR #236 CI, five-axis review, merge, post-merge CI, and backlink comments remain pending.
+- all authoritative referenced files must exist and be non-empty
+- M1-001 reviewed markers connect Frozen Decisions 1–9, product contract, roadmap, and traceability
+- M1-003 reviewed markers connect Frozen Decision 9, Protocol Evidence Policy, and independent-implementation ADR
+- negative regressions cover production TLS, changed identity, Frozen Decision 6, GPL stop, unknown-field no-guess, Frozen Decision 9, and missing-provenance fail-closed weakening
+- no general natural-language parser or new product interpretation was introduced
 
 ## Immediate handoff checklist
 
-1. Validate and commit the audit, traceability, evidence packages, and this handoff for #232.
-2. Validate Draft PR #236 against #232 and the original PRs #218–#220.
-3. Require the protected GitHub check and all eleven machine-report gates to pass with zero annotations.
-4. Perform current-head five-axis merge review; merge only with Critical=0/High=0 and the Mediums correctly tracked by #233.
-5. Verify post-merge `main` CI and audit #232.
-6. Add backfill links to original PRs #218–#220 and Issues #1–#3.
-7. Complete #233 before returning to planned M1-011.
+1. Commit #233 evidence, traceability/audit disposition, and this handoff.
+2. Push and create the #233 Draft PR.
+3. Require protected CI 11/11 with zero annotations.
+4. Perform current-head five-axis review; merge only with Critical=0/High=0.
+5. Verify post-merge `main` CI and link the final disposition to #218, #220, #1, and #3.
+6. Return to planned M1-011 (#18).
 
 ## Next tooling-bootstrap order
 
@@ -143,9 +134,8 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-BACKFILL-001 | #232 | records formal gates and independent reviews for M1-001 through M1-003 |
 | M1-CONTRACT-001 test hardening | #233 | resolves two tracked Medium findings before M1 completion |
-| M1-011 next planned Issue | #18 | proceeds after formal backfill is clean |
+| M1-011 next planned Issue | #18 | proceeds after #233 protected merge and audit |
 
 Use the Standing Authorization to create the real tools, not a long-lived waiver. A reasonable end state is:
 
@@ -157,14 +147,12 @@ Use the Standing Authorization to create the real tools, not a long-lived waiver
 - source-level architecture checker with tested allowlist and violations
 - canonical docs checker with tracked-file selection and tested fail-closed behavior
 
-The formal tooling now exists. M1-001 through M1-003 have passed the formal gates locally and received genuinely independent Critical/High review; the remaining work is to merge the auditable backfill package, verify protected CI, add backlinks, and resolve #233.
+The formal tooling and independent backfill now exist and have passed protected CI. #233 is the final corrective follow-up from that backfill before planned M1 work resumes.
 
 ## Formal backfill blockers before M1 completion
 
-- Merge the #232 audit/evidence PR after its protected CI and current-head review pass.
-- Verify the post-merge `main` GitHub Actions run.
-- Link the merged backfill result to original PRs #218–#220, Issues #1–#3, and `SOURCE_TRACEABILITY.md`.
-- Resolve the two Medium contract-test findings through #233 before M1 completion.
+- Resolve and merge the two Medium contract-test findings through #233.
+- Verify #233 post-merge `main` CI and link the final disposition to the affected original PRs/Issues.
 - Any failure requires a fixing PR; do not declare M1 complete until all backfill passes.
 
 ## Repository hygiene and protected artifacts
