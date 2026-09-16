@@ -1,0 +1,22 @@
+{
+  "issue": "M1-011",
+  "implementationCommit": "d3e2bd4308e245d1910ca09968b8bef385779324",
+  "documentationValidation": {
+    "docsCheck": "passed",
+    "backlogValidation": "passed",
+    "architectureCheck": "passed",
+    "diffCheck": "passed"
+  },
+  "referencedPathValidation": {
+    "M1-012": "present",
+    "M1-015": "present",
+    "C-010": "present"
+  },
+  "fullVerify": {
+    "gatesRun": 11,
+    "failures": 0,
+    "result": "passed"
+  },
+  "manualHardwareRequired": false,
+  "remainingReview": "privacy/security five-axis PR review"
+}
