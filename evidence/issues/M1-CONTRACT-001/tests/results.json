@@ -1,0 +1,29 @@
+{
+  "issue": "M1-CONTRACT-001",
+  "implementationCommit": "e3f2cbea03d69293860a0e6b96c01255e0831acc",
+  "tddRedEvidence": {
+    "testsRun": 15,
+    "expectedErrors": 4,
+    "reason": "new negative tests referenced drift checks and authoritative-source inputs that did not yet exist"
+  },
+  "targetedContractTests": {
+    "testsRun": 23,
+    "failures": 0,
+    "errors": 0,
+    "result": "passed"
+  },
+  "fullVerify": {
+    "gatesRun": 11,
+    "failures": 0,
+    "result": "passed"
+  },
+  "negativeCoverage": [
+    "M1-001 production TLS default",
+    "M1-001 changed-identity fail closed",
+    "Frozen Decision 6 TLS/security fail closed",
+    "M1-003 GPL implementation stop condition",
+    "Protocol Evidence Policy unknown-field no-guess rule",
+    "Frozen Decision 9 independent implementation",
+    "M1-003 missing-provenance fail closed"
+  ]
+}
