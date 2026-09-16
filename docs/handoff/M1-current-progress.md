@@ -1,6 +1,6 @@
 # MacKVM M1 Current Handoff
 
-Updated: 2026-09-16 13:46 Asia/Taipei
+Updated: 2026-09-16 13:56 Asia/Taipei
 
 ## Objective and authorization
 
@@ -97,36 +97,28 @@ Corrective M1-ARCH-001 was merged through [PR #235](https://github.com/SheldonCh
 
 Corrective M1-BACKFILL-001 was merged through [PR #236](https://github.com/SheldonChangL/mac_kvm/pull/236) as `1ccad42a262b8e8c7b731b51b7a88f31df572285`. Independent final results for M1-001 through M1-003 are Critical 0 / High 0. PR-head run `35060279641` and post-merge `main` run `35060468551` passed 11/11 with zero annotations. The merged audit is linked from the original PRs #218–#220, Issues #1–#3, and source traceability.
 
-## Active work: M1-CONTRACT-001
+Corrective M1-CONTRACT-001 was merged through [PR #237](https://github.com/SheldonChangL/mac_kvm/pull/237) as `70d1709b138d9d6851f8a971cec1e631ddb5830f`. It resolved both M1-001/M1-003 Medium test-depth findings. The targeted suite passed 23/23; PR-head run `35061245774` and post-merge `main` run `35061382279` passed 11/11 with zero annotations; final review was Critical 0 / High 0 / Medium 0 / Low 0.
 
-- GitHub Issue: [#233](https://github.com/SheldonChangL/mac_kvm/issues/233)
-- Branch: `fix/m1-contract-001-strengthen-contract-tests`
-- Base/current merged HEAD: `1ccad42a262b8e8c7b731b51b7a88f31df572285`
-- Implementation commit: `e3f2cbea03d69293860a0e6b96c01255e0831acc`
-- PR: Draft [#237](https://github.com/SheldonChangL/mac_kvm/pull/237)
-- Initial TDD red run: **15 tests, 4 expected errors**
-- Final targeted M1-001/M1-003 suite: **23/23 passed**
-- Committed-head `make verify`: **11/11 gates passed**
-- Canonical/frozen documents changed: **none**
-- Runtime/product behavior changed: **none**
+## Next active work: M1-011
+
+- GitHub Issue: [#5](https://github.com/SheldonChangL/mac_kvm/issues/5)
+- Title: Privacy-safe Logging and Error Taxonomy
+- Planned branch: `feat/m1-011-logging-policy`
+- Base/current merged HEAD: `70d1709b138d9d6851f8a971cec1e631ddb5830f`
+- Dependency M1-002: merged with readable evidence
+- Frozen contract C-010: present in `CONTRACT_CATALOG.md`
+- Exact production/decision file: `docs/adr/M1-011-logging-policy.md`
+- Required evidence path: `evidence/issues/M1-011/`
+- GitHub Issue #18 is M2-015, not M1-011, and is not eligible.
 - Repository visibility: public; strict branch protection active
-
-Implemented contract enforcement:
-
-- all authoritative referenced files must exist and be non-empty
-- M1-001 reviewed markers connect Frozen Decisions 1–9, product contract, roadmap, and traceability
-- M1-003 reviewed markers connect Frozen Decision 9, Protocol Evidence Policy, and independent-implementation ADR
-- negative regressions cover production TLS, changed identity, Frozen Decision 6, GPL stop, unknown-field no-guess, Frozen Decision 9, and missing-provenance fail-closed weakening
-- no general natural-language parser or new product interpretation was introduced
 
 ## Immediate handoff checklist
 
-1. Commit #233 evidence, traceability/audit disposition, and this handoff.
-2. Validate Draft PR #237 against #233.
-3. Require protected CI 11/11 with zero annotations.
-4. Perform current-head five-axis review; merge only with Critical=0/High=0.
-5. Verify post-merge `main` CI and link the final disposition to #218, #220, #1, and #3.
-6. Return to planned M1-011 (#18).
+1. Create `feat/m1-011-logging-policy` from protected `main` for GitHub Issue #5.
+2. Produce only the M1-011 logging/error-taxonomy ADR plus its explicitly required evidence package.
+3. Cover Selected, Rejected, Consequences, Security/Compatibility impact, Rollback, owners, and blockers.
+4. Run `make docs-check`, the backlog validator, `make architecture-check`, and full `make verify`.
+5. Complete five-axis review, protected PR merge, and post-merge `main` CI before the next Issue.
 
 ## Next tooling-bootstrap order
 
@@ -134,8 +126,7 @@ GitHub Issue numbers are not the same as M1 sequence numbers.
 
 | Next Issue | GitHub Issue | Dependency purpose |
 |---|---:|---|
-| M1-CONTRACT-001 test hardening | #233 | resolves two tracked Medium findings before M1 completion |
-| M1-011 next planned Issue | #18 | proceeds after #233 protected merge and audit |
+| M1-011 logging policy | #5 | next planned Issue; depends only on completed M1-002 |
 
 Use the Standing Authorization to create the real tools, not a long-lived waiver. A reasonable end state is:
 
@@ -147,13 +138,15 @@ Use the Standing Authorization to create the real tools, not a long-lived waiver
 - source-level architecture checker with tested allowlist and violations
 - canonical docs checker with tracked-file selection and tested fail-closed behavior
 
-The formal tooling and independent backfill now exist and have passed protected CI. #233 is the final corrective follow-up from that backfill before planned M1 work resumes.
+The formal tooling, independent backfill, and both corrective Medium dispositions now exist and have passed protected CI. Planned M1 work resumes at M1-011 / GitHub Issue #5.
 
-## Formal backfill blockers before M1 completion
+## Formal backfill status
 
-- Resolve and merge the two Medium contract-test findings through #233.
-- Verify #233 post-merge `main` CI and link the final disposition to the affected original PRs/Issues.
-- Any failure requires a fixing PR; do not declare M1 complete until all backfill passes.
+- M1-001 through M1-003 formal gates: complete.
+- Genuine independent Critical/High reviews: complete.
+- M1-002 High correction: complete.
+- M1-001/M1-003 Medium test-depth corrections: complete.
+- Original PR/Issue and traceability backlinks: complete.
 
 ## Repository hygiene and protected artifacts
 
