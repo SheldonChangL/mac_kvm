@@ -100,7 +100,7 @@ Corrective M1-ARCH-001 was merged through [PR #235](https://github.com/SheldonCh
 - GitHub Issue: [#232](https://github.com/SheldonChangL/mac_kvm/issues/232)
 - Branch: `feat/m1-backfill-001-formal-gates`
 - Base/current merged HEAD: `b1c3fa5a6013b2cf482d2175e3d16d01a8000e97`
-- PR: not created yet
+- PR: Draft [#236](https://github.com/SheldonChangL/mac_kvm/pull/236)
 - `make docs-check`: **passed**
 - `make architecture-check`: **passed**
 - `python3 Tools/Backlog/validate_package.py`: **passed**, `PACKAGE OK: 217 issues, 5 milestones, 17 epics`
@@ -125,12 +125,12 @@ Backfill evidence is recorded in:
 - `evidence/issues/M1-BACKFILL-001/`
 - `MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md`
 
-The original same-executor reviews remain identified as bootstrap reviews, not as the required independent review. No runtime feature or public contract changed in the backfill work. Audit PR CI, five-axis review, merge, post-merge CI, and backlink comments remain pending.
+The original same-executor reviews remain identified as bootstrap reviews, not as the required independent review. No runtime feature or public contract changed in the backfill work. Draft PR #236 CI, five-axis review, merge, post-merge CI, and backlink comments remain pending.
 
 ## Immediate handoff checklist
 
 1. Validate and commit the audit, traceability, evidence packages, and this handoff for #232.
-2. Push and create a Draft PR referencing #232 and the original PRs #218–#220.
+2. Validate Draft PR #236 against #232 and the original PRs #218–#220.
 3. Require the protected GitHub check and all eleven machine-report gates to pass with zero annotations.
 4. Perform current-head five-axis merge review; merge only with Critical=0/High=0 and the Mediums correctly tracked by #233.
 5. Verify post-merge `main` CI and audit #232.
