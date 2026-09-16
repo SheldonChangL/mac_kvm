@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-001",
+  "validationDate": "2026-09-16",
+  "buildCommit": "b1c3fa5a6013b2cf482d2175e3d16d01a8000e97",
+  "os": "macOS 26.6.2 (25G83)",
+  "cpuArchitecture": "arm64",
+  "pythonVersion": "3.9.6",
+  "swiftVersion": "Apple Swift 6.2.3",
+  "displayLayout": null,
+  "keyboardLayout": null,
+  "network": null,
+  "peerVersion": null,
+  "notApplicableReason": "M1-001 is a product-contract decision diff with no runtime, input, display, network, or peer behavior to exercise. Manual verification is source and evidence review."
+}

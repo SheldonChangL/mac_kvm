@@ -1,0 +1,15 @@
+{
+  "issue": "M1-BACKFILL-001",
+  "formalBackfillCommit": "b1c3fa5a6013b2cf482d2175e3d16d01a8000e97",
+  "formalGates": {"gatesRun": 11, "failures": 0, "result": "passed"},
+  "repositoryContractTests": {"testsRun": 39, "failures": 0, "errors": 0, "result": "passed"},
+  "m1001TargetedTests": {"testsRun": 5, "failures": 0, "errors": 0, "result": "passed"},
+  "m1003TargetedTests": {"testsRun": 6, "failures": 0, "errors": 0, "result": "passed"},
+  "architectureCheckTests": {"testsRun": 26, "failures": 0, "errors": 0, "result": "passed"},
+  "independentReview": {
+    "m1001": {"critical": 0, "high": 0, "medium": 1, "mediumTrackingIssue": 233},
+    "m1002Initial": {"critical": 0, "high": 1, "fixingIssue": 234, "fixingPr": 235},
+    "m1002Final": {"critical": 0, "high": 0, "medium": 0, "low": 0},
+    "m1003": {"critical": 0, "high": 0, "medium": 1, "mediumTrackingIssue": 233}
+  }
+}

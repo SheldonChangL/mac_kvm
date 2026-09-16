@@ -1,0 +1,8 @@
+{
+  "issue": "M1-003",
+  "formalBackfillCommit": "b1c3fa5a6013b2cf482d2175e3d16d01a8000e97",
+  "targetedContractTests": {"testsRun": 6, "failures": 0, "errors": 0, "result": "passed"},
+  "cumulativeRepositoryContractTests": {"testsRun": 39, "failures": 0, "errors": 0, "result": "passed"},
+  "formalGates": {"gatesRun": 11, "failures": 0, "result": "passed"},
+  "protectedMainRun": {"runId": 35037917261, "gatesRun": 11, "annotations": 0, "result": "passed"}
+}
