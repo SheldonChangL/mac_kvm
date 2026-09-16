@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-003",
+  "mode": "formal-backfill",
+  "originalPr": 220,
+  "originalHead": "089821f393d462d06a979390701a3401bd2ce90b",
+  "mergeCommit": "e35988a3b508d405f18bc4dea1d171e855f58d15",
+  "validatedCommit": "b1c3fa5a6013b2cf482d2175e3d16d01a8000e97",
+  "startedAt": "2026-09-16T05:29:47.392+00:00",
+  "endedAt": "2026-09-16T05:30:01.106+00:00",
+  "status": "passed",
+  "commands": [
+    {"command": "make docs-check", "exitCode": 0, "result": "docs check OK"},
+    {"command": "make architecture-check", "exitCode": 0, "result": "architecture check OK"},
+    {"command": "python3 Tools/Backlog/validate_package.py", "exitCode": 0, "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"},
+    {"command": "make verify REPORT=artifacts/ci/m1-001-003-backfill-final-report.json", "exitCode": 0, "result": "11/11 gates passed"}
+  ]
+}

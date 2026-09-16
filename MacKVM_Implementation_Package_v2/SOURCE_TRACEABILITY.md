@@ -2,6 +2,16 @@
 
 本文件只負責來源、Issue、程式碼與測試的追蹤，不是產品合約。若內容與 canonical specification 不一致，以 canonical specification 為準。
 
+## Formal Backfill Status
+
+M1-001、M1-002、M1-003 的正式 gate 與獨立 Critical／High review 補驗記錄位於 [`docs/audits/M1-001-003-formal-backfill.md`](../docs/audits/M1-001-003-formal-backfill.md)。個別 evidence packages 位於：
+
+- [`evidence/issues/M1-001/`](../evidence/issues/M1-001/summary.md)
+- [`evidence/issues/M1-002/`](../evidence/issues/M1-002/summary.md)
+- [`evidence/issues/M1-003/`](../evidence/issues/M1-003/summary.md)
+
+M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 re-review 歸零。M1-001 與 M1-003 的兩個 Medium test-depth finding 由 Issue #233 追蹤；該 Issue 有 owner、P1、M1 milestone，並阻擋 M1 completion declaration。
+
 ## Source Precedence for M1-001
 
 1. [`docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md`](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md)：M1-001 的 canonical architecture／MVP contract。
