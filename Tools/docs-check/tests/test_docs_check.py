@@ -176,8 +176,10 @@ class DocsCheckTests(unittest.TestCase):
         self.assertIn("docs-check:", makefile)
         self.assertIn("Tools/docs-check/docs-check.py", makefile)
         self.assertIn('"docs-check"', ci_gate)
-        self.assertIn('"docs-check-unit-tests"', ci_gate)
-        self.assertIn('"Tools/docs-check/tests"', ci_gate)
+        self.assertIn('"tool-test-discovery"', ci_gate)
+        self.assertIn("discover_tool_test_files", ci_gate)
+        self.assertIn("relative_path.parent.as_posix()", ci_gate)
+        self.assertIn("relative_path.name", ci_gate)
 
 
 if __name__ == "__main__":

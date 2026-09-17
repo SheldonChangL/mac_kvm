@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "phase": "red",
+  "result": "failed-as-expected",
+  "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v",
+  "failureCount": 5,
+  "reason": "Tool-test discovery and dynamic gate construction APIs did not yet exist",
+  "remediation": "implemented deterministic fail-closed discovery and isolated gate generation"
+}

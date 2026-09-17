@@ -17,6 +17,12 @@ spec.loader.exec_module(cigates)
 
 
 class CIGateTests(unittest.TestCase):
+    def write_tool_test(self, repository_root, relative_path, body):
+        test_path = Path(repository_root) / relative_path
+        test_path.parent.mkdir(parents=True, exist_ok=True)
+        test_path.write_text(body, encoding="utf-8")
+        return test_path
+
     def gate_result(self, gate, status="passed", exit_code=0):
         return cigates.GateResult(
             name=gate.name,
@@ -223,6 +229,169 @@ class CIGateTests(unittest.TestCase):
         self.assertIn("verify:", makefile)
         self.assertIn("Tools/cigates/cigates.py", makefile)
         self.assertTrue(canonical_validator.is_file())
+
+    def test_actual_gate_list_includes_each_tool_test_file_once(self):
+        gates = cigates.build_gate_specs(REPOSITORY_ROOT)
+        commands = [list(gate.command) for gate in gates]
+        diagnostic_commands = [
+            command
+            for command in commands
+            if "Tools/diagnostic-bundle/tests" in command
+        ]
+
+        self.assertEqual(len(diagnostic_commands), 1)
+        self.assertEqual(
+            diagnostic_commands[0],
+            [
+                "python3",
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                "Tools/diagnostic-bundle/tests",
+                "-p",
+                "test_diagnostic_bundle.py",
+                "-v",
+            ],
+        )
+        self.assertEqual(len(commands), len({tuple(command) for command in commands}))
+
+    def test_tool_test_discovery_is_deterministic_and_supports_nested_tests(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            self.write_tool_test(
+                repository_root,
+                "Tools/zeta/tests/nested/test_second.py",
+                "import unittest\n",
+            )
+            self.write_tool_test(
+                repository_root,
+                "Tools/alpha/tests/test_first.py",
+                "import unittest\n",
+            )
+
+            discovery = cigates.discover_tool_test_files(repository_root)
+            gates = cigates.build_tool_test_gate_specs(discovery)
+
+        self.assertEqual(discovery.errors, ())
+        self.assertEqual(
+            [str(path) for path in discovery.relative_paths],
+            [
+                "Tools/alpha/tests/test_first.py",
+                "Tools/zeta/tests/nested/test_second.py",
+            ],
+        )
+        self.assertEqual(
+            [gate.name for gate in gates],
+            [
+                "tool-test:alpha/tests/test_first.py",
+                "tool-test:zeta/tests/nested/test_second.py",
+            ],
+        )
+        self.assertEqual(gates[1].command[5], "Tools/zeta/tests/nested")
+        self.assertEqual(gates[1].command[7], "test_second.py")
+
+    def test_empty_tools_directory_is_valid_but_missing_tools_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            (repository_root / "Tools").mkdir()
+            empty = cigates.discover_tool_test_files(repository_root)
+            empty_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(repository_root),
+                    "--check-tool-tests",
+                    "--expected-tool-test-count",
+                    "0",
+                ]
+            )
+            mismatch_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(repository_root),
+                    "--check-tool-tests",
+                    "--expected-tool-test-count",
+                    "1",
+                ]
+            )
+
+            missing_root = repository_root / "missing"
+            missing_root.mkdir()
+            missing = cigates.discover_tool_test_files(missing_root)
+            missing_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(missing_root),
+                    "--check-tool-tests",
+                ]
+            )
+
+        self.assertEqual(empty.relative_paths, ())
+        self.assertEqual(empty.errors, ())
+        self.assertEqual(empty_exit, 0)
+        self.assertEqual(mismatch_exit, 1)
+        self.assertEqual(missing.relative_paths, ())
+        self.assertIn("tools-root-missing", missing.errors)
+        self.assertEqual(missing_exit, 1)
+
+    def test_symlinked_tool_test_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            target = self.write_tool_test(
+                repository_root,
+                "fixtures/test_external.py",
+                "import unittest\n",
+            )
+            linked_test = repository_root / "Tools/demo/tests/test_linked.py"
+            linked_test.parent.mkdir(parents=True)
+            linked_test.symlink_to(target)
+
+            discovery = cigates.discover_tool_test_files(repository_root)
+
+        self.assertEqual(discovery.relative_paths, ())
+        self.assertIn("tool-test-symlink", discovery.errors)
+
+    def test_discovered_test_gate_propagates_pass_import_and_test_failure(self):
+        passing_source = (
+            "import unittest\n"
+            "class Passing(unittest.TestCase):\n"
+            "    def test_ok(self): self.assertTrue(True)\n"
+        )
+        failing_source = (
+            "import unittest\n"
+            "class Failing(unittest.TestCase):\n"
+            "    def test_failure(self): self.fail('synthetic')\n"
+        )
+        import_failure_source = "raise RuntimeError('synthetic import failure')\n"
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            self.write_tool_test(
+                repository_root,
+                "Tools/demo/tests/test_pass.py",
+                passing_source,
+            )
+            self.write_tool_test(
+                repository_root,
+                "Tools/demo/tests/test_fail.py",
+                failing_source,
+            )
+            self.write_tool_test(
+                repository_root,
+                "Tools/demo/tests/test_import_fail.py",
+                import_failure_source,
+            )
+            discovery = cigates.discover_tool_test_files(repository_root)
+            gates = cigates.build_tool_test_gate_specs(discovery)
+            results = {
+                gate.command[7]: cigates.run_gate(gate, repository_root, 10)
+                for gate in gates
+            }
+
+        self.assertEqual(results["test_pass.py"].status, "passed")
+        self.assertEqual(results["test_fail.py"].status, "failed")
+        self.assertNotEqual(results["test_fail.py"].exit_code, 0)
+        self.assertEqual(results["test_import_fail.py"].status, "failed")
+        self.assertNotEqual(results["test_import_fail.py"].exit_code, 0)
 
 
 if __name__ == "__main__":

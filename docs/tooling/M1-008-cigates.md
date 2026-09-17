@@ -7,12 +7,23 @@ M1-008 adds one fail-fast build/test/manifest gate used locally by `make verify`
 ## Gate order
 
 1. Canonical backlog/package manifest validation.
-2. CI gate unit tests.
-3. Repository contract tests.
-4. Swift Unit/Integration/System test-target verifier.
-5. Native macOS 14 arm64 build verifier.
+2. Documentation validation.
+3. Architecture boundary validation.
+4. Code-quality/Swift warnings-as-errors validation.
+5. Fail-closed tool-test discovery and count consistency.
+6. One isolated gate for every sorted `Tools/*/tests/**/test_*.py` file.
+7. Repository contract tests.
+8. Swift Unit/Integration/System test-target verifier.
+9. Native macOS 14 arm64 build verifier.
 
 The first non-passing gate stops execution, marks later gates `not-run`, writes the report, and returns non-zero. A timeout terminates the spawned process group. Keyboard interruption and runner `SIGTERM` use the same cleanup path, return exit 130, and make a best-effort report write before the runner's forced-termination grace period ends.
+
+Tool tests are discovered from source-controlled regular files only. Symlinked
+tool/test roots or files fail the discovery gate. Each file receives a stable
+`tool-test:<tool-relative-path>` report name and an isolated `unittest discover`
+process scoped to that exact filename. The discovery gate verifies the expected
+file count again immediately before the test gates, so additions/removals cannot
+silently escape the planned run.
 
 ## Report contract
 
@@ -20,6 +31,10 @@ Schema version 1 includes:
 
 - overall status, start/end timestamps, commit, platform, machine architecture, Python version, and Swift version
 - each gate name, argv array, status, exit code, timestamps, duration, output SHA-256 values, and output line counts
+
+Because each discovered tool test file is a separate gate, the report is also
+the canonical index of exactly which suites CI executed. Existing suites are
+not separately hard-coded, preventing duplicate execution.
 
 Raw stdout/stderr is intentionally excluded from the report so future fixture or failure content cannot become a durable artifact. The console prints only allowlisted context and gate status metadata.
 

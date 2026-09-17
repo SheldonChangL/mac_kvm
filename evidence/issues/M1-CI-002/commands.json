@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CI-002",
+  "githubIssue": 244,
+  "implementationCommit": "51a1ca5337b5ef9653969af9054b2d6abfd4b90f",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v",
+      "exitCode": 0,
+      "result": "15 tests passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' -v",
+      "exitCode": 0,
+      "result": "26 tests passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/docs-check/tests -p 'test_*.py' -v",
+      "exitCode": 0,
+      "result": "12 tests passed"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-ci-002-committed-report.json",
+      "startedAt": "2026-09-17T00:43:14.959+00:00",
+      "endedAt": "2026-09-17T00:43:28.460+00:00",
+      "exitCode": 0,
+      "result": "13/13 gates passed; diagnostic-bundle suite passed"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "phase": "red",
+      "result": "five new tests errored because discovery APIs were absent"
+    },
+    {
+      "command": "make verify",
+      "result": "two intermediate runs exposed stale hard-coded integration assertions; corrected in scope"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-ci-002-implementation-report.json",
+      "environment": "restricted outer execution sandbox",
+      "exitCode": 2,
+      "result": "SwiftPM manifest sandbox_apply failed with Operation not permitted"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-ci-002-committed-report.json",
+      "environment": "normal local macOS toolchain",
+      "exitCode": 0,
+      "result": "13/13 gates passed"
+    }
+  ]
+}
