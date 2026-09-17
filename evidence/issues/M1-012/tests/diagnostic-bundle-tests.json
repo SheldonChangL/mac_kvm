@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-012",
+  "commit": "37b1685796a2c155b3ec2391c3be0e6da29127b8",
+  "command": "python3 Tools/diagnostic-bundle/tests/test_diagnostic_bundle.py -v",
+  "startedAt": "2026-09-17T00:25:50.242Z",
+  "endedAt": "2026-09-17T00:25:50.562Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 18,
+  "tests": [
+    "test_boolean_schema_version_is_not_accepted_as_integer_one",
+    "test_cancellation_removes_partial_archive",
+    "test_category_must_match_the_event_catalog",
+    "test_cli_happy_path_creates_bundle_without_echoing_content",
+    "test_completed_cleanup_event_cannot_claim_partial_or_failed_outcome",
+    "test_correlation_id_must_be_canonical_version_four_uuid",
+    "test_event_catalog_maps_category_severity_error_and_metadata_schema",
+    "test_existing_output_is_preserved",
+    "test_free_form_text_is_rejected_in_version_fields",
+    "test_happy_path_exports_only_allowlisted_metadata",
+    "test_input_symlink_is_rejected_without_creating_output",
+    "test_invalid_cli_arguments_do_not_echo_untrusted_values",
+    "test_invalid_json_cli_error_is_typed_and_does_not_echo_input",
+    "test_maximum_record_boundary_is_accepted",
+    "test_one_record_over_limit_fails_without_output",
+    "test_oversized_input_is_rejected_before_json_parsing",
+    "test_prohibited_content_classes_are_rejected_before_serialization",
+    "test_unknown_event_and_free_form_string_are_rejected"
+  ]
+}

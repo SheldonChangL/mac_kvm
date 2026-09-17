@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-012",
+  "phase": "red",
+  "command": "python3 Tools/diagnostic-bundle/tests/test_diagnostic_bundle.py -v",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "FileNotFoundError",
+  "failureReason": "Tools/diagnostic-bundle/diagnostic-bundle.py did not exist before implementation",
+  "remediation": "Added and hardened the issue-scoped implementation, then reran the same suite with 18 tests passing"
+}
