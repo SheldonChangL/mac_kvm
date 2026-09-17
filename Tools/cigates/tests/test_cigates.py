@@ -414,6 +414,175 @@ class CIGateTests(unittest.TestCase):
         self.assertEqual(results["test_import_fail.py"].status, "failed")
         self.assertNotEqual(results["test_import_fail.py"].exit_code, 0)
 
+    def test_evidence_test_discovery_is_deterministic_and_supports_nested_tests(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            self.write_tool_test(
+                repository_root,
+                "evidence/issues/M1-200/tests/nested/test_second.py",
+                "import unittest\n",
+            )
+            self.write_tool_test(
+                repository_root,
+                "evidence/issues/M1-100/tests/test_first.py",
+                "import unittest\n",
+            )
+
+            discovery = cigates.discover_evidence_test_files(repository_root)
+            gates = cigates.build_evidence_test_gate_specs(discovery)
+
+        self.assertEqual(discovery.errors, ())
+        self.assertEqual(
+            [str(path) for path in discovery.relative_paths],
+            [
+                "evidence/issues/M1-100/tests/test_first.py",
+                "evidence/issues/M1-200/tests/nested/test_second.py",
+            ],
+        )
+        self.assertEqual(
+            [gate.name for gate in gates],
+            [
+                "evidence-test:M1-100/tests/test_first.py",
+                "evidence-test:M1-200/tests/nested/test_second.py",
+            ],
+        )
+        self.assertEqual(gates[1].command[5], "evidence/issues/M1-200/tests/nested")
+        self.assertEqual(gates[1].command[7], "test_second.py")
+
+    def test_empty_evidence_tree_is_valid_but_missing_root_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            (repository_root / "evidence/issues").mkdir(parents=True)
+            empty = cigates.discover_evidence_test_files(repository_root)
+            empty_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(repository_root),
+                    "--check-evidence-tests",
+                    "--expected-evidence-test-count",
+                    "0",
+                ]
+            )
+            mismatch_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(repository_root),
+                    "--check-evidence-tests",
+                    "--expected-evidence-test-count",
+                    "1",
+                ]
+            )
+
+            missing_root = repository_root / "missing"
+            missing_root.mkdir()
+            missing = cigates.discover_evidence_test_files(missing_root)
+            missing_exit = cigates.main(
+                [
+                    "--repository-root",
+                    str(missing_root),
+                    "--check-evidence-tests",
+                ]
+            )
+
+        self.assertEqual(empty.relative_paths, ())
+        self.assertEqual(empty.errors, ())
+        self.assertEqual(empty_exit, 0)
+        self.assertEqual(mismatch_exit, 1)
+        self.assertEqual(missing.relative_paths, ())
+        self.assertIn("evidence-root-missing", missing.errors)
+        self.assertEqual(missing_exit, 1)
+
+    def test_symlinked_evidence_issue_and_test_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            external_issue = repository_root / "fixtures/external-issue"
+            external_issue.mkdir(parents=True)
+            issues_root = repository_root / "evidence/issues"
+            issues_root.mkdir(parents=True)
+            (issues_root / "linked-issue").symlink_to(external_issue)
+
+            target = self.write_tool_test(
+                repository_root,
+                "fixtures/test_external.py",
+                "import unittest\n",
+            )
+            linked_test = issues_root / "M1-100/tests/test_linked.py"
+            linked_test.parent.mkdir(parents=True)
+            linked_test.symlink_to(target)
+
+            discovery = cigates.discover_evidence_test_files(repository_root)
+
+        self.assertEqual(discovery.relative_paths, ())
+        self.assertIn("evidence-issue-root-symlink", discovery.errors)
+        self.assertIn("evidence-test-symlink", discovery.errors)
+
+    def test_symlinked_evidence_root_and_tests_root_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            external_evidence = repository_root / "fixtures/external-evidence"
+            (external_evidence / "issues").mkdir(parents=True)
+            (repository_root / "evidence").symlink_to(external_evidence)
+            parent_discovery = cigates.discover_evidence_test_files(repository_root)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            external_issues = repository_root / "fixtures/external-issues"
+            external_issues.mkdir(parents=True)
+            evidence_root = repository_root / "evidence"
+            evidence_root.mkdir()
+            (evidence_root / "issues").symlink_to(external_issues)
+            root_discovery = cigates.discover_evidence_test_files(repository_root)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            external_tests = repository_root / "fixtures/external-tests"
+            external_tests.mkdir(parents=True)
+            issue_root = repository_root / "evidence/issues/M1-100"
+            issue_root.mkdir(parents=True)
+            (issue_root / "tests").symlink_to(external_tests)
+            tests_discovery = cigates.discover_evidence_test_files(repository_root)
+
+        self.assertEqual(parent_discovery.relative_paths, ())
+        self.assertIn("evidence-root-symlink", parent_discovery.errors)
+        self.assertEqual(root_discovery.relative_paths, ())
+        self.assertIn("evidence-issues-root-symlink", root_discovery.errors)
+        self.assertEqual(tests_discovery.relative_paths, ())
+        self.assertIn("evidence-test-symlink", tests_discovery.errors)
+
+    def test_discovered_evidence_gate_propagates_test_failure(self):
+        passing_source = (
+            "import unittest\n"
+            "class Passing(unittest.TestCase):\n"
+            "    def test_ok(self): self.assertTrue(True)\n"
+        )
+        failing_source = (
+            "import unittest\n"
+            "class Failing(unittest.TestCase):\n"
+            "    def test_failure(self): self.fail('synthetic')\n"
+        )
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            self.write_tool_test(
+                repository_root,
+                "evidence/issues/M1-100/tests/test_pass.py",
+                passing_source,
+            )
+            self.write_tool_test(
+                repository_root,
+                "evidence/issues/M1-100/tests/test_fail.py",
+                failing_source,
+            )
+            discovery = cigates.discover_evidence_test_files(repository_root)
+            gates = cigates.build_evidence_test_gate_specs(discovery)
+            results = {
+                gate.command[7]: cigates.run_gate(gate, repository_root, 10)
+                for gate in gates
+            }
+
+        self.assertEqual(results["test_pass.py"].status, "passed")
+        self.assertEqual(results["test_fail.py"].status, "failed")
+        self.assertNotEqual(results["test_fail.py"].exit_code, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
