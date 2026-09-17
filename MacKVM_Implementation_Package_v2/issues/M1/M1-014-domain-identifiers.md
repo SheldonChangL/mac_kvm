@@ -41,6 +41,7 @@ labels:
 
 ## Exact Files
 
+- `Packages/KVMContracts/Sources/KVMContracts/KVMEvent.swift`
 - `Packages/KVMContracts/Sources/KVMContracts/DomainIdentifiers.swift`
 - `Packages/KVMContracts/Tests/KVMContractsTests/DomainIdentifiersTests.swift`
 - `docs/components/M1-014-domain-identifiers.md`
