@@ -37,6 +37,8 @@ _EVENT_FIELDS = frozenset(
 _EVENT_CATALOG = {
     "connectivity.connection.failed": {
         "category": "connectivity",
+        "severity": "warning",
+        "errorCode": None,
         "metadata": {
             "stage": frozenset({"connect", "handshake", "read", "write"}),
             "reason": frozenset(
@@ -49,8 +51,10 @@ _EVENT_CATALOG = {
     },
     "inputSafety.cleanup.completed": {
         "category": "inputSafety",
+        "severity": "info",
+        "errorCode": None,
         "metadata": {
-            "outcome": frozenset({"completed", "partial", "failed"}),
+            "outcome": frozenset({"completed"}),
         },
     },
 }

@@ -178,6 +178,29 @@ class DiagnosticBundleTests(unittest.TestCase):
         ):
             self.create_bundle(payload)
 
+    def test_completed_cleanup_event_cannot_claim_partial_or_failed_outcome(self):
+        for outcome in ("partial", "failed"):
+            with self.subTest(outcome=outcome):
+                payload = valid_payload()
+                payload["logs"][1]["metadata"]["outcome"] = outcome
+
+                with self.assertRaisesRegex(
+                    diagnostic_bundle.BundleError, "invalid_value"
+                ):
+                    self.create_bundle(payload)
+
+    def test_event_catalog_maps_category_severity_error_and_metadata_schema(self):
+        allowed_severities = {"debug", "info", "notice", "warning", "error"}
+
+        for event_id, entry in diagnostic_bundle._EVENT_CATALOG.items():
+            with self.subTest(event_id=event_id):
+                self.assertEqual(
+                    set(entry), {"category", "severity", "errorCode", "metadata"}
+                )
+                self.assertIn(entry["severity"], allowed_severities)
+                self.assertIsNone(entry["errorCode"])
+                self.assertIsInstance(entry["metadata"], dict)
+
     def test_cancellation_removes_partial_archive(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             output = Path(temporary_directory) / "diagnostics.zip"
