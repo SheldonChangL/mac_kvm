@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "51a1ca5337b5ef9653969af9054b2d6abfd4b90f",
+  "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v",
+  "exitCode": 0,
+  "testCount": 15,
+  "result": "passed",
+  "coverage": [
+    "current repository single execution",
+    "deterministic nested discovery",
+    "empty and missing roots",
+    "symlink rejection",
+    "passing suite",
+    "import failure",
+    "assertion failure",
+    "count mismatch",
+    "gate fail-fast behavior",
+    "timeout process cleanup",
+    "cancellation process cleanup",
+    "machine-readable report"
+  ]
+}
