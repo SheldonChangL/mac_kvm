@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "implementationCommit": "c438ff2e6f3ce2a36797b6d7c1330fcf86510d41",
+  "implementationCommit": "4fe69405d0c583fbb4da46146825077b1ff5baa9",
   "status": "passed",
   "results": [
     {
@@ -16,10 +16,16 @@
       "evidence": "nested SwiftPM .build exclusion and all fail-closed source rules passed"
     },
     {
-      "suite": "cumulative repository gates",
-      "tests": 13,
+      "suite": "CI gate orchestrator",
+      "tests": 16,
       "failures": 0,
-      "evidence": "all named gates passed after child .build generation"
+      "evidence": "child package gate is present exactly once with warnings-as-errors"
+    },
+    {
+      "suite": "cumulative repository gates",
+      "tests": 14,
+      "failures": 0,
+      "evidence": "all named gates passed, including swift-package-test:KVMContracts"
     }
   ]
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "issue": "M1-PKG-001",
   "githubIssue": 246,
-  "implementationCommit": "c438ff2e6f3ce2a36797b6d7c1330fcf86510d41",
+  "implementationCommit": "4fe69405d0c583fbb4da46146825077b1ff5baa9",
   "status": "passed",
   "toolchain": {
     "machine": "arm64",
@@ -11,6 +11,11 @@
     "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
   },
   "commands": [
+    {
+      "command": "python3 -m unittest Tools/cigates/tests/test_cigates.py -v",
+      "exitCode": 0,
+      "result": "16 tests passed; child package gate appears exactly once"
+    },
     {
       "command": "swift test --package-path Packages/KVMContracts",
       "exitCode": 0,
@@ -47,11 +52,15 @@
       "result": "architecture check OK after child .build generation"
     },
     {
-      "command": "make verify REPORT=artifacts/ci/m1-pkg-001-committed-report.json",
-      "startedAt": "2026-09-17T01:03:58.941+00:00",
-      "endedAt": "2026-09-17T01:04:13.891+00:00",
+      "command": "make verify REPORT=artifacts/ci/m1-pkg-001-ci-coverage-report.json",
       "exitCode": 0,
-      "result": "13/13 gates passed"
+      "result": "14/14 gates passed; swift-package-test:KVMContracts passed"
+    },
+    {
+      "command": "GitHub run 35169281192",
+      "phase": "pre-merge-review",
+      "exitCode": 0,
+      "result": "old 13-gate set passed but did not execute child package; retained as insufficient evidence and remediated before merge"
     },
     {
       "command": "git diff --check",

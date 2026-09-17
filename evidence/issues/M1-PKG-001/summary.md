@@ -2,7 +2,9 @@
 
 GitHub Issue: #246
 
-Implementation commit: `c438ff2e6f3ce2a36797b6d7c1330fcf86510d41`
+Final implementation commit: `4fe69405d0c583fbb4da46146825077b1ff5baa9`
+
+Package/checker implementation commit: `c438ff2e6f3ce2a36797b6d7c1330fcf86510d41`
 
 ## Outcome
 
@@ -16,6 +18,7 @@ silently walking upward to the repository package and running unrelated tests.
 - `Packages/KVMContracts/Tests/KVMContractsTests/PackageOwnershipTests.swift`
 - Nested SwiftPM `.build` product exclusion in the architecture checker.
 - Architecture regression test and tooling documentation update.
+- Named cumulative `swift-package-test:KVMContracts` blocking gate.
 - This evidence package.
 
 ## Acceptance criteria mapping
@@ -27,8 +30,10 @@ silently walking upward to the repository package and running unrelated tests.
 - Future M1-013 test ownership: its exact test directory is now the child test
   target source root.
 - Sequential compatibility: the exact child test command generates nested
-  `.build` products, after which `make architecture-check` and all 13 cumulative
+  `.build` products, after which `make architecture-check` and all 14 cumulative
   gates pass without cleanup.
+- GitHub enforcement: the cumulative pipeline runs the child package tests once
+  with compiler warnings treated as errors; they are not local-only.
 - Root compatibility: the canonical Xcode workspace build succeeds, and the
   root package test/build gates remain green.
 - Scope: no public API, KVMEvent case, runtime behavior, root dependency edge,
@@ -47,8 +52,8 @@ silently walking upward to the repository package and running unrelated tests.
    trust, or runtime resources are added. The checker ignores only directory
    components named `.build`; actual source, other hidden trees, and source
    symlinks remain fail-closed.
-4. Tests / validation: the ownership test, 27 architecture tests, canonical
-   workspace build, and 13 cumulative gates pass.
+4. Tests / validation: the ownership test, 27 architecture tests, 16 CI-gate
+   tests, canonical workspace build, and 14 cumulative gates pass.
 5. Scope / hygiene / rollback: generated products are ignored, owner artifacts
    remain untracked, and reverting this PR restores the prior state while
    correctly re-blocking M1-013.
@@ -68,6 +73,9 @@ silently walking upward to the repository package and running unrelated tests.
   architecture checker scanned generated `.build` Swift/symlink content. A TDD
   regression reproduced both violations; the checker now excludes only nested
   SwiftPM `.build` products, and the exact command sequence passes.
+- The first PR-head GitHub run passed the old 13-gate set but did not execute the
+  child Swift package. Pre-merge review retained that as evidence, added the
+  named blocking gate, and requires a replacement GitHub run before merge.
 
 ## Known limitations
 
