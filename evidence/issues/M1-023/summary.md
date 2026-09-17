@@ -2,7 +2,7 @@
 
 GitHub Issue: #12
 
-Implementation commit: `4f79bf2900333ff276c19cdffc8fd8d1cc3e2ee7`
+Implementation commit: `706fa8a6295140ad745cb6d03ca176eddf065bd3`
 
 ## Deliverables
 
@@ -34,7 +34,7 @@ Implementation commit: `4f79bf2900333ff276c19cdffc8fd8d1cc3e2ee7`
   mutable runtime resource exists in this registry-only change; not applicable.
 - Architecture/public behavior: no Swift API, parser, encoder, message code,
   networking, TLS policy, KVM Core behavior, input behavior, or UI is added.
-- Formal gates: all Required Commands, the 9-test register suite, and all 14
+- Formal gates: all Required Commands, the 11-test register suite, and all 14
   cumulative repository gates pass at the implementation commit.
 
 ## Fail-closed initial state

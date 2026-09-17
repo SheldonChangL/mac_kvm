@@ -23,7 +23,7 @@ server execution is owned by M1-024, and no mock is used as a substitute.
    - Expected: one in-memory complete-entry happy path passes; missing/empty
      peer version, invalid TLS, sensitive/unreviewed data, traversal, unknown
      metadata, duplicate ids, and unknown-field promotion fail.
-   - Actual: 9/9 tests passed.
+   - Actual: 11/11 tests passed.
 4. Ran all Required Commands and the cumulative repository pipeline.
    - Actual: docs/package/architecture passed; 14/14 repository gates passed.
 5. Inspected repository changes for prohibited material and private content.

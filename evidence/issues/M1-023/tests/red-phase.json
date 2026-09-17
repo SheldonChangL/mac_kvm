@@ -15,7 +15,13 @@
       "exitCode": 1,
       "failureType": "AssertionFailure",
       "failureReason": "duplicate-id validation was masked by fixture existence validation"
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "exitCode": 1,
+      "failureType": "TwoAssertionFailures",
+      "failureReason": "non-empty register status was not coupled to entries and approved evidence did not require a wire claim"
     }
   ],
-  "remediation": "Created the fail-closed register and documentation, hardened closed metadata/path/TLS/privacy/review rules, ordered semantic/id validation before fixture integrity checks, and reran all 9 tests successfully."
+  "remediation": "Created the fail-closed register and documentation; hardened closed metadata, path, TLS, privacy, review, status, approved-claim, and streamed fixture-integrity rules; ordered semantic/id validation before fixture checks; and reran all 11 tests successfully."
 }

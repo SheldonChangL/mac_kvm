@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "issue": "M1-023",
   "githubIssue": 12,
-  "implementationCommit": "4f79bf2900333ff276c19cdffc8fd8d1cc3e2ee7",
+  "implementationCommit": "706fa8a6295140ad745cb6d03ca176eddf065bd3",
   "status": "passed",
   "toolchain": {
     "machine": "arm64",
@@ -13,36 +13,36 @@
   "commands": [
     {
       "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
-      "startedAt": "2026-09-17T06:23:39Z",
-      "endedAt": "2026-09-17T06:23:39Z",
+      "startedAt": "2026-09-17T06:29:17Z",
+      "endedAt": "2026-09-17T06:29:17Z",
       "exitCode": 0,
-      "result": "9 tests passed"
+      "result": "11 tests passed"
     },
     {
       "command": "make docs-check",
-      "startedAt": "2026-09-17T06:22:57.889Z",
-      "endedAt": "2026-09-17T06:22:57.991Z",
+      "startedAt": "2026-09-17T06:29:26.681Z",
+      "endedAt": "2026-09-17T06:29:26.776Z",
       "exitCode": 0,
       "result": "docs check OK"
     },
     {
       "command": "python3 Tools/Backlog/validate_package.py",
-      "startedAt": "2026-09-17T06:22:57.835Z",
-      "endedAt": "2026-09-17T06:22:57.888Z",
+      "startedAt": "2026-09-17T06:29:26.630Z",
+      "endedAt": "2026-09-17T06:29:26.681Z",
       "exitCode": 0,
       "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
     },
     {
       "command": "make architecture-check",
-      "startedAt": "2026-09-17T06:22:57.991Z",
-      "endedAt": "2026-09-17T06:22:58.115Z",
+      "startedAt": "2026-09-17T06:29:26.776Z",
+      "endedAt": "2026-09-17T06:29:26.918Z",
       "exitCode": 0,
       "result": "architecture check OK"
     },
     {
-      "command": "make verify REPORT=artifacts/ci/m1-023-implementation-report.json",
-      "startedAt": "2026-09-17T06:22:57.394Z",
-      "endedAt": "2026-09-17T06:23:18.871Z",
+      "command": "make verify REPORT=artifacts/ci/m1-023-final-implementation-report.json",
+      "startedAt": "2026-09-17T06:29:26.311Z",
+      "endedAt": "2026-09-17T06:29:47.668Z",
       "exitCode": 0,
       "result": "14/14 gates passed"
     },
@@ -69,6 +69,11 @@
       "finding": "duplicate ids were checked after fixture access, masking the intended failure",
       "severity": "medium",
       "result": "fixed before commit by separating semantic/id validation from fixture integrity validation"
+    },
+    {
+      "finding": "a non-empty register could retain the initialized status and an approved entry could contain no wire claim",
+      "severity": "high",
+      "result": "fixed by 706fa8a6295140ad745cb6d03ca176eddf065bd3 with status consistency, non-empty approved claim, and streamed fixture-integrity checks"
     }
   ]
 }
