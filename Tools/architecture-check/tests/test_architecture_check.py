@@ -425,10 +425,11 @@ class ArchitectureCheckTests(unittest.TestCase):
             '("python3", "Tools/architecture-check/architecture-check.py")',
             ci_gate,
         )
-        self.assertIn('"architecture-check-unit-tests"', ci_gate)
-        self.assertIn('"code-quality-unit-tests"', ci_gate)
-        self.assertIn('"Tools/architecture-check/tests"', ci_gate)
-        self.assertIn('"Tools/code-quality/tests"', ci_gate)
+        self.assertIn('"tool-test-discovery"', ci_gate)
+        self.assertIn("discover_tool_test_files", ci_gate)
+        self.assertIn("build_tool_test_gate_specs", ci_gate)
+        self.assertIn("relative_path.parent.as_posix()", ci_gate)
+        self.assertIn("relative_path.name", ci_gate)
 
 
 if __name__ == "__main__":

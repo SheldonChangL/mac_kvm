@@ -67,6 +67,12 @@ class GateResult:
         }
 
 
+@dataclasses.dataclass(frozen=True)
+class ToolTestDiscovery:
+    relative_paths: Tuple[Path, ...]
+    errors: Tuple[str, ...]
+
+
 def output_metadata(output: str):
     encoded = output.encode("utf-8", errors="replace")
     return hashlib.sha256(encoded).hexdigest(), len(output.splitlines())
@@ -153,8 +159,75 @@ def run_gate(
     )
 
 
-def build_gate_specs() -> List[GateSpec]:
-    return [
+def discover_tool_test_files(repository_root: Path) -> ToolTestDiscovery:
+    tools_root = repository_root / "Tools"
+    if not tools_root.is_dir() or tools_root.is_symlink():
+        return ToolTestDiscovery((), ("tools-root-missing",))
+
+    relative_paths = []
+    errors = []
+    try:
+        tool_roots = sorted(tools_root.iterdir(), key=lambda path: path.name)
+        for tool_root in tool_roots:
+            if tool_root.is_symlink():
+                errors.append("tool-root-symlink")
+                continue
+            if not tool_root.is_dir():
+                continue
+            tests_root = tool_root / "tests"
+            if tests_root.is_symlink():
+                errors.append("tool-test-symlink")
+                continue
+            if not tests_root.is_dir():
+                continue
+            for candidate in sorted(
+                tests_root.rglob("*"),
+                key=lambda path: path.relative_to(repository_root).as_posix(),
+            ):
+                if candidate.is_symlink():
+                    errors.append("tool-test-symlink")
+                    continue
+                if (
+                    candidate.is_file()
+                    and candidate.name.startswith("test_")
+                    and candidate.suffix == ".py"
+                ):
+                    relative_paths.append(candidate.relative_to(repository_root))
+    except OSError:
+        errors.append("tool-test-discovery-io-failure")
+
+    unique_paths = tuple(
+        sorted(set(relative_paths), key=lambda path: path.as_posix())
+    )
+    return ToolTestDiscovery(unique_paths, tuple(sorted(set(errors))))
+
+
+def build_tool_test_gate_specs(discovery: ToolTestDiscovery) -> List[GateSpec]:
+    gates = []
+    for relative_path in discovery.relative_paths:
+        tool_relative_path = Path(*relative_path.parts[1:])
+        gates.append(
+            GateSpec(
+                "tool-test:{0}".format(tool_relative_path.as_posix()),
+                (
+                    "python3",
+                    "-m",
+                    "unittest",
+                    "discover",
+                    "-s",
+                    relative_path.parent.as_posix(),
+                    "-p",
+                    relative_path.name,
+                    "-v",
+                ),
+            )
+        )
+    return gates
+
+
+def build_gate_specs(repository_root: Path) -> List[GateSpec]:
+    discovery = discover_tool_test_files(repository_root)
+    gates = [
         GateSpec(
             "manifest-validation",
             ("python3", "Tools/Backlog/validate_package.py"),
@@ -164,92 +237,54 @@ def build_gate_specs() -> List[GateSpec]:
             ("python3", "Tools/docs-check/docs-check.py"),
         ),
         GateSpec(
-            "docs-check-unit-tests",
-            (
-                "python3",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "Tools/docs-check/tests",
-                "-p",
-                "test_*.py",
-                "-v",
-            ),
-        ),
-        GateSpec(
             "architecture-check",
             ("python3", "Tools/architecture-check/architecture-check.py"),
-        ),
-        GateSpec(
-            "architecture-check-unit-tests",
-            (
-                "python3",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "Tools/architecture-check/tests",
-                "-p",
-                "test_*.py",
-                "-v",
-            ),
         ),
         GateSpec(
             "code-quality",
             ("python3", "Tools/code-quality/code-quality.py"),
         ),
         GateSpec(
-            "code-quality-unit-tests",
+            "tool-test-discovery",
             (
                 "python3",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "Tools/code-quality/tests",
-                "-p",
-                "test_*.py",
-                "-v",
+                "Tools/cigates/cigates.py",
+                "--repository-root",
+                ".",
+                "--check-tool-tests",
+                "--expected-tool-test-count",
+                str(len(discovery.relative_paths)),
             ),
-        ),
-        GateSpec(
-            "ci-gate-unit-tests",
-            (
-                "python3",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "Tools/cigates/tests",
-                "-p",
-                "test_*.py",
-                "-v",
-            ),
-        ),
-        GateSpec(
-            "repository-contract-tests",
-            (
-                "python3",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "Tests/Contracts",
-                "-p",
-                "test_*.py",
-                "-v",
-            ),
-        ),
-        GateSpec(
-            "swift-test-targets",
-            ("./Tools/verify/M1-007-test-targets.sh",),
-        ),
-        GateSpec(
-            "native-arm64-build",
-            ("./Tools/verify/M1-005-mac-arm64-build.sh",),
         ),
     ]
+    gates.extend(build_tool_test_gate_specs(discovery))
+    gates.extend(
+        [
+            GateSpec(
+                "repository-contract-tests",
+                (
+                    "python3",
+                    "-m",
+                    "unittest",
+                    "discover",
+                    "-s",
+                    "Tests/Contracts",
+                    "-p",
+                    "test_*.py",
+                    "-v",
+                ),
+            ),
+            GateSpec(
+                "swift-test-targets",
+                ("./Tools/verify/M1-007-test-targets.sh",),
+            ),
+            GateSpec(
+                "native-arm64-build",
+                ("./Tools/verify/M1-005-mac-arm64-build.sh",),
+            ),
+        ]
+    )
+    return gates
 
 
 def command_first_line(command: Sequence[str], repository_root: Path) -> str:
@@ -337,7 +372,7 @@ def run_pipeline(
         f"swift={context['swiftVersion']}"
     )
 
-    gates = build_gate_specs()
+    gates = build_gate_specs(repository_root)
     results = []
     pipeline_exit_code = 0
 
@@ -394,6 +429,8 @@ def parse_arguments(arguments):
         default="artifacts/ci/m1-008-report.json",
     )
     parser.add_argument("--timeout-seconds", type=int, default=600)
+    parser.add_argument("--check-tool-tests", action="store_true")
+    parser.add_argument("--expected-tool-test-count", type=int)
     return parser.parse_args(arguments)
 
 
@@ -406,6 +443,28 @@ def main(arguments=None) -> int:
     if options.timeout_seconds <= 0:
         print("timeout seconds must be positive", file=sys.stderr)
         return EXIT_USAGE
+    if options.check_tool_tests:
+        discovery = discover_tool_test_files(repository_root)
+        if discovery.errors:
+            print(
+                "tool test discovery failed: {0}".format(
+                    ",".join(discovery.errors)
+                ),
+                file=sys.stderr,
+            )
+            return EXIT_FAILURE
+        if (
+            options.expected_tool_test_count is not None
+            and options.expected_tool_test_count != len(discovery.relative_paths)
+        ):
+            print("tool test discovery failed: count-mismatch", file=sys.stderr)
+            return EXIT_FAILURE
+        print(
+            "tool test discovery OK: {0} files".format(
+                len(discovery.relative_paths)
+            )
+        )
+        return 0
 
     report_path = Path(options.report)
     if not report_path.is_absolute():
