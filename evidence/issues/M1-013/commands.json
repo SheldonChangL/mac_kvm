@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-013",
+  "githubIssue": 10,
+  "implementationCommit": "2e761d287080c3a4fc748775d22e009b0493ce9d",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "startedAt": "2026-09-17T01:25:09.490Z",
+      "endedAt": "2026-09-17T01:25:09.492Z",
+      "exitCode": 0,
+      "result": "5 tests passed"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-09-17T01:25:20.288Z",
+      "endedAt": "2026-09-17T01:25:21.640Z",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-17T01:25:39.676Z",
+      "endedAt": "2026-09-17T01:25:39.736Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-17T01:25:39.839Z",
+      "endedAt": "2026-09-17T01:25:39.968Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-17T01:25:39.736Z",
+      "endedAt": "2026-09-17T01:25:39.839Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-013-committed-report.json",
+      "startedAt": "2026-09-17T01:25:39.676Z",
+      "endedAt": "2026-09-17T01:26:01.267Z",
+      "exitCode": 0,
+      "result": "14/14 gates passed"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-17T01:25:27.000Z",
+      "endedAt": "2026-09-17T01:25:27.001Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "remediatedFindings": [
+    {
+      "finding": "NaN preserved by the reference clamp made equality non-reflexive and JSON encoding fail",
+      "severity": "high",
+      "result": "fixed in the implementation commit by normalizing NaN to zero with a regression test"
+    }
+  ]
+}
