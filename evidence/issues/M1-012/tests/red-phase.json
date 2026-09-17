@@ -7,5 +7,5 @@
   "status": "expected_failure",
   "failureType": "FileNotFoundError",
   "failureReason": "Tools/diagnostic-bundle/diagnostic-bundle.py did not exist before implementation",
-  "remediation": "Added the issue-scoped implementation, then reran the same suite with 14 tests passing"
+  "remediation": "Added and hardened the issue-scoped implementation, then reran the same suite with 16 tests passing"
 }

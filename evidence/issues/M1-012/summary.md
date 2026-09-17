@@ -2,7 +2,7 @@
 
 GitHub Issue: #8
 
-Implementation commit: `5e4af2b321bc9f2dd39c32366fbdfc2771666647`
+Implementation commit: `3891f43dc05cb7d05885932f4599c35375ddf5f1`
 
 ## Deliverables
 
@@ -36,10 +36,14 @@ Implementation commit: `5e4af2b321bc9f2dd39c32366fbdfc2771666647`
 ## Security and fail-safe properties
 
 - Input reads are bounded before JSON parsing.
+- Input must be a regular non-symlink file opened once with `O_NOFOLLOW`, so a
+  path swap cannot redirect validation and reading to different sources.
 - Output is assembled in a mode-0600 same-directory temporary file and linked
   atomically only after validation and ZIP closure.
 - Existing output is never overwritten, including a creation race.
 - CLI failure output uses closed error codes and omits input content and paths.
+- Invalid CLI tokens and unexpected internal exceptions are also reduced to
+  fixed nonzero errors without echoing untrusted values or stack traces.
 - `KeyboardInterrupt` exits 130 and cleanup is verified without sleeps/retries.
 
 ## Known limitations and follow-ups
