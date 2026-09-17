@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "registerId": "M1-023",
+  "protocol": "barrier",
+  "status": "initialized-no-approved-evidence",
+  "nextEvidenceIssue": "M1-024",
+  "authoritativePolicyRefs": [
+    "docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy",
+    "docs/adr/M1-003-independent-implementation-policy.md#evidence-register",
+    "MacKVM_Implementation_Package_v2/PROTOCOL_EVIDENCE_POLICY.md#barrier-compatibility",
+    "Tests/Fixtures/fixture-metadata.schema.json"
+  ],
+  "policy": {
+    "consumableDisposition": "approved",
+    "unknownFieldPolicy": "remain-unknown-and-block-wire-claim",
+    "mutationPolicy": "append-only-supersede-never-rewrite",
+    "rawCapturePolicy": "outside-repository-until-sanitized-and-reviewed",
+    "syntheticEvidencePolicy": "cannot-establish-wire-claim-without-approved-source",
+    "prohibitedContent": [
+      "Barrier-or-Deskflow-source",
+      "Barrier-or-Deskflow-header",
+      "GPL-derived-constant-table",
+      "decompiled-implementation",
+      "typed-text",
+      "clipboard-payload",
+      "credential",
+      "private-key",
+      "token",
+      "hostname",
+      "ip-address",
+      "other-private-data"
+    ]
+  },
+  "entryContract": {
+    "evidenceIdPattern": "^BARRIER-EVID-[0-9]{4}$",
+    "relatedIssuePattern": "^M[1-5]-[0-9]{3}$",
+    "utcDateTimePattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$",
+    "fixturePathPattern": "^Tests/Fixtures/Barrier/(?!.*(?:\\.\\./|/\\.\\.(?:/|$)))[A-Za-z0-9][A-Za-z0-9._/-]{0,255}$",
+    "sha256Pattern": "^[a-f0-9]{64}$",
+    "sourceCategories": [
+      "public-specification",
+      "black-box-capture",
+      "sanitized-conformance-vector"
+    ],
+    "dispositions": [
+      "pending-review",
+      "approved",
+      "rejected",
+      "quarantined",
+      "superseded"
+    ],
+    "consumableDisposition": "approved",
+    "emptyEntriesStatus": "initialized-no-approved-evidence",
+    "nonemptyEntriesStatus": "active",
+    "approvedEntryRequiresWireClaim": true,
+    "fixtureIntegrity": "regular-non-symlink-streamed-sha256-and-length",
+    "directions": [
+      "server-to-client",
+      "client-to-server",
+      "bidirectional"
+    ],
+    "allowedObjectKeys": {
+      "$": [
+        "evidenceId",
+        "relatedIssue",
+        "source",
+        "capture",
+        "peer",
+        "transport",
+        "provenance",
+        "sanitization",
+        "fixture",
+        "coverage",
+        "limitations",
+        "ambiguousFields",
+        "prohibitedInferences",
+        "frozenContractRefs",
+        "consumingTests"
+      ],
+      "source": ["category", "acquisitionMethod"],
+      "capture": ["capturedAt", "tools"],
+      "capture.tools[]": ["name", "version"],
+      "peer": ["product", "version", "role", "os"],
+      "peer.os": ["name", "version", "build"],
+      "transport": ["networkScope", "tls"],
+      "transport.tls": [
+        "enabled",
+        "protocolVersion",
+        "certificateIdentitySanitized"
+      ],
+      "provenance": [
+        "lawfulUseStatement",
+        "permittedUse",
+        "producer",
+        "reviewer",
+        "disposition"
+      ],
+      "provenance.reviewer": [
+        "identity",
+        "independentFromProducer",
+        "reviewedAt"
+      ],
+      "sanitization": [
+        "procedure",
+        "status",
+        "containsSensitiveData",
+        "removedCategories"
+      ],
+      "fixture": ["path", "sha256", "byteLength"],
+      "coverage": ["direction", "behaviors", "wireClaims"],
+      "coverage.wireClaims[]": [
+        "claimId",
+        "assertion",
+        "establishedFieldIds",
+        "evidenceLocations"
+      ],
+      "ambiguousFields[]": [
+        "fieldId",
+        "observation",
+        "status",
+        "blockedClaimIds"
+      ]
+    },
+    "requiredFields": [
+      "evidenceId",
+      "relatedIssue",
+      "source.category",
+      "source.acquisitionMethod",
+      "capture.capturedAt",
+      "capture.tools",
+      "peer.product",
+      "peer.version",
+      "peer.role",
+      "peer.os.name",
+      "peer.os.version",
+      "peer.os.build",
+      "transport.networkScope",
+      "transport.tls.enabled",
+      "transport.tls.protocolVersion",
+      "transport.tls.certificateIdentitySanitized",
+      "provenance.lawfulUseStatement",
+      "provenance.permittedUse",
+      "provenance.producer",
+      "provenance.reviewer.identity",
+      "provenance.reviewer.independentFromProducer",
+      "provenance.reviewer.reviewedAt",
+      "provenance.disposition",
+      "sanitization.procedure",
+      "sanitization.status",
+      "sanitization.containsSensitiveData",
+      "sanitization.removedCategories",
+      "fixture.path",
+      "fixture.sha256",
+      "fixture.byteLength",
+      "coverage.direction",
+      "coverage.behaviors",
+      "coverage.wireClaims",
+      "limitations",
+      "ambiguousFields",
+      "prohibitedInferences",
+      "frozenContractRefs",
+      "consumingTests"
+    ]
+  },
+  "entries": []
+}

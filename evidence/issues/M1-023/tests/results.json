@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-023",
+  "commit": "706fa8a6295140ad745cb6d03ca176eddf065bd3",
+  "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+  "startedAt": "2026-09-17T06:29:17Z",
+  "endedAt": "2026-09-17T06:29:17Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 11,
+  "tests": [
+    "test_approved_entry_requires_at_least_one_wire_claim",
+    "test_complete_approved_entry_is_accepted",
+    "test_empty_server_version_is_rejected",
+    "test_enabled_tls_without_observed_version_is_rejected",
+    "test_fixture_path_traversal_and_unknown_metadata_are_rejected",
+    "test_missing_server_version_is_rejected",
+    "test_register_and_documentation_define_fail_closed_contract",
+    "test_register_rejects_unvalidated_entries_and_duplicate_ids",
+    "test_register_status_tracks_entry_presence",
+    "test_sensitive_or_unreviewed_evidence_is_rejected",
+    "test_unknown_field_cannot_be_promoted_to_wire_claim"
+  ]
+}

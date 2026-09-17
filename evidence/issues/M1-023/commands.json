@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-023",
+  "githubIssue": 12,
+  "implementationCommit": "706fa8a6295140ad745cb6d03ca176eddf065bd3",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "startedAt": "2026-09-17T06:29:17Z",
+      "endedAt": "2026-09-17T06:29:17Z",
+      "exitCode": 0,
+      "result": "11 tests passed"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-17T06:29:26.681Z",
+      "endedAt": "2026-09-17T06:29:26.776Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-17T06:29:26.630Z",
+      "endedAt": "2026-09-17T06:29:26.681Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-17T06:29:26.776Z",
+      "endedAt": "2026-09-17T06:29:26.918Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-023-final-implementation-report.json",
+      "startedAt": "2026-09-17T06:29:26.311Z",
+      "endedAt": "2026-09-17T06:29:47.668Z",
+      "exitCode": 0,
+      "result": "14/14 gates passed"
+    },
+    {
+      "command": "git diff --check && git diff --cached --check",
+      "startedAt": "2026-09-17T06:25:04Z",
+      "endedAt": "2026-09-17T06:25:04Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "exitCode": 1,
+      "result": "expected red phase: canonical register did not exist"
+    },
+    {
+      "finding": "empty required metadata and traversal/unknown metadata were not initially rejected",
+      "severity": "high",
+      "result": "fixed before commit with closed keys, non-empty metadata, safe path rules, and regression tests"
+    },
+    {
+      "finding": "duplicate ids were checked after fixture access, masking the intended failure",
+      "severity": "medium",
+      "result": "fixed before commit by separating semantic/id validation from fixture integrity validation"
+    },
+    {
+      "finding": "a non-empty register could retain the initialized status and an approved entry could contain no wire claim",
+      "severity": "high",
+      "result": "fixed by 706fa8a6295140ad745cb6d03ca176eddf065bd3 with status consistency, non-empty approved claim, and streamed fixture-integrity checks"
+    }
+  ]
+}
