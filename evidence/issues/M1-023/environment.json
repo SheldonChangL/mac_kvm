@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-023",
+  "commit": "4f79bf2900333ff276c19cdffc8fd8d1cc3e2ee7",
+  "capturedAt": "2026-09-17T06:23:31Z",
+  "host": {
+    "os": "macOS",
+    "osVersion": "26.6.2",
+    "osBuild": "25G83",
+    "architecture": "arm64",
+    "graphics": "Apple M4 Pro",
+    "keyboardLayout": "com.apple.keylayout.ABC"
+  },
+  "displayLayout": {
+    "status": "not-exercised",
+    "reason": "Registry-only Issue; no input or screen-routing behavior is executed."
+  },
+  "network": {
+    "status": "not-exercised",
+    "identifyingAddressesRecorded": false
+  },
+  "peer": {
+    "status": "not-operated",
+    "product": null,
+    "version": null,
+    "os": null,
+    "tls": null,
+    "reason": "M1-024 owns real Windows/Linux Barrier server captures; no mock is substituted here."
+  },
+  "privacy": {
+    "typedTextRecorded": false,
+    "clipboardPayloadRecorded": false,
+    "credentialOrKeyMaterialRecorded": false,
+    "hostnameOrAddressRecorded": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-023",
+  "phase": "red",
+  "status": "expected_failure",
+  "attempts": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "exitCode": 1,
+      "failureType": "FileNotFoundError",
+      "failureReason": "evidence/registers/M1-023.json did not exist before implementation"
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "exitCode": 1,
+      "failureType": "AssertionFailure",
+      "failureReason": "duplicate-id validation was masked by fixture existence validation"
+    }
+  ],
+  "remediation": "Created the fail-closed register and documentation, hardened closed metadata/path/TLS/privacy/review rules, ordered semantic/id validation before fixture integrity checks, and reran all 9 tests successfully."
+}
