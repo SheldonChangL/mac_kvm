@@ -346,6 +346,19 @@ class ArchitectureCheckTests(unittest.TestCase):
         self.assertEqual(violations[0].rule, "source-read-error")
         self.assertNotIn("ff", architecture_check.format_violation(violations[0]))
 
+    def test_nested_swiftpm_build_products_are_not_repository_source(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_repository(temporary_directory)
+            build_root = root / "Packages/KVMContracts/.build"
+            generated_root = build_root / "arm64-apple-macosx/debug"
+            generated_root.mkdir(parents=True)
+            (generated_root / "runner.swift").write_text("import WinSDK\n")
+            (build_root / "debug").symlink_to(generated_root)
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(violations, [])
+
     def test_symlinked_swift_source_fails_closed(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = self.make_repository(temporary_directory)

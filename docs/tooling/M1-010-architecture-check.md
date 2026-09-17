@@ -37,6 +37,9 @@ Matching requires a word boundary to avoid rejecting unrelated identifiers such 
 ## Fail-closed behavior
 
 - Swift source paths are deterministic and sorted.
+- Nested SwiftPM `.build` directories are generated products, not repository
+  source, and are excluded from both source and symlink discovery. Other hidden
+  directories are not implicitly excluded.
 - Symlinked `.swift` files are rejected rather than followed.
 - Invalid UTF-8 or unreadable source is reported as a typed rule without logging file content.
 - Diagnostics contain only repository-relative path, line, fixed rule id, and allowlisted module/token detail.

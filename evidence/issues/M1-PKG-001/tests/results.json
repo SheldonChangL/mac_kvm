@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "4fe69405d0c583fbb4da46146825077b1ff5baa9",
+  "status": "passed",
+  "results": [
+    {
+      "suite": "KVMContracts child package",
+      "tests": 1,
+      "failures": 0,
+      "evidence": "childPackageOwnsKVMContractsTests passed"
+    },
+    {
+      "suite": "architecture checker",
+      "tests": 27,
+      "failures": 0,
+      "evidence": "nested SwiftPM .build exclusion and all fail-closed source rules passed"
+    },
+    {
+      "suite": "CI gate orchestrator",
+      "tests": 16,
+      "failures": 0,
+      "evidence": "child package gate is present exactly once with warnings-as-errors"
+    },
+    {
+      "suite": "cumulative repository gates",
+      "tests": 14,
+      "failures": 0,
+      "evidence": "all named gates passed, including swift-package-test:KVMContracts"
+    }
+  ]
+}

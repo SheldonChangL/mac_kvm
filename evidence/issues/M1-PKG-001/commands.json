@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PKG-001",
+  "githubIssue": 246,
+  "implementationCommit": "4fe69405d0c583fbb4da46146825077b1ff5baa9",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 -m unittest Tools/cigates/tests/test_cigates.py -v",
+      "exitCode": 0,
+      "result": "16 tests passed; child package gate appears exactly once"
+    },
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "exitCode": 0,
+      "result": "1 child-package ownership test passed"
+    },
+    {
+      "command": "swift package --package-path Packages/KVMContracts describe --type json",
+      "exitCode": 0,
+      "result": "KVMContracts package; KVMContracts library target; KVMContractsTests test target"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "python3 -m unittest Tools/architecture-check/tests/test_architecture_check.py -v",
+      "exitCode": 0,
+      "result": "27 tests passed"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "architecture check OK after child .build generation"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-pkg-001-ci-coverage-report.json",
+      "exitCode": 0,
+      "result": "14/14 gates passed; swift-package-test:KVMContracts passed"
+    },
+    {
+      "command": "GitHub run 35169281192",
+      "phase": "pre-merge-review",
+      "exitCode": 0,
+      "result": "old 13-gate set passed but did not execute child package; retained as insufficient evidence and remediated before merge"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "phase": "red",
+      "exitCode": 0,
+      "result": "false green: parent MacKVM package resolved and three unrelated tests ran"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-pkg-001-implementation-report.json",
+      "phase": "red",
+      "exitCode": 2,
+      "result": "architecture checker treated nested SwiftPM .build products as KVMContracts source"
+    },
+    {
+      "command": "python3 -m unittest Tools/architecture-check/tests/test_architecture_check.py -v",
+      "phase": "red",
+      "exitCode": 1,
+      "result": "new regression test reproduced generated runner.swift and debug symlink violations"
+    }
+  ]
+}

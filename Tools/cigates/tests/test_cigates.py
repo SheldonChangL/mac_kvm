@@ -256,6 +256,27 @@ class CIGateTests(unittest.TestCase):
         )
         self.assertEqual(len(commands), len({tuple(command) for command in commands}))
 
+    def test_actual_gate_list_includes_kvmcontracts_child_package_once(self):
+        gates = cigates.build_gate_specs(REPOSITORY_ROOT)
+        matches = [
+            gate
+            for gate in gates
+            if gate.name == "swift-package-test:KVMContracts"
+        ]
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(
+            matches[0].command,
+            (
+                "swift",
+                "test",
+                "--package-path",
+                "Packages/KVMContracts",
+                "-Xswiftc",
+                "-warnings-as-errors",
+            ),
+        )
+
     def test_tool_test_discovery_is_deterministic_and_supports_nested_tests(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             repository_root = Path(temporary_directory)
