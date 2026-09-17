@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-013",
+  "commit": "2e761d287080c3a4fc748775d22e009b0493ce9d",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-17T01:25:09.490Z",
+  "endedAt": "2026-09-17T01:25:09.492Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 5,
+  "tests": [
+    "childPackageOwnsKVMContractsTests",
+    "allKVMEventVariantsRoundTrip",
+    "normalizedPointClampsConstructionAndDecoding",
+    "invalidClosedEnumValueIsRejected",
+    "nonFiniteNormalizedPointMaintainsValueSemantics"
+  ]
+}

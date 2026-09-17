@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-013",
+  "phase": "red",
+  "status": "expected_failure",
+  "attempts": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "exitCode": 1,
+      "failureType": "SwiftCompilationError",
+      "failureReason": "The contract tests referenced KVMEvent and its required domain payload types before the production declarations existed."
+    },
+    {
+      "command": "swift test --package-path Packages/KVMContracts --filter nonFiniteNormalizedPointMaintainsValueSemantics",
+      "exitCode": 1,
+      "failureType": "TestFailureAndEncodingError",
+      "failureReason": "The reference-style clamp preserved NaN, violating reflexive Equatable semantics, the normalized zero expectation, and JSONEncoder finite-number requirements."
+    }
+  ],
+  "remediation": "Added the issue-scoped domain model, then normalized NaN to zero; the complete child-package suite passed with 5 tests."
+}
