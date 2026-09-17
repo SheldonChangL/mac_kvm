@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CI-003",
+  "phase": "red",
+  "status": "expected_failure",
+  "attempts": [
+    {
+      "command": "python3 -m unittest <four focused evidence-discovery tests> -v",
+      "exitCode": 1,
+      "failureType": "FourAttributeErrors",
+      "failureReason": "discover_evidence_test_files and build_evidence_test_gate_specs did not exist"
+    },
+    {
+      "command": "python3 -m unittest Tools.cigates.tests.test_cigates.CIGateTests.test_symlinked_evidence_root_and_tests_root_are_rejected -v",
+      "exitCode": 1,
+      "failureType": "AssertionFailure",
+      "failureReason": "a symlinked parent evidence directory was not rejected"
+    }
+  ],
+  "remediation": "Added deterministic evidence discovery/gates/CLI count checking, rejected every symlink layer including the parent evidence directory, and reran all 21 CI-gate tests plus 15 cumulative gates successfully."
+}
