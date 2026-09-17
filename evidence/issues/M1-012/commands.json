@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-012",
+  "githubIssue": 8,
+  "implementationCommit": "5e4af2b321bc9f2dd39c32366fbdfc2771666647",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 Tools/diagnostic-bundle/tests/test_diagnostic_bundle.py -v",
+      "startedAt": "2026-09-17T00:13:56.944Z",
+      "endedAt": "2026-09-17T00:13:57.176Z",
+      "exitCode": 0,
+      "result": "14 tests passed"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-09-17T00:14:05.001Z",
+      "endedAt": "2026-09-17T00:14:11.277Z",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-17T00:14:17.401Z",
+      "endedAt": "2026-09-17T00:14:17.525Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-17T00:14:17.525Z",
+      "endedAt": "2026-09-17T00:14:17.635Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-17T00:14:17.635Z",
+      "endedAt": "2026-09-17T00:14:17.791Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-012-implementation-report.json",
+      "startedAt": "2026-09-17T00:14:27.381Z",
+      "endedAt": "2026-09-17T00:14:39.857Z",
+      "exitCode": 0,
+      "result": "11/11 gates passed"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-17T00:14:17.791Z",
+      "endedAt": "2026-09-17T00:14:17.855Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "command": "make code-quality-check",
+      "environment": "restricted outer execution sandbox",
+      "exitCode": 2,
+      "result": "SwiftPM manifest sandbox_apply failed with Operation not permitted"
+    },
+    {
+      "command": "make code-quality-check",
+      "environment": "normal local toolchain environment",
+      "exitCode": 0,
+      "result": "swift-format and Swift tests with warnings-as-errors passed"
+    }
+  ]
+}
