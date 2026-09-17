@@ -35,18 +35,12 @@ _EVENT_FIELDS = frozenset(
     {"category", "eventId", "correlationId", "metadata"}
 )
 _EVENT_CATALOG = {
-    "connectivity.connection.failed": {
+    "connectivity.connection.stateChanged": {
         "category": "connectivity",
-        "severity": "warning",
+        "severity": "info",
         "errorCode": None,
         "metadata": {
-            "stage": frozenset({"connect", "handshake", "read", "write"}),
-            "reason": frozenset(
-                {"unavailable", "disconnected", "refused", "reset", "timeout"}
-            ),
-            "retry": frozenset(
-                {"never", "userActionRequired", "backoff", "immediateAfterStateChange"}
-            ),
+            "state": frozenset({"connecting", "connected", "disconnected"}),
         },
     },
     "inputSafety.cleanup.completed": {

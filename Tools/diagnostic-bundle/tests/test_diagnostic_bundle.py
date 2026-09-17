@@ -36,13 +36,9 @@ def valid_payload():
         "logs": [
             {
                 "category": "connectivity",
-                "eventId": "connectivity.connection.failed",
+                "eventId": "connectivity.connection.stateChanged",
                 "correlationId": "6f4dc34c-1266-4c44-b42c-250bb621a41e",
-                "metadata": {
-                    "stage": "connect",
-                    "reason": "refused",
-                    "retry": "backoff",
-                },
+                "metadata": {"state": "connected"},
             },
             {
                 "category": "inputSafety",

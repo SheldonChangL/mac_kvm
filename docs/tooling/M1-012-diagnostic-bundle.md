@@ -36,7 +36,7 @@ The initial internal event catalog is intentionally small:
 
 | Event id | Category | Severity | Exact metadata |
 |---|---|---|---|
-| `connectivity.connection.failed` | `connectivity` | `warning` | closed `stage`, `reason`, and `retry` enums |
+| `connectivity.connection.stateChanged` | `connectivity` | `info` | closed `state` enum |
 | `inputSafety.cleanup.completed` | `inputSafety` | `info` | `outcome` must be `completed` |
 
 Each event must contain exactly `category`, `eventId`, `correlationId`, and
@@ -45,9 +45,11 @@ category mismatches, metadata keys, enum values, arbitrary strings, and
 non-canonical correlation values fail closed.
 
 Severity and the optional typed error code are fixed catalog properties, not
-caller fields. The initial entries have no error code. A completed event cannot
-carry `partial` or `failed`; those outcomes require separately reviewed event
-ids so diagnostics never assert success for an unsuccessful cleanup.
+caller fields. The initial entries describe non-error outcomes and have no
+error code; this skeleton does not invent an error representation owned by
+M1-015. A completed event cannot carry `partial` or `failed`; those outcomes
+require separately reviewed event ids so diagnostics never assert success for
+an unsuccessful cleanup.
 
 This catalog supports only the skeleton tests and is not a Swift event API.
 Adding an event or field requires the M1-011 catalog/privacy review and an
