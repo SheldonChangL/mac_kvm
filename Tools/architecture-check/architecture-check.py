@@ -14,6 +14,7 @@ EXIT_NOT_FOUND = 66
 EXIT_CANCELLED = 130
 
 SOURCE_SCAN_ROOTS = ("Apps", "Packages", "reference")
+IGNORED_GENERATED_DIRECTORY_NAMES = (".build",)
 KVMCORE_ROOT = "Packages/KVMCore"
 KVMCONTRACTS_ROOT = "Packages/KVMContracts"
 PROTOCOL_ROOTS = ("Packages/BarrierCompatibility", "Packages/NativeProtocol")
@@ -132,13 +133,23 @@ def is_within(relative_path: str, root: str) -> bool:
     return relative_path == root or relative_path.startswith(f"{root}/")
 
 
+def is_generated_path(path: Path, source_root: Path) -> bool:
+    return any(
+        part in IGNORED_GENERATED_DIRECTORY_NAMES
+        for part in path.relative_to(source_root).parts
+    )
+
+
 def swift_source_paths(repository_root: Path):
     paths = []
     for root_name in SOURCE_SCAN_ROOTS:
         source_root = repository_root / root_name
         if source_root.is_dir():
             paths.extend(
-                path for path in source_root.rglob("*.swift") if not path.is_symlink()
+                path
+                for path in source_root.rglob("*.swift")
+                if not path.is_symlink()
+                and not is_generated_path(path, source_root)
             )
     return sorted(paths, key=lambda item: item.relative_to(repository_root).as_posix())
 
@@ -151,7 +162,10 @@ def source_symlink_paths(repository_root: Path):
             paths.append(source_root)
         elif source_root.is_dir():
             paths.extend(
-                path for path in source_root.rglob("*") if path.is_symlink()
+                path
+                for path in source_root.rglob("*")
+                if path.is_symlink()
+                and not is_generated_path(path, source_root)
             )
     return sorted(paths, key=lambda item: item.relative_to(repository_root).as_posix())
 
