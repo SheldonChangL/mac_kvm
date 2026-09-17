@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-XCODE-001",
+  "githubIssue": 241,
+  "implementationCommit": "ba7db5410c4218984ce1cd9a252a4f5e527362cf",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_xcode_workspace -v",
+      "exitCode": 0,
+      "result": "3 tests passed"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-09-16T23:59:58.552Z",
+      "endedAt": "2026-09-17T00:00:08.299Z",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-xcode-001-implementation-report.json",
+      "startedAt": "2026-09-16T23:59:37.372Z",
+      "endedAt": "2026-09-16T23:59:50.054Z",
+      "exitCode": 0,
+      "result": "11/11 gates passed"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ]
+}
