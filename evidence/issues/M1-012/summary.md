@@ -2,7 +2,7 @@
 
 GitHub Issue: #8
 
-Implementation commit: `4a996ed13bba45f0a949b5ea3cc660621201694a`
+Implementation commit: `37b1685796a2c155b3ec2391c3be0e6da29127b8`
 
 ## Deliverables
 
@@ -47,6 +47,8 @@ Implementation commit: `4a996ed13bba45f0a949b5ea3cc660621201694a`
 - Every catalog entry fixes category, severity, optional typed error code, and
   metadata schema. `inputSafety.cleanup.completed` accepts only `completed`, so
   no event can assert success for partial or failed cleanup.
+- Initial catalog entries are non-error outcomes; the skeleton does not invent
+  the typed error representation explicitly owned by M1-015.
 - `KeyboardInterrupt` exits 130 and cleanup is verified without sleeps/retries.
 
 ## Known limitations and follow-ups
