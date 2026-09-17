@@ -56,7 +56,8 @@ Issue that owns the emitting component.
   strings have no schema field and are rejected as `unknown_field`.
 - Values are validated before serialization; there is no best-effort string
   scrubbing, hashing, truncation, debug bypass, or raw exception output.
-- Input is read with a hard 1 MiB bound. At most 256 event records are accepted.
+- Input must be a regular non-symlink file and is read through one opened file
+  descriptor with a hard 1 MiB bound. At most 256 event records are accepted.
 - Output is created beside a mode-0600 temporary file, fully closed, then
   atomically linked into place. Existing output is never overwritten.
 - Failure or `KeyboardInterrupt` removes the temporary archive. Error output is
@@ -69,7 +70,8 @@ lifecycle behavior.
 ## Exit behavior
 
 - `0`: bundle created.
-- `2`: typed validation, input, output, I/O, or cleanup failure.
+- `2`: typed arguments, validation, input, output, I/O, cleanup, or internal
+  failure.
 - `130`: cancellation by `KeyboardInterrupt`.
 
 Success prints only `diagnostic bundle created`. Failure prints only

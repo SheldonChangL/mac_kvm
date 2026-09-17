@@ -285,6 +285,48 @@ class DiagnosticBundleTests(unittest.TestCase):
             self.assertEqual(result.stderr, "")
             self.assertTrue(zipfile.is_zipfile(output))
 
+    def test_input_symlink_is_rejected_without_creating_output(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            source = Path(temporary_directory) / "source.json"
+            input_path = Path(temporary_directory) / "input.json"
+            output = Path(temporary_directory) / "diagnostics.zip"
+            source.write_text(json.dumps(valid_payload()), encoding="utf-8")
+            input_path.symlink_to(source)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(TOOL_PATH),
+                    "--input",
+                    str(input_path),
+                    "--output",
+                    str(output),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(
+            result.stderr.strip(), "diagnostic bundle failed: input_unavailable"
+        )
+        self.assertFalse(output.exists())
+
+    def test_invalid_cli_arguments_do_not_echo_untrusted_values(self):
+        result = subprocess.run(
+            [sys.executable, str(TOOL_PATH), "--unexpected=typed-secret"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(
+            result.stderr.strip(), "diagnostic bundle failed: invalid_arguments"
+        )
+        self.assertNotIn("typed-secret", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

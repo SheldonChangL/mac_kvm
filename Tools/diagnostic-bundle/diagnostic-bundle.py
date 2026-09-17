@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
 import uuid
@@ -59,6 +60,11 @@ class BundleError(Exception):
     def __init__(self, code):
         self.code = code
         super().__init__(code)
+
+
+class _SafeArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise BundleError("invalid_arguments")
 
 
 def _require_mapping(value):
@@ -233,15 +239,28 @@ def create_bundle(payload, output_path, before_commit=None):
 
 def create_bundle_from_file(input_path, output_path, before_commit=None):
     source = Path(input_path)
+    descriptor = None
     try:
-        if source.stat().st_size > MAX_INPUT_BYTES:
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        descriptor = os.open(source, flags)
+        source_status = os.fstat(descriptor)
+        if not stat.S_ISREG(source_status.st_mode):
+            raise BundleError("invalid_input_file")
+        if source_status.st_size > MAX_INPUT_BYTES:
             raise BundleError("input_too_large")
-        with source.open("rb") as source_file:
+        with os.fdopen(descriptor, "rb") as source_file:
+            descriptor = None
             raw_input = source_file.read(MAX_INPUT_BYTES + 1)
     except BundleError:
         raise
     except OSError:
         raise BundleError("input_unavailable") from None
+    finally:
+        if descriptor is not None:
+            try:
+                os.close(descriptor)
+            except OSError:
+                raise BundleError("cleanup_failed") from None
 
     if len(raw_input) > MAX_INPUT_BYTES:
         raise BundleError("input_too_large")
@@ -254,7 +273,7 @@ def create_bundle_from_file(input_path, output_path, before_commit=None):
 
 
 def _parse_arguments(arguments):
-    parser = argparse.ArgumentParser(
+    parser = _SafeArgumentParser(
         description="Create a fail-closed, allowlisted MacKVM diagnostic bundle."
     )
     parser.add_argument("--input", required=True, help="Structured JSON input")
@@ -263,8 +282,8 @@ def _parse_arguments(arguments):
 
 
 def main(arguments=None):
-    options = _parse_arguments(arguments)
     try:
+        options = _parse_arguments(arguments)
         create_bundle_from_file(options.input, options.output)
     except BundleError as error:
         print(
@@ -275,6 +294,9 @@ def main(arguments=None):
     except KeyboardInterrupt:
         print("diagnostic bundle cancelled", file=sys.stderr)
         return 130
+    except Exception:
+        print("diagnostic bundle failed: internal_failure", file=sys.stderr)
+        return 2
     print("diagnostic bundle created")
     return 0
 
