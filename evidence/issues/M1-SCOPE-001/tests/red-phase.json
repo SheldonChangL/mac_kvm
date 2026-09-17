@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-SCOPE-001",
+  "phase": "red",
+  "command": "python3 evidence/issues/M1-SCOPE-001/tests/test_m1_014_exact_files.py -v",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "testsRun": 2,
+  "failures": 1,
+  "failureReason": "M1-014 Issue and manifest omitted Packages/KVMContracts/Sources/KVMContracts/KVMEvent.swift from Exact Files",
+  "remediation": "Added the existing extraction source to both canonical lists without changing any other M1-014 scope or product behavior."
+}

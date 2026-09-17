@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-SCOPE-001",
+  "commit": "c2ba1b2ea631c86d31ac74e7139bcf985021314d",
+  "command": "python3 evidence/issues/M1-SCOPE-001/tests/test_m1_014_exact_files.py -v",
+  "startedAt": "2026-09-17T23:47:31Z",
+  "endedAt": "2026-09-17T23:47:31Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 2,
+  "tests": [
+    "test_issue_and_manifest_declare_the_required_extraction_file",
+    "test_m1_013_documentation_predeclares_semantics_preserving_extraction"
+  ]
+}

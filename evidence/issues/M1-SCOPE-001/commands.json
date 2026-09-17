@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-SCOPE-001",
+  "githubIssue": 253,
+  "implementationCommit": "c2ba1b2ea631c86d31ac74e7139bcf985021314d",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 evidence/issues/M1-SCOPE-001/tests/test_m1_014_exact_files.py -v",
+      "startedAt": "2026-09-17T23:47:31Z",
+      "endedAt": "2026-09-17T23:47:31Z",
+      "exitCode": 0,
+      "result": "2 tests passed"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-17T23:47:43.113Z",
+      "endedAt": "2026-09-17T23:47:43.183Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-17T23:47:43.183Z",
+      "endedAt": "2026-09-17T23:47:43.318Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-17T23:47:43.318Z",
+      "endedAt": "2026-09-17T23:47:43.484Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-scope-001-implementation-report.json",
+      "startedAt": "2026-09-17T23:47:41.772Z",
+      "endedAt": "2026-09-17T23:48:14.812Z",
+      "exitCode": 0,
+      "result": "17/17 gates passed, including the M1-SCOPE-001 evidence test"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-17T23:48:30Z",
+      "endedAt": "2026-09-17T23:48:30Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ]
+}
