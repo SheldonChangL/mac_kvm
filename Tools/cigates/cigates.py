@@ -68,7 +68,7 @@ class GateResult:
 
 
 @dataclasses.dataclass(frozen=True)
-class ToolTestDiscovery:
+class TestDiscovery:
     relative_paths: Tuple[Path, ...]
     errors: Tuple[str, ...]
 
@@ -159,10 +159,10 @@ def run_gate(
     )
 
 
-def discover_tool_test_files(repository_root: Path) -> ToolTestDiscovery:
+def discover_tool_test_files(repository_root: Path) -> TestDiscovery:
     tools_root = repository_root / "Tools"
     if not tools_root.is_dir() or tools_root.is_symlink():
-        return ToolTestDiscovery((), ("tools-root-missing",))
+        return TestDiscovery((), ("tools-root-missing",))
 
     relative_paths = []
     errors = []
@@ -199,10 +199,61 @@ def discover_tool_test_files(repository_root: Path) -> ToolTestDiscovery:
     unique_paths = tuple(
         sorted(set(relative_paths), key=lambda path: path.as_posix())
     )
-    return ToolTestDiscovery(unique_paths, tuple(sorted(set(errors))))
+    return TestDiscovery(unique_paths, tuple(sorted(set(errors))))
 
 
-def build_tool_test_gate_specs(discovery: ToolTestDiscovery) -> List[GateSpec]:
+def discover_evidence_test_files(repository_root: Path) -> TestDiscovery:
+    evidence_root = repository_root / "evidence"
+    if evidence_root.is_symlink():
+        return TestDiscovery((), ("evidence-root-symlink",))
+    if not evidence_root.is_dir():
+        return TestDiscovery((), ("evidence-root-missing",))
+
+    issues_root = evidence_root / "issues"
+    if issues_root.is_symlink():
+        return TestDiscovery((), ("evidence-issues-root-symlink",))
+    if not issues_root.is_dir():
+        return TestDiscovery((), ("evidence-issues-root-missing",))
+
+    relative_paths = []
+    errors = []
+    try:
+        issue_roots = sorted(issues_root.iterdir(), key=lambda path: path.name)
+        for issue_root in issue_roots:
+            if issue_root.is_symlink():
+                errors.append("evidence-issue-root-symlink")
+                continue
+            if not issue_root.is_dir():
+                continue
+            tests_root = issue_root / "tests"
+            if tests_root.is_symlink():
+                errors.append("evidence-test-symlink")
+                continue
+            if not tests_root.is_dir():
+                continue
+            for candidate in sorted(
+                tests_root.rglob("*"),
+                key=lambda path: path.relative_to(repository_root).as_posix(),
+            ):
+                if candidate.is_symlink():
+                    errors.append("evidence-test-symlink")
+                    continue
+                if (
+                    candidate.is_file()
+                    and candidate.name.startswith("test_")
+                    and candidate.suffix == ".py"
+                ):
+                    relative_paths.append(candidate.relative_to(repository_root))
+    except OSError:
+        errors.append("evidence-test-discovery-io-failure")
+
+    unique_paths = tuple(
+        sorted(set(relative_paths), key=lambda path: path.as_posix())
+    )
+    return TestDiscovery(unique_paths, tuple(sorted(set(errors))))
+
+
+def build_tool_test_gate_specs(discovery: TestDiscovery) -> List[GateSpec]:
     gates = []
     for relative_path in discovery.relative_paths:
         tool_relative_path = Path(*relative_path.parts[1:])
@@ -225,8 +276,32 @@ def build_tool_test_gate_specs(discovery: ToolTestDiscovery) -> List[GateSpec]:
     return gates
 
 
+def build_evidence_test_gate_specs(discovery: TestDiscovery) -> List[GateSpec]:
+    gates = []
+    for relative_path in discovery.relative_paths:
+        evidence_relative_path = Path(*relative_path.parts[2:])
+        gates.append(
+            GateSpec(
+                "evidence-test:{0}".format(evidence_relative_path.as_posix()),
+                (
+                    "python3",
+                    "-m",
+                    "unittest",
+                    "discover",
+                    "-s",
+                    relative_path.parent.as_posix(),
+                    "-p",
+                    relative_path.name,
+                    "-v",
+                ),
+            )
+        )
+    return gates
+
+
 def build_gate_specs(repository_root: Path) -> List[GateSpec]:
-    discovery = discover_tool_test_files(repository_root)
+    tool_discovery = discover_tool_test_files(repository_root)
+    evidence_discovery = discover_evidence_test_files(repository_root)
     gates = [
         GateSpec(
             "manifest-validation",
@@ -253,11 +328,24 @@ def build_gate_specs(repository_root: Path) -> List[GateSpec]:
                 ".",
                 "--check-tool-tests",
                 "--expected-tool-test-count",
-                str(len(discovery.relative_paths)),
+                str(len(tool_discovery.relative_paths)),
+            ),
+        ),
+        GateSpec(
+            "evidence-test-discovery",
+            (
+                "python3",
+                "Tools/cigates/cigates.py",
+                "--repository-root",
+                ".",
+                "--check-evidence-tests",
+                "--expected-evidence-test-count",
+                str(len(evidence_discovery.relative_paths)),
             ),
         ),
     ]
-    gates.extend(build_tool_test_gate_specs(discovery))
+    gates.extend(build_tool_test_gate_specs(tool_discovery))
+    gates.extend(build_evidence_test_gate_specs(evidence_discovery))
     gates.extend(
         [
             GateSpec(
@@ -442,6 +530,8 @@ def parse_arguments(arguments):
     parser.add_argument("--timeout-seconds", type=int, default=600)
     parser.add_argument("--check-tool-tests", action="store_true")
     parser.add_argument("--expected-tool-test-count", type=int)
+    parser.add_argument("--check-evidence-tests", action="store_true")
+    parser.add_argument("--expected-evidence-test-count", type=int)
     return parser.parse_args(arguments)
 
 
@@ -472,6 +562,28 @@ def main(arguments=None) -> int:
             return EXIT_FAILURE
         print(
             "tool test discovery OK: {0} files".format(
+                len(discovery.relative_paths)
+            )
+        )
+        return 0
+    if options.check_evidence_tests:
+        discovery = discover_evidence_test_files(repository_root)
+        if discovery.errors:
+            print(
+                "evidence test discovery failed: {0}".format(
+                    ",".join(discovery.errors)
+                ),
+                file=sys.stderr,
+            )
+            return EXIT_FAILURE
+        if (
+            options.expected_evidence_test_count is not None
+            and options.expected_evidence_test_count != len(discovery.relative_paths)
+        ):
+            print("evidence test discovery failed: count-mismatch", file=sys.stderr)
+            return EXIT_FAILURE
+        print(
+            "evidence test discovery OK: {0} files".format(
                 len(discovery.relative_paths)
             )
         )

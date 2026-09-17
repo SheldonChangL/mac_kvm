@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CI-003",
+  "commit": "78c0262419c934b12329c6e4af4276cac42e5d56",
+  "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v",
+  "startedAt": "2026-09-17T06:40:53Z",
+  "endedAt": "2026-09-17T06:40:53Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 21,
+  "coverage": [
+    "current repository tool-test single execution",
+    "tool and evidence deterministic nested discovery",
+    "empty and missing roots",
+    "parent, root, issue, tests, nested, and file symlink rejection",
+    "evidence count mismatch",
+    "passing evidence test",
+    "failing evidence test",
+    "tool import and assertion failure",
+    "pipeline fail-fast and not-run states",
+    "timeout process-group cleanup",
+    "cancellation process-group cleanup",
+    "machine-readable report",
+    "KVMContracts child package gate",
+    "arm64 read-only GitHub workflow contract"
+  ]
+}
