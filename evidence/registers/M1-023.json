@@ -50,6 +50,10 @@
       "superseded"
     ],
     "consumableDisposition": "approved",
+    "emptyEntriesStatus": "initialized-no-approved-evidence",
+    "nonemptyEntriesStatus": "active",
+    "approvedEntryRequiresWireClaim": true,
+    "fixtureIntegrity": "regular-non-symlink-streamed-sha256-and-length",
     "directions": [
       "server-to-client",
       "client-to-server",

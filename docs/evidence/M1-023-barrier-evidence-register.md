@@ -40,7 +40,14 @@ Only an entry whose `provenance.disposition` is exactly `approved` may support
 a wire contract or implementation. `pending-review`, `rejected`, `quarantined`,
 and `superseded` entries are non-consumable. Approval requires a reviewer who
 is independent of the evidence producer; a Product Owner merge-review waiver
-does not convert unreviewed protocol evidence into approved evidence.
+does not convert unreviewed protocol evidence into approved evidence. An
+approved entry must establish at least one individually identified wire claim;
+an empty approval cannot be used as a compatibility gate.
+
+The register status must match its contents: an empty register remains
+`initialized-no-approved-evidence`, while any non-empty register is `active`.
+Retained fixtures must be regular files whose path contains no symlink; length
+and SHA-256 are verified with bounded streaming reads before an entry passes.
 
 Updates are append-only. Corrections add a replacement entry and mark the old
 entry `superseded`; they never rewrite the provenance, fixture digest, or review

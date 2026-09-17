@@ -100,6 +100,8 @@ def validate_entry(register, entry):
             raise ValueError("approved evidence requires independent review")
         if reviewer["identity"] == entry["provenance"]["producer"]:
             raise ValueError("producer cannot independently approve evidence")
+        if not entry["coverage"]["wireClaims"]:
+            raise ValueError("approved evidence requires at least one wire claim")
 
     claim_ids = set()
     established_field_ids = set()
@@ -147,6 +149,9 @@ def validate_register(register):
         raise ValueError("unexpected register fields")
     if register["status"] not in {"initialized-no-approved-evidence", "active"}:
         raise ValueError("invalid register status")
+    expected_status = "active" if register["entries"] else "initialized-no-approved-evidence"
+    if register["status"] != expected_status:
+        raise ValueError("register status does not match entry presence")
 
     evidence_ids = set()
     for entry in register["entries"]:
@@ -157,12 +162,21 @@ def validate_register(register):
 
     for entry in register["entries"]:
         fixture_path = REPOSITORY_ROOT / entry["fixture"]["path"]
-        if fixture_path.is_symlink() or not fixture_path.is_file():
+        relative_fixture_path = Path(entry["fixture"]["path"])
+        current = REPOSITORY_ROOT
+        for component in relative_fixture_path.parts:
+            current = current / component
+            if current.is_symlink():
+                raise ValueError("registered fixture path cannot contain a symlink")
+        if not fixture_path.is_file():
             raise ValueError("registered fixture must be a regular non-symlink file")
-        payload = fixture_path.read_bytes()
-        if len(payload) != entry["fixture"]["byteLength"]:
+        if fixture_path.stat().st_size != entry["fixture"]["byteLength"]:
             raise ValueError("registered fixture byte length mismatch")
-        if hashlib.sha256(payload).hexdigest() != entry["fixture"]["sha256"]:
+        digest = hashlib.sha256()
+        with fixture_path.open("rb") as fixture:
+            for chunk in iter(lambda: fixture.read(64 * 1024), b""):
+                digest.update(chunk)
+        if digest.hexdigest() != entry["fixture"]["sha256"]:
             raise ValueError("registered fixture digest mismatch")
 
 
@@ -311,6 +325,7 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         sensitive = self.sample_entry()
         sensitive["sanitization"]["containsSensitiveData"] = True
         register = copy.deepcopy(self.register)
+        register["status"] = "active"
         register["entries"] = [sensitive]
         with self.assertRaisesRegex(ValueError, "sensitive"):
             validate_register(register)
@@ -320,6 +335,20 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         register["entries"] = [duplicate, copy.deepcopy(duplicate)]
         with self.assertRaisesRegex(ValueError, "duplicate evidence id"):
             validate_register(register)
+
+    def test_register_status_tracks_entry_presence(self):
+        entry = self.sample_entry()
+        entry["provenance"]["disposition"] = "pending-review"
+        register = copy.deepcopy(self.register)
+        register["entries"] = [entry]
+        with self.assertRaisesRegex(ValueError, "status"):
+            validate_register(register)
+
+    def test_approved_entry_requires_at_least_one_wire_claim(self):
+        entry = self.sample_entry()
+        entry["coverage"]["wireClaims"] = []
+        with self.assertRaisesRegex(ValueError, "wire claim"):
+            validate_entry(self.register, entry)
 
 
 if __name__ == "__main__":
