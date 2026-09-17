@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "c438ff2e6f3ce2a36797b6d7c1330fcf86510d41",
+  "status": "passed",
+  "results": [
+    {
+      "suite": "KVMContracts child package",
+      "tests": 1,
+      "failures": 0,
+      "evidence": "childPackageOwnsKVMContractsTests passed"
+    },
+    {
+      "suite": "architecture checker",
+      "tests": 27,
+      "failures": 0,
+      "evidence": "nested SwiftPM .build exclusion and all fail-closed source rules passed"
+    },
+    {
+      "suite": "cumulative repository gates",
+      "tests": 13,
+      "failures": 0,
+      "evidence": "all named gates passed after child .build generation"
+    }
+  ]
+}
