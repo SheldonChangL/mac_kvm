@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CI-003",
+  "githubIssue": 251,
+  "implementationCommit": "78c0262419c934b12329c6e4af4276cac42e5d56",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py' -v",
+      "startedAt": "2026-09-17T06:40:53Z",
+      "endedAt": "2026-09-17T06:40:53Z",
+      "exitCode": 0,
+      "result": "21 tests passed"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-17T06:41:24.960Z",
+      "endedAt": "2026-09-17T06:41:25.011Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-17T06:41:25.011Z",
+      "endedAt": "2026-09-17T06:41:25.107Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-17T06:41:25.107Z",
+      "endedAt": "2026-09-17T06:41:25.224Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-ci-003-implementation-report.json",
+      "startedAt": "2026-09-17T06:41:24.860Z",
+      "endedAt": "2026-09-17T06:41:44.134Z",
+      "exitCode": 0,
+      "result": "15/15 gates passed; evidence-test-discovery passed with zero files on pre-M1-023 main"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-17T06:42:01Z",
+      "endedAt": "2026-09-17T06:42:01Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ]
+}
