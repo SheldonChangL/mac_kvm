@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "issue": "M1-012",
   "githubIssue": 8,
-  "implementationCommit": "3891f43dc05cb7d05885932f4599c35375ddf5f1",
+  "implementationCommit": "4a996ed13bba45f0a949b5ea3cc660621201694a",
   "status": "passed",
   "toolchain": {
     "machine": "arm64",
@@ -13,50 +13,50 @@
   "commands": [
     {
       "command": "python3 Tools/diagnostic-bundle/tests/test_diagnostic_bundle.py -v",
-      "startedAt": "2026-09-17T00:17:36.381Z",
-      "endedAt": "2026-09-17T00:17:36.669Z",
+      "startedAt": "2026-09-17T00:22:00.761Z",
+      "endedAt": "2026-09-17T00:22:01.044Z",
       "exitCode": 0,
-      "result": "16 tests passed"
+      "result": "18 tests passed"
     },
     {
       "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
-      "startedAt": "2026-09-17T00:17:43.350Z",
-      "endedAt": "2026-09-17T00:17:49.879Z",
+      "startedAt": "2026-09-17T00:22:06.546Z",
+      "endedAt": "2026-09-17T00:22:13.059Z",
       "exitCode": 0,
       "result": "BUILD SUCCEEDED"
     },
     {
       "command": "python3 Tools/Backlog/validate_package.py",
-      "startedAt": "2026-09-17T00:17:55.614Z",
-      "endedAt": "2026-09-17T00:17:55.737Z",
+      "startedAt": "2026-09-17T00:22:18.058Z",
+      "endedAt": "2026-09-17T00:22:18.183Z",
       "exitCode": 0,
       "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
     },
     {
       "command": "make architecture-check",
-      "startedAt": "2026-09-17T00:17:55.738Z",
-      "endedAt": "2026-09-17T00:17:55.843Z",
+      "startedAt": "2026-09-17T00:22:18.183Z",
+      "endedAt": "2026-09-17T00:22:18.288Z",
       "exitCode": 0,
       "result": "architecture check OK"
     },
     {
       "command": "make docs-check",
-      "startedAt": "2026-09-17T00:17:55.843Z",
-      "endedAt": "2026-09-17T00:17:56.003Z",
+      "startedAt": "2026-09-17T00:22:18.288Z",
+      "endedAt": "2026-09-17T00:22:18.440Z",
       "exitCode": 0,
       "result": "docs check OK"
     },
     {
-      "command": "make verify REPORT=artifacts/ci/m1-012-hardened-implementation-report.json",
-      "startedAt": "2026-09-17T00:18:07.639Z",
-      "endedAt": "2026-09-17T00:18:19.754Z",
+      "command": "make verify REPORT=artifacts/ci/m1-012-contract-fixed-implementation-report.json",
+      "startedAt": "2026-09-17T00:22:29.332Z",
+      "endedAt": "2026-09-17T00:22:41.944Z",
       "exitCode": 0,
       "result": "11/11 gates passed"
     },
     {
       "command": "git diff --check",
-      "startedAt": "2026-09-17T00:17:56.003Z",
-      "endedAt": "2026-09-17T00:17:56.072Z",
+      "startedAt": "2026-09-17T00:22:18.441Z",
+      "endedAt": "2026-09-17T00:22:18.503Z",
       "exitCode": 0,
       "result": "no output"
     }
@@ -73,6 +73,11 @@
       "environment": "normal local toolchain environment",
       "exitCode": 0,
       "result": "swift-format and Swift tests with warnings-as-errors passed"
+    },
+    {
+      "finding": "completed cleanup event allowed partial or failed outcome and catalog lacked fixed severity",
+      "severity": "medium",
+      "result": "fixed by 4a996ed13bba45f0a949b5ea3cc660621201694a with two regression tests"
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 GitHub Issue: #8
 
-Implementation commit: `3891f43dc05cb7d05885932f4599c35375ddf5f1`
+Implementation commit: `4a996ed13bba45f0a949b5ea3cc660621201694a`
 
 ## Deliverables
 
@@ -44,6 +44,9 @@ Implementation commit: `3891f43dc05cb7d05885932f4599c35375ddf5f1`
 - CLI failure output uses closed error codes and omits input content and paths.
 - Invalid CLI tokens and unexpected internal exceptions are also reduced to
   fixed nonzero errors without echoing untrusted values or stack traces.
+- Every catalog entry fixes category, severity, optional typed error code, and
+  metadata schema. `inputSafety.cleanup.completed` accepts only `completed`, so
+  no event can assert success for partial or failed cleanup.
 - `KeyboardInterrupt` exits 130 and cleanup is verified without sleeps/retries.
 
 ## Known limitations and follow-ups
