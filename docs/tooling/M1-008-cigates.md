@@ -12,9 +12,10 @@ M1-008 adds one fail-fast build/test/manifest gate used locally by `make verify`
 4. Code-quality/Swift warnings-as-errors validation.
 5. Fail-closed tool-test discovery and count consistency.
 6. One isolated gate for every sorted `Tools/*/tests/**/test_*.py` file.
-7. Repository contract tests.
-8. Swift Unit/Integration/System test-target verifier.
-9. Native macOS 14 arm64 build verifier.
+7. Issue-scoped `KVMContracts` child-package tests with compiler warnings as errors.
+8. Repository contract tests.
+9. Swift Unit/Integration/System test-target verifier.
+10. Native macOS 14 arm64 build verifier.
 
 The first non-passing gate stops execution, marks later gates `not-run`, writes the report, and returns non-zero. A timeout terminates the spawned process group. Keyboard interruption and runner `SIGTERM` use the same cleanup path, return exit 130, and make a best-effort report write before the runner's forced-termination grace period ends.
 
@@ -35,6 +36,10 @@ Schema version 1 includes:
 Because each discovered tool test file is a separate gate, the report is also
 the canonical index of exactly which suites CI executed. Existing suites are
 not separately hard-coded, preventing duplicate execution.
+
+The `swift-package-test:KVMContracts` gate runs the child package directly, so
+tests owned by contract Issues cannot silently fall back to or be omitted from
+the root package test run.
 
 Raw stdout/stderr is intentionally excluded from the report so future fixture or failure content cannot become a durable artifact. The console prints only allowlisted context and gate status metadata.
 

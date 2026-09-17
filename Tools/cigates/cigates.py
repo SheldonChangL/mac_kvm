@@ -261,6 +261,17 @@ def build_gate_specs(repository_root: Path) -> List[GateSpec]:
     gates.extend(
         [
             GateSpec(
+                "swift-package-test:KVMContracts",
+                (
+                    "swift",
+                    "test",
+                    "--package-path",
+                    "Packages/KVMContracts",
+                    "-Xswiftc",
+                    "-warnings-as-errors",
+                ),
+            ),
+            GateSpec(
                 "repository-contract-tests",
                 (
                     "python3",
