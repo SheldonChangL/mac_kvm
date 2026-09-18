@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-017",
+  "commit": "5f2bb6c15bd22c2848531fd985d2dc798cd56a64",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-18T05:31:17.983Z",
+  "endedAt": "2026-09-18T05:31:20.227Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 29,
+  "issueTests": [
+    "transportConnectsAndPreservesOutboundByteOrder",
+    "incomingChunksRemainOrderedWithoutImplyingFrameBoundaries",
+    "zeroLengthChunksAreNoOps",
+    "transportRejectsInvalidLifecycleOperations",
+    "disconnectIsIdempotentAndFinishesIncomingBytes",
+    "typedFailureTerminatesIncomingBytes",
+    "cancellationRemainsATypedTerminalFailure",
+    "boundedBufferOverflowFailsClosedWithoutReordering"
+  ],
+  "regressionTestsRun": 21
+}

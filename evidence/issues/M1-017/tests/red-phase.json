@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-017",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "TransportTests referenced the Transport protocol before the production contract existed.",
+  "remediation": "Added only the ordered byte-stream Transport contract, its semantics documentation, and contract tests; all 29 package tests then passed."
+}

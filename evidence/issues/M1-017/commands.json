@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-017",
+  "githubIssue": 20,
+  "implementationCommit": "5f2bb6c15bd22c2848531fd985d2dc798cd56a64",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "startedAt": "2026-09-18T05:31:17.983Z",
+      "endedAt": "2026-09-18T05:31:20.227Z",
+      "exitCode": 0,
+      "result": "29 tests passed"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-09-18T05:31:55.810Z",
+      "endedAt": "2026-09-18T05:31:56.799Z",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-18T05:31:15.600Z",
+      "endedAt": "2026-09-18T05:31:15.633Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-18T05:31:15.633Z",
+      "endedAt": "2026-09-18T05:31:15.726Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-18T05:31:15.726Z",
+      "endedAt": "2026-09-18T05:31:15.830Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make code-quality-check",
+      "startedAt": "2026-09-18T05:31:15.830Z",
+      "endedAt": "2026-09-18T05:31:16.885Z",
+      "exitCode": 0,
+      "result": "swift-format version/lint and warnings-as-errors passed"
+    },
+    {
+      "command": "git diff --check HEAD",
+      "startedAt": "2026-09-18T05:32:39Z",
+      "endedAt": "2026-09-18T05:32:39Z",
+      "exitCode": 0,
+      "result": "no output"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-017-implementation-report.json",
+      "startedAt": "2026-09-18T05:31:15.518Z",
+      "endedAt": "2026-09-18T05:31:34.004Z",
+      "exitCode": 0,
+      "result": "17/17 gates passed"
+    }
+  ]
+}
