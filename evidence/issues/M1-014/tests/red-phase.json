@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-014",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "DomainIdentifiersTests referenced SessionID before the production declaration existed.",
+  "remediation": "Extracted DeviceID and ScreenID without semantic changes and added the equivalent SessionID declaration; all 8 package tests then passed."
+}

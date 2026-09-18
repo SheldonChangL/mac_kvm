@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-014",
+  "commit": "082ff1843d8a4fa8e562d6caa74d2cef8e287b59",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-18T00:02:54.243Z",
+  "endedAt": "2026-09-18T00:03:02.456Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 8,
+  "issueTests": [
+    "domainIdentifiersPreserveTheirUUIDAndRoundTrip",
+    "domainIdentifiersSupportUUIDBoundaryValues",
+    "malformedIdentifierPayloadsAreRejected"
+  ],
+  "regressionCoverage": [
+    "allKVMEventVariantsRoundTrip",
+    "normalizedPointClampsConstructionAndDecoding",
+    "invalidClosedEnumValueIsRejected",
+    "nonFiniteNormalizedPointMaintainsValueSemantics",
+    "childPackageOwnsKVMContractsTests"
+  ]
+}
