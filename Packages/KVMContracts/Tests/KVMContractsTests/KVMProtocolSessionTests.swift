@@ -10,6 +10,7 @@ private actor RecordingProtocolSession: KVMProtocolSession {
   private(set) var connectCount = 0
   private(set) var sentEvents: [KVMEvent] = []
   private(set) var disconnectReasons: [DisconnectReason] = []
+  private var hasConnected = false
   private var isTerminal = false
 
   init() {
@@ -19,6 +20,16 @@ private actor RecordingProtocolSession: KVMProtocolSession {
   }
 
   func connect() async throws(CoreError) {
+    guard !hasConnected, !isTerminal else {
+      throw CoreError(
+        code: .internalFailure(.preconditionFailed),
+        severity: .error,
+        retryDisposition: .never,
+        cleanupDisposition: .notRequired
+      )
+    }
+
+    hasConnected = true
     connectCount += 1
   }
 
@@ -59,11 +70,8 @@ private actor RecordingProtocolSession: KVMProtocolSession {
   }
 }
 
-private func requireSessionContract<T: KVMProtocolSession>(_: T) {}
-
 @Test func sessionConnectsSendsAndEmitsPlatformNeutralEvents() async throws {
   let session = RecordingProtocolSession()
-  requireSessionContract(session)
   var iterator = session.events.makeAsyncIterator()
   let event = KVMEvent.scroll(deltaX: -1, deltaY: 2)
 
@@ -73,6 +81,20 @@ private func requireSessionContract<T: KVMProtocolSession>(_: T) {}
   #expect(try await iterator.next() == event)
   #expect(await session.connectCount == 1)
   #expect(await session.sentEvents == [event])
+}
+
+@Test func sessionRejectsRepeatedConnectAndReconnectAfterTermination() async throws {
+  let session = RecordingProtocolSession()
+
+  try await session.connect()
+  await #expect(throws: CoreError.self) {
+    try await session.connect()
+  }
+
+  await session.disconnect(reason: .userRequested)
+  await #expect(throws: CoreError.self) {
+    try await session.connect()
+  }
 }
 
 @Test func disconnectReasonsAreClosedTypedAndCodable() throws {
