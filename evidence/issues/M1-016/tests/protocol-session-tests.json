@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-016",
+  "commit": "a3d292c554cc95b1dd8c00d982d8214d731338e9",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-18T05:12:47.246Z",
+  "endedAt": "2026-09-18T05:12:49.383Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 21,
+  "issueTests": [
+    "sessionConnectsSendsAndEmitsPlatformNeutralEvents",
+    "sessionRejectsRepeatedConnectAndReconnectAfterTermination",
+    "disconnectReasonsAreClosedTypedAndCodable",
+    "gracefulDisconnectFinishesEventsAndIsIdempotent",
+    "terminalFailureFinishesEventsWithTheTypedCoreError",
+    "cancellationIsTerminalAndSendAfterTerminationFailsClosed"
+  ],
+  "regressionTestsRun": 15
+}

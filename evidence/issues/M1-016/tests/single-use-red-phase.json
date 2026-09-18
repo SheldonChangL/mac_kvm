@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-016",
+  "phase": "review-finding-red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-18T05:11:51.811Z",
+  "endedAt": "2026-09-18T05:11:51.813Z",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "TestExpectationFailure",
+  "failedTest": "sessionRejectsRepeatedConnectAndReconnectAfterTermination",
+  "failureReason": "The recording conformer accepted both repeated connect and reconnect after terminal completion, contradicting the documented single-use contract.",
+  "remediation": "The conformer now rejects both paths with a typed CoreError; the final 21-test package run passed."
+}
