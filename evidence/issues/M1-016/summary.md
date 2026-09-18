@@ -2,7 +2,7 @@
 
 GitHub Issue: #19
 
-Implementation commit: `77c93e38add832931215ebdef5d83f36026120d9`
+Implementation commit: `a3d292c554cc95b1dd8c00d982d8214d731338e9`
 
 ## Deliverables
 
@@ -29,6 +29,8 @@ Implementation commit: `77c93e38add832931215ebdef5d83f36026120d9`
 - Cancellation and cleanup: cancellation remains a typed terminal failure,
   normal disconnect completes once, repeated disconnect is safe, and send
   after termination fails closed.
+- Single-use lifecycle: repeated connect and reconnect after terminal state
+  both fail closed in the contract conformer test.
 - Architecture: no Barrier/native wire token, Transport implementation, socket,
   OS input type, platform cleanup, UI, TLS implementation, or logging sink is
   introduced.
