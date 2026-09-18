@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-015",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "CoreErrorsTests referenced the Core error, result, retry, cleanup, cancellation, and diagnostic-code types before the production taxonomy existed.",
+  "remediation": "Added only the closed M1-011-derived taxonomy and privacy-safe numeric diagnostic code; all 15 package tests then passed."
+}
