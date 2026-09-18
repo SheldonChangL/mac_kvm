@@ -20,8 +20,9 @@ Implementation commit: `d4e8ae2c798e0c853e9767b36c2c897505101c61`
   terminal/cancellation refinements rather than an unreported replacement.
 - Happy path: a `Sendable` conformer connects, sends, and emits the same
   platform-neutral `KVMEvent`.
-- Boundary and invalid input: every closed disconnect reason round-trips at the
-  `Int32.min` diagnostic boundary, while an unknown reason fails decoding.
+- Boundary and invalid input: send after terminal completion fails closed,
+  every closed disconnect reason round-trips, and an unknown reason fails
+  decoding.
 - Error and privacy: connect/send use typed `CoreError` throws; failure stream
   termination preserves the typed error and encoded reasons contain no message
   or description field.
@@ -56,6 +57,8 @@ Implementation commit: `d4e8ae2c798e0c853e9767b36c2c897505101c61`
 - Swift's constructible `AsyncThrowingStream` currently uses existential
   `Error`. The public documentation and tests require conformers to emit only
   `CoreError`; concrete session Issues must retain this invariant.
+- The recorded local Xcode result is an incremental workspace build. The PR CI
+  must also pass from its clean checkout before merge.
 - The resource-free test conformer proves contract behavior, not future socket,
   task, timer, TLS, trust, or input-state cleanup. Resource owners must add
   implementation-level idempotency and cancellation tests.

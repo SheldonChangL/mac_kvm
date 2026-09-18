@@ -59,7 +59,7 @@ private actor RecordingProtocolSession: KVMProtocolSession {
   }
 }
 
-private func requireSessionContract<T: KVMProtocolSession & Sendable>(_: T) {}
+private func requireSessionContract<T: KVMProtocolSession>(_: T) {}
 
 @Test func sessionConnectsSendsAndEmitsPlatformNeutralEvents() async throws {
   let session = RecordingProtocolSession()
@@ -80,8 +80,7 @@ private func requireSessionContract<T: KVMProtocolSession & Sendable>(_: T) {}
     code: .security(.identityChanged),
     severity: .error,
     retryDisposition: .userActionRequired,
-    cleanupDisposition: .completed,
-    underlyingDiagnosticCode: UnderlyingDiagnosticCode(rawValue: Int32.min)
+    cleanupDisposition: .completed
   )
   let reasons: [DisconnectReason] = [
     .userRequested,

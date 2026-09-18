@@ -1,5 +1,3 @@
-import Foundation
-
 /// The closed, privacy-safe reason supplied when a protocol session is ended.
 ///
 /// Protocol adapters may refine a terminal failure into `CoreError`, but must
@@ -32,10 +30,15 @@ public protocol KVMProtocolSession: Sendable {
   ///
   /// A normal disconnect finishes the stream once. Cancellation and failure
   /// finish it by throwing a `CoreError`. Implementations must map all other
-  /// implementation errors to `CoreError` before crossing this boundary.
+  /// implementation errors to `CoreError` before crossing this boundary. The
+  /// stream has exactly one consumer; creating multiple iterators is invalid.
   var events: AsyncThrowingStream<KVMEvent, any Error> { get }
 
   /// Connects and completes only after the protocol session can send events.
+  ///
+  /// A session instance is single-use. Repeated connect, including after a
+  /// terminal result, must fail closed with `CoreError`; reconnect creates a
+  /// new session instance and event stream.
   func connect() async throws(CoreError)
 
   /// Encodes and sends one platform-neutral event in session order.
@@ -45,6 +48,8 @@ public protocol KVMProtocolSession: Sendable {
   ///
   /// This operation is asynchronous so callers can await terminal stream
   /// delivery and resource cleanup. It must be idempotent and must not depend
-  /// on a successful network response.
+  /// on a successful network response. Cleanup must complete in bounded time
+  /// even when the calling task is already cancelled; cancellation must not
+  /// cause an early return that skips cleanup or terminal stream delivery.
   func disconnect(reason: DisconnectReason) async
 }

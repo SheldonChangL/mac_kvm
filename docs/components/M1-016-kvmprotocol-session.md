@@ -34,6 +34,21 @@ values. Swift currently constructs `AsyncThrowingStream` with existential
 `Error`; conformers therefore MUST translate any thrown implementation error
 to the closed `CoreError` taxonomy before it crosses this boundary.
 
+### Reference package delta
+
+The reference package predates M1-015 and uses free-form String payloads for
+`protocolError` and `securityRejected`, plus standalone `timeout`. M1-016
+intentionally replaces those reference-only cases with:
+
+- `.failure(CoreError)`, which represents protocol, security, timeout,
+  transport, and other failures through the closed M1-015 taxonomy; and
+- `.cancellation(CancellationReason)`, which makes structured cancellation an
+  explicit terminal failure.
+
+`userRequested`, `transportClosed`, and `applicationTermination` remain as
+closed non-payload cases. This delta removes privacy-unsafe strings without
+changing C-003's reasoned disconnect semantics.
+
 ## Contract
 
 `KVMProtocolSession` is `Sendable` and provides:
@@ -48,6 +63,11 @@ to the closed `CoreError` taxonomy before it crosses this boundary.
 Barrier and Native Protocol implementations conform to the same interface.
 KVM Core depends on this protocol, never on either concrete implementation.
 
+Each session instance and its event stream are single-use. `events` has one
+consumer; multiple iterators could divide events and are invalid. A repeated
+`connect()`, including after terminal completion, fails closed with a typed
+error. Reconnect creates a new session instance with a new event stream.
+
 ## Terminal and cancellation semantics
 
 A conforming implementation must satisfy all of the following:
@@ -61,7 +81,10 @@ A conforming implementation must satisfy all of the following:
   original message, description, path, address, peer identity, or payload;
 - after terminal completion, new sends fail closed with a typed error;
 - repeated disconnect calls are safe and do not repeat resource cleanup; and
-- disconnect and cleanup do not depend on receiving a network response.
+- disconnect and cleanup do not depend on receiving a network response;
+- cleanup completes in bounded time even if the caller's task is already
+  cancelled; and
+- Task cancellation cannot skip cleanup or terminal stream delivery.
 
 `DisconnectReason` is deliberately closed and `Codable`:
 
