@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-014",
+  "githubIssue": 13,
+  "implementationCommit": "082ff1843d8a4fa8e562d6caa74d2cef8e287b59",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "startedAt": "2026-09-18T00:02:54.243Z",
+      "endedAt": "2026-09-18T00:03:02.456Z",
+      "exitCode": 0,
+      "result": "8 tests passed"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-09-18T00:03:02.457Z",
+      "endedAt": "2026-09-18T00:03:07.477Z",
+      "exitCode": 0,
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-18T00:03:07.477Z",
+      "endedAt": "2026-09-18T00:03:11.754Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-18T00:03:11.754Z",
+      "endedAt": "2026-09-18T00:03:15.525Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-18T00:03:15.525Z",
+      "endedAt": "2026-09-18T00:03:18.751Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "git diff --check HEAD",
+      "startedAt": "2026-09-18T00:03:18.751Z",
+      "endedAt": "2026-09-18T00:03:21.767Z",
+      "exitCode": 0,
+      "result": "no output"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-014-implementation-report.json",
+      "startedAt": "2026-09-18T00:03:21.767Z",
+      "endedAt": "2026-09-18T00:03:49.875Z",
+      "exitCode": 0,
+      "result": "17/17 gates passed"
+    }
+  ]
+}
