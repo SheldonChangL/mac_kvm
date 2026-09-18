@@ -2,7 +2,7 @@
 
 GitHub Issue: #19
 
-Implementation commit: `d4e8ae2c798e0c853e9767b36c2c897505101c61`
+Implementation commit: `77c93e38add832931215ebdef5d83f36026120d9`
 
 ## Deliverables
 
