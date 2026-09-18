@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-016",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "KVMProtocolSessionTests referenced KVMProtocolSession and DisconnectReason before the production contract existed.",
+  "environmentNote": "An initial run was discarded because the outer execution sandbox prevented SwiftPM manifest evaluation; the recorded red run was repeated outside that sandbox and reached the expected compiler errors.",
+  "remediation": "Added only the closed session contract, typed disconnect reasons, documentation, and contract tests; all 20 package tests then passed."
+}
