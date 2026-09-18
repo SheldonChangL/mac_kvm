@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-015",
+  "commit": "0287018890f09b65c60144eb1fb6328c1b4fdbec",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-18T00:17:03.740Z",
+  "endedAt": "2026-09-18T00:17:09.656Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 15,
+  "issueTests": [
+    "errorCodesMapToTheFrozenDomains",
+    "frozenErrorCodeAllowlistsAreComplete",
+    "typedFailureRoundTripsWithoutArbitraryErrorContent",
+    "retryDispositionSeparatesAutomaticAndUserMediatedRetry",
+    "underlyingDiagnosticCodePreservesInt32Boundaries",
+    "unknownTaxonomyValuesFailClosed",
+    "cancellationFailureRemainsTypedAndTerminal"
+  ],
+  "regressionTestsRun": 8
+}
