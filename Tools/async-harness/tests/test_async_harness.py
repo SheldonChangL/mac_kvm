@@ -64,6 +64,10 @@ async def sleep_then_record(harness, name, duration_nanoseconds):
     harness.record("{0}-woke".format(name), task=name)
 
 
+async def noop():
+    return None
+
+
 async def yield_then_sleep(harness, duration_nanoseconds):
     await harness.yield_now()
     await harness.sleep(duration_nanoseconds)
@@ -691,6 +695,276 @@ class TeardownTests(HarnessTestCase):
         self.assertEqual(harness.state("pending"), "closed")
         self.assertEqual(harness.pending_sleep_count, 0)
         self.assertTrue(harness.is_idle)
+
+
+class FailFastCleanupTests(HarnessTestCase):
+    """A rejected await must not let its cleanup block drive the scheduler."""
+
+    def test_unsupported_await_cleanup_cannot_mutate_the_harness(self):
+        observed = []
+
+        async def attacker(harness):
+            try:
+                await BogusAwaitable()
+            finally:
+                try:
+                    harness.advance(10)
+                except async_harness.HarnessError as error:
+                    observed.append(error.code)
+
+        harness = self.make_harness()
+        harness.spawn("victim", sleep_then_record(harness, "victim", 10))
+        attacking = attacker(harness)
+        harness.spawn("attacker", attacking)
+        harness.run_until_blocked()
+
+        self.assertEqual(observed, ["harness-tearing-down"])
+        self.assertEqual(harness.now, 0)
+        self.assertEqual(harness.state("victim"), "sleeping")
+        self.assertEqual(harness.pending_sleep_count, 1)
+        self.assertNotIn("victim-woke", notes(harness))
+        self.assertCoroutineClosed(attacking)
+        self.assertEqual(harness.state("attacker"), "failed")
+        with self.assertRaises(async_harness.HarnessError) as captured:
+            harness.result("attacker")
+        self.assertEqual(captured.exception.code, "unsupported-await")
+
+    def test_clock_overflow_cleanup_cannot_mutate_the_harness(self):
+        observed = []
+
+        async def attacker(harness):
+            try:
+                await harness.sleep(async_harness.MAX_SLEEP_NANOSECONDS)
+            finally:
+                try:
+                    harness.advance(10)
+                except async_harness.HarnessError as error:
+                    observed.append(error.code)
+
+        harness = self.make_harness()
+        harness.advance(async_harness.MAX_CLOCK_NANOSECONDS)
+        harness.spawn("victim", sleep_then_record(harness, "victim", 0))
+        attacking = attacker(harness)
+        harness.spawn("attacker", attacking)
+        harness.run_until_blocked()
+
+        self.assertEqual(observed, ["harness-tearing-down"])
+        self.assertEqual(harness.now, async_harness.MAX_CLOCK_NANOSECONDS)
+        self.assertCoroutineClosed(attacking)
+        with self.assertRaises(async_harness.HarnessError) as captured:
+            harness.result("attacker")
+        self.assertEqual(captured.exception.code, "clock-overflow")
+
+    def test_fail_fast_cleanup_rejects_every_control_entry_point(self):
+        observed = []
+
+        async def attacker(harness):
+            try:
+                await BogusAwaitable()
+            finally:
+                attempts = (
+                    ("advance", lambda: harness.advance(10)),
+                    ("spawn", lambda: harness.spawn("late", noop())),
+                    ("run", lambda: harness.run_until_blocked()),
+                    ("cancel", lambda: harness.cancel("victim")),
+                )
+                for label, attempt in attempts:
+                    try:
+                        attempt()
+                        observed.append((label, "allowed"))
+                    except async_harness.HarnessError as error:
+                        observed.append((label, error.code))
+                harness.record("attacker-cleanup", task="attacker")
+
+        harness = self.make_harness()
+        harness.spawn("victim", sleep_then_record(harness, "victim", 10))
+        harness.spawn("attacker", attacker(harness))
+        harness.run_until_blocked()
+
+        self.assertEqual(
+            observed,
+            [
+                ("advance", "harness-tearing-down"),
+                ("spawn", "harness-tearing-down"),
+                ("run", "harness-tearing-down"),
+                ("cancel", "harness-tearing-down"),
+            ],
+        )
+        self.assertEqual(harness.now, 0)
+        self.assertEqual(harness.state("victim"), "sleeping")
+        self.assertEqual(harness.active_task_names, ("victim",))
+        self.assertIn("attacker-cleanup", notes(harness))
+
+    def test_fail_fast_cleanup_failure_keeps_the_primary_task_failure(self):
+        async def attacker(harness):
+            try:
+                await BogusAwaitable()
+            finally:
+                raise ValueError("cleanup boom")
+
+        harness = self.make_harness()
+        harness.spawn("attacker", attacker(harness))
+        harness.spawn("healthy", record_then_yield(harness, "healthy", 1))
+        harness.run_until_blocked()
+
+        self.assertEqual(harness.state("attacker"), "failed")
+        self.assertEqual(harness.state("healthy"), "completed")
+        with self.assertRaises(async_harness.HarnessError) as captured:
+            harness.result("attacker")
+        self.assertEqual(captured.exception.code, "unsupported-await")
+        self.assertIn(
+            ("failed", "attacker", "unsupported-await"), projection(harness)
+        )
+        self.assertIn(
+            ("cleanup-failed", "attacker", "ValueError"), projection(harness)
+        )
+
+    def test_fail_fast_cleanup_does_not_swallow_a_budget_violation(self):
+        async def attacker(harness):
+            try:
+                await BogusAwaitable()
+            finally:
+                raise async_harness.HarnessLimitError("scenario-budget")
+
+        harness = self.make_harness()
+        harness.spawn("attacker", attacker(harness))
+
+        with self.assertRaises(async_harness.HarnessLimitError) as captured:
+            harness.run_until_blocked()
+        self.assertEqual(captured.exception.code, "scenario-budget")
+
+        self.assertEqual(harness.state("attacker"), "failed")
+        self.assertIn(
+            ("cleanup-failed", "attacker", "HarnessLimitError"),
+            projection(harness),
+        )
+
+
+class TeardownCleanupFailureTests(HarnessTestCase):
+    """One bad cleanup block must not abandon the remaining coroutines."""
+
+    def build_two_pending(self, failure):
+        async def raising(harness):
+            try:
+                await harness.sleep(100)
+            finally:
+                harness.record("first-cleanup", task="first")
+                raise failure
+
+        harness = self.make_harness()
+        first = raising(harness)
+        harness.spawn("first", first)
+        second = sleep_then_record(harness, "second", 50)
+        harness.spawn("second", second)
+        harness.run_until_blocked()
+        return harness, first, second
+
+    def assertFullyTornDown(self, harness, first, second):
+        self.assertCoroutineClosed(first)
+        self.assertCoroutineClosed(second)
+        self.assertEqual(harness.state("first"), "closed")
+        self.assertEqual(harness.state("second"), "closed")
+        self.assertEqual(harness.pending_sleep_count, 0)
+        self.assertEqual(harness.active_task_names, ())
+        self.assertTrue(harness.is_idle)
+        self.assertIn(("closed", "second", "teardown"), projection(harness))
+
+    def test_limit_error_cleanup_still_closes_the_remaining_task(self):
+        harness, first, second = self.build_two_pending(
+            async_harness.HarnessLimitError("scenario-budget")
+        )
+
+        with self.assertRaises(async_harness.HarnessLimitError) as captured:
+            harness.close()
+        self.assertEqual(captured.exception.code, "scenario-budget")
+
+        self.assertFullyTornDown(harness, first, second)
+        self.assertIn(
+            ("cleanup-failed", "first", "HarnessLimitError"),
+            projection(harness),
+        )
+
+    def test_keyboard_interrupt_cleanup_still_closes_the_remaining_task(self):
+        harness, first, second = self.build_two_pending(KeyboardInterrupt())
+
+        with self.assertRaises(KeyboardInterrupt):
+            harness.close()
+
+        self.assertFullyTornDown(harness, first, second)
+        self.assertIn(
+            ("cleanup-failed", "first", "KeyboardInterrupt"),
+            projection(harness),
+        )
+
+    def test_system_exit_cleanup_still_closes_the_remaining_task(self):
+        harness, first, second = self.build_two_pending(SystemExit(3))
+
+        with self.assertRaises(SystemExit):
+            harness.close()
+
+        self.assertFullyTornDown(harness, first, second)
+        self.assertIn(
+            ("cleanup-failed", "first", "SystemExit"), projection(harness)
+        )
+
+    def test_close_reports_only_the_first_cleanup_failure(self):
+        async def raising(harness, name, failure):
+            try:
+                await harness.sleep(100)
+            finally:
+                raise failure
+
+        harness = self.make_harness()
+        harness.spawn("first", raising(harness, "first", ValueError("first")))
+        harness.spawn(
+            "second", raising(harness, "second", KeyError("second"))
+        )
+        harness.run_until_blocked()
+
+        with self.assertRaises(ValueError):
+            harness.close()
+
+        self.assertEqual(harness.active_task_names, ())
+        self.assertEqual(harness.pending_sleep_count, 0)
+        self.assertIn(
+            ("cleanup-failed", "second", "KeyError"), projection(harness)
+        )
+
+    def test_limit_break_preserves_its_budget_error_over_cleanup_failure(self):
+        async def forever(harness):
+            while True:
+                await harness.yield_now()
+
+        async def raising(harness):
+            try:
+                await harness.sleep(100)
+            finally:
+                raise async_harness.HarnessLimitError("scenario-budget")
+
+        harness = self.make_harness(max_steps=4)
+        raiser = raising(harness)
+        harness.spawn("raiser", raiser)
+        pending = sleep_then_record(harness, "pending", 100)
+        harness.spawn("pending", pending)
+        spinner = forever(harness)
+        harness.spawn("spinner", spinner)
+
+        with self.assertRaises(async_harness.HarnessLimitError) as captured:
+            harness.run_until_blocked()
+        self.assertEqual(captured.exception.code, "step-limit-exceeded")
+
+        self.assertCoroutineClosed(raiser)
+        self.assertCoroutineClosed(pending)
+        self.assertEqual(harness.state("raiser"), "closed")
+        self.assertEqual(harness.state("pending"), "closed")
+        self.assertEqual(harness.pending_sleep_count, 0)
+        self.assertEqual(harness.active_task_names, ())
+        self.assertTrue(harness.is_idle)
+        self.assertIn(
+            ("cleanup-failed", "raiser", "HarnessLimitError"),
+            projection(harness),
+        )
+        self.assertIn(("closed", "pending", "limit-break"), projection(harness))
 
 
 class CommandLineTests(HarnessTestCase):

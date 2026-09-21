@@ -321,6 +321,31 @@ class Harness:
         self._teardown("limit-break")
         raise HarnessLimitError(code)
 
+    def _close_coroutine(self, task: _Task) -> Optional[BaseException]:
+        """Closes one coroutine under the teardown mutation guard.
+
+        The guard is held for the whole `close()` call, so a `finally` block
+        that reaches back into `spawn`, `advance`, `run_until_blocked` or
+        `cancel` is rejected with `harness-tearing-down` instead of mutating
+        the clock or the queues of an unrelated task. Every cleanup failure,
+        including a `BaseException`, is recorded by type name and returned
+        rather than propagated, so one bad cleanup block can never abort the
+        caller's own cleanup loop.
+        """
+        self._teardown_depth += 1
+        try:
+            task.coroutine.close()
+        except BaseException as error:  # noqa: BLE001 - cleanup must not mask
+            self._record(
+                "cleanup-failed",
+                task.name,
+                _safe_detail(type(error).__name__),
+            )
+            return error
+        finally:
+            self._teardown_depth -= 1
+        return None
+
     def _teardown(self, reason: str) -> Optional[BaseException]:
         self._teardown_depth += 1
         first_failure = None  # type: Optional[BaseException]
@@ -336,20 +361,12 @@ class Harness:
                 task.pending_throw = None
                 task.state = "closed"
                 self._record("closed", task.name, reason)
-                try:
-                    task.coroutine.close()
-                except HarnessLimitError:
-                    raise
-                except (Exception, TaskCancelled) as error:  # noqa: BLE001
-                    self._record(
-                        "cleanup-failed",
-                        task.name,
-                        _safe_detail(type(error).__name__),
-                    )
-                    if first_failure is None:
-                        first_failure = error
-            self._runnable.clear()
+                cleanup_failure = self._close_coroutine(task)
+                if cleanup_failure is not None and first_failure is None:
+                    first_failure = cleanup_failure
         finally:
+            self._runnable.clear()
+            self._sleepers.clear()
             self._teardown_depth -= 1
         return first_failure
 
@@ -434,19 +451,21 @@ class Harness:
         """Fails a task the scheduler refuses to resume, and closes it.
 
         The rejection is never thrown back into the task, so scenario code
-        cannot catch a harness contract violation and keep running.
+        cannot catch a harness contract violation and keep running. The close
+        runs under the same mutation guard as `close()`, so the failing task's
+        `finally` block cannot advance the clock, spawn, drain the runnable
+        queue or cancel an unrelated task on its way out. A cleanup block that
+        itself raises is recorded as `cleanup-failed` and never replaces the
+        task's primary failure; a cleanup `BaseException` still propagates,
+        after being recorded, so a budget violation or a keyboard interrupt is
+        not swallowed by the scheduler.
         """
         self._finish_failed(task, error, error.code)
-        try:
-            task.coroutine.close()
-        except HarnessLimitError:
-            raise
-        except (Exception, TaskCancelled) as cleanup_error:  # noqa: BLE001
-            self._record(
-                "cleanup-failed",
-                task.name,
-                _safe_detail(type(cleanup_error).__name__),
-            )
+        cleanup_failure = self._close_coroutine(task)
+        if cleanup_failure is not None and not isinstance(
+            cleanup_failure, (Exception, TaskCancelled)
+        ):
+            raise cleanup_failure
 
     def _handle_request(self, task: _Task, request: Any) -> None:
         if isinstance(request, tuple) and request == ("yield",):
@@ -505,6 +524,19 @@ async def _self_check_cleaner(harness: Harness) -> None:
         harness.record("cleanup", task="cleaner")
 
 
+def _closed_after_failure(harness: Harness) -> None:
+    """Closes a harness on an error path without masking the first error.
+
+    A cleanup block that raises is already recorded as `cleanup-failed` in the
+    harness event log, so dropping it here loses no diagnosis while keeping
+    the failure that actually aborted the scenario.
+    """
+    try:
+        harness.close()
+    except BaseException:  # noqa: BLE001 - the original failure must win
+        pass
+
+
 def _build_self_check_harness() -> Harness:
     harness = Harness()
     try:
@@ -518,7 +550,7 @@ def _build_self_check_harness() -> Harness:
         harness.run_until_blocked()
         harness.advance(20)
     except BaseException:
-        harness.close()
+        _closed_after_failure(harness)
         raise
     return harness
 
@@ -548,7 +580,11 @@ def _invariants_hold(harness: Harness) -> bool:
 
 def run_self_check() -> Dict[str, Any]:
     first = _build_self_check_harness()
-    second = _build_self_check_harness()
+    try:
+        second = _build_self_check_harness()
+    except BaseException:
+        _closed_after_failure(first)
+        raise
     first_events = [_event_payload(event) for event in first.events]
     second_events = [_event_payload(event) for event in second.events]
     report = {
@@ -560,8 +596,10 @@ def run_self_check() -> Dict[str, Any]:
         "clockNanoseconds": first.now,
         "events": first_events,
     }
-    first.close()
-    second.close()
+    try:
+        first.close()
+    finally:
+        second.close()
     return report
 
 

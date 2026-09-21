@@ -83,6 +83,12 @@ Terminal states are `completed`, `failed`, `cancelled` and `closed`.
   fails that task closed with `clock-overflow`. Neither rejection is thrown
   back into the task, and the task's coroutine is closed immediately, so
   scenario code cannot catch a harness contract violation and keep running.
+  That immediate close runs under the same mutation guard as `close()`, so the
+  rejected task's `finally` block cannot advance the clock, spawn, drain the
+  runnable queue or cancel an unrelated task on its way out: those calls are
+  rejected with `harness-tearing-down` exactly as during teardown. A rejected
+  task therefore cannot wake, complete or cancel any other task, and its own
+  stored failure stays the rejection code even if its cleanup block raises.
 
 ## Resource ownership and teardown
 
@@ -101,8 +107,26 @@ Terminal states are `completed`, `failed`, `cancelled` and `closed`.
   `harness-tearing-down`, still accepts `record`, and if the event budget is
   already exhausted it counts the dropped note in
   `dropped_teardown_event_count` instead of raising from inside a `finally`
-  block. A cleanup block that itself raises is recorded as `cleanup-failed`
-  with the exception type name; `close()` re-raises the first such failure.
+  block. The same guard covers the single-coroutine close that
+  `unsupported-await` and `clock-overflow` perform, so there is exactly one
+  set of cleanup rules for every path that closes a coroutine.
+- A cleanup block that itself raises is recorded as `cleanup-failed` with the
+  exception type name only, never a message. No cleanup failure — not an
+  `Exception`, not a `HarnessLimitError`, not a `KeyboardInterrupt` or
+  `SystemExit` — can abort the teardown loop: the remaining coroutines are
+  still closed and the runnable queue and sleeper set are still cleared.
+  `close()` then re-raises the *first* cleanup failure, after teardown is
+  complete. A `limit-break` teardown discards cleanup failures instead, so a
+  budget violation always propagates as its original budget error; the
+  discarded failures remain visible as `cleanup-failed` events.
+- A fail-fast close reports differently, because the task already has a
+  primary failure to preserve: an ordinary `Exception` or `TaskCancelled` from
+  its cleanup block is recorded and dropped, while a cleanup `BaseException`
+  is recorded and then propagates out of `run_until_blocked` or `advance`, so
+  a budget violation or a keyboard interrupt is never swallowed. Either way
+  the task's stored failure remains the original rejection code.
+- `spawn` closes a rejected coroutine before it has run a single line, so that
+  close cannot execute scenario cleanup and needs no guard.
 
 ## Limits and fail-closed validation
 

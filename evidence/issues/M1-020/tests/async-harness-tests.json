@@ -1,21 +1,42 @@
 {
-  "command": "python3 -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py -v",
-  "commit": "ac93145fb04d313a01ab2ad590df5d4be7432dee",
-  "endedAt": "2026-09-21T06:37:21.666Z",
+  "command": "python3 -W error::RuntimeWarning -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py -v",
+  "commit": "this commit; its parent is a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a, whose own evidence run is superseded by the run recorded here",
+  "endedAt": "2026-09-21T06:48:42.366Z",
   "errors": 0,
   "exitCode": 0,
   "failures": 0,
   "issue": "M1-020",
   "phase": "green",
+  "previousRound": {
+    "commit": "ac93145fb04d313a01ab2ad590df5d4be7432dee",
+    "testsRun": 46
+  },
+  "reviewRound": 1,
   "runtimeWarningCheck": {
-    "command": "python3 -W error::RuntimeWarning -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py",
+    "command": "the recorded command already runs under -W error::RuntimeWarning",
     "result": "no unawaited-coroutine RuntimeWarning emitted"
   },
   "runtimeWarnings": 0,
   "schemaVersion": 1,
   "skipped": 0,
-  "startedAt": "2026-09-21T06:37:21.323Z",
+  "startedAt": "2026-09-21T06:48:42.013Z",
   "status": "passed",
+  "testsAddedThisRound": {
+    "FailFastCleanupTests": [
+      "test_clock_overflow_cleanup_cannot_mutate_the_harness",
+      "test_fail_fast_cleanup_does_not_swallow_a_budget_violation",
+      "test_fail_fast_cleanup_failure_keeps_the_primary_task_failure",
+      "test_fail_fast_cleanup_rejects_every_control_entry_point",
+      "test_unsupported_await_cleanup_cannot_mutate_the_harness"
+    ],
+    "TeardownCleanupFailureTests": [
+      "test_close_reports_only_the_first_cleanup_failure",
+      "test_keyboard_interrupt_cleanup_still_closes_the_remaining_task",
+      "test_limit_break_preserves_its_budget_error_over_cleanup_failure",
+      "test_limit_error_cleanup_still_closes_the_remaining_task",
+      "test_system_exit_cleanup_still_closes_the_remaining_task"
+    ]
+  },
   "testsByClass": {
     "CancellationTests": [
       "test_cancel_is_idempotent",
@@ -37,6 +58,13 @@
       "test_report_path_that_is_a_symlink_fails_closed",
       "test_self_check_succeeds_and_emits_a_deterministic_report",
       "test_unknown_argument_fails_with_a_usage_exit_code"
+    ],
+    "FailFastCleanupTests": [
+      "test_clock_overflow_cleanup_cannot_mutate_the_harness",
+      "test_fail_fast_cleanup_does_not_swallow_a_budget_violation",
+      "test_fail_fast_cleanup_failure_keeps_the_primary_task_failure",
+      "test_fail_fast_cleanup_rejects_every_control_entry_point",
+      "test_unsupported_await_cleanup_cannot_mutate_the_harness"
     ],
     "FakeClockTests": [
       "test_clock_fails_closed_at_the_maximum_representable_time",
@@ -73,6 +101,13 @@
     "SourcePolicyTests": [
       "test_harness_uses_no_wall_clock_sleep_retry_or_randomness"
     ],
+    "TeardownCleanupFailureTests": [
+      "test_close_reports_only_the_first_cleanup_failure",
+      "test_keyboard_interrupt_cleanup_still_closes_the_remaining_task",
+      "test_limit_break_preserves_its_budget_error_over_cleanup_failure",
+      "test_limit_error_cleanup_still_closes_the_remaining_task",
+      "test_system_exit_cleanup_still_closes_the_remaining_task"
+    ],
     "TeardownTests": [
       "test_close_closes_unfinished_coroutines_and_is_idempotent",
       "test_closed_tasks_have_no_result",
@@ -80,7 +115,7 @@
       "test_mutating_the_harness_during_teardown_fails_closed"
     ]
   },
-  "testsRun": 46,
+  "testsRun": 56,
   "toolchain": {
     "machine": "arm64",
     "platform": "macOS-26.6.2-arm64",

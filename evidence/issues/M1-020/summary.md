@@ -2,10 +2,18 @@
 
 Base commit: `adf6030969f5ecc9f65de0ec768868e42888797d`
 Implementation commit: `ac93145fb04d313a01ab2ad590df5d4be7432dee`
+Evidence commit (round 0): `a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a`
+Review-fix commit (round 1): this commit, parented on
+`a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a`
 
-Status: **passed**. Every command in `commands.json` was executed in this
-session on this machine; each exit code, timestamp, test count and gate count
-recorded there and below comes from that run's output.
+Status: **passed**. Every command in `commands.json` was re-executed in the
+round-1 session on this machine against the fixed working tree; each exit
+code, timestamp, test count and gate count recorded there and below comes
+from that run's output and replaces the round-0 numbers. One caveat is
+recorded honestly: `make verify` stamps `HEAD` into its report, so
+`artifacts/ci/m1-020-implementation-report.json` names
+`a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a` even though the tree it graded
+already contained the round-1 fix.
 
 ## Deliverables
 
@@ -68,13 +76,121 @@ Defects found in the draft by running it, and fixed here:
 
 Test count went from 34 draft cases to 46.
 
+## Review round 1: two High findings, both closed
+
+An independent reviewer read the round-0 implementation and reproduced two
+High findings. Both are real, both were reproduced locally before being
+fixed, and both now have regression tests. Test count went from 46 to 56.
+
+### High 1 - fail-fast cleanup ran outside the mutation guard
+
+`_fail_fast` marked a task `failed` for `unsupported-await` (or the
+sleep-deadline `clock-overflow`) and then called `task.coroutine.close()`
+*outside* the teardown guard. The failing task's `finally` block therefore
+still held full control of the harness. Reproduced locally before the fix
+with a victim sleeping until clock 10 and an attacker awaiting an
+unsupported awaitable whose `finally` called `advance(10)`; after
+`run_until_blocked` the observed state was `now == 10` and
+`victim == "completed"`, and the trace contained `sleep-expired`, the
+victim's `victim-woke` note and `completed` - all produced during another
+task's fail-fast cleanup. That broke fail-closed deterministic isolation and
+contradicted the documented promise that cleanup cannot mutate the harness.
+
+Fix: the single-coroutine close is now performed by one shared helper,
+`Harness._close_coroutine`, which holds `_teardown_depth` for the duration of
+`coroutine.close()`. Both `_fail_fast` and the `close()`/`limit-break`
+teardown loop call it, so there is exactly one set of cleanup rules for every
+path that closes a coroutine. `spawn`, `advance`, `run_until_blocked` and
+`cancel` are all rejected with `harness-tearing-down` during a fail-fast
+close; `record` keeps following the documented teardown rule. A cleanup
+failure is recorded as `cleanup-failed` with the exception type name and
+never replaces the task's primary failure.
+
+Regression tests (`FailFastCleanupTests`):
+
+- `test_unsupported_await_cleanup_cannot_mutate_the_harness` - the reviewer's
+  exact probe. Asserts the reentrant `advance` observes
+  `harness-tearing-down`, `now == 0`, the unrelated victim is still
+  `sleeping` with `pending_sleep_count == 1` and no `victim-woke` note, and
+  the attacker's `result` still raises `unsupported-await`.
+- `test_clock_overflow_cleanup_cannot_mutate_the_harness` - the same probe on
+  the sleep-deadline `clock-overflow` fail-fast path, which shares the
+  mechanism.
+- `test_fail_fast_cleanup_rejects_every_control_entry_point` - all four
+  mutating entry points are rejected from one cleanup block, while `record`
+  is still accepted.
+- `test_fail_fast_cleanup_failure_keeps_the_primary_task_failure` - a
+  `ValueError` from cleanup is recorded as `cleanup-failed` and the stored
+  failure stays `unsupported-await`; an unrelated task still completes.
+- `test_fail_fast_cleanup_does_not_swallow_a_budget_violation` - a cleanup
+  `HarnessLimitError` is recorded and still propagates.
+
+### High 2 - one cleanup `BaseException` abandoned the rest of teardown
+
+`_teardown` explicitly re-raised `HarnessLimitError` from `coroutine.close()`
+and otherwise caught only `Exception` and `TaskCancelled`. A cleanup block
+raising `HarnessLimitError`, `KeyboardInterrupt` or `SystemExit` therefore
+aborted the teardown loop, leaving every later coroutine unclosed and the
+runnable queue uncleared - a direct violation of "close every unfinished
+coroutine" and of the limit-break cleanup promise.
+
+Fix: `_close_coroutine` catches `BaseException`, records `cleanup-failed`
+with the type name only, and *returns* the failure instead of propagating it,
+so no cleanup block can abort the caller's loop. `_teardown` keeps the first
+returned failure, finishes closing every remaining task, and clears the
+runnable queue and the sleeper set in a `finally`. `close()` re-raises that
+first failure only after teardown is complete. `_break` discards cleanup
+failures so a budget violation always propagates as its original budget
+error; the discarded failures stay visible as `cleanup-failed` events.
+Nothing is silently swallowed on the `close()` path, so a `KeyboardInterrupt`
+or `SystemExit` raised by scenario cleanup still reaches the test runner.
+
+Regression tests (`TeardownCleanupFailureTests`), each with two pending
+coroutines where the first one's cleanup raises:
+
+- `test_limit_error_cleanup_still_closes_the_remaining_task`
+- `test_keyboard_interrupt_cleanup_still_closes_the_remaining_task`
+- `test_system_exit_cleanup_still_closes_the_remaining_task`
+
+  Each asserts both coroutines are closed, both tasks are `closed`,
+  `pending_sleep_count == 0`, `active_task_names == ()`, `is_idle`, the second
+  task's `closed` event is present, the first failure is recorded as
+  `cleanup-failed` by type name, and `close()` re-raises that first failure.
+
+- `test_close_reports_only_the_first_cleanup_failure` - with two raising
+  cleanups, `close()` raises the first and records the second.
+- `test_limit_break_preserves_its_budget_error_over_cleanup_failure` - a
+  step-limit break whose first cleanup raises `HarnessLimitError` still
+  propagates `step-limit-exceeded`, still closes every pending coroutine and
+  still clears the queues.
+
+### Re-audit of every remaining close path
+
+- `spawn`'s rejection path (`_closed_quietly`) closes a coroutine that has
+  never executed a line, so that close cannot run scenario cleanup and needs
+  no guard. Documented as such rather than guarded unnecessarily.
+- `cancel` closes nothing; it only delivers `TaskCancelled`.
+- `_resume` clears `self._current` before `_handle_request` runs, so a
+  fail-fast close is never skipped by the "is current task" teardown guard.
+- The CLI self-check driver had the same masking shape on its error paths:
+  `_build_self_check_harness` called `harness.close()` inside
+  `except BaseException` and `run_self_check` closed the two harnesses in
+  sequence, so a cleanup failure could replace the real error or leak the
+  second harness. Both now keep the first error and still close everything,
+  via `_closed_after_failure` and a `try/finally` around the paired closes.
+  This is the fail-fast/teardown audit the reviewer asked for, not unrelated
+  refactoring.
+
 ## Red phase
 
 `tests/red-phase.json` records the genuine failing run. The suite was copied,
 unchanged, into a temporary directory outside the repository at the same
 relative path (`Tools/async-harness/tests/test_async_harness.py`) with
 `Tools/async-harness/async-harness.py` deliberately absent. The repository
-working tree was not modified for that run. The command exited `1` with one
+working tree was not modified for that run. That run predates the ten round-1
+regression tests and was not repeated for them; those tests were instead
+shown red by reproducing both findings against the unfixed implementation
+before the fix, as described above. The command exited `1` with one
 collection error: `ImportError: Failed to import test module` caused by
 `FileNotFoundError` for the missing tool, raised from `load_tool()`. The
 temporary directory was then removed.
@@ -91,7 +207,8 @@ in the red report rather than papered over.
   `import asyncio`, `asyncio.`, `import threading`, `import random`,
   `import socket`, `import subprocess`, `import urllib`, `retry` or `poll`.
   Advanceable fake clock: `FakeClockTests`. Event ordering: `OrderingTests`.
-  Cancellation: `CancellationTests`. Resource ownership: `TeardownTests`.
+  Cancellation: `CancellationTests`. Resource ownership: `TeardownTests`,
+  `TeardownCleanupFailureTests` and `FailFastCleanupTests`.
 - **Happy path.** `test_clock_starts_at_zero_and_only_moves_on_explicit_advance`,
   `test_runnable_tasks_interleave_in_deterministic_spawn_order`,
   `test_identical_scenarios_produce_identical_event_traces`,
@@ -114,7 +231,8 @@ in the red report rather than papered over.
   `test_raising_task_cancelled_without_a_request_fails_closed`,
   `test_close_closes_unfinished_coroutines_and_is_idempotent`,
   `test_limit_break_closes_every_pending_coroutine`,
-  `test_mutating_the_harness_during_teardown_fails_closed`.
+  `test_mutating_the_harness_during_teardown_fails_closed`, and all of
+  `FailFastCleanupTests` and `TeardownCleanupFailureTests`.
 - **No new public contract.** The harness is a repository tool. It adds no
   Swift target, no product, no protocol or wire value, no Barrier token, no
   frame, no socket, no TLS or trust behavior and no platform permission
@@ -125,8 +243,10 @@ in the red report rather than papered over.
 - **Architecture, lint, build, tests.** `xcodebuild ... build` succeeded,
   `make architecture-check`, `make docs-check` and `make code-quality-check`
   (which includes `swift test -Xswiftc -warnings-as-errors`) all exited `0`,
-  and `make verify` reported 18/18 gates passed. No new warning was emitted:
-  the Python suite runs clean under `-W error::RuntimeWarning`.
+  and `make verify` reported 18/18 gates passed. Those are the round-1
+  numbers, re-run against the fixed tree. No new warning was emitted: the
+  Python suite runs clean under `-W error::RuntimeWarning`, which is now the
+  recorded green command rather than a separate check.
 - **Privacy.** The harness performs no logging. Its event log holds only fixed
   event kinds, validated task names, exception *type* names, integer deadlines
   and integer durations; no return value, exception message, path, host name
@@ -161,7 +281,12 @@ gitignored `/artifacts/` path and are not tracked changes.
   A scenario that needs a cancelled task to observe real elapsed virtual time
   during cleanup cannot be written with this harness.
 - `close()` re-raises only the *first* failure a cleanup block raised;
-  subsequent ones are recorded as `cleanup-failed` events only.
+  subsequent ones are recorded as `cleanup-failed` events only. A
+  `limit-break` teardown re-raises none of them, because the original budget
+  error must win.
+- A cleanup `BaseException` raised during a *fail-fast* close propagates out
+  of `run_until_blocked` or `advance`, so a scenario whose cleanup raises
+  `SystemExit` will see it there rather than in `close()`.
 - If the event budget is exhausted before teardown, teardown notes are counted
   in `dropped_teardown_event_count` instead of being recorded.
 - The harness is single-threaded and not safe to share across threads.
@@ -171,7 +296,15 @@ gitignored `/artifacts/` path and are not tracked changes.
 
 ## Remaining risks
 
-- The red phase is an import-level failure, not a per-assertion red run.
+- The red phase is an import-level failure, not a per-assertion red run, and
+  it was recorded in round 0, before the ten round-1 regression tests existed.
+- Round 0 shipped with both High findings present, which is direct evidence
+  that the round-0 suite did not cover reentrancy from a cleanup block. The
+  ten new tests close the two reported holes; other cleanup-reentrancy shapes
+  may still be uncovered.
+- `artifacts/ci/m1-020-implementation-report.json` records the parent commit
+  SHA, because `make verify` stamps `HEAD` and the fix was uncommitted when
+  the gates ran.
 - The self-check scenario is fixed and covers one cancellation shape; broader
   determinism confidence comes from the unit suite, not from the CLI.
 - Determinism was verified on one toolchain (Python 3.9.6, arm64 macOS). The
@@ -188,7 +321,7 @@ The reviewer should re-run every command in `commands.json`.
 
 ## Rollback
 
-Revert the two M1-020 commits, or delete `Tools/async-harness/`,
+Revert the three M1-020 commits, or delete `Tools/async-harness/`,
 `docs/tooling/M1-020-async-harness.md` and `evidence/issues/M1-020/`. Tool
 test discovery is count-driven, so removal drops the
 `tool-test:async-harness/tests/test_async_harness.py` gate automatically and
