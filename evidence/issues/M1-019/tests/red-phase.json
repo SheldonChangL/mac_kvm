@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-019",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMCore",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureCount": 33,
+  "failureReason": "MockTransportTests referenced MockTransport and MockTransportCompletion before the production double existed; every reference reported 'cannot find MockTransport in scope'.",
+  "targetDiscoveryNote": "Before the KVMCoreTests target existed, this command resolved upward to the root package and ran only the 3 pre-existing scaffold tests, so the Exact Test File was never compiled. The Product Owner authorized adding the KVMCoreTests target to the root Package.swift for exactly this reason.",
+  "remediation": "Added only the package-visible MockTransport double, its component documentation, and the KVMCoreTests target; all 15 package tests then passed."
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-019",
+  "commit": "c4a69f7fb65e3de3d9d7c68fa2ba50991a0535c8",
+  "command": "swift test --package-path Packages/KVMCore",
+  "startedAt": "2026-09-21T05:54:21.657Z",
+  "endedAt": "2026-09-21T05:54:23.737Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 15,
+  "target": "KVMCoreTests",
+  "discoveryCommand": "swift test --package-path Packages/KVMCore --list-tests",
+  "issueTests": [
+    "mockTransportRecordsOutboundBytesInCallOrder",
+    "mockTransportDeliversScriptedInboundChunksInOrder",
+    "mockTransportTreatsZeroLengthSendAsSuccessfulNoOp",
+    "mockTransportRejectsEmptyScriptedInboundChunk",
+    "mockTransportRejectsNonPositiveBufferLimit",
+    "mockTransportRejectsInvalidLifecycleOperations",
+    "mockTransportInjectsNormalEndOfStreamAfterScriptedChunks",
+    "mockTransportInjectsTypedTransportFailure",
+    "mockTransportInjectsCancellationDomainFailure",
+    "mockTransportFailsClosedOnBoundedBufferOverflow",
+    "mockTransportDisconnectIsIdempotentAndFinishesIncomingBytesOnce",
+    "mockTransportCleanupCompletesInsideAnAlreadyCancelledTask"
+  ],
+  "issueTestsRun": 12,
+  "regressionTestsRun": 3,
+  "regressionTestsSkipped": 1,
+  "skippedReason": "MacKVMSystemTests.systemTestTargetRequiresExplicitOptIn requires explicit system-test opt-in and was already skipped before this Issue.",
+  "usesWallClockSleepOrRetry": false
+}

@@ -44,6 +44,11 @@ let package = Package(
       path: "Packages/NativeProtocol/Sources/NativeProtocol"
     ),
     .testTarget(
+      name: "KVMCoreTests",
+      dependencies: ["KVMContracts", "KVMCore"],
+      path: "Packages/KVMCore/Tests/KVMCoreTests"
+    ),
+    .testTarget(
       name: "MacKVMUnitTests",
       dependencies: ["KVMContracts", "KVMCore"],
       path: "Tests/Unit"
