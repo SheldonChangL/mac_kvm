@@ -36,12 +36,12 @@ public struct ContinuousKVMClock: KVMClock {
 
 /// A manually advanced monotonic clock for deterministic tests.
 ///
-/// `advance(by:)` resumes every sleep whose deadline has been reached, ordered
-/// first by deadline and then by registration. It never waits for wall time.
+/// `advance(by:)` resumes every sleep whose deadline has been reached. Tasks
+/// resumed by the same advance may execute in any order. The clock never waits
+/// for wall time.
 public actor TestKVMClock: KVMClock {
   private struct PendingSleep {
     let deadline: Duration
-    let registrationOrder: UInt64
     let continuation: CheckedContinuation<Void, any Error>
   }
 
@@ -80,7 +80,6 @@ public actor TestKVMClock: KVMClock {
           (continuation: CheckedContinuation<Void, any Error>) in
           pendingSleeps[identifier] = PendingSleep(
             deadline: deadline,
-            registrationOrder: identifier,
             continuation: continuation
           )
           resumeSatisfiedCountWaiters()
@@ -104,15 +103,7 @@ public actor TestKVMClock: KVMClock {
     }
 
     elapsed += duration
-    let due =
-      pendingSleeps
-      .filter { $0.value.deadline <= elapsed }
-      .sorted {
-        if $0.value.deadline == $1.value.deadline {
-          return $0.value.registrationOrder < $1.value.registrationOrder
-        }
-        return $0.value.deadline < $1.value.deadline
-      }
+    let due = pendingSleeps.filter { $0.value.deadline <= elapsed }
 
     for (identifier, sleep) in due {
       pendingSleeps.removeValue(forKey: identifier)

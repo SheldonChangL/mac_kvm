@@ -18,8 +18,9 @@ Implementation commit: `cce5e48f3627addeb362d909091f1383ba0b8536`
 - Production clock: `ContinuousKVMClock` uses monotonic `ContinuousClock`, maps
   task cancellation to `cancellation.requested`, and retains no arbitrary
   implementation error text.
-- Test clock: `TestKVMClock` advances explicitly, releases due continuations in
-  deadline/registration order, and never waits for wall time.
+- Test clock: `TestKVMClock` advances explicitly, releases every due
+  continuation, and never waits for wall time. Tasks due in one advance have no
+  observable execution-order guarantee.
 - Deadline coverage: concurrent two- and five-second deadlines release only at
   their corresponding explicit advances.
 - Backoff coverage: a 1/2/4 sequence completes through explicit advances and

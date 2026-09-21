@@ -19,7 +19,7 @@ import Testing
   #expect(await clock.elapsed == .seconds(5))
 }
 
-@Test func testClockReleasesDeadlineOrderDeterministically() async throws {
+@Test func testClockReleasesEachDeadlineAtItsExplicitBoundary() async throws {
   let clock = TestKVMClock()
   let earlier = Task {
     try await clock.sleep(for: .seconds(2))

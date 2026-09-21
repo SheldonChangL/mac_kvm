@@ -67,8 +67,13 @@ registered with a monotonic deadline and a stable registration order.
 - accepts only non-negative durations;
 - advances elapsed time without waiting for wall time;
 - resumes every newly due sleep;
-- orders equal deadlines by registration order; and
 - leaves later deadlines pending.
+
+Resuming a continuation only makes its task eligible to run. Tasks that share
+a deadline, or that become due in the same `advance(by:)` call, may execute in
+any order on Swift's concurrent executor. Consumers that require an observable
+order must coordinate that order explicitly rather than infer it from clock
+registration or continuation-resume order.
 
 Cancellation removes and resumes the exact pending continuation with a typed
 cancellation error. The internal `waitUntilPendingSleepCount` barrier exists
@@ -108,7 +113,7 @@ keepalive, and cleanup Issues own their corresponding limits.
 Contract tests verify:
 
 - manual advance completes a sleep without wall-clock delay;
-- concurrent deadlines release in deterministic order;
+- distinct deadlines release only at their explicit monotonic boundaries;
 - a 1/2/4 backoff sequence progresses only through explicit advances;
 - zero duration is a no-op;
 - negative sleep and advance durations fail closed;

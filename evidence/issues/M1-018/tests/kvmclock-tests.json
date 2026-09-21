@@ -10,7 +10,7 @@
   "testsRun": 36,
   "issueTests": [
     "testClockAdvancesWithoutWallClockSleep",
-    "testClockReleasesDeadlineOrderDeterministically",
+    "testClockReleasesEachDeadlineAtItsExplicitBoundary",
     "backoffSequenceUsesOnlyExplicitClockAdvances",
     "zeroDurationCompletesWithoutScheduling",
     "negativeDurationsFailClosed",
