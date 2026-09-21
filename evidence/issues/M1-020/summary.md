@@ -9,11 +9,12 @@ Review-fix commit (round 1): this commit, parented on
 Status: **passed**. Every command in `commands.json` was re-executed in the
 round-1 session on this machine against the fixed working tree; each exit
 code, timestamp, test count and gate count recorded there and below comes
-from that run's output and replaces the round-0 numbers. One caveat is
-recorded honestly: `make verify` stamps `HEAD` into its report, so
-`artifacts/ci/m1-020-implementation-report.json` names
-`a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a` even though the tree it graded
-already contained the round-1 fix.
+from that run's output and replaces the round-0 numbers. The gate sequence
+was first run against the fixed but uncommitted working tree, and
+`make verify` was then re-run once against the committed fix as
+`dff9081a6858187330441db0d122612f3f0adab7`: 18/18 gates passed both times,
+and `artifacts/ci/m1-020-implementation-report.json` now carries that commit
+SHA rather than the parent's.
 
 ## Deliverables
 
@@ -302,9 +303,11 @@ gitignored `/artifacts/` path and are not tracked changes.
   that the round-0 suite did not cover reentrancy from a cleanup block. The
   ten new tests close the two reported holes; other cleanup-reentrancy shapes
   may still be uncovered.
-- `artifacts/ci/m1-020-implementation-report.json` records the parent commit
-  SHA, because `make verify` stamps `HEAD` and the fix was uncommitted when
-  the gates ran.
+- Every gate except `make verify` was run against the fixed working tree
+  before the commit and was not re-run afterwards. The tree content is
+  identical, and `git diff --check` plus the post-commit `make verify` (which
+  re-runs the Python suite as a gate) cover that gap, but the earlier
+  timestamps in `commands.json` predate the commit.
 - The self-check scenario is fixed and covers one cancellation shape; broader
   determinism confidence comes from the unit suite, not from the CLI.
 - Determinism was verified on one toolchain (Python 3.9.6, arm64 macOS). The

@@ -76,7 +76,7 @@
   ],
   "implementationCommit": "ac93145fb04d313a01ab2ad590df5d4be7432dee",
   "issue": "M1-020",
-  "reviewFixCommit": "this commit; its parent is a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a, whose own evidence run is superseded by the run recorded here",
+  "reviewFixCommit": "dff9081a6858187330441db0d122612f3f0adab7",
   "reviewRound": 1,
   "schemaVersion": 1,
   "status": "passed",
@@ -87,5 +87,5 @@
     "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
     "xcodeVersion": "Xcode 26.2 (17C52)"
   },
-  "verifyReportCommitField": "artifacts/ci/m1-020-implementation-report.json records commit a8ce83cc1973eba396bd5a2087b8553c8e9e9e0a because make verify stamps HEAD, and the review fix was still an uncommitted working-tree change when the gates ran; the gate results describe the fixed working tree"
+  "verifyReportCommitField": "make verify was re-run once against the committed fix; artifacts/ci/m1-020-implementation-report.json records commit dff9081a6858187330441db0d122612f3f0adab7 with status passed and 18/18 gates passed. The timestamps recorded above are from the pre-commit run of the same gate sequence against the identical working tree."
 }
