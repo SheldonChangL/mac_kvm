@@ -1,0 +1,128 @@
+{
+  "command": "python3 -W error::RuntimeWarning -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py -v",
+  "commit": "dff9081a6858187330441db0d122612f3f0adab7",
+  "endedAt": "2026-09-21T06:48:42.366Z",
+  "errors": 0,
+  "exitCode": 0,
+  "failures": 0,
+  "issue": "M1-020",
+  "phase": "green",
+  "previousRound": {
+    "commit": "ac93145fb04d313a01ab2ad590df5d4be7432dee",
+    "testsRun": 46
+  },
+  "reviewRound": 1,
+  "runtimeWarningCheck": {
+    "command": "the recorded command already runs under -W error::RuntimeWarning",
+    "result": "no unawaited-coroutine RuntimeWarning emitted"
+  },
+  "runtimeWarnings": 0,
+  "schemaVersion": 1,
+  "skipped": 0,
+  "startedAt": "2026-09-21T06:48:42.013Z",
+  "status": "passed",
+  "testsAddedThisRound": {
+    "FailFastCleanupTests": [
+      "test_clock_overflow_cleanup_cannot_mutate_the_harness",
+      "test_fail_fast_cleanup_does_not_swallow_a_budget_violation",
+      "test_fail_fast_cleanup_failure_keeps_the_primary_task_failure",
+      "test_fail_fast_cleanup_rejects_every_control_entry_point",
+      "test_unsupported_await_cleanup_cannot_mutate_the_harness"
+    ],
+    "TeardownCleanupFailureTests": [
+      "test_close_reports_only_the_first_cleanup_failure",
+      "test_keyboard_interrupt_cleanup_still_closes_the_remaining_task",
+      "test_limit_break_preserves_its_budget_error_over_cleanup_failure",
+      "test_limit_error_cleanup_still_closes_the_remaining_task",
+      "test_system_exit_cleanup_still_closes_the_remaining_task"
+    ]
+  },
+  "testsByClass": {
+    "CancellationTests": [
+      "test_cancel_is_idempotent",
+      "test_cancellation_is_delivered_exactly_once",
+      "test_cancelling_a_completed_task_is_a_no_op",
+      "test_cancelling_a_sleeping_task_runs_cleanup_deterministically",
+      "test_cancelling_before_the_first_step_still_cancels",
+      "test_cleanup_may_yield_after_cancellation",
+      "test_cleanup_sleep_after_cancellation_is_elided_not_awaited",
+      "test_no_task_or_sleep_leaks_after_a_mixed_scenario",
+      "test_raising_task_cancelled_without_a_request_fails_closed",
+      "test_suppressing_cancellation_fails_closed"
+    ],
+    "CommandLineTests": [
+      "test_help_succeeds_without_writing_a_report",
+      "test_missing_report_directory_fails_closed",
+      "test_report_is_bounded_by_the_event_budget",
+      "test_report_path_that_is_a_directory_fails_closed",
+      "test_report_path_that_is_a_symlink_fails_closed",
+      "test_self_check_succeeds_and_emits_a_deterministic_report",
+      "test_unknown_argument_fails_with_a_usage_exit_code"
+    ],
+    "FailFastCleanupTests": [
+      "test_clock_overflow_cleanup_cannot_mutate_the_harness",
+      "test_fail_fast_cleanup_does_not_swallow_a_budget_violation",
+      "test_fail_fast_cleanup_failure_keeps_the_primary_task_failure",
+      "test_fail_fast_cleanup_rejects_every_control_entry_point",
+      "test_unsupported_await_cleanup_cannot_mutate_the_harness"
+    ],
+    "FakeClockTests": [
+      "test_clock_fails_closed_at_the_maximum_representable_time",
+      "test_clock_starts_at_zero_and_only_moves_on_explicit_advance",
+      "test_invalid_sleep_and_advance_durations_fail_closed",
+      "test_maximum_sleep_is_accepted_and_one_nanosecond_more_fails",
+      "test_partial_advance_does_not_wake_a_later_deadline",
+      "test_zero_duration_sleep_completes_without_any_advance"
+    ],
+    "InvalidInputTests": [
+      "test_duplicate_task_names_fail_closed",
+      "test_event_details_are_restricted_to_allowlist_metadata",
+      "test_invalid_task_names_fail_closed",
+      "test_result_requires_a_terminal_task",
+      "test_spawning_a_non_coroutine_fails_closed",
+      "test_task_failure_is_isolated_and_reported",
+      "test_unknown_task_lookups_fail_closed",
+      "test_unsupported_await_fails_the_task_closed"
+    ],
+    "LimitTests": [
+      "test_constructor_limits_are_bounded_and_validated",
+      "test_event_limit_fails_closed",
+      "test_step_limit_fails_closed_and_breaks_the_harness",
+      "test_task_limit_fails_closed"
+    ],
+    "OrderingTests": [
+      "test_equal_deadlines_follow_sleep_order_not_spawn_order",
+      "test_equal_deadlines_wake_in_scheduling_order",
+      "test_event_log_records_sequence_and_clock_for_every_event",
+      "test_identical_scenarios_produce_identical_event_traces",
+      "test_runnable_tasks_interleave_in_deterministic_spawn_order",
+      "test_sleepers_wake_in_deadline_order_not_spawn_order"
+    ],
+    "SourcePolicyTests": [
+      "test_harness_uses_no_wall_clock_sleep_retry_or_randomness"
+    ],
+    "TeardownCleanupFailureTests": [
+      "test_close_reports_only_the_first_cleanup_failure",
+      "test_keyboard_interrupt_cleanup_still_closes_the_remaining_task",
+      "test_limit_break_preserves_its_budget_error_over_cleanup_failure",
+      "test_limit_error_cleanup_still_closes_the_remaining_task",
+      "test_system_exit_cleanup_still_closes_the_remaining_task"
+    ],
+    "TeardownTests": [
+      "test_close_closes_unfinished_coroutines_and_is_idempotent",
+      "test_closed_tasks_have_no_result",
+      "test_limit_break_closes_every_pending_coroutine",
+      "test_mutating_the_harness_during_teardown_fails_closed"
+    ]
+  },
+  "testsRun": 56,
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "xcodeVersion": "Xcode 26.2 (17C52)"
+  },
+  "usesWallClockSleepOrRetry": false,
+  "verifyGate": "tool-test:async-harness/tests/test_async_harness.py"
+}

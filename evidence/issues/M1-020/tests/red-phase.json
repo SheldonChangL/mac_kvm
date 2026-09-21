@@ -1,0 +1,19 @@
+{
+  "command": "python3 -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py -v",
+  "endedAt": "2026-09-21T06:35:05.034Z",
+  "errors": 1,
+  "exitCode": 1,
+  "failureDiagnostic": "ImportError: Failed to import test module: test_async_harness -> FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/m1-020-red.DRnbPQ/Tools/async-harness/async-harness.py' (raised from load_tool() at test_async_harness.py line 19, reached from line 23)",
+  "failureReason": "Every assertion in the suite loads the tool by path. With the implementation absent the module cannot be imported, so unittest reports one collection error and exits non-zero. The suite therefore cannot pass without Tools/async-harness/async-harness.py.",
+  "failureType": "ImportError/FileNotFoundError",
+  "issue": "M1-020",
+  "phase": "red",
+  "remediation": "Tools/async-harness/async-harness.py was implemented in the repository working tree; the same command then reported 46 passing tests and exit code 0 (see async-harness-tests.json).",
+  "schemaVersion": 1,
+  "setup": "Only Tools/async-harness/tests/test_async_harness.py was copied into the temporary root, at the same relative path. Tools/async-harness/async-harness.py was deliberately absent. The repository working tree was not modified for this run.",
+  "startedAt": "2026-09-21T06:35:04.960Z",
+  "status": "expected_failure",
+  "temporaryDirectoryRemoved": true,
+  "testsRun": 1,
+  "workingDirectory": "/tmp/m1-020-red.DRnbPQ (temporary, outside the repository, removed after the run)"
+}

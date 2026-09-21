@@ -1,0 +1,91 @@
+{
+  "baseCommit": "adf6030969f5ecc9f65de0ec768868e42888797d",
+  "commands": [
+    {
+      "command": "python3 -W error::RuntimeWarning -m unittest discover -s Tools/async-harness/tests -p test_async_harness.py -v",
+      "endedAt": "2026-09-21T06:48:42.366Z",
+      "exitCode": 0,
+      "phase": "green",
+      "result": "56 tests passed, 0 failures, 0 errors, 0 skipped, 0 RuntimeWarnings",
+      "startedAt": "2026-09-21T06:48:42.013Z"
+    },
+    {
+      "command": "python3 Tools/async-harness/async-harness.py --report artifacts/ci/m1-020-self-check.json",
+      "endedAt": "2026-09-21T06:48:42.413Z",
+      "exitCode": 0,
+      "phase": "green",
+      "result": "async harness self-check OK: 21 events; report written",
+      "startedAt": "2026-09-21T06:48:42.366Z"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build",
+      "endedAt": "2026-09-21T06:48:44.289Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "** BUILD SUCCEEDED **",
+      "startedAt": "2026-09-21T06:48:42.413Z"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "endedAt": "2026-09-21T06:48:44.363Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "startedAt": "2026-09-21T06:48:44.289Z"
+    },
+    {
+      "command": "make architecture-check",
+      "endedAt": "2026-09-21T06:48:44.854Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "architecture check OK",
+      "startedAt": "2026-09-21T06:48:44.364Z"
+    },
+    {
+      "command": "make docs-check",
+      "endedAt": "2026-09-21T06:48:44.969Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "docs check OK",
+      "startedAt": "2026-09-21T06:48:44.854Z"
+    },
+    {
+      "command": "make code-quality-check",
+      "endedAt": "2026-09-21T06:48:45.982Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "swift-format version/lint --strict and swift test -Xswiftc -warnings-as-errors passed",
+      "startedAt": "2026-09-21T06:48:44.969Z"
+    },
+    {
+      "command": "git diff --check adf6030969f5ecc9f65de0ec768868e42888797d",
+      "endedAt": "2026-09-21T06:48:46.001Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "no output",
+      "startedAt": "2026-09-21T06:48:45.982Z"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-020-implementation-report.json",
+      "endedAt": "2026-09-21T06:49:06.969Z",
+      "exitCode": 0,
+      "phase": "gate",
+      "result": "18/18 gates passed, including tool-test:async-harness/tests/test_async_harness.py",
+      "startedAt": "2026-09-21T06:48:46.001Z"
+    }
+  ],
+  "implementationCommit": "ac93145fb04d313a01ab2ad590df5d4be7432dee",
+  "issue": "M1-020",
+  "reviewFixCommit": "dff9081a6858187330441db0d122612f3f0adab7",
+  "reviewRound": 1,
+  "schemaVersion": 1,
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "xcodeVersion": "Xcode 26.2 (17C52)"
+  },
+  "verifyReportCommitField": "make verify was re-run once against the committed fix; artifacts/ci/m1-020-implementation-report.json records commit dff9081a6858187330441db0d122612f3f0adab7 with status passed and 18/18 gates passed. The timestamps recorded above are from the pre-commit run of the same gate sequence against the identical working tree."
+}
