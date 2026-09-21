@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "issue": "M1-018",
-  "commit": "33025556cfb61922697ed1c371e927b8fd1c1d72",
+  "commit": "253e778dfaeffee42daa18edaeb9b34899524174",
   "command": "swift test --package-path Packages/KVMContracts",
-  "startedAt": "2026-09-21T00:47:03.155Z",
-  "endedAt": "2026-09-21T00:47:05.324Z",
+  "startedAt": "2026-09-21T00:55:57.575Z",
+  "endedAt": "2026-09-21T00:55:59.980Z",
   "exitCode": 0,
   "status": "passed",
   "testsRun": 37,
