@@ -61,7 +61,7 @@ its cleanup at the suspension boundary.
 ## Test clock
 
 `TestKVMClock` is an actor with explicit elapsed time. Each positive sleep is
-registered with a monotonic deadline and a stable registration order.
+registered with a monotonic deadline.
 `advance(by:)`:
 
 - accepts only non-negative durations;
@@ -90,7 +90,8 @@ A component implementing a timeout owns its deadline policy and requests the
 remaining duration through `KVMClock`. A reconnect component owns its backoff
 sequence and awaits the clock once per selected delay. Injecting
 `TestKVMClock` lets tests advance exactly to each requested boundary and prove
-ordering or cancellation without depending on machine speed.
+per-deadline release boundaries or cancellation without depending on machine
+speed.
 
 M1-018 intentionally does not freeze the numeric timeout or backoff values.
 For example, M1-060 owns the reconnect sequence and cap; protocol handshake,
@@ -119,6 +120,8 @@ Contract tests verify:
 - negative sleep and advance durations fail closed;
 - cancelling a test-clock sleep removes its continuation and throws typed
   cancellation; and
+- a task cancelled before calling the test clock never registers a pending
+  continuation; and
 - the production clock maps task cancellation to the same typed taxonomy.
 
 The tests contain no real sleep, timing tolerance, retry loop, or skipped case.

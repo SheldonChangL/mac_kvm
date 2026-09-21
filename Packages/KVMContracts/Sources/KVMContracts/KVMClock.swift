@@ -130,7 +130,6 @@ public actor TestKVMClock: KVMClock {
             expectedCount: expectedCount,
             continuation: continuation
           )
-          resumeSatisfiedCountWaiters()
         }
       } onCancel: {
         Task {

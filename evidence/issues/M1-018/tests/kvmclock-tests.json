@@ -7,7 +7,7 @@
   "endedAt": "2026-09-21T00:47:05.324Z",
   "exitCode": 0,
   "status": "passed",
-  "testsRun": 36,
+  "testsRun": 37,
   "issueTests": [
     "testClockAdvancesWithoutWallClockSleep",
     "testClockReleasesEachDeadlineAtItsExplicitBoundary",
@@ -15,9 +15,10 @@
     "zeroDurationCompletesWithoutScheduling",
     "negativeDurationsFailClosed",
     "cancellingSleepRemovesPendingContinuationAndStaysTyped",
+    "preCancelledSleepNeverRegistersAContinuation",
     "productionClockMapsTaskCancellationToCoreError"
   ],
-  "issueTestsRun": 7,
+  "issueTestsRun": 8,
   "regressionTestsRun": 29,
   "usesWallClockSleep": false
 }

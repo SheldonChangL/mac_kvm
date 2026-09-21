@@ -106,6 +106,27 @@ import Testing
   #expect(await clock.pendingSleepCount == 0)
 }
 
+@Test func preCancelledSleepNeverRegistersAContinuation() async {
+  let clock = TestKVMClock()
+  let sleeper = Task {
+    withUnsafeCurrentTask { task in
+      task?.cancel()
+    }
+    try await clock.sleep(for: .seconds(60))
+  }
+
+  do {
+    try await sleeper.value
+    Issue.record("pre-cancelled sleep must not complete successfully")
+  } catch let error as CoreError {
+    #expect(error.code == .cancellation(.requested))
+    #expect(error.cleanupDisposition == .completed)
+  } catch {
+    Issue.record("pre-cancelled sleep must remain a CoreError")
+  }
+  #expect(await clock.pendingSleepCount == 0)
+}
+
 @Test func productionClockMapsTaskCancellationToCoreError() async {
   let clock = ContinuousKVMClock()
   let sleeper = Task {

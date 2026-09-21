@@ -16,7 +16,7 @@
       "startedAt": "2026-09-21T00:47:03.155Z",
       "endedAt": "2026-09-21T00:47:05.324Z",
       "exitCode": 0,
-      "result": "36 tests passed"
+      "result": "37 tests passed"
     },
     {
       "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",

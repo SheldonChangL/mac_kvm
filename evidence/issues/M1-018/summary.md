@@ -28,8 +28,9 @@ Implementation commit: `33025556cfb61922697ed1c371e927b8fd1c1d72`
 - Boundary and invalid input: zero duration is a no-op; negative sleep and
   advance durations fail closed with `internal.preconditionFailed`.
 - Cancellation/cleanup: cancelling a pending sleep removes its continuation
-  and throws typed cancellation with completed cleanup; the production clock
-  maps task cancellation identically.
+  and throws typed cancellation with completed cleanup; a pre-cancelled task
+  never registers a continuation; the production clock maps task cancellation
+  identically.
 - Architecture/privacy: no network, protocol, Barrier, UI, input, logging,
   payload, address, path, key, credential, or arbitrary error string enters the
   contract.
