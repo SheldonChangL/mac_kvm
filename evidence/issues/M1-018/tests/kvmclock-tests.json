@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-018",
+  "commit": "cce5e48f3627addeb362d909091f1383ba0b8536",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "startedAt": "2026-09-21T00:35:19.834Z",
+  "endedAt": "2026-09-21T00:35:22.328Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 36,
+  "issueTests": [
+    "testClockAdvancesWithoutWallClockSleep",
+    "testClockReleasesDeadlineOrderDeterministically",
+    "backoffSequenceUsesOnlyExplicitClockAdvances",
+    "zeroDurationCompletesWithoutScheduling",
+    "negativeDurationsFailClosed",
+    "cancellingSleepRemovesPendingContinuationAndStaysTyped",
+    "productionClockMapsTaskCancellationToCoreError"
+  ],
+  "issueTestsRun": 7,
+  "regressionTestsRun": 29,
+  "usesWallClockSleep": false
+}

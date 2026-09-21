@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-018",
+  "phase": "red",
+  "command": "swift test --package-path Packages/KVMContracts",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "KVMClockTests referenced TestKVMClock and ContinuousKVMClock before the production contract and implementations existed.",
+  "remediation": "Added only the C-004 KVMClock boundary, monotonic production clock, manually advanced test clock, typed cancellation mapping, and deterministic scheduling controls; all 36 package tests then passed."
+}
