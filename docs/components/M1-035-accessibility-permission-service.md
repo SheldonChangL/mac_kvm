@@ -37,6 +37,12 @@ that "Prompting occurs asynchronously and does not affect the return value", so
 the returned `AccessibilityTrustRequestResult` reports only
 `trustStateAtReturn`, the state observed at the instant the SDK call returned.
 
+Submitting that option *requests macOS to display a prompt*. It does not
+guarantee one: macOS decides whether to display it, and can suppress redisplay
+when an existing TCC decision already covers the requesting identity. If macOS
+displays it, a reviewer can observe it. Either way the call returns immediately,
+and this component never observes, waits for, or reports the prompt.
+
 `trustStateAtReturn == .notTrusted` therefore means "not trusted at return". It
 is never evidence that a prompt appeared, that the user saw it, or that the user
 refused it. The service does not sleep, poll, retry, or wait for an answer. A
@@ -136,13 +142,15 @@ One further test is declared but **skipped by default**: the Tier-H manual
 probe described in the next section. Skipping it is not an acceptance bypass.
 Every behavior test listed above runs and passes in an ordinary run, and the
 probe asserts no behavior that those tests leave uncovered; it exists only so a
-reviewer can trigger real OS UI on purpose.
+reviewer can drive the real macOS APIs on purpose and observe whatever OS UI
+macOS displays.
 
-The prompt window, the user grant and refusal paths, and the actual System
-Settings window are OS UI and cannot be asserted by an automated run. They are
-recorded as reviewer-performed real-machine verification in
-`evidence/issues/M1-035/manual.md`, and the probe below is the executable entry
-point the reviewer uses to trigger them.
+Any prompt window macOS chooses to display, the user grant and refusal paths,
+and the actual System Settings window are OS UI and cannot be asserted by an
+automated run. They are recorded as reviewer-performed real-machine
+verification in `evidence/issues/M1-035/manual.md`, and the probe below is the
+executable entry point the reviewer uses to request them. No prompt was observed
+for M1-035.
 
 ## Tier-H manual probe
 
@@ -151,8 +159,9 @@ which a reviewer could call these `package`-level methods. The test
 `manualRealAPIProbeRunsOneReviewerSelectedAction`, in the Exact Test File,
 closes that gap: it drives `AccessibilityPermissionService()` production
 defaults — the real macOS APIs, with no seam substituted — inside the real
-SwiftPM test process, so the reviewer can observe the actual prompt and the
-actual System Settings window.
+SwiftPM test process, so the reviewer can observe whatever OS UI macOS
+displays: the actual System Settings window, and the Accessibility prompt if
+macOS displays it.
 
 The probe is skipped unless the environment variable
 `MACKVM_M1_035_MANUAL_PROBE` names one action, so an ordinary CI run or local
@@ -167,7 +176,9 @@ MACKVM_M1_035_MANUAL_PROBE=check \
   swift test --package-path Packages/MacPlatform \
   --filter manualRealAPIProbeRunsOneReviewerSelectedAction
 
-# Request trust. Displays the real Accessibility prompt.
+# Request trust. Requests macOS to display the real Accessibility prompt;
+# macOS may suppress redisplay for an existing TCC decision. Returns immediately
+# either way.
 MACKVM_M1_035_MANUAL_PROBE=request \
   swift test --package-path Packages/MacPlatform \
   --filter manualRealAPIProbeRunsOneReviewerSelectedAction

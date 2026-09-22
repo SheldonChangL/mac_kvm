@@ -1,0 +1,488 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-035",
+  "githubIssue": 23,
+  "branch": "feat/m1-035-accessibility-permission-service",
+  "baseCommit": "c26240787447a911209867611c0210ec0fa7f428",
+  "implementationCommit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+  "implementationCommitNote": "Stamped after the coordinating Codex reviewer created the commit. The author still never wrote to .git; the SHA is transcribed from the reviewer's committed HEAD.",
+  "status": "reviewer_verified",
+  "statusNote": "All Acceptance Criteria of the canonical GitHub Issue #23 are met. The reviewer's authoritative Required Command sweep passed in the exact frozen forms, and make verify was re-run against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3 with all 19 named gates passing at exit 0; see reviewerFinalResults.makeVerifyCommittedHead. The Issue's Scope requires real check, request and open settings, and all three were executed through AccessibilityPermissionService production defaults on real macOS by a non-author reviewer, so the 'Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證' criterion is met. Two supplemental observations remain outstanding and are recorded honestly as Tier-H limitations rather than as failed criteria: the real Accessibility prompt was never visibly seen, and no same-process grant-to-revoke transition was demonstrated. The Issue requires neither, so neither blocks acceptance. See manual.md and manualProbeCommands.reviewerRuns.",
+  "authorship": {
+    "implementationAuthor": "Claude Opus 5",
+    "detail": "Claude Opus 5 wrote the implementation, the tests, the component document and this evidence package, and is the sole author of repository content for this Issue. The coordinating Codex agent is a separate executor that reviews, runs the authoritative Required Command sweep in the exact frozen forms, performs the real-machine manual verification, creates the commit, and opens and merges the pull request.",
+    "authorDidNot": [
+      "commit",
+      "stage",
+      "push",
+      "branch",
+      "open or merge a pull request",
+      "write to .git",
+      "update external GitHub state"
+    ]
+  },
+  "protectedArtifacts": "MacKVM_M1-001_unblock.zip and mackvm-unblock/ were never read, opened, listed for content, written, staged, or deleted. They remain untracked and unchanged.",
+  "generatedProducts": "Packages/MacPlatform/.build and .build were written by the test runs and are covered by the existing **/.build/ ignore rule. artifacts/ is Git-ignored, so the author's make verify report is not committed.",
+  "environmentCaveat": "See environment.json authorEnvironmentLimitations. SwiftPM manifest evaluation and xcodebuild -workspace both fail for reasons that reproduce on an unmodified export of the base commit. Every exact frozen form that is blocked is recorded as blocked and is never claimed as passing on the strength of an author run. Each one has since been reported as passing by the reviewer, including make verify against the committed tree; see reviewerFinalResults.",
+  "requiredCommands": [
+    {
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "exitCode": 1,
+      "status": "blocked_environmental",
+      "startedAt": "2026-09-22T01:44:50.994Z",
+      "endedAt": "2026-09-22T01:44:52.051Z",
+      "result": "error: 'macplatform': Invalid manifest, then sandbox-exec: sandbox_apply: Operation not permitted. All 11 tests did execute and pass from the already-built product, but the manifest reload failed, so the command exited 1 and this run is not authoritative.",
+      "reviewerAction": "Re-run in the exact frozen form and confirm exit 0 with 11 tests passed.",
+      "reviewerResolution": "Resolved. The reviewer ran the exact frozen form and it passed, reporting 12 total tests with the opt-in manual probe skipped by default. The same exact form also passed inside make verify as the swift-package-test:MacPlatform gate. The reviewer reported a total-test count, not an executed-case count, so the author's 11-executed / 12-declared breakdown is not restated as the reviewer's number."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "11 tests in 12 executed cases passed, 0 failures, 0 compiler warnings. Report: tests/results.json.",
+      "note": "--disable-sandbox only disables SwiftPM's own nested sandbox. It does not change package identity, target ownership, test selection, or any assertion."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "exitCode": 66,
+      "status": "blocked_environmental_preexisting",
+      "result": "xcodebuild: error: 'MacKVM.xcworkspace' is not a workspace file.",
+      "preexistingProof": "Reproduced identically against a pristine 'git archive c26240787447a911209867611c0210ec0fa7f428 | tar -x' export in /tmp, and also with the outer harness sandbox disabled. The workspace files are untouched by this Issue and contents.xcworkspacedata is valid XML.",
+      "reviewerAction": "Re-run in the exact frozen form and confirm ** BUILD SUCCEEDED **.",
+      "reviewerResolution": "Resolved. The reviewer reported the exact Xcode workspace macOS build as succeeding."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T01:44:05.882Z",
+      "endedAt": "2026-09-22T01:44:05.958Z",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T01:44:05.304Z",
+      "endedAt": "2026-09-22T01:44:05.659Z",
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-035-author-report.json",
+      "form": "exact",
+      "exitCode": 2,
+      "status": "blocked_environmental",
+      "startedAt": "2026-09-22T01:44:14.203Z",
+      "endedAt": "2026-09-22T01:44:16.202Z",
+      "result": "Gates 1 to 3 passed: manifest-validation exit 0, docs-check exit 0, architecture-check exit 0. Gate 4 code-quality exited 1 and the pipeline stopped, leaving the remaining 15 gates not-run. make itself returned 2.",
+      "failureCause": "Inside code-quality, swift-format-version exited 0 and swift-format-lint exited 0 with zero findings. Only the third sub-command, 'swift test -Xswiftc -warnings-as-errors', failed, with sandbox-exec: sandbox_apply: Operation not permitted. The --disable-sandbox equivalent of that same sub-command passes with 15 tests and no warnings.",
+      "reviewerAction": "Re-run make verify and confirm all 19 named gates pass, with swift-package-test:MacPlatform present exactly once.",
+      "reviewerResolution": "Resolved. The reviewer ran make verify and all 19 named gates passed, including swift-package-test:MacPlatform exactly once. The authoritative run is the one against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3; see reviewerFinalResults.makeVerifyCommittedHead."
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T01:44:05.692Z",
+      "endedAt": "2026-09-22T01:44:05.850Z",
+      "result": "docs check OK",
+      "coverageNote": "docs-check reads git-tracked files, so the still-untracked new document and this evidence package are not covered by that run. Both were additionally validated by invoking the tool's own scan_repository directly on the new paths, which reported no violations, and the JSON files were parsed for validity and duplicate keys."
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "No output and no findings. This is the exact lint argv used by the code-quality gate, so it covers both new Swift files.",
+      "note": "An initial run reported one [OrderedImports] finding on the new source; the imports were reordered and the rerun is clean."
+    },
+    {
+      "command": "swift test -Xswiftc -warnings-as-errors",
+      "form": "exact",
+      "exitCode": 1,
+      "status": "blocked_environmental",
+      "result": "sandbox-exec: sandbox_apply: Operation not permitted. This is the third code-quality sub-command."
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "15 tests passed, 0 failures, 0 warnings. The root package compiles the new MacPlatform source with warnings as errors."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/KVMContracts -Xswiftc -warnings-as-errors",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "56 tests passed. The consumed M1-015 taxonomy is unchanged and green."
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-tool-tests",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "tool test discovery OK: 6 files"
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-evidence-tests",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "evidence test discovery OK: 2 files",
+      "note": "This evidence package adds no test_*.py file, so the discovered count and the pinned 19-gate inventory are unchanged."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 27 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/async-harness/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 56 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 23 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/code-quality/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 9 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/diagnostic-bundle/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 18 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/docs-check/tests -p 'test_*.py'",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Ran 12 tests, OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+      "exitCode": 1,
+      "status": "blocked_environmental_preexisting",
+      "result": "Ran 54 tests, FAILED with 9 failures, all in verifier suites that shell out to SwiftPM: M1-004 repository skeleton (2), M1-005 native arm64 build (1), M1-006 package boundaries (3), M1-007 test targets (3).",
+      "preexistingProof": "The identical nine failures, by name, occur on a pristine git archive export of base commit c26240787447a911209867611c0210ec0fa7f428 in /tmp. No failure involves MacPlatform, Accessibility, or any file this Issue touches.",
+      "reviewerAction": "Re-run and confirm 54 tests pass.",
+      "reviewerResolution": "Resolved. The reviewer reported Repository Contracts passing 54 of 54, and the same suite passed as the repository-contract-tests gate inside make verify."
+    },
+    {
+      "command": "./Tools/verify/M1-007-test-targets.sh",
+      "exitCode": 1,
+      "status": "blocked_environmental",
+      "result": "swift package dump-package produced no output under the session sandbox, so the script's JSON parse raised JSONDecodeError. The script accepts no --disable-sandbox flag, so no equivalent run is possible.",
+      "reviewerResolution": "Resolved. The script passed in the reviewer environment as the swift-test-targets gate of the 19-gate make verify run."
+    },
+    {
+      "command": "./Tools/verify/M1-005-mac-arm64-build.sh",
+      "exitCode": 1,
+      "status": "blocked_environmental",
+      "result": "Failed identically at swift package dump-package with JSONDecodeError. The script accepts no --disable-sandbox flag, so no equivalent run is possible.",
+      "reviewerResolution": "Resolved. The script passed in the reviewer environment as the native-arm64-build gate of the 19-gate make verify run."
+    }
+  ],
+  "reviewerPendingSummary": {
+    "exactCommandsToRerun": [],
+    "exactCommandsRerunNote": "Empty. Every exact frozen form that was blocked in the author environment has since been reported as passing by the reviewer: the exact child-package swift test, the exact xcodebuild workspace build, Tests/Contracts, and make verify with all 19 named gates, which itself runs the two Tools/verify scripts as the swift-test-targets and native-arm64-build gates. make verify was additionally re-run against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3 and passed all 19 gates at exit 0; that run is the authoritative one. See reviewerFinalResults.",
+    "manualVerification": "Performed and sufficient for the canonical Issue. The author still performed no manual verification and observed no OS UI. A non-author reviewer executed all three Issue Scope actions — check, request and open settings — on real macOS through AccessibilityPermissionService production defaults, so the Acceptance Criterion 'Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證' is met. Two supplemental observations were not demonstrated and remain recorded as Tier-H limitations rather than as unmet criteria: a visible prompt redisplay and a same-process grant-to-revoke transition. See manual.md and manualProbeCommands.reviewerRuns.",
+    "review": "Independent five-axis review by the coordinating Codex agent, which is a different executor from the Claude Opus 5 author."
+  },
+  "manualProbeCommands": {
+    "environmentVariable": "MACKVM_M1_035_MANUAL_PROBE",
+    "actions": [
+      "check",
+      "request",
+      "open-settings"
+    ],
+    "purpose": "Tier-H manual harness only. Not an automated acceptance command, not part of the Required Command sweep, and not a substitute for any gate. It exists because M1-035 adds no app wiring, so the manual steps otherwise had no executable entry point.",
+    "defaultState": "Skipped when the variable is unset or empty, so no ordinary run can ask macOS to display OS UI.",
+    "requestSemantics": "The request action submits kAXTrustedCheckOptionPrompt as true, which requests macOS to display a prompt and returns immediately. macOS decides whether to display it and can suppress redisplay for an existing TCC decision. If macOS displays it, the reviewer can observe it. No prompt was observed for M1-035 and none is claimed.",
+    "artifacts": {
+      "sanitizedLog": "manual-output.log",
+      "sanitizedLogNote": "Contains exactly the probe output lines of the five reviewer runs, in observed run order, and nothing else.",
+      "machineReadableResult": "manual-result.json",
+      "machineReadableResultNote": "schemaVersion 1, issue M1-035, commit-stamped, every field drawn from a closed vocabulary it declares. canonicalFocusVerdict is passed; the prompt-not-observed and same-process-transition gaps are carried as supplementalLimitations.",
+      "screenshotOrVideo": "none-stored",
+      "screenshotOrVideoRationale": "Not necessary. A capture would add an installed-application and system-settings inventory of the reviewer machine without strengthening the API result, which is already carried by the exit codes and the closed outcome names. The reviewer visual observation is recorded in manual-result.json runs[].visualObservation instead."
+    },
+    "exactForms": {
+      "check": "MACKVM_M1_035_MANUAL_PROBE=check swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+      "request": "MACKVM_M1_035_MANUAL_PROBE=request swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+      "openSettings": "MACKVM_M1_035_MANUAL_PROBE=open-settings swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction"
+    },
+    "authorRuns": [
+      {
+        "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "form": "equivalent",
+        "exitCode": 0,
+        "status": "passed",
+        "result": "11 tests passed in 12 executed cases, 0 failures, 0 compiler warnings. The probe was reported skipped with the reason string, emitted no output line, and displayed no OS UI."
+      },
+      {
+        "command": "MACKVM_M1_035_MANUAL_PROBE=check swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+        "form": "equivalent",
+        "exitCode": 0,
+        "status": "passed",
+        "result": "1 test passed, emitted 'M1-035 manual probe: action=check outcome=notTrusted'.",
+        "uiSafety": "The check action calls only AXIsProcessTrusted, documented by the installed SDK as a prompt-free query. No prompt and no window was displayed. This verifies the probe mechanism and is not manual verification."
+      },
+      {
+        "command": "MACKVM_M1_035_MANUAL_PROBE=bogus-action swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+        "form": "equivalent",
+        "exitCode": 1,
+        "status": "expected_failure",
+        "result": "Failed with 'unknown manual probe action; expected check, request or open-settings'. The unrecognized value was not echoed. Proves the probe does not pass silently."
+      }
+    ],
+    "authorDidNotRun": [
+      "request",
+      "open-settings"
+    ],
+    "authorDidNotRunReason": "Both display OS UI. The author performed no manual verification and observed no OS UI. All three actions were executed by the reviewer; see reviewerRuns.",
+    "reviewerRuns": {
+      "source": "Reported by the coordinating Codex reviewer on the 2026-09-22 UTC observation day, against commit 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3. Transcribed by the author, who observed none of it.",
+      "machineReadableRecord": "manual-result.json records these same runs in closed-vocabulary form, and manual-output.log carries their sanitized output lines verbatim.",
+      "runs": [
+        {
+          "action": "check",
+          "form": "exact",
+          "responsibleIdentity": "root / ChatGPT",
+          "status": "passed",
+          "emitted": "M1-035 manual probe: action=check outcome=trusted",
+          "exitCode": 0,
+          "demonstrates": "The real AXIsProcessTrusted path returns trusted for a responsible identity that genuinely holds Accessibility authorization, through the production default with no seam substituted. Together with the notTrusted runs under the Claude Code and Claude Opus 5 identities, both real trust states were observed on real macOS. This satisfies the Issue Scope item 'check'."
+        },
+        {
+          "action": "open-settings",
+          "form": "exact",
+          "exitCode": 0,
+          "status": "passed",
+          "emitted": "outcome=systemSettingsApplication",
+          "reviewerObservation": "The reviewer visually confirmed that System Settings opened and showed the Accessibility permissions list.",
+          "notClaimed": "This is not evidence of a deep link. The implementation opens the System Settings application only; the Accessibility pane was already the selected pane. Known limitation 1 is unchanged."
+        },
+        {
+          "action": "request",
+          "form": "exact",
+          "responsibleIdentity": "Claude Code",
+          "status": "passed",
+          "emitted": "M1-035 manual probe: action=request outcome=notTrusted",
+          "exitCode": 0,
+          "reviewerObservation": "No OS prompt was visibly observed. The request itself ran to completion and exited 0.",
+          "inference": "A pre-existing denied TCC decision for the responsible identity plausibly suppressed redisplay of the prompt. This is recorded as an inference, not as an observation, and it is not offered as evidence that the prompt is displayed.",
+          "notDemonstrated": "That macOS displayed its Accessibility prompt. The call requests macOS to display one; macOS can suppress prompt redisplay for an existing TCC decision. No OS prompt was visibly observed. The Issue's Scope and Acceptance Criteria do not require prompt redisplay, so this is recorded as a Tier-H limitation and remaining risk, not as a failed criterion and not as a claim that the prompt path is verified.",
+          "demonstrates": "The real AXIsProcessTrustedWithOptions request path was executed through the production default with no seam substituted, and returned the documented immediate notTrusted state, matching the installed SDK's 'Prompting occurs asynchronously and does not affect the return value.' This satisfies the Issue Scope item 'request'."
+        },
+        {
+          "action": "check",
+          "command": "MACKVM_M1_035_MANUAL_PROBE=check swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+          "form": "equivalent",
+          "launchedBy": "Claude Opus 5",
+          "exitCode": 0,
+          "status": "not_demonstrated",
+          "emitted": "outcome=notTrusted",
+          "uiState": "Taken while the System Settings Accessibility toggle named lowercase 'claude' was switched on. The reviewer switched it from off to on after explicit owner authorization and Touch ID, and the UI visibly showed it on.",
+          "interpretation": "The trusted transition was not observed for the probe process. The lowercase 'claude' UI row was not the effective TCC responsible identity of that Swift test process, so the toggle did not apply to it. This is a Tier-H verification limitation, not a product-code failure and not a passed trusted-transition test.",
+          "scope": "Author-created supplemental manual step. The canonical Issue does not require a same-process grant-to-revoke transition, so this run is non-blocking for acceptance."
+        },
+        {
+          "action": "check",
+          "command": "MACKVM_M1_035_MANUAL_PROBE=check swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+          "form": "equivalent",
+          "launchedBy": "Claude Opus 5",
+          "exitCode": 0,
+          "status": "not_demonstrated",
+          "emitted": "outcome=notTrusted",
+          "uiState": "Taken after the reviewer restored the lowercase 'claude' toggle to off.",
+          "interpretation": "Identical to the toggle-on run, which is consistent with the toggle never having applied to this process. Because neither direction changed the observed outcome, the run is recorded as not demonstrating revoke either.",
+          "scope": "Author-created supplemental manual step. The canonical Issue does not require a same-process grant-to-revoke transition, so this run is non-blocking for acceptance."
+        }
+      ],
+      "grantRevokeConclusion": {
+        "status": "not_demonstrated",
+        "statement": "Grant and revoke success for the actual Swift test process was not demonstrated. Toggling the lowercase 'claude' row on and then off produced outcome=notTrusted both times, so the UI row was not the probe process's effective TCC responsible identity.",
+        "classification": "Remaining Tier-H limitation and risk. It is not a product-code failure, no trusted-transition test is claimed as passed, and it does not block acceptance: the same-process grant-to-revoke transition is an author-created supplemental step that exceeds the canonical Issue's stated Scope and Acceptance Criteria.",
+        "consistentWith": "The identity-specific TCC behavior already documented in identityScope and in manual.md, and with the check run under the root / ChatGPT responsible identity returning trusted."
+      },
+      "attemptedCommands": [
+        {
+          "command": "MACKVM_M1_035_MANUAL_PROBE=check swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+          "form": "exact",
+          "attemptedBy": "Claude Code",
+          "exitCode": 1,
+          "status": "blocked_environmental",
+          "result": "Failed before any test ran, at manifest evaluation, with a sandbox-exec failure.",
+          "classification": "Nested sandbox environment limitation of that agent session, the same restriction recorded in environment.json authorEnvironmentLimitations. It is not a product test failure, and the exact form passed in the reviewer environment."
+        }
+      ]
+    },
+    "identityScope": "These commands validate the production-default service in the real SwiftPM test process, not the final app's signing identity. macOS Accessibility (TCC) authorization is identity-specific, so app-bundle and signing integration is a downstream integration concern that this Issue does not claim."
+  },
+  "reviewerPreliminaryResults": {
+    "status": "superseded_by_reviewerFinalResults",
+    "meaning": "Results the coordinating Codex reviewer reported as observed during an earlier pass. They are retained for traceability only and are superseded by reviewerFinalResults, which records the reviewer's final sweep. The author ran none of them.",
+    "observed": [
+      {
+        "command": "swift test --package-path Packages/MacPlatform",
+        "form": "exact",
+        "exitCode": 0,
+        "result": "11 tests.",
+        "note": "Observed before the manual probe existed. A re-run now reports 11 tests passed and 1 skipped, because the default-skipped probe is the twelfth declared test."
+      },
+      {
+        "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+        "form": "exact",
+        "exitCode": 0,
+        "result": "** BUILD SUCCEEDED **",
+        "note": "Confirms the author-environment xcodebuild failure recorded above is environmental and not attributable to this change."
+      },
+      {
+        "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+        "form": "exact",
+        "exitCode": 0,
+        "result": "54 tests, OK.",
+        "note": "Confirms the nine author-environment failures recorded above are environmental and pre-existing."
+      }
+    ],
+    "stillPending": [],
+    "stillPendingNote": "Both items previously listed here have since been reported by the reviewer: make verify passed 19 of 19 named gates, including against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3, and all three Tier-H probe actions were executed on real macOS. See reviewerFinalResults and manualProbeCommands.reviewerRuns. The canonical Issue's Tier-H criterion is met; the visible prompt redisplay and the same-process grant-to-revoke transition remain undemonstrated supplemental observations."
+  },
+  "reviewerFinalResults": {
+    "status": "final_reviewer_reported",
+    "source": "Reported by the coordinating Codex reviewer, a different executor from the Claude Opus 5 author. The author transcribed these values and ran none of them. Where the reviewer reported no value, the field says so rather than supplying one.",
+    "observationDay": "2026-09-22 UTC",
+    "makeVerifyCommittedHead": {
+      "command": "make verify REPORT=<reviewer report>",
+      "form": "exact",
+      "commandNote": "The REPORT argument named an ephemeral reviewer report written outside the repository, in the reviewer session's temporary directory. Its absolute path is deliberately not recorded here, in keeping with this package's practice of excluding absolute paths; only the basename is given below.",
+      "commit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+      "startedAt": "2026-09-22T05:55:28.060+00:00",
+      "endedAt": "2026-09-22T05:56:03.868+00:00",
+      "exitCode": 0,
+      "status": "passed",
+      "authoritative": true,
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "result": "All 19 named gates passed, each exiting 0, against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3. The gate set is identical to the pre-commit sweep, with swift-package-test:MacPlatform present exactly once and running the exact frozen form swift test --package-path Packages/MacPlatform.",
+      "gateNames": [
+        "manifest-validation",
+        "docs-check",
+        "architecture-check",
+        "code-quality",
+        "tool-test-discovery",
+        "evidence-test-discovery",
+        "tool-test:architecture-check/tests/test_architecture_check.py",
+        "tool-test:async-harness/tests/test_async_harness.py",
+        "tool-test:cigates/tests/test_cigates.py",
+        "tool-test:code-quality/tests/test_code_quality.py",
+        "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
+        "tool-test:docs-check/tests/test_docs_check.py",
+        "evidence-test:M1-023/tests/test_register.py",
+        "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
+        "swift-package-test:KVMContracts",
+        "swift-package-test:MacPlatform",
+        "repository-contract-tests",
+        "swift-test-targets",
+        "native-arm64-build"
+      ],
+      "runOrder": "post_commit",
+      "runOrderDetail": "Authoritative. This run verifies the committed tree at the implementation commit, which supersedes the pre-commit sweep recorded in makeVerify as the record of gate coverage for this Issue.",
+      "sandboxNote": "Run outside the Codex outer sandbox so that SwiftPM could apply its own sandbox. That changes no source file, no test selection, no assertion, and no security default; it only removes a nested-sandbox restriction of the surrounding agent session. The gates and their exact command forms are unchanged.",
+      "reportBasename": "m1-035-review-head-unsandboxed.json",
+      "reportLocation": "Ephemeral reviewer report outside the repository. Not committed and not part of this evidence package."
+    },
+    "makeVerifyInSandboxAttempt": {
+      "command": "make verify REPORT=<reviewer report>",
+      "form": "exact",
+      "commit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+      "status": "blocked_environmental",
+      "result": "Attempted at the same HEAD immediately before makeVerifyCommittedHead, from inside the Codex outer sandbox. It stopped at the code-quality gate because swift test -Xswiftc -warnings-as-errors could not invoke a nested sandbox-exec.",
+      "classification": "Environment attempt, not a product failure. It is the same nested-sandbox restriction already recorded in environment.json authorEnvironmentLimitations. The immediately following unsandboxed run at the same HEAD passed all 19 gates.",
+      "reportBasename": "m1-035-review-head.json",
+      "reportLocation": "Ephemeral reviewer report outside the repository. Not committed and not part of this evidence package."
+    },
+    "makeVerify": {
+      "command": "make verify REPORT=artifacts/ci/m1-035-review-precommit.json",
+      "form": "exact",
+      "status": "passed",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "result": "All 19 named gates passed, with swift-package-test:MacPlatform present exactly once and running the exact frozen form swift test --package-path Packages/MacPlatform.",
+      "gateNames": [
+        "manifest-validation",
+        "docs-check",
+        "architecture-check",
+        "code-quality",
+        "tool-test-discovery",
+        "evidence-test-discovery",
+        "tool-test:architecture-check/tests/test_architecture_check.py",
+        "tool-test:async-harness/tests/test_async_harness.py",
+        "tool-test:cigates/tests/test_cigates.py",
+        "tool-test:code-quality/tests/test_code_quality.py",
+        "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
+        "tool-test:docs-check/tests/test_docs_check.py",
+        "evidence-test:M1-023/tests/test_register.py",
+        "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
+        "swift-package-test:KVMContracts",
+        "swift-package-test:MacPlatform",
+        "repository-contract-tests",
+        "swift-test-targets",
+        "native-arm64-build"
+      ],
+      "runOrder": "pre_commit",
+      "runOrderDetail": "The sweep completed before the implementation commit existed. Its report records the then-current HEAD as base commit c26240787447a911209867611c0210ec0fa7f428 and endedAt 2026-09-22T02:04:59.610+00:00, while commit 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3 is authored 2026-09-22T02:05:28+00:00. These gates therefore ran against the staged change rather than the committed tree. make verify was subsequently re-run against the committed tree; see makeVerifyCommittedHead.",
+      "reportPath": "artifacts/ci/m1-035-review-precommit.json",
+      "reportPathNote": "artifacts/ is Git-ignored, so the report is not committed and is not part of this evidence package.",
+      "authoritative": false,
+      "authoritativeNote": "Historical. This sweep is superseded as the authoritative record by makeVerifyCommittedHead, which ran the same gate set against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3. It is retained because it is a genuine reviewer observation of the staged change."
+    },
+    "observed": [
+      {
+        "command": "swift test --package-path Packages/MacPlatform",
+        "form": "exact",
+        "status": "passed",
+        "result": "Passed with 12 total tests, the opt-in manual probe skipped by default.",
+        "note": "The reviewer reported a total-test count. The author's own breakdown of 12 declared functions, 11 executed in 12 cases and 1 skipped, stays in tests/results.json and is not restated as the reviewer's number."
+      },
+      {
+        "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+        "form": "exact",
+        "status": "passed",
+        "result": "The Xcode workspace macOS build succeeded."
+      },
+      {
+        "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+        "form": "exact",
+        "status": "passed",
+        "result": "Repository Contracts passed 54 of 54."
+      },
+      {
+        "command": "git diff --cached --check",
+        "status": "passed",
+        "result": "Passed with no reported findings."
+      },
+      {
+        "command": "staged documentation and verifier checks",
+        "status": "passed",
+        "result": "The reviewer reported the relevant staged doc and verifier checks as passing.",
+        "note": "The reviewer did not enumerate the individual command forms for this item, so none is reconstructed here."
+      }
+    ],
+    "manualProbeRuns": "Recorded in manualProbeCommands.reviewerRuns, together with what those runs did and did not demonstrate."
+  }
+}

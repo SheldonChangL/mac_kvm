@@ -233,8 +233,9 @@ func requestAlwaysSubmitsThePromptOptionRegardlessOfTrustState(trustedWhenPrompt
 @Test func productionDefaultReadsTrustThroughTheRealSDKWithoutDisplayingUI() {
   // The production default calls the real AXIsProcessTrusted, which the
   // installed SDK documents as a plain query with no prompt. requestTrust and
-  // openSystemSettings are deliberately not exercised here: they would display
-  // OS UI. Their real-machine behavior is reviewer-verified manual evidence.
+  // openSystemSettings are deliberately not exercised here: they ask macOS to
+  // display OS UI. Their real-machine behavior is reviewer-verified manual
+  // evidence.
   let state = AccessibilityPermissionService().currentTrustState()
 
   #expect(AccessibilityTrustState.allCases.contains(state))
@@ -288,10 +289,14 @@ private func sanitizedFailureName(_ error: CoreError) -> String {
 ///
 /// This exists only so the reviewer can drive `AccessibilityPermissionService()`
 /// production defaults — the real macOS APIs, with no mocked seam — inside the
-/// real SwiftPM test process, and then inspect the actual Accessibility prompt
-/// and the actual System Settings window with their own eyes. The probe asserts
-/// nothing about that UI, because a test process cannot observe it; the UI
-/// observation is the reviewer's, recorded in `evidence/issues/M1-035/manual.md`.
+/// real SwiftPM test process, and then inspect whatever OS UI macOS displays
+/// with their own eyes. The `request` action asks macOS to display the
+/// Accessibility prompt by submitting `kAXTrustedCheckOptionPrompt` as `true`;
+/// macOS decides whether to display it and can suppress redisplay for an
+/// existing TCC decision, so a prompt is requested, never guaranteed, and none
+/// was observed for M1-035. The probe asserts nothing about that UI, because a
+/// test process cannot observe it; the UI observation is the reviewer's,
+/// recorded in `evidence/issues/M1-035/manual.md`.
 ///
 /// It is not a shortcut around the automated suite and carries no acceptance
 /// credit of its own: every behavior test above still runs and must still pass

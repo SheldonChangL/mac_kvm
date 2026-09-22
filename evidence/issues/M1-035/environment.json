@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-035",
+  "githubIssue": 23,
+  "role": "author",
+  "recordedAt": "2026-09-22T01:45:00.000Z",
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "kernelRelease": "25.6.0"
+  },
+  "hardware": {
+    "architecture": "arm64",
+    "model": "not_captured",
+    "cpuBrand": "not_captured",
+    "rosettaTranslated": "not_captured",
+    "note": "sysctl hw.model, machdep.cpu.brand_string and sysctl.proc_translated are refused in the author sandbox with 'Operation not permitted'. The values are deliberately not reconstructed. uname -m reports arm64. The reviewer subsequently read sysctl.proc_translated = 0 and the native-arm64 gate passed, and separately reported the machine model, CPU brand and memory; see reviewerEnvironment.hardware."
+  },
+  "toolchain": {
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDriverVersion": "1.127.14.1",
+    "swiftFormatVersion": "6.2.3",
+    "pythonVersion": "3.9.6",
+    "xcodeVersion": "Xcode 26.2",
+    "xcodeBuildVersion": "17C52",
+    "macOSSDKVersion": "26.2",
+    "macOSSDKPath": "MacOSX26.2.sdk",
+    "targetTriple": "arm64-apple-macosx26.0"
+  },
+  "repository": {
+    "branch": "feat/m1-035-accessibility-permission-service",
+    "baseCommit": "c26240787447a911209867611c0210ec0fa7f428",
+    "implementationCommit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+    "implementationCommitNote": "Stamped after the coordinating Codex reviewer created the commit. The author did not commit; the SHA is transcribed from the reviewer's committed HEAD."
+  },
+  "reviewerEnvironment": {
+    "role": "reviewer",
+    "source": "Reported by the coordinating Codex reviewer and transcribed by the author, who observed none of it.",
+    "observationDay": "2026-09-22 UTC",
+    "commitUnderVerification": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+    "os": {
+      "productName": "macOS",
+      "productVersion": "26.6.2",
+      "buildVersion": "25G83"
+    },
+    "hardware": {
+      "architecture": "arm64",
+      "rosettaTranslated": false,
+      "rosettaEvidence": "sysctl.proc_translated = 0, read in the reviewer environment. This is the value the author environment could not read.",
+      "model": "MacBook Pro",
+      "cpuBrand": "Apple M4 Pro",
+      "modelIdentifier": "Mac16,7",
+      "memory": "24 GB",
+      "source": "Reported by the coordinating reviewer from a read-only metadata query. The author observed none of it.",
+      "uniqueIdentifiersExcluded": "The raw hardware output contained unique device identifiers. They are deliberately excluded from this evidence record and are not quoted, hashed, abbreviated, or otherwise represented anywhere in evidence/issues/M1-035/."
+    },
+    "displayAndKeyboard": {
+      "captured": false,
+      "reason": "Partially queried and still recorded as uncaptured. The display query returned no panel resolution or layout, and the keyboard query returned selected input sources rather than a physical layout. Nothing is reconstructed or guessed, so the metadata the author environment marked as reviewer-required remains uncaptured. It does not affect any automated result, because the automated suite substitutes the dependency seam.",
+      "display": {
+        "query": "system_profiler SPDisplaysDataType -json",
+        "reported": "The built-in Apple M4 Pro display and GPU path, with Metal support.",
+        "resolution": "not_captured",
+        "layout": "not_captured",
+        "notCapturedReason": "This non-interactive output did not report panel resolution or display layout. Neither value is guessed."
+      },
+      "keyboard": {
+        "query": "defaults read com.apple.HIToolbox AppleSelectedInputSources",
+        "selectedInputSources": [
+          "Traditional Chinese Zhuyin (com.apple.inputmethod.TCIM.Zhuyin)",
+          "PressAndHold non-keyboard input method"
+        ],
+        "physicalLayout": "not_captured",
+        "notCapturedReason": "Selected input sources identify the active input methods, not the physical keyboard layout. No physical layout is inferred from them."
+      }
+    },
+    "network": {
+      "applicable": false,
+      "reason": "Not applicable to M1-035. The check, request and open System Settings actions are local-only and open no network connection, so no network metadata exists to record. Unchanged from the author environment."
+    },
+    "peer": {
+      "applicable": false,
+      "reason": "Not applicable to M1-035. The local-only actions make no peer connection, and no Barrier or Native peer is involved. Unchanged from the author environment."
+    },
+    "accessibilityGrantState": {
+      "beforeAndDuring": "Two distinct responsible identities were exercised. Under the root / ChatGPT responsible identity the real check returned trusted. Under the Claude Code and Claude Opus 5 launched probe processes the real check returned notTrusted, both while the System Settings Accessibility toggle named lowercase 'claude' was on and after it was restored to off.",
+      "conclusion": "The lowercase 'claude' UI row was not the effective TCC responsible identity of the Swift test process, so no grant or revoke transition was demonstrated for that process. Recorded as a Tier-H limitation in manual.md and in commands.json manualProbeCommands.reviewerRuns.",
+      "toggleHandling": "The reviewer switched that toggle from off to on after explicit owner authorization and Touch ID, and restored it to off afterwards. The system was left in its original state."
+    },
+    "metadataQueries": {
+      "nature": "Read-only metadata queries run by the coordinating reviewer. They mutate no state and are not part of the Issue verification command set in commands.json.",
+      "commands": [
+        "system_profiler SPDisplaysDataType -json",
+        "defaults read com.apple.HIToolbox AppleSelectedInputSources",
+        "system_profiler SPHardwareDataType -json"
+      ],
+      "sanitization": "Only the facts recorded above were carried over. Unique device identifiers, user name, and absolute paths present in the raw output were deliberately excluded and are not represented in any form."
+    }
+  },
+  "sdkFactsVerifiedOnThisHost": {
+    "AXIsProcessTrusted": "extern Boolean AXIsProcessTrusted (void) CF_AVAILABLE_MAC(10_4); documented as returning whether the current process is a trusted accessibility client, with no prompt behavior.",
+    "AXIsProcessTrustedWithOptions": "extern Boolean AXIsProcessTrustedWithOptions (CFDictionaryRef __nullable options) CF_AVAILABLE_MAC(10_9);",
+    "kAXTrustedCheckOptionPrompt": "extern CFStringRef kAXTrustedCheckOptionPrompt CF_AVAILABLE_MAC(10_9); header value observed at runtime as the string 'AXTrustedCheckOptionPrompt'.",
+    "promptAsynchronyQuote": "Prompting occurs asynchronously and does not affect the return value.",
+    "promptAsynchronySource": "MacOSX26.2.sdk ApplicationServices.framework/Frameworks/HIServices.framework/Headers/AXUIElement.h line 60",
+    "NSWorkspaceOpenURL": "- (BOOL)openURL:(NSURL *)url; documented as 'Open a URL, using the default handler for the URL's scheme'.",
+    "NSWorkspaceURLForApplicationWithBundleIdentifier": "- (nullable NSURL *)URLForApplicationWithBundleIdentifier:(NSString *)bundleIdentifier API_AVAILABLE(macos(10.6)); documented as returning nil if no app has the bundle identifier.",
+    "noDeclaredSettingsPaneAPI": "A recursive search of the installed AppKit and Foundation headers for openSystemSettings, openSettings and SystemSettings found no declaration. No SDK-declared API or URI opens the Accessibility pane, so none is claimed.",
+    "systemSettingsBundleIdentifier": "com.apple.systempreferences, read from the CFBundleIdentifier of the installed /System/Applications/System Settings.app on this host."
+  },
+  "network": {
+    "applicable": false,
+    "reason": "M1-035 performs no network, transport, TLS, or peer communication. No peer, server build, or wire version participates in this Issue."
+  },
+  "peer": {
+    "applicable": false,
+    "reason": "No Barrier or Native Protocol peer is involved."
+  },
+  "displayAndInput": {
+    "applicable": false,
+    "authorReason": "The automated suite substitutes the dependency seam, so no window, prompt, display topology, or keyboard layout affects any automated result. The sanitized real-machine record is manual-output.log and manual-result.json.",
+    "reviewerRequirement": "Display/layout and keyboard-layout metadata must be captured by the reviewer during the real-machine manual verification recorded in manual.md, because the System Settings window, and any Accessibility prompt macOS chooses to display, are OS UI.",
+    "reviewerOutcome": "Not captured. See reviewerEnvironment.displayAndKeyboard. The reviewer later ran read-only display and keyboard metadata queries, but the display query returned no panel resolution or layout and the keyboard query returned selected input sources rather than a physical layout, so the reviewer-required metadata remains uncaptured and is not reconstructed."
+  },
+  "authorEnvironmentLimitations": {
+    "swiftPackageManagerSandbox": "SwiftPM manifest evaluation fails in this session with 'sandbox-exec: sandbox_apply: Operation not permitted'. It reproduces on an unmodified export of the base commit and persists even when the outer harness sandbox is disabled, so it is a property of the host session and not of this change. Exact SwiftPM Required Command forms are therefore non-authoritative here; --disable-sandbox equivalents were run instead and are labelled as such in commands.json.",
+    "xcodebuildWorkspace": "xcodebuild reports \"'MacKVM.xcworkspace' is not a workspace file\" (exit 66). It reproduces identically on a pristine git archive export of base commit c26240787447a911209867611c0210ec0fa7f428 in /tmp, so it is environmental and pre-existing. The workspace files are untouched by this Issue.",
+    "consequence": "No blocked command is claimed as passing on the strength of an author run. Every one of them has since been reported as passing by the reviewer in its exact frozen form; see commands.json reviewerFinalResults."
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-035",
+  "phase": "green",
+  "commit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+  "commitNote": "Stamped after the coordinating Codex reviewer created the commit. Transcribed from the reviewer's committed HEAD.",
+  "source": "author",
+  "authoritative": false,
+  "authoritativeNote": "The suites below are author runs and used the --disable-sandbox equivalent, because the exact SwiftPM Required Command form cannot evaluate a manifest in the author session. The authoritative exact-form runs were performed by the reviewer and are recorded in reviewerRuns and in commands.json reviewerFinalResults.",
+  "reviewerRuns": {
+    "source": "Reported by the coordinating Codex reviewer and transcribed by the author, who ran none of it.",
+    "observationDay": "2026-09-22 UTC",
+    "runs": [
+      {
+        "command": "swift test --package-path Packages/MacPlatform",
+        "form": "exact",
+        "status": "passed",
+        "testsTotal": 12,
+        "result": "Passed with 12 total tests, the opt-in manual probe skipped by default.",
+        "countReconciliation": "The reviewer reported a total-test count of 12, which matches the 12 declared test functions recorded below. The author's finer breakdown of 11 executed functions in 12 executed cases plus 1 skipped is an author observation and is not restated as the reviewer's number."
+      },
+      {
+        "command": "make verify REPORT=<reviewer report>",
+        "form": "exact",
+        "status": "passed",
+        "result": "All 19 named gates passed, including swift-package-test:MacPlatform, swift-package-test:KVMContracts and repository-contract-tests. Run twice by the reviewer: once pre-commit against the staged change, and again against the committed tree at 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3, exit 0, 19 of 19 gates passed. The committed-tree run is authoritative; see commands.json reviewerFinalResults.makeVerifyCommittedHead."
+      },
+      {
+        "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+        "form": "exact",
+        "status": "passed",
+        "result": "Repository Contracts passed 54 of 54."
+      },
+      {
+        "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+        "form": "exact",
+        "status": "passed",
+        "result": "The Xcode workspace macOS build succeeded."
+      }
+    ]
+  },
+  "suites": [
+    {
+      "name": "MacPlatformTests",
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "exactFrozenForm": "swift test --package-path Packages/MacPlatform",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 11,
+      "testCasesRun": 12,
+      "testCasesNote": "12 test functions are declared. 11 executed and all passed; one of those is parameterized over two arguments, so the 11 executed functions produce 12 executed cases. The twelfth declared function is the opt-in Tier-H manual probe, which is skipped unless MACKVM_M1_035_MANUAL_PROBE selects an action.",
+      "failures": 0,
+      "compilerWarnings": 0,
+      "issueTests": [
+        {
+          "name": "trustedProcessReportsTrustedStateWithoutPrompting",
+          "category": "happy-path",
+          "asserts": "A trusted process reports .trusted, has no actionable failure, submits no prompt, and performs no settings lookup or open."
+        },
+        {
+          "name": "untrustedProcessIsAValidStateMappedToTheFrozenPermissionFailure",
+          "category": "denied-boundary",
+          "asserts": "Untrusted is returned as a state with no prompt submitted, and maps to exactly permission.accessibilityDenied, severity error, retry userActionRequired with automatic retry refused, cleanup notRequired, and no underlying diagnostic code."
+        },
+        {
+          "name": "requestSubmitsThePromptOptionAndReportsOnlyTheImmediateState",
+          "category": "happy-path",
+          "asserts": "requestTrust submits prompt=true exactly once, reports promptRequested and the immediate trust state only, and performs no additional trust read, poll, sleep or retry."
+        },
+        {
+          "name": "requestAlwaysSubmitsThePromptOptionRegardlessOfTrustState",
+          "category": "boundary",
+          "asserts": "prompt=true is submitted for both immediate trust outcomes, and trustStateAtReturn tracks only the SDK return value."
+        },
+        {
+          "name": "openSettingsReportsTheApplicationDestinationOnSuccess",
+          "category": "happy-path",
+          "asserts": "A successful open returns .systemSettingsApplication after exactly one resolve and one open, and submits no prompt."
+        },
+        {
+          "name": "unresolvableSettingsApplicationFailsClosedWithoutOpeningAnything",
+          "category": "injected-failure",
+          "asserts": "A nil application URL fails closed as permission.capabilityUnavailable with retry never, cleanup notRequired, no underlying code, and zero open attempts."
+        },
+        {
+          "name": "rejectedOpenRequestMapsToATypedUserActionFailure",
+          "category": "injected-failure",
+          "asserts": "A refused open maps to permission.capabilityUnavailable with retry userActionRequired, automatic retry refused, and no underlying code."
+        },
+        {
+          "name": "settingsFailuresRetainNoPlatformErrorContentOrPath",
+          "category": "injected-failure-privacy",
+          "asserts": "Both settings failures encode to exactly the four keys code, severity, retryDisposition and cleanupDisposition, and the encoded form contains no application name, no /System/Applications path, and no file:// scheme even though a path-shaped URL was injected."
+        },
+        {
+          "name": "repeatedOperationsAreIdempotentAndOwnNoResourceToClean",
+          "category": "idempotency-cleanup",
+          "asserts": "Repeating check, request and open yields equal results, delegates to the seam exactly once per call with counts 2, [true, true], 2 and 2, and accumulates no state; nothing is owned that requires release."
+        },
+        {
+          "name": "productionDefaultReadsTrustThroughTheRealSDKWithoutDisplayingUI",
+          "category": "production-default-smoke",
+          "asserts": "AccessibilityPermissionService() with no injected seam calls the real AXIsProcessTrusted and returns a valid AccessibilityTrustState without trapping and without displaying UI."
+        },
+        {
+          "name": "manualRealAPIProbeRunsOneReviewerSelectedAction",
+          "category": "manual-probe-opt-in",
+          "skippedByDefault": true,
+          "acceptanceCredit": "none",
+          "asserts": "With MACKVM_M1_035_MANUAL_PROBE set to check, request or open-settings, drives AccessibilityPermissionService() production defaults against the real macOS APIs with no seam substituted, emits one sanitized closed state or result name, and fails on any other action value. It asserts nothing about the OS UI itself, which only the reviewer can observe."
+        }
+      ],
+      "regressionTests": [
+        "childPackageOwnsMacPlatformTests"
+      ],
+      "declaredTests": 12,
+      "testsSkipped": 1,
+      "skipNote": "The skip is not an acceptance bypass and grants no acceptance credit. Every behavior test still runs and still passes in the default run; the probe asserts no behavior those tests leave uncovered. Its default-skipped state is the safety property that keeps OS UI out of ordinary CI."
+    },
+    {
+      "name": "MacKVM root package",
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "exactFrozenForm": "swift test -Xswiftc -warnings-as-errors",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 15,
+      "failures": 0,
+      "compilerWarnings": 0,
+      "purpose": "The root package compiles the new MacPlatform source with warnings as errors and proves no pre-existing root test regressed."
+    },
+    {
+      "name": "KVMContractsTests",
+      "command": "swift test --disable-sandbox --package-path Packages/KVMContracts -Xswiftc -warnings-as-errors",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 56,
+      "failures": 0,
+      "purpose": "The frozen M1-015 taxonomy consumed by this Issue is unchanged and still green."
+    }
+  ],
+  "cancellationCoverage": {
+    "applicable": false,
+    "reason": "The service is an immutable Sendable struct that owns no task, timer, queue, observer, notification registration, file handle, or mutable state. Every operation is one synchronous macOS call. There is no asynchronous operation, no in-flight work, and no cancellation or teardown entry point, so no cancellation test can be written that asserts anything real.",
+    "substitute": "repeatedOperationsAreIdempotentAndOwnNoResourceToClean asserts the equivalent obligation: repetition is safe, each call delegates exactly once, results depend only on that call, and nothing accumulates that would require cleanup."
+  },
+  "uiSafety": "No automated test displays an Accessibility prompt or a System Settings window. Nine of the behavior tests substitute the dependency seam; the tenth calls only AXIsProcessTrusted through the production default, which the installed SDK documents as a prompt-free query. The eleventh declared new test is the manual probe, which is skipped unless MACKVM_M1_035_MANUAL_PROBE explicitly selects an action, and was observed skipped with no output in the default run.",
+  "manualProbe": {
+    "test": "manualRealAPIProbeRunsOneReviewerSelectedAction",
+    "purpose": "M1-035 adds no application wiring and the service is package-level, so the Tier-H manual steps had no executable entry point. The probe supplies one inside the real SwiftPM test process, using production defaults and no mocked seam.",
+    "notAnAcceptanceTest": "It is a reviewer-driven manual harness, not an automated acceptance test and not a shortcut around the full automated suite. It carries no acceptance credit of its own.",
+    "environmentVariable": "MACKVM_M1_035_MANUAL_PROBE",
+    "actions": [
+      "check",
+      "request",
+      "open-settings"
+    ],
+    "defaultState": "Skipped when the variable is unset or empty, so no ordinary CI or local run can display OS UI.",
+    "unknownActionBehavior": "Fails the run with 'unknown manual probe action; expected check, request or open-settings'. The unrecognized value is never echoed.",
+    "determinism": "One run performs exactly one action. No sleep, poll, retry, timeout, or app wiring.",
+    "artifacts": {
+      "sanitizedLog": "../manual-output.log",
+      "machineReadableResult": "../manual-result.json",
+      "note": "manual-output.log holds the five reviewer probe output lines in observed run order and nothing else. manual-result.json is the schemaVersion 1, commit-stamped, closed-vocabulary record of the same runs, with canonicalFocusVerdict passed and the supplemental gaps carried as supplementalLimitations. No screenshot or video is stored; see manual.md 'Artifacts' for why none is necessary."
+    },
+    "output": "Exactly one line per run: 'M1-035 manual probe: action=<action> outcome=<name>'. <name> is only a closed enum case name (trusted, notTrusted, systemSettingsApplication) or a closed taxonomy name such as permission.capabilityUnavailable. No path, URL, platform error string, typed text, clipboard payload, or private data can be emitted.",
+    "commands": {
+      "check": "MACKVM_M1_035_MANUAL_PROBE=check swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+      "request": "MACKVM_M1_035_MANUAL_PROBE=request swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+      "openSettings": "MACKVM_M1_035_MANUAL_PROBE=open-settings swift test --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction"
+    },
+    "authorExecuted": [
+      {
+        "action": "default run, variable unset",
+        "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "exitCode": 0,
+        "result": "11 tests passed in 12 cases, probe reported skipped, no probe output line, no OS UI displayed."
+      },
+      {
+        "action": "check",
+        "command": "MACKVM_M1_035_MANUAL_PROBE=check swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+        "exitCode": 0,
+        "result": "1 test passed, emitted 'action=check outcome=notTrusted'.",
+        "uiSafety": "check calls only AXIsProcessTrusted, which the installed SDK documents as a prompt-free query. No prompt and no window was displayed."
+      },
+      {
+        "action": "bogus-action",
+        "command": "MACKVM_M1_035_MANUAL_PROBE=bogus-action swift test --disable-sandbox --package-path Packages/MacPlatform --filter manualRealAPIProbeRunsOneReviewerSelectedAction",
+        "exitCode": 1,
+        "result": "Failed with 'unknown manual probe action; expected check, request or open-settings'. The unrecognized value was not echoed. This proves the probe does not pass silently."
+      }
+    ],
+    "authorDidNotExecute": [
+      "request",
+      "open-settings"
+    ],
+    "authorDidNotExecuteReason": "Both display OS UI. The author performed no manual verification and observed no OS UI. Running the check action and the unknown-action case verifies only the probe mechanism, not the Tier-H manual criterion. The reviewer has since executed all three actions on real macOS; see reviewerExecuted and manual.md, where the criterion is recorded as met.",
+    "identityScope": "The probe validates the production-default service in the real SwiftPM test process. It does not validate the final app's signing identity. macOS Accessibility (TCC) authorization is identity-specific, granted to a particular requesting binary and code-signing identity, so app-bundle and signing integration is a downstream integration concern and is not claimed by this Issue.",
+    "reviewerExecuted": {
+      "source": "Reported by the coordinating Codex reviewer on the 2026-09-22 UTC observation day against commit 9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3. Full detail, including exit codes and the toggle handling, is in commands.json manualProbeCommands.reviewerRuns; this block records only what each run does and does not establish for the test evidence.",
+      "check": {
+        "result": "pass",
+        "emitted": "M1-035 manual probe: action=check outcome=trusted",
+        "establishes": "The real AXIsProcessTrusted path returns trusted for a responsible identity that holds Accessibility authorization, under the root / ChatGPT identity, through production defaults with no seam substituted. A separate run under a Claude Code identity emitted notTrusted, so both real states were observed.",
+        "exitCode": 0
+      },
+      "openSettings": {
+        "result": "pass",
+        "emitted": "outcome=systemSettingsApplication",
+        "exitCode": 0,
+        "establishes": "The real System Settings application opens, visually confirmed by the reviewer, who saw the Accessibility permissions list.",
+        "doesNotEstablish": "A deep link to the Accessibility pane. The implementation opens the application only and the pane was already selected."
+      },
+      "request": {
+        "result": "pass",
+        "emitted": "M1-035 manual probe: action=request outcome=notTrusted",
+        "establishes": "The request path runs against the real macOS API through production defaults and reports only the immediate state, which was notTrusted, matching the SDK's documented asynchronous prompt behavior. This is the Issue Scope item 'request'.",
+        "doesNotEstablish": "That macOS displayed the Accessibility prompt. The call requests macOS to display one by submitting kAXTrustedCheckOptionPrompt as true, and macOS can suppress prompt redisplay for an existing TCC decision. No OS prompt was visibly observed. A pre-existing denied TCC decision plausibly suppressed redisplay; that is an inference, not an observation. The canonical Issue does not require prompt redisplay, so this is a Tier-H limitation rather than an unmet criterion.",
+        "exitCode": 0
+      },
+      "grantRevokeTransition": {
+        "result": "not-demonstrated",
+        "detail": "With the System Settings Accessibility toggle named lowercase 'claude' switched on, and again after it was restored to off, the filtered check probe exited 0 and emitted outcome=notTrusted both times. The UI row was not the probe process's effective TCC responsible identity.",
+        "classification": "Remaining Tier-H limitation and risk. It is not a product-code failure, no trusted-transition test is recorded as passed, and it is non-blocking: a same-process grant-to-revoke transition is an author-created supplemental step that the canonical Issue does not require."
+      }
+    }
+  }
+}
