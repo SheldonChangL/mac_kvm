@@ -13,9 +13,10 @@ M1-008 adds one fail-fast build/test/manifest gate used locally by `make verify`
 5. Fail-closed tool-test discovery and count consistency.
 6. One isolated gate for every sorted `Tools/*/tests/**/test_*.py` file.
 7. Issue-scoped `KVMContracts` child-package tests with compiler warnings as errors.
-8. Repository contract tests.
-9. Swift Unit/Integration/System test-target verifier.
-10. Native macOS 14 arm64 build verifier.
+8. Issue-scoped `MacPlatform` child-package tests.
+9. Repository contract tests.
+10. Swift Unit/Integration/System test-target verifier.
+11. Native macOS 14 arm64 build verifier.
 
 The first non-passing gate stops execution, marks later gates `not-run`, writes the report, and returns non-zero. A timeout terminates the spawned process group. Keyboard interruption and runner `SIGTERM` use the same cleanup path, return exit 130, and make a best-effort report write before the runner's forced-termination grace period ends.
 
@@ -37,9 +38,23 @@ Because each discovered tool test file is a separate gate, the report is also
 the canonical index of exactly which suites CI executed. Existing suites are
 not separately hard-coded, preventing duplicate execution.
 
-The `swift-package-test:KVMContracts` gate runs the child package directly, so
-tests owned by contract Issues cannot silently fall back to or be omitted from
-the root package test run.
+The `swift-package-test:KVMContracts` and `swift-package-test:MacPlatform`
+gates run their child packages directly, so tests owned by contract or macOS
+platform Issues cannot silently fall back to or be omitted from the root
+package test run. `swift-package-test:MacPlatform` runs the exact command
+`swift test --package-path Packages/MacPlatform` that M1-035 requires, so that
+Issue's future `MacPlatformTests` suite is executed by a named blocking gate
+rather than by an implicit walk upward to the repository package. The
+`MacPlatform` gate deliberately omits `-Xswiftc -warnings-as-errors`: it must
+stay byte-identical to the frozen M1-035 Required Command, and the `MacPlatform`
+library sources are already compiled with warnings as errors by the root
+`code-quality` gate.
+
+`build_gate_specs` is pinned by a gate-inventory regression test that asserts
+the exact ordered list of gate names and the expected cumulative gate count of
+19. Adding, removing, renaming, or reordering a gate fails that test until the
+inventory and this document are updated together. That includes any gate added
+implicitly by a newly discovered tool or evidence test file.
 
 Raw stdout/stderr is intentionally excluded from the report so future fixture or failure content cannot become a durable artifact. The console prints only allowlisted context and gate status metadata.
 
