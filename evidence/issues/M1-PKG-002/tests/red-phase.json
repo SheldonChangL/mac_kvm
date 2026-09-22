@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PKG-002",
+  "githubIssue": 263,
+  "phase": "red",
+  "baseCommit": "ea153ed39976df5ca22ea05fb664dc18951e3ed1",
+  "implementationCommit": "3e8ccb94b0a71edd882471913994fef385f12229",
+  "implementationCommitNote": "The author environment denies writes to .git, so the implementation commit was created by the independent reviewer (the coordinating Codex agent) and its full SHA is stamped here. The rounds below all predate that commit; they were run by the implementation author (Claude Opus 5) against unmodified HEAD ea153ed39976df5ca22ea05fb664dc18951e3ed1.",
+  "privacyNote": "Only command names, exit codes, test names, counts, target names, and content-free reasons are recorded. No failure text, diff, credential, or owner-artifact content is reproduced.",
+  "runEnvironment": "All rounds were run by the implementation author before the implementation existed on disk, on an arm64 macOS host whose seatbelt sandbox forbids the nested sandbox SwiftPM creates. Where the frozen Required Command form could not evaluate a manifest at all, the same command was retried with --disable-sandbox and both results are recorded separately. The redness each round proves is a property of the repository state, not of that flag. The reviewer subsequently re-ran every frozen Required Command form against the committed tree with no flag and no shim; those green results are recorded in commands.json.",
+  "rounds": [
+    {
+      "name": "package-identity-fallback",
+      "purpose": "Proves that before Packages/MacPlatform/Package.swift exists, the M1-035 package path does not identify a MacPlatform package at all.",
+      "setup": "Unmodified HEAD ea153ed39976df5ca22ea05fb664dc18951e3ed1. Packages/MacPlatform contained only Sources/MacPlatform.",
+      "commandRequiredForm": "swift package --package-path Packages/MacPlatform describe --type json",
+      "requiredFormExitCode": null,
+      "requiredFormStatus": "blocked_by_author_environment",
+      "requiredFormResult": "SwiftPM reported 'mac_kvm': Invalid manifest followed by sandbox-exec: sandbox_apply: Operation not permitted, then fatalError. The package identity it attempted to compile was already 'mac_kvm', the repository package, not 'macplatform'.",
+      "command": "swift package --disable-sandbox --package-path Packages/MacPlatform describe --type json",
+      "startedAt": "2026-09-22T00:54:49.578+00:00",
+      "endedAt": "2026-09-22T00:54:51.033+00:00",
+      "exitCode": 0,
+      "status": "expected_failure",
+      "failureType": "false-green-parent-fallback",
+      "observedPackageName": "MacKVM",
+      "observedPackagePath": "repository root",
+      "observedTargets": [
+        "BarrierCompatibility",
+        "KVMContracts",
+        "KVMCore",
+        "KVMCoreTests",
+        "MacKVM",
+        "MacKVMIntegrationTests",
+        "MacKVMSystemTests",
+        "MacKVMUnitTests",
+        "MacPlatform",
+        "NativeProtocol"
+      ],
+      "observedMacPlatformTestsTarget": false,
+      "reason": "Exit zero is itself the defect. SwiftPM walked upward to the repository package, so the acceptance criterion 'identifies package MacPlatform, its source/test targets, and the local KVMContracts dependency' could not be satisfied and no MacPlatformTests target existed."
+    },
+    {
+      "name": "test-command-false-green",
+      "purpose": "Proves that the exact M1-035 Required Command passed while executing no MacPlatform-owned test, which is the false-green validation path the Issue exists to remove.",
+      "setup": "Same unmodified HEAD. No child manifest and no MacPlatformTests directory existed.",
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "startedAt": "2026-09-22T00:54:58.254+00:00",
+      "endedAt": "2026-09-22T00:55:01.332+00:00",
+      "exitCode": 0,
+      "status": "expected_failure",
+      "failureType": "false-green-parent-fallback",
+      "testsExecuted": 15,
+      "macPlatformTestsExecuted": 0,
+      "reason": "The run reported 'Test run with 15 tests in 0 suites passed'. Every one of those tests belongs to the root package targets KVMCoreTests, MacKVMUnitTests, MacKVMIntegrationTests and MacKVMSystemTests. No output line referenced MacPlatform, so M1-035 could have been declared green without ever compiling or running a MacPlatform test."
+    },
+    {
+      "name": "missing-named-cumulative-gate",
+      "purpose": "Proves that the cumulative pipeline had no swift-package-test:MacPlatform gate and no regression test pinning the gate inventory.",
+      "setup": "The two new regression tests were added to Tools/cigates/tests/test_cigates.py first. Tools/cigates/cigates.py was still unmodified, so build_gate_specs still produced 18 gates.",
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p test_cigates.py -v",
+      "startedAt": "2026-09-22T00:55:38.890+00:00",
+      "endedAt": "2026-09-22T00:55:39.244+00:00",
+      "exitCode": 1,
+      "status": "expected_failure",
+      "failureType": "assertion-failure",
+      "testsExecuted": 23,
+      "passedTestCount": 21,
+      "failedTestCount": 2,
+      "failedTests": {
+        "test_actual_gate_list_includes_macplatform_child_package_once": "AssertionError: 0 != 1. No gate named swift-package-test:MacPlatform existed.",
+        "test_cumulative_gate_inventory_is_the_expected_named_gates": "AssertionError: the produced 18-name gate list differed from the expected 19-name inventory at the position where swift-package-test:MacPlatform belongs."
+      },
+      "reason": "Both failures are caused only by the absent gate. The 21 pre-existing tests stayed green, confirming the new tests are additive and do not weaken existing coverage."
+    }
+  ],
+  "remediation": "Packages/MacPlatform/Package.swift, Packages/MacPlatform/Tests/MacPlatformTests/PackageOwnershipTests.swift and the swift-package-test:MacPlatform gate in Tools/cigates/cigates.py were then written. All three rounds turn green; see results.json.",
+  "limitations": [
+    "Rounds one and two are whole-command redness, not per-assertion redness: before this Issue there was no MacPlatform test target in which an assertion could fail. The defect being proven is exactly that absence, so a per-assertion red phase is not constructible for them.",
+    "Round three is per-assertion red for both new tests.",
+    "No seeded-defect round was produced for the child manifest itself. A manifest is declarative; its correctness is proven positively by the describe output and by the M1-035 path-ownership check recorded in results.json."
+  ]
+}

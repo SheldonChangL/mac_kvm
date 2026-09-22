@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PKG-002",
+  "githubIssue": 263,
+  "phase": "green",
+  "baseCommit": "ea153ed39976df5ca22ea05fb664dc18951e3ed1",
+  "implementationCommit": "3e8ccb94b0a71edd882471913994fef385f12229",
+  "implementationCommitNote": "The implementation commit 3e8ccb94b0a71edd882471913994fef385f12229, 'test(macplatform): add child package CI gate', was created by the independent reviewer (the coordinating Codex agent) because the author environment denies writes to .git.",
+  "status": "passed",
+  "resultsSource": "The entries in results are the implementation author's green runs, several of which needed a --disable-sandbox flag or a temporary PATH shim to run at all in the author environment. They are superseded by the reviewer's authoritative sweep of the exact frozen Required Command forms against the committed tree, recorded in commands.json under commands: swift package describe exit 0; swift test exit 0 with 1 test; cigates unittest exit 0 with 23 tests; staged git diff --cached --check exit 0; staged docs-check exit 0; backlog validator exit 0; architecture check exit 0; make verify exit 0 with 19/19 named gates; xcodebuild workspace build exit 0 with ** BUILD SUCCEEDED **.",
+  "results": [
+    {
+      "suite": "MacPlatform child package",
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "startedAt": "2026-09-22T00:56:35.215+00:00",
+      "endedAt": "2026-09-22T00:56:41.856+00:00",
+      "exitCode": 0,
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "evidence": "childPackageOwnsMacPlatformTests() passed. The run reported 'Test run with 1 test in 0 suites passed'. Contrast with the red phase, where the same package path ran 15 unrelated root-package tests and zero MacPlatform tests.",
+      "source": "author"
+    },
+    {
+      "suite": "MacPlatform package identity",
+      "command": "swift package --disable-sandbox --package-path Packages/MacPlatform describe --type json",
+      "startedAt": "2026-09-22T00:56:22.517+00:00",
+      "endedAt": "2026-09-22T00:56:23.278+00:00",
+      "exitCode": 0,
+      "failures": 0,
+      "observed": {
+        "name": "MacPlatform",
+        "toolsVersion": "6.2",
+        "platforms": "macos 14.0",
+        "products": "library MacPlatform -> [MacPlatform]",
+        "libraryTarget": "MacPlatform at Sources/MacPlatform, sources [MacPlatform.swift], product dependency KVMContracts",
+        "testTarget": "MacPlatformTests at Tests/MacPlatformTests, sources [PackageOwnershipTests.swift], target dependency MacPlatform",
+        "dependency": "identity kvmcontracts, type fileSystem, path Packages/KVMContracts"
+      },
+      "evidence": "The described package is MacPlatform rooted at Packages/MacPlatform, not the repository package. The single dependency is of SwiftPM type fileSystem resolved through the local ../KVMContracts path.",
+      "source": "author"
+    },
+    {
+      "suite": "M1-035 exact test-path ownership",
+      "command": "swift package describe --type json and swift test, both with --disable-sandbox, against a throwaway copy of Packages/MacPlatform and Packages/KVMContracts outside the repository",
+      "exitCode": 0,
+      "tests": 2,
+      "failures": 0,
+      "evidence": "A stub file named exactly AccessibilityPermissionServiceTests.swift was placed in the copy's Tests/MacPlatformTests directory. describe then listed MacPlatformTests sources as [AccessibilityPermissionServiceTests.swift, PackageOwnershipTests.swift] at path Tests/MacPlatformTests, and swift test executed both, reporting 'Test run with 2 tests in 0 suites passed'. This proves the frozen M1-035 path is owned and executed by MacPlatformTests.",
+      "isolation": "The stub was created only inside a mktemp -d scratch directory outside the repository. It was never written to, staged in, or committed to the repository, and the scratch directory was deleted and its absence re-verified immediately after the run. The repository contains no AccessibilityPermissionService file of any kind.",
+      "source": "author"
+    },
+    {
+      "suite": "CI gate orchestrator",
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p test_cigates.py -v",
+      "startedAt": "2026-09-22T00:56:51.067+00:00",
+      "endedAt": "2026-09-22T00:56:51.408+00:00",
+      "exitCode": 0,
+      "tests": 23,
+      "failures": 0,
+      "evidence": "21 pre-existing tests plus the 2 new ones passed. test_actual_gate_list_includes_macplatform_child_package_once pins the gate to exactly one occurrence of argv ['swift', 'test', '--package-path', 'Packages/MacPlatform']. test_cumulative_gate_inventory_is_the_expected_named_gates pins the exact ordered 19-name inventory, asserts the count equals EXPECTED_CUMULATIVE_GATE_COUNT = 19, and asserts the names are unique.",
+      "source": "author"
+    },
+    {
+      "suite": "cumulative repository gates",
+      "command": "make verify REPORT=artifacts/ci/m1-pkg-002-report.json",
+      "startedAt": "2026-09-22T00:58:26.440+00:00",
+      "endedAt": "2026-09-22T00:59:03.232+00:00",
+      "exitCode": 0,
+      "tests": 19,
+      "failures": 0,
+      "evidence": "19/19 gates passed, report status 'passed'. The report contains exactly one gate named swift-package-test:MacPlatform, with argv ['swift', 'test', '--package-path', 'Packages/MacPlatform'], status passed, exit 0, positioned immediately after swift-package-test:KVMContracts. The cumulative count moved from 18 to 19.",
+      "environmentQualifier": "Run with a temporary PATH shim, outside the repository, that appends --disable-sandbox to swift build/test/package invocations. The shim was required because the author host's seatbelt sandbox blocks the nested sandbox SwiftPM creates; it changes no gate name, order, or argv recorded in cigates.py. See commands.json for the unmodified make verify run and the exact distinction.",
+      "source": "author"
+    },
+    {
+      "suite": "root package compatibility",
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "startedAt": "2026-09-22T00:57:58.046+00:00",
+      "endedAt": "2026-09-22T00:58:00.700+00:00",
+      "exitCode": 0,
+      "tests": 15,
+      "failures": 0,
+      "evidence": "The root MacKVM package still builds and tests with warnings treated as errors after the nested child manifest was added. No compiler warning was emitted. The root dependency graph and root Package.swift were not modified.",
+      "source": "author"
+    },
+    {
+      "suite": "repository policy checks",
+      "exitCode": 0,
+      "failures": 0,
+      "evidence": "architecture check OK; docs check OK; PACKAGE OK: 217 issues, 5 milestones, 17 epics; swift-format 6.2.3 strict recursive lint over Package.swift, Apps, Packages, Tests and reference produced zero diagnostics; git diff --check produced no output. The generated Packages/MacPlatform/.build tree is excluded from the architecture scan and ignored by Git.",
+      "source": "author"
+    }
+  ]
+}

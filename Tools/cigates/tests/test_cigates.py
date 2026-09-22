@@ -10,6 +10,7 @@ from unittest import mock
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 MODULE_PATH = REPOSITORY_ROOT / "Tools/cigates/cigates.py"
+EXPECTED_CUMULATIVE_GATE_COUNT = 19
 
 spec = importlib.util.spec_from_file_location("cigates", MODULE_PATH)
 cigates = importlib.util.module_from_spec(spec)
@@ -276,6 +277,56 @@ class CIGateTests(unittest.TestCase):
                 "-warnings-as-errors",
             ),
         )
+
+    def test_actual_gate_list_includes_macplatform_child_package_once(self):
+        gates = cigates.build_gate_specs(REPOSITORY_ROOT)
+        matches = [
+            gate
+            for gate in gates
+            if gate.name == "swift-package-test:MacPlatform"
+        ]
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(
+            matches[0].command,
+            (
+                "swift",
+                "test",
+                "--package-path",
+                "Packages/MacPlatform",
+            ),
+        )
+
+    def test_cumulative_gate_inventory_is_the_expected_named_gates(self):
+        gates = cigates.build_gate_specs(REPOSITORY_ROOT)
+        names = [gate.name for gate in gates]
+
+        self.assertEqual(
+            names,
+            [
+                "manifest-validation",
+                "docs-check",
+                "architecture-check",
+                "code-quality",
+                "tool-test-discovery",
+                "evidence-test-discovery",
+                "tool-test:architecture-check/tests/test_architecture_check.py",
+                "tool-test:async-harness/tests/test_async_harness.py",
+                "tool-test:cigates/tests/test_cigates.py",
+                "tool-test:code-quality/tests/test_code_quality.py",
+                "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
+                "tool-test:docs-check/tests/test_docs_check.py",
+                "evidence-test:M1-023/tests/test_register.py",
+                "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
+                "swift-package-test:KVMContracts",
+                "swift-package-test:MacPlatform",
+                "repository-contract-tests",
+                "swift-test-targets",
+                "native-arm64-build",
+            ],
+        )
+        self.assertEqual(len(names), EXPECTED_CUMULATIVE_GATE_COUNT)
+        self.assertEqual(len(names), len(set(names)))
 
     def test_tool_test_discovery_is_deterministic_and_supports_nested_tests(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
