@@ -1,0 +1,71 @@
+{
+  "baseCommit": "f67d9b2d03a325bd2adc0c5f7ade96e019262ac2",
+  "implementationCommit": "2c67f5a7d3b49046f81714ad85089e1fdc099861",
+  "issue": "M1-052",
+  "phase": "red",
+  "privacyNote": "No failure text, diff, or assertion rendering from either run is reproduced here. Only test names, counts, exit codes and content-free reasons are recorded. Both runs used synthetic fixtures; no real clipboard content existed at any point.",
+  "remediation": "Packages/KVMContracts/Sources/KVMContracts/ClipboardPayload.swift was then implemented, and the suite passed 56/56. The implementation is committed as 2c67f5a7d3b49046f81714ad85089e1fdc099861 (feat(contracts): add bounded UTF-8 clipboard codec). See clipboard-payload-tests.json.",
+  "rounds": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts --disable-sandbox",
+      "compileErrorsByKind": {
+        "cannot find 'ClipboardByteLimit' in scope": 60,
+        "cannot find 'ClipboardTextCodec' in scope": 66,
+        "value of type 'ClipboardPayload' has no member 'utf8ByteCount'": 4,
+        "value of type 'ClipboardPayload' has no member 'validate'": 10
+      },
+      "endedAt": "2026-09-21T23:46:05.064Z",
+      "exitCode": 1,
+      "failureType": "compile-error",
+      "limitation": "A compile failure is a whole-suite red, not a per-assertion red. Round two exists to close that gap.",
+      "name": "missing-implementation",
+      "purpose": "Proves the suite cannot pass without Packages/KVMContracts/Sources/KVMContracts/ClipboardPayload.swift.",
+      "setup": "ClipboardPayloadTests.swift was present in the repository working tree; ClipboardPayload.swift had not been written yet. No other file was changed.",
+      "startedAt": "2026-09-21T23:46:03.291Z",
+      "status": "expected_failure",
+      "testsExecuted": 0
+    },
+    {
+      "command": "swift test --package-path . --disable-sandbox",
+      "endedAt": "2026-09-21T23:46:52.073Z",
+      "exitCode": 1,
+      "failedTestCount": 11,
+      "failedTests": {
+        "byteLimitRejectsEveryNonPositiveConfiguration": 1,
+        "clipboardFailuresUseTheFrozenClipboardTaxonomy": 7,
+        "codecAcceptsContentExactlyAtTheByteLimit": 1,
+        "codecAcceptsDataSlicesWithANonZeroStartIndex": 1,
+        "codecRejectsContentOneByteOverTheLimit": 2,
+        "decodingPreservesEveryValidByteSequenceExactly": 2,
+        "decodingRejectsEveryInvalidUTF8Shape": 12,
+        "limitsCountUTF8BytesNotCharacters": 2,
+        "oversizedInputIsRejectedBeforeUTF8Validation": 2,
+        "payloadBoundsAreEnforcedOnUTF8ByteCount": 2,
+        "smallestValidLimitAcceptsExactlyOneByte": 1
+      },
+      "failureType": "assertion-failure",
+      "limitation": "Eight of the nineteen new tests stayed green against the naive implementation: utf8PlainTextRoundTripsThroughTheCodec, byteLimitSatisfiesTheContractsValueSemantics, maximumLimitComparesWithoutOverflow, emptyContentIsCarriedRatherThanRejectedHere, emptyPayloadHasZeroUTF8Bytes, clipboardFailuresCarryNoTextOrHash, clipboardPayloadCodingShapeIsUnchanged and codecIsPureAcrossRepeatedSuccessAndFailure. They pin guarantees the naive implementation happened to satisfy, and clipboardFailuresCarryNoTextOrHash in particular is structurally guaranteed by the M1-015 CoreError shape, which has no free-text field; no plausible implementation of this Issue could make it red. Those eight are documented guarantees, not defect detectors.",
+      "name": "naive-implementation",
+      "passedTestCount": 45,
+      "purpose": "Proves per-assertion redness. A deliberately naive but compiling implementation was written so that every guarantee this Issue claims has a concrete wrong implementation to fail against.",
+      "recordedIssueCount": 33,
+      "seededDefects": [
+        "ClipboardByteLimit accepted a zero byte count (only negatives rejected).",
+        "Failures used notice severity instead of the frozen warning severity.",
+        "Failures carried the observed size in underlyingDiagnosticCode instead of nil.",
+        "encode used a strict less-than comparison, rejecting content exactly at the limit.",
+        "decode used String(data:encoding:.utf8), which silently strips a leading U+FEFF.",
+        "decode enforced size after decoding and allocating instead of before.",
+        "utf8ByteCount counted Characters instead of UTF-8 bytes."
+      ],
+      "setup": "Packages/KVMContracts was copied to a scratch directory outside the repository (literal host path deliberately omitted from this evidence), with the build directory removed. The naive ClipboardPayload.swift was written only into that copy. The unchanged test file was used. The repository working tree was not modified for this run and never contained the naive implementation.",
+      "startedAt": "2026-09-21T23:46:44.714Z",
+      "status": "expected_failure",
+      "temporaryDirectoryRemoved": false,
+      "temporaryDirectoryRemovedNote": "Re-verified at the time of this evidence update: the scratch copy still exists on the author machine. It is outside the repository, holds only a throwaway package copy plus the seeded naive implementation, and was never staged, committed, or referenced by the implementation.",
+      "testsExecuted": 56
+    }
+  ],
+  "runEnvironment": "Both rounds were run by the author before the implementation commit existed, in an environment that required --disable-sandbox. The redness they record is a property of the test suite and is unaffected by that flag; the authoritative green result is the reviewer's unmodified command in clipboard-payload-tests.json.",
+  "schemaVersion": 1
+}
