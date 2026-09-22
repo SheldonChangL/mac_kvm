@@ -1,0 +1,66 @@
+{
+  "asyncCancellationTests": {
+    "count": 0,
+    "reason": "This Issue adds only immutable values and pure static functions. There is no task, clock, timer, buffer, connection, pasteboard handle, or other owned resource, so there is nothing to cancel or clean up. A cancel test would have required inventing an async wrapper solely to have something to cancel, which would add untested public API and prove nothing. Purity and the absence of owned resources are asserted directly by codecIsPureAcrossRepeatedSuccessAndFailure instead."
+  },
+  "command": "swift test --package-path Packages/KVMContracts",
+  "determinism": {
+    "randomness": 0,
+    "realIO": 0,
+    "retryOrPollLoops": 0,
+    "sleeps": 0,
+    "threadsOrTasks": 0,
+    "wallClockDependencies": 0
+  },
+  "exitCode": 0,
+  "failures": 0,
+  "implementationCommit": "2c67f5a7d3b49046f81714ad85089e1fdc099861",
+  "issue": "M1-052",
+  "newTestCount": 19,
+  "newTestsByCategory": {
+    "boundary": [
+      "codecAcceptsContentExactlyAtTheByteLimit",
+      "codecRejectsContentOneByteOverTheLimit",
+      "emptyContentIsCarriedRatherThanRejectedHere",
+      "emptyPayloadHasZeroUTF8Bytes",
+      "limitsCountUTF8BytesNotCharacters",
+      "maximumLimitComparesWithoutOverflow",
+      "payloadBoundsAreEnforcedOnUTF8ByteCount",
+      "smallestValidLimitAcceptsExactlyOneByte"
+    ],
+    "compatibility": [
+      "clipboardPayloadCodingShapeIsUnchanged"
+    ],
+    "determinism": [
+      "codecIsPureAcrossRepeatedSuccessAndFailure"
+    ],
+    "happyPath": [
+      "byteLimitSatisfiesTheContractsValueSemantics",
+      "codecAcceptsDataSlicesWithANonZeroStartIndex",
+      "decodingPreservesEveryValidByteSequenceExactly",
+      "utf8PlainTextRoundTripsThroughTheCodec"
+    ],
+    "invalidInput": [
+      "byteLimitRejectsEveryNonPositiveConfiguration",
+      "decodingRejectsEveryInvalidUTF8Shape",
+      "oversizedInputIsRejectedBeforeUTF8Validation"
+    ],
+    "privacyAndTaxonomy": [
+      "clipboardFailuresCarryNoTextOrHash",
+      "clipboardFailuresUseTheFrozenClipboardTaxonomy"
+    ]
+  },
+  "phase": "green",
+  "preExistingTestCount": 37,
+  "privacyNote": "Every fixture in the suite is a synthetic sentinel written for this Issue. No real clipboard content, credential, key material or typed input exists in the tests or in this report.",
+  "recordedAt": "2026-09-22T00:01:45Z",
+  "recordedAtNote": "Record time of this evidence update, not a command start time.",
+  "result": "Build complete. 56 tests passed, 0 failures, 0 skipped (37 pre-existing plus 19 new).",
+  "resultNote": "Authoritative result: the Issue's exact command, run by the reviewer outside the workspace sandbox against the committed implementation. The author environment could only run it with --disable-sandbox; see commands.json historicalAuthorEnvironmentAttempts.",
+  "resultSource": "reviewer",
+  "schemaVersion": 1,
+  "skipped": 0,
+  "status": "passed",
+  "testsRun": 56,
+  "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+}

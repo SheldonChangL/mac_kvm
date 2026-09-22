@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-052",
+  "branch": "feat/m1-052-clipboard-payload",
+  "status": "reviewer_verified",
+  "baseCommit": "f67d9b2d03a325bd2adc0c5f7ade96e019262ac2",
+  "implementationCommit": "2c67f5a7d3b49046f81714ad85089e1fdc099861",
+  "implementationCommitSubject": "feat(contracts): add bounded UTF-8 clipboard codec",
+  "reviewerVerifiedAt": "2026-09-22T00:01:45Z",
+  "reviewerVerifiedAtNote": "Record time of this evidence update, not a command start time. Precise start/end timestamps for the reviewer runs were not captured and are deliberately not reconstructed.",
+  "commitStatus": {
+    "state": "committed",
+    "implementationCommit": "2c67f5a7d3b49046f81714ad85089e1fdc099861",
+    "implementationFiles": [
+      "Packages/KVMContracts/Sources/KVMContracts/ClipboardPayload.swift",
+      "Packages/KVMContracts/Tests/KVMContractsTests/ClipboardPayloadTests.swift",
+      "docs/components/M1-052-clipboard-payload.md"
+    ],
+    "detail": "The implementation commit exists on this branch and contains exactly the three authorized source/test/doc files. It was committed by the reviewer because the author environment denied writes to .git. Authorship of this evidence package remains with the author.",
+    "evidenceCommit": null,
+    "protectedArtifacts": "MacKVM_M1-001_unblock.zip and mackvm-unblock/ were never read, written, staged, or committed and remain untracked."
+  },
+  "authoritativeResults": {
+    "source": "reviewer",
+    "environment": {
+      "machine": "arm64",
+      "platform": "macOS",
+      "swiftVersion": "6.2.3",
+      "swiftFormatVersion": "6.2.3",
+      "xcodeVersion": "Xcode 26.2"
+    },
+    "note": "Run outside the workspace sandbox after implementation, and reviewed again against the committed content of 2c67f5a7d3b49046f81714ad85089e1fdc099861. These entries supersede every author-environment result below."
+  },
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/KVMContracts",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Build complete. 56 tests passed, 0 failures, 0 skipped (37 pre-existing plus 19 new).",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "** BUILD SUCCEEDED **. The compiler invocation and the built target were -target arm64-apple-macos14.0. Only that target was built; this run is not evidence that both arm64 and arm64e were built.",
+      "warnings": "xcodebuild emitted a multiple-matching-destinations warning listing arm64e, arm64 and x86_64 variants of the macOS destination and selected the first. Apart from that destination-selection warning and platform-discovery warnings, no compile warning is attributable to this change.",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "make code-quality-check",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "All steps passed: swift-format-version 6.2.3 (pinned), strict lint exit 0, root swift-test with warnings-as-errors exit 0.",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "make docs-check",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "docs check OK. The component doc is tracked in the implementation commit, so it is covered by this run.",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK",
+      "treeState": "2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "git diff --check (staged)",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "No whitespace or conflict-marker violation in the staged diff, checked immediately before the implementation commit.",
+      "treeState": "staged content of 2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "staged secret scan",
+      "phase": "required",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Explicit scan of the staged content found no credential, private-key, or token material.",
+      "treeState": "staged content of 2c67f5a7d3b49046f81714ad85089e1fdc099861"
+    },
+    {
+      "command": "JSON validation of evidence/issues/M1-052/**/*.json",
+      "phase": "supplementary",
+      "source": "reviewer",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Every evidence JSON file parsed cleanly prior to this update. Validity was re-confirmed after this update."
+    }
+  ],
+  "historicalAuthorEnvironmentAttempts": {
+    "note": "NON-AUTHORITATIVE. Recorded only to document why the author could not produce the commit or run two Required Commands to completion. Every failure below is an author-sandbox restriction reproduced on the unmodified HEAD tree, not a code defect, and every one of them is superseded by the reviewer results above.",
+    "attempts": [
+      {
+        "command": "swift test --package-path Packages/KVMContracts",
+        "exitCode": 1,
+        "status": "blocked_by_author_environment",
+        "startedAt": "2026-09-21T23:51:52.810Z",
+        "endedAt": "2026-09-21T23:51:53.621Z",
+        "result": "Nothing compiled. SwiftPM could not evaluate the manifest: 'sandbox-exec: sandbox_apply: Operation not permitted', then 'Invalid manifest'. The author session ran inside a seatbelt sandbox forbidding the nested sandbox SwiftPM creates. Reproduced identically on unmodified HEAD.",
+        "authorWorkaround": "swift test --package-path Packages/KVMContracts --disable-sandbox, exit 0, 56 tests passed."
+      },
+      {
+        "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+        "exitCode": 66,
+        "status": "blocked_by_author_environment",
+        "startedAt": "2026-09-21T23:51:56.293Z",
+        "endedAt": "2026-09-21T23:51:56.882Z",
+        "result": "\"'MacKVM.xcworkspace' is not a workspace file\", emitted before compiling anything, alongside an FS-event-stream failure, a CoreSimulatorService failure, and a log-file permission error. xcodebuild -list failed the same way. The workspace file is valid and unmodified; this Issue touched no project, workspace, scheme, or manifest file.",
+        "authorWorkaround": "swift build --disable-sandbox, exit 0, Build complete."
+      },
+      {
+        "command": "make code-quality-check",
+        "exitCode": 2,
+        "status": "blocked_by_author_environment",
+        "startedAt": "2026-09-21T23:51:58.758Z",
+        "endedAt": "2026-09-21T23:51:59.734Z",
+        "result": "Steps one and two passed (swift-format-version 6.2.3, strict lint exit 0). Step three, swift test -Xswiftc -warnings-as-errors, hit the same nested-sandbox restriction because the pinned command cannot pass --disable-sandbox. Reproduced on unmodified HEAD.",
+        "authorWorkaround": "swift test --disable-sandbox -Xswiftc -warnings-as-errors, exit 0 for both the root and the child package."
+      },
+      {
+        "command": "git add / git commit",
+        "status": "blocked_by_author_environment",
+        "result": "Writes to .git were denied: \"Unable to create '.git/index.lock': Operation not permitted\"; a direct touch of .git/probe-write failed identically. Nothing was staged, committed, branched, pushed, or merged by the author. The reviewer created the implementation commit instead."
+      }
+    ],
+    "authorEnvironment": {
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64",
+      "pythonVersion": "3.9.6",
+      "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "swiftFormatVersion": "6.2.3",
+      "xcodeVersion": "Xcode 26.2 (17C52)"
+    }
+  }
+}
