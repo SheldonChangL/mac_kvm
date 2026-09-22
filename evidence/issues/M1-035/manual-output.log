@@ -1,0 +1,5 @@
+M1-035 manual probe: action=check outcome=trusted
+M1-035 manual probe: action=open-settings outcome=systemSettingsApplication
+M1-035 manual probe: action=request outcome=notTrusted
+M1-035 manual probe: action=check outcome=notTrusted
+M1-035 manual probe: action=check outcome=notTrusted

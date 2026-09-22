@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-035",
+  "phase": "red",
+  "recordedBefore": "Any content existed in Packages/MacPlatform/Sources/MacPlatform/AccessibilityPermissionService.swift. Only MacPlatform.swift, the pre-existing boundary-only source, was present.",
+  "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+  "commandNote": "The exact frozen form is 'swift test --package-path Packages/MacPlatform'. It cannot evaluate a manifest in the author session, so the --disable-sandbox equivalent was used for the red observation. See environment.json authorEnvironmentLimitations.",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "compilerErrorCount": 34,
+  "distinctMissingSymbols": [
+    "cannot find type 'AccessibilityPermissionService' in scope",
+    "cannot find 'AccessibilityPermissionService' in scope",
+    "cannot find 'AccessibilityTrustState' in scope"
+  ],
+  "failureReason": "AccessibilityPermissionServiceTests referenced the service, the trust state, the request result, the settings destination, and the injectable dependency seam before any of them existed, so the test target failed to compile and no assertion could be evaluated.",
+  "whyThisIsObjective": [
+    "The ten new tests assert named requirements, not 'looks fine': the prompt option value submitted to the SDK, the exact frozen CoreError code, severity, retry and cleanup values, the absence of an underlying diagnostic code, exact seam invocation counts, the encoded CoreError key set, and the absence of any path or URL in a failure.",
+    "Each test can only pass by implementing the behavior; none can be satisfied by a hard-coded success, because the seam invocation counts and the injected failure paths are asserted."
+  ],
+  "regressionBaseline": "The one pre-existing test, childPackageOwnsMacPlatformTests, passed on the unmodified base commit and is unchanged by this Issue.",
+  "remediation": "Added AccessibilityPermissionService.swift with the check, request and open-settings behavior, the internal dependency seam and its live production default. All 11 child-package tests then passed; see results.json.",
+  "manualProbeTDDNote": {
+    "test": "manualRealAPIProbeRunsOneReviewerSelectedAction",
+    "addedAfterGreen": true,
+    "honestStatement": "This test was added after the green phase, in response to a review finding that the Tier-H manual steps had no executable entry point within Issue scope. It is not part of the red-green cycle above and is not claimed to be: it is a reviewer-driven manual harness, it asserts no new production behavior, and no production code was changed for it, so no new red phase was manufactured.",
+    "failureDemonstrated": "Its fail-closed path was demonstrated by execution rather than asserted on paper: MACKVM_M1_035_MANUAL_PROBE=bogus-action exits 1 with 'unknown manual probe action; expected check, request or open-settings'. With the variable unset the probe is reported skipped and emits nothing.",
+    "acceptanceImpact": "None. The 11 automated tests above still run and still pass in the default run; the probe's default skip carries no acceptance credit and bypasses nothing."
+  }
+}

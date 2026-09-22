@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-035",
+  "githubIssue": 23,
+  "artifactKind": "manual-verification-result",
+  "commit": "9c53be7d5a49aaf69e371c83f2ac3e6ce3df17d3",
+  "observationDay": "2026-09-22",
+  "observationDayNote": "The reviewer reported the UTC observation day, not per-run clock times, so no per-run timestamp is recorded and none is invented.",
+  "source": "reviewer",
+  "sourceNote": "Executed and reported by the coordinating Codex reviewer, a different executor from the Claude Opus 5 implementation author. Transcribed by the author, who executed none of these runs and observed no OS UI.",
+  "probe": {
+    "test": "manualRealAPIProbeRunsOneReviewerSelectedAction",
+    "environmentVariable": "MACKVM_M1_035_MANUAL_PROBE",
+    "actions": [
+      "check",
+      "request",
+      "open-settings"
+    ],
+    "outputLineFormat": "M1-035 manual probe: action=<action> outcome=<name>",
+    "outputArtifact": "manual-output.log",
+    "outputArtifactNote": "manual-output.log contains exactly the sanitized probe output lines of the runs below, in the same observed order, and nothing else."
+  },
+  "sanitization": {
+    "policy": "Every field below is drawn from a closed vocabulary declared in closedVocabularies. No filesystem path, username, account name, unique device identifier, serial number, secret, key material, URL, platform error string, typed text, clipboard payload, or free-form transcript text is recorded.",
+    "responsibleIdentityNote": "responsibleIdentity values are the closed labels this evidence package already uses to distinguish which TCC responsible identity produced a run. They are not account names and carry no path or device information.",
+    "toggleRowNote": "The System Settings row the reviewer toggled is referenced only by the closed uiState label. Its displayed name is recorded in prose in manual.md and is not restated here."
+  },
+  "closedVocabularies": {
+    "action": [
+      "check",
+      "request",
+      "open-settings"
+    ],
+    "outcome": [
+      "trusted",
+      "notTrusted",
+      "systemSettingsApplication"
+    ],
+    "responsibleIdentity": [
+      "root-chatgpt",
+      "claude-code",
+      "claude-opus-5"
+    ],
+    "commandForm": [
+      "exact",
+      "equivalent"
+    ],
+    "verdict": [
+      "passed",
+      "completedNotDemonstrated"
+    ],
+    "uiState": [
+      "notApplicable",
+      "lowercase-claude-toggle-on",
+      "restored-toggle-off"
+    ],
+    "visualObservation": [
+      "notApplicable",
+      "systemSettingsWindowOpenedShowingAccessibilityList",
+      "promptNotObserved"
+    ]
+  },
+  "runs": [
+    {
+      "index": 1,
+      "action": "check",
+      "commandForm": "exact",
+      "responsibleIdentity": "root-chatgpt",
+      "exitCode": 0,
+      "outcome": "trusted",
+      "uiState": "notApplicable",
+      "visualObservation": "notApplicable",
+      "verdict": "passed",
+      "establishes": "The real AXIsProcessTrusted path, reached through production defaults with no seam substituted, returns trusted for a responsible identity that holds Accessibility authorization. This is the Issue Scope item check.",
+      "limitations": []
+    },
+    {
+      "index": 2,
+      "action": "open-settings",
+      "commandForm": "exact",
+      "responsibleIdentity": "root-chatgpt",
+      "exitCode": 0,
+      "outcome": "systemSettingsApplication",
+      "uiState": "notApplicable",
+      "visualObservation": "systemSettingsWindowOpenedShowingAccessibilityList",
+      "verdict": "passed",
+      "establishes": "The real System Settings application opens through production defaults, visually confirmed by the reviewer. This is the Issue Scope item open settings.",
+      "doesNotEstablish": "A deep link to the Accessibility pane. The implementation opens the application only, and the Accessibility pane was already the selected pane, so pane selection was not caused by this code. Known limitation 1 in summary.md is unchanged.",
+      "limitations": [
+        "pane-already-selected"
+      ]
+    },
+    {
+      "index": 3,
+      "action": "request",
+      "commandForm": "exact",
+      "responsibleIdentity": "claude-code",
+      "exitCode": 0,
+      "outcome": "notTrusted",
+      "uiState": "notApplicable",
+      "visualObservation": "promptNotObserved",
+      "verdict": "passed",
+      "establishes": "The real AXIsProcessTrustedWithOptions path, reached through production defaults with no seam substituted, submits kAXTrustedCheckOptionPrompt as true to request that macOS display a prompt, and returns immediately with the state at return only, matching the installed SDK sentence 'Prompting occurs asynchronously and does not affect the return value.' This is the Issue Scope item request.",
+      "doesNotEstablish": "That macOS displayed a prompt. The method requests macOS to display one; macOS can suppress prompt redisplay for an existing TCC decision. No prompt was observed for M1-035 and none is claimed.",
+      "limitations": [
+        "prompt-not-observed"
+      ]
+    },
+    {
+      "index": 4,
+      "action": "check",
+      "commandForm": "equivalent",
+      "commandFormNote": "Launched from a Claude Code agent session, which required the SwiftPM --disable-sandbox equivalent because of the nested-sandbox restriction recorded in environment.json authorEnvironmentLimitations. The flag disables only SwiftPM's own nested sandbox and changes no assertion.",
+      "responsibleIdentity": "claude-opus-5",
+      "exitCode": 0,
+      "outcome": "notTrusted",
+      "uiState": "lowercase-claude-toggle-on",
+      "visualObservation": "notApplicable",
+      "verdict": "completedNotDemonstrated",
+      "establishes": "The check path completed and returned a valid state with the toggle switched on. Nothing about a grant transition.",
+      "doesNotEstablish": "A same-process grant transition. The toggled row was not the effective TCC responsible identity of the Swift test process, so the toggle did not apply to it.",
+      "limitations": [
+        "same-process-transition-not-demonstrated"
+      ]
+    },
+    {
+      "index": 5,
+      "action": "check",
+      "commandForm": "equivalent",
+      "commandFormNote": "Same equivalent form and same reason as run 4.",
+      "responsibleIdentity": "claude-opus-5",
+      "exitCode": 0,
+      "outcome": "notTrusted",
+      "uiState": "restored-toggle-off",
+      "visualObservation": "notApplicable",
+      "verdict": "completedNotDemonstrated",
+      "establishes": "The check path completed and returned a valid state after the toggle was restored to off, and the system was left in its original state.",
+      "doesNotEstablish": "A revoke transition. The process never reached trusted in run 4, so no trusted value existed to be revoked or cached.",
+      "limitations": [
+        "same-process-transition-not-demonstrated"
+      ]
+    }
+  ],
+  "canonicalFocusVerdict": "passed",
+  "canonicalFocusVerdictBasis": {
+    "scopeItems": [
+      {
+        "item": "check",
+        "runs": [
+          1,
+          4,
+          5
+        ],
+        "verdict": "passed",
+        "note": "Both real trust states were observed, each under the responsible identity that holds or lacks the grant."
+      },
+      {
+        "item": "request",
+        "runs": [
+          3
+        ],
+        "verdict": "passed",
+        "note": "Executed against the real macOS API through production defaults, exit 0, immediate-return semantics as documented."
+      },
+      {
+        "item": "open-settings",
+        "runs": [
+          2
+        ],
+        "verdict": "passed",
+        "note": "Executed against the real macOS API through production defaults, exit 0, System Settings visually confirmed open."
+      },
+      {
+        "item": "no-crash-when-unauthorized",
+        "runs": [
+          3,
+          4,
+          5
+        ],
+        "verdict": "passed",
+        "note": "Every untrusted run exited 0 with no crash and no hang reported."
+      },
+      {
+        "item": "privacy-and-fail-safe",
+        "runs": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "verdict": "passed",
+        "note": "All captured probe output is exactly the closed sanitized lines in manual-output.log. The service contains no logging, input capture, injection, event tap, key or button state, async task, or owned resource. See manual.md Step 7 for the scope of that claim."
+      }
+    ],
+    "reviewerIndependence": "All runs were executed or directed by the coordinating Codex reviewer, a different executor from the implementation author."
+  },
+  "supplementalLimitations": [
+    {
+      "id": "prompt-not-observed",
+      "severity": "non-blocking",
+      "requiredByCanonicalIssue": false,
+      "statement": "No Accessibility prompt was observed. requestTrust asks macOS to display one by submitting kAXTrustedCheckOptionPrompt as true; macOS decides whether to display it and can suppress redisplay for an existing TCC decision. A pre-existing denied TCC decision for that responsible identity is a plausible explanation, but that is an inference and not an observation.",
+      "notClaimed": "That the prompt was displayed, that the prompt path is visually verified, or that a user saw or answered a prompt.",
+      "carryForward": "The downstream Issue that wires this service into the application shell must not read M1-035 as evidence that the prompt is displayed."
+    },
+    {
+      "id": "same-process-transition-not-demonstrated",
+      "severity": "non-blocking",
+      "requiredByCanonicalIssue": false,
+      "statement": "No same-process grant-to-revoke transition was demonstrated. Toggling the System Settings Accessibility row on and then off left the probe outcome at notTrusted in both states, because that row was not the probe process's effective TCC responsible identity.",
+      "notClaimed": "That a grant or a revoke was reflected by a later check, and that any trusted-transition result passed.",
+      "carryForward": "Demonstrate the transition against the process's actual effective TCC responsible identity in the downstream app-shell and signing integration Issue."
+    },
+    {
+      "id": "pane-already-selected",
+      "severity": "non-blocking",
+      "requiredByCanonicalIssue": false,
+      "statement": "System Settings opened with the Accessibility pane already selected. The implementation opens the application only and performs no pane deep link, so pane selection is not attributable to this code.",
+      "notClaimed": "An Accessibility pane deep link.",
+      "carryForward": "None. This is the documented known limitation 1, unchanged."
+    },
+    {
+      "id": "repeat-request-and-open-settings-not-repeated",
+      "severity": "non-blocking",
+      "requiredByCanonicalIssue": false,
+      "statement": "The supplemental real-machine idempotency observation repeated the check action only. The reviewer reported no second request run and no second open-settings run, so real-machine repetition of those two actions is not evidenced.",
+      "notClaimed": "Real-machine idempotency of request or open-settings. Automated idempotency for all three operations is covered by repeatedOperationsAreIdempotentAndOwnNoResourceToClean in tests/results.json.",
+      "carryForward": "Optional. It strengthens the record but is not required by the canonical Issue."
+    }
+  ],
+  "artifactPolicy": {
+    "sanitizedLog": "manual-output.log",
+    "machineReadableResult": "manual-result.json",
+    "screenshotOrVideo": "none-stored",
+    "screenshotOrVideoRationale": "No screenshot or video is necessary or stored. A capture of the System Settings window or of a prompt would add an installed-application and system-settings inventory of the reviewer's machine to this repository without strengthening the API result, which is already carried by the exit codes and the closed outcome names. The reviewer's visual observation is recorded instead, per run, in runs[].visualObservation."
+  },
+  "notClaimedAnywhere": [
+    "that macOS displayed the Accessibility prompt",
+    "that a same-process grant-to-revoke transition passed",
+    "that an Accessibility pane deep link was performed",
+    "that a system-wide log inspection was performed",
+    "that the final signed app bundle is Accessibility-authorized"
+  ]
+}
