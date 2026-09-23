@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-053",
+  "githubIssue": 29,
+  "commit": "5ca459acea932fd7324450d34224934ac12de22a",
+  "source": "Codex root reviewer run, transcribed by the author.",
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-09-23T05:53:56.086Z",
+  "endedAt": "2026-09-23T05:54:05.060Z",
+  "timestampNote": "UTC wrapper timestamps including orchestration overhead; not process runtime.",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "package": "MacPlatform",
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "testsPassed": 63,
+    "failures": 0,
+    "skippedByDefault": 3,
+    "skipped": [
+      "M1-035 Tier-H probe",
+      "M1-036 Tier-H probe",
+      "manualUniquePasteboardProbeRunsTheRealAdapterPath (M1-053 Tier-H probe)"
+    ]
+  },
+  "m1053DeclaredTests": {
+    "countBySourceReading": 32,
+    "ordinary": 31,
+    "optInTierH": 1,
+    "note": "Counted by the author by reading the test file; per-file pass counts were not separately reported by the reviewer. The suite total above is authoritative. The four read-access tests added by the High-finding fix account for the increase from the first reviewer run's 59 tests to 63.",
+    "coverage": {
+      "happyPath": [
+        "pasteboardPlainTextTypeIsTheUTF8PlainTextIdentifier",
+        "pasteboardReadObservesTheChangeCountThenReadsPlainText",
+        "pasteboardWriteClearsWritesAndReportsTheCountObservedAfterWriting",
+        "pasteboardWriteThenReadRoundTripsTheSameTextAndGeneration",
+        "pasteboardEmptyTextIsValidPlainTextInBothDirections",
+        "pasteboardPlainTextAlongsideOtherTypesIsRead"
+      ],
+      "boundaryAndLimit": [
+        "pasteboardReadAcceptsTextAtExactlyTheByteLimitAndRejectsOneByteOver",
+        "pasteboardWriteAcceptsTextAtExactlyTheByteLimitAndRejectsOneByteOverBeforeTouchingIt",
+        "pasteboardLimitCountsUTF8BytesNotCharacters",
+        "pasteboardOversizedFailureMatchesTheM1052CodecFailure"
+      ],
+      "invalidInputAndUnsupported": [
+        "pasteboardEmptyPasteboardReadIsATypedUnsupportedFailureWithoutReadingAString",
+        "pasteboardNonPlainTextContentIsATypedUnsupportedFailureWithoutReadingAString",
+        "pasteboardAdvertisedPlainTextThatCannotBeReadIsATypedUnclassifiedFailure"
+      ],
+      "permission": [
+        "pasteboardExplicitReadDenialFailsClosedBeforeAnyObservation",
+        "pasteboardReadThatIsNotExplicitlyDeniedProceedsAndTheReadDecides",
+        "pasteboardReadDenialLatchesNothingAndRecoversOnTheNextCall",
+        "pasteboardReadDenialDoesNotBlockWritesOrChangeCountObservation"
+      ],
+      "writeFailureAndOrdering": [
+        "pasteboardClearFailureStopsBeforeAnyStringIsWritten",
+        "pasteboardStringWriteFailureReportsNoGenerationAndLeavesThePasteboardCleared"
+      ],
+      "changeCountObservation": [
+        "pasteboardChangeCountObservationReadsOnlyTheCountAndTracksEveryChange"
+      ],
+      "idempotencyRecoveryCleanup": [
+        "pasteboardRepeatedReadsAreIdempotentAndNeverMutate",
+        "pasteboardRepeatedWritesEachClearAndWriteExactlyOnceInOrder",
+        "pasteboardFailuresLatchNothingAndTheNextCallRecovers",
+        "pasteboardUnreadableOrUnsupportedContentRecoversAfterTheNextChange"
+      ],
+      "concurrency": [
+        "pasteboardAdapterRunsOnADetachedNonMainActorTask"
+      ],
+      "privacy": [
+        "pasteboardEveryFailureEncodesToTheClosedTaxonomyWithoutContent",
+        "pasteboardReadTextNeverRendersItsContent"
+      ],
+      "tierHHarness": [
+        "manualPasteboardProbeSelectionFailsClosedAndIsSkippedByDefault",
+        "manualPasteboardProbeSequenceProducesTheExpectedClosedResultOnAFake",
+        "manualPasteboardProbeReportsAMismatchWithoutTheText",
+        "onlyTheTierHLiveRegionNamesARealPasteboard"
+      ],
+      "optInTierH": [
+        "manualUniquePasteboardProbeRunsTheRealAdapterPath"
+      ]
+    },
+    "cancellation": "Not applicable: the adapter is synchronous and owns no task, timer, observer or resource. Cleanup/idempotency coverage is the repetition and recovery tests plus the probe's releaseGlobally() defer."
+  },
+  "tdd": {
+    "testFileWrittenBeforeSource": true,
+    "redRunRecorded": false,
+    "note": "The test file was written before the source file in the first author session, but the author had no shell tool, so no red-phase run exists. The first reviewer run's failure was a test-file defect, not a TDD red phase; see review-findings.json."
+  },
+  "privacy": "No clipboard text, bytes, hash, pasteboard name or user data is recorded."
+}

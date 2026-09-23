@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-053",
+  "githubIssue": 29,
+  "commit": "5ca459acea932fd7324450d34224934ac12de22a",
+  "source": "Codex root reviewer, transcribed by the author. Sanitized: no serial number, hardware UUID, device name, user name, home path, pasteboard name or other private identifier is recorded.",
+  "date": "2026-09-23",
+  "timezone": "Asia/Taipei",
+  "timestamps": {
+    "firstCommandStartedAt": "2026-09-23T05:53:56.086Z",
+    "lastCommandEndedAt": "2026-09-23T05:54:35.612Z",
+    "note": "UTC wrapper timestamps including orchestration overhead."
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83"
+  },
+  "hardware": {
+    "architecture": "arm64",
+    "chip": "Apple M4 Pro"
+  },
+  "toolchain": {
+    "xcodeSDK": "macOS 26.2",
+    "swift": "6.2.3",
+    "swiftFormat": "6.2.3",
+    "packageDeploymentFloor": "macOS 14",
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "xcodebuildCompilerTarget": "arm64-apple-macos14.0"
+  },
+  "keyboardLayout": "com.apple.keylayout.ABC",
+  "keyboardLayoutNote": "Recorded for completeness; this Issue has no keyboard behavior.",
+  "display": {
+    "status": "not_collected",
+    "required": false,
+    "reason": "Display details beyond the Apple M4 Pro chipset were unavailable. Display layout and resolution do not affect pasteboard behavior."
+  },
+  "network": {
+    "exercised": false,
+    "applicable": false,
+    "reason": "Local platform adapter; no network, transport or TLS is involved."
+  },
+  "peer": {
+    "exercised": false,
+    "applicable": false,
+    "reason": "No Barrier or native protocol peer participates."
+  },
+  "pasteboard": {
+    "realPasteboardUsed": "AppKit uniquely named private pasteboard created with NSPasteboard.withUniqueName(), released with releaseGlobally() in defer",
+    "generalPasteboardRead": false,
+    "generalPasteboardModified": false,
+    "pasteboardNameRecorded": false,
+    "accessBehaviorObserved": "not_observed",
+    "accessBehaviorNote": "No System Settings pasteboard access change was made and no .alwaysDeny state was observed on a real pasteboard."
+  },
+  "accessibility": {
+    "required": false,
+    "note": "The adapter has no Accessibility dependency."
+  }
+}

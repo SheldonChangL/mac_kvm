@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-053",
+  "githubIssue": 29,
+  "branch": "feat/m1-053-mac-pasteboard-adapter",
+  "baseCommit": "e84ecee5e269912e46298b3a48f8911c97f86c07",
+  "implementationCommit": "5ca459acea932fd7324450d34224934ac12de22a",
+  "implementationCommitFiles": [
+    "Packages/MacPlatform/Sources/MacPlatform/MacPasteboardAdapter.swift",
+    "Packages/MacPlatform/Tests/MacPlatformTests/MacPasteboardAdapterTests.swift",
+    "docs/components/M1-053-mac-pasteboard-adapter.md"
+  ],
+  "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+  "status": "reviewer_verified",
+  "statusNote": "Commands 1-7 were run by the Codex root reviewer at implementation commit 5ca459acea932fd7324450d34224934ac12de22a; the conflict check and make verify (19/19) were run by the same reviewer at evidence commit b940d166bb68f1fa56572dc687bf5153cc6c6faf. All were transcribed by the author, Claude Opus 5.5, who had no shell tool in any M1-053 session and ran nothing. PR, GitHub CI, merge and a final-head re-run remain pending.",
+  "authorship": {
+    "repositoryContentAuthor": "Claude Opus 5.5",
+    "reviewer": "Codex root reviewer",
+    "detail": "Claude Opus 5.5 authored the source, test file, component document and this evidence package. The Codex root reviewer found the review findings, ran every command and the Tier-H probe, and drove remediation; it did not author repository content.",
+    "authorDidNot": [
+      "run any shell command",
+      "compile or run tests",
+      "execute the Tier-H probe",
+      "commit, stage, push or write to .git",
+      "open or merge a pull request",
+      "update GitHub state"
+    ]
+  },
+  "timestampNote": "startedAt and endedAt are UTC wrapper timestamps from the reviewer's orchestration. They include orchestration overhead and are not process-runtime claims.",
+  "requiredCommands": [
+    {
+      "id": 1,
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "startedAt": "2026-09-23T05:53:56.086Z",
+      "endedAt": "2026-09-23T05:54:05.060Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "build": "complete",
+        "swiftTestingTarget": "arm64e-apple-macos14.0",
+        "testsPassed": 63,
+        "failures": 0,
+        "skippedByDefault": 3,
+        "skippedTests": ["M1-035 Tier-H probe", "M1-036 Tier-H probe", "M1-053 Tier-H probe"]
+      },
+      "report": "tests/results.json"
+    },
+    {
+      "id": 2,
+      "command": "env MACKVM_M1_053_MANUAL_PROBE=unique-pasteboard-round-trip swift test --package-path Packages/MacPlatform --filter manualUniquePasteboardProbeRunsTheRealAdapterPath",
+      "form": "exact_opt_in_tier_h",
+      "startedAt": "2026-09-23T05:54:05.060Z",
+      "endedAt": "2026-09-23T05:54:09.356Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "testsPassed": 1,
+        "failures": 0,
+        "reportedTestDurationSeconds": 0.014,
+        "sanitizedLine": "M1-053 manual probe: action=unique-pasteboard-round-trip initialRead=clipboard.unsupportedType markerWrite=written writeCountVsInitial=different readBack=markerMatched readCountVsWrite=equal oversizedWrite=clipboard.oversized countAfterOversizedVsWrite=equal readAfterOversized=markerMatched nonTextRead=clipboard.unsupportedType clearedRead=clipboard.unsupportedType"
+      },
+      "report": "tests/tier-h-probe.json"
+    },
+    {
+      "id": 3,
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "startedAt": "2026-09-23T05:54:09.356Z",
+      "endedAt": "2026-09-23T05:54:14.394Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "finalLine": "** BUILD SUCCEEDED **",
+        "compilerTarget": "arm64-apple-macos14.0",
+        "nonFatalWarnings": [
+          "supported-platform discovery",
+          "multiple matching destinations; arm64e was listed first but the compile target was arm64"
+        ],
+        "newSourceWarningsAttributedToM1053": 0
+      }
+    },
+    {
+      "id": 4,
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "startedAt": "2026-09-23T05:54:14.394Z",
+      "endedAt": "2026-09-23T05:54:22.366Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "id": 5,
+      "command": "make architecture-check",
+      "form": "exact",
+      "startedAt": "2026-09-23T05:54:22.367Z",
+      "endedAt": "2026-09-23T05:54:26.129Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK"
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "id": 6,
+      "command": "make code-quality-check",
+      "startedAt": "2026-09-23T05:54:26.129Z",
+      "endedAt": "2026-09-23T05:54:32.394Z",
+      "exitCode": 0,
+      "status": "passed",
+      "subSteps": [
+        {
+          "name": "swift-format-version",
+          "exitCode": 0,
+          "version": "6.2.3",
+          "stdoutSha256": "c55a2ec9b9d5ca78f4281349ef612925879d134e8c7f983e3b13d5a887a723d9",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrEmpty": true
+        },
+        {
+          "name": "swift-format-lint-strict",
+          "exitCode": 0,
+          "findings": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutEmpty": true,
+          "stderrEmpty": true
+        },
+        {
+          "name": "swift-test-warnings-as-errors",
+          "exitCode": 0,
+          "stdoutSha256": "b80f49868579a65b91f8d586a1515ac39ab5164906fca6609ad84b11887e570b",
+          "stderrSha256": "73c4ce9f61739ee2347f1618f6d5ef1b1eaca14fd865fdd55cf44d228e0913ef"
+        }
+      ],
+      "hashNote": "SHA-256 of command output streams as reported by the reviewer. e3b0c442... is the SHA-256 of empty input. No clipboard content was hashed."
+    },
+    {
+      "id": 7,
+      "command": "git diff --check HEAD^ HEAD",
+      "startedAt": "2026-09-23T05:54:32.394Z",
+      "endedAt": "2026-09-23T05:54:35.612Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "no output"
+    }
+  ],
+  "evidenceCommitCommands": [
+    {
+      "id": 8,
+      "command": "git merge-tree FETCH_HEAD HEAD",
+      "form": "conflict_check",
+      "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+      "startedAt": "2026-09-23T06:08:46.011Z",
+      "endedAt": "2026-09-23T06:08:49.802Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "fetchedRemoteMain": "e84ecee5e269912e46298b3a48f8911c97f86c07",
+        "remoteMainEqualsBranchBase": true,
+        "mergeTree": "0f57ab7a940359625fbebe7180d8c5e01ccc3cf3",
+        "conflicts": 0
+      }
+    },
+    {
+      "id": 9,
+      "command": "make verify",
+      "form": "exact",
+      "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+      "startedAt": "2026-09-23T06:09:04.809Z",
+      "endedAt": "2026-09-23T06:09:45.267Z",
+      "exitCode": 0,
+      "status": "passed",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "reportPath": "artifacts/ci/m1-008-report.json",
+      "reportPathNote": "Repository-relative; artifacts/ is Git-ignored and the report is not committed. The absolute path printed by the tool is deliberately not recorded.",
+      "reportSha256": "ae6c6cd731704ed68be2cd7fa2b7b8f4c8ab9438916d456be3527d9ad54abc50",
+      "gateDurationsMs": {
+        "manifest-validation": 68,
+        "docs-check": 129,
+        "architecture-check": 252,
+        "code-quality": 2573,
+        "tool-test-discovery": 48,
+        "evidence-test-discovery": 52,
+        "tool-test:architecture-check": 637,
+        "tool-test:async-harness": 348,
+        "tool-test:cigates": 309,
+        "tool-test:code-quality": 69,
+        "tool-test:diagnostic-bundle": 251,
+        "tool-test:docs-check": 124,
+        "evidence-test:M1-023": 48,
+        "evidence-test:M1-SCOPE-001": 60,
+        "swift-package-test:KVMContracts": 431,
+        "swift-package-test:MacPlatform": 479,
+        "repository-contract-tests": 25264,
+        "swift-test-targets": 766,
+        "native-arm64-build": 1003
+      }
+    }
+  ],
+  "pending": [
+    {
+      "item": "pull request, GitHub CI, merge",
+      "status": "pending"
+    },
+    {
+      "item": "final-head re-run",
+      "status": "pending",
+      "note": "The evidence-finalization commit SHA is not known yet. Re-running the gates at the final head and GitHub CI remain reviewer duties before merge."
+    }
+  ],
+  "completed": [
+    "make verify at evidence commit b940d166bb68f1fa56572dc687bf5153cc6c6faf: 19/19",
+    "conflict check against remote main: no conflict",
+    "non-author Codex five-axis review: complete (tests/review-findings.json)"
+  ],
+  "authorCommandAttempts": [],
+  "authorCommandAttemptsNote": "No shell tool was available to the author in any M1-053 session, so no author command result exists or is claimed.",
+  "reviewHistory": "tests/review-findings.json"
+}

@@ -1,0 +1,1 @@
+M1-053 manual probe: action=unique-pasteboard-round-trip initialRead=clipboard.unsupportedType markerWrite=written writeCountVsInitial=different readBack=markerMatched readCountVsWrite=equal oversizedWrite=clipboard.oversized countAfterOversizedVsWrite=equal readAfterOversized=markerMatched nonTextRead=clipboard.unsupportedType clearedRead=clipboard.unsupportedType
