@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "phase": "green",
+  "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
+  "implementationCommit": "dbc45d4e04942a03a6e73b86420801802369673f",
+  "authoritativeResult": "reviewerFinal",
+  "authoritativeResultNote": "reviewerFinal below is the authoritative green for the committed test file. Every other top-level count and timestamp is the first author session's pre-correction run and is retained as history only.",
+  "reviewerFinal": {
+    "source": "root-reviewer",
+    "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+    "status": "passed",
+    "build": {
+      "command": "swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests",
+      "commandForm": "equivalent",
+      "exitCode": 0,
+      "result": "Build complete in 3.56s; no compile errors or warnings from repository code."
+    },
+    "ordinarySuite": {
+      "command": "env -u MACKVM_M1_036_MANUAL_PROBE -u MACKVM_M1_035_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "commandForm": "equivalent",
+      "cleanProcess": true,
+      "exitCode": 0,
+      "declaredTests": 31,
+      "executedTests": 29,
+      "skippedTests": 2,
+      "skippedTestNames": [
+        "manualRealAPIProbeRunsOneReviewerSelectedAction",
+        "manualRealInjectionProbeRunsOneReviewerSelectedAction"
+      ],
+      "failures": 0,
+      "swiftTestingRunSeconds": 0.006,
+      "executedCases": "not_reported",
+      "result": "Passed in a clean process after the pure-unit event-handle correction, with no warm-up run and no hang. The M1-036 test file declares 19 of the 31 tests."
+    },
+    "exactFormInMakeVerify": {
+      "command": "swift test --package-path Packages/MacPlatform",
+      "commandForm": "exact",
+      "gate": "swift-package-test:MacPlatform",
+      "exitCode": 0,
+      "durationMs": 3290,
+      "runOrder": "post_commit_after_evidence_edits",
+      "result": "Passed as a gate of the authoritative post-commit make verify (19/19, exit 0) at HEAD dbc45d4e04942a03a6e73b86420801802369673f; see commands.json reviewerFinalResults.makeVerify.",
+      "preCommitHistory": "The earlier pre-commit sweep also passed this gate, in 3646 ms; see commands.json reviewerFinalResults.makeVerifyPreCommitHistory."
+    },
+    "xcodebuildWorkspace": {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "commandForm": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "** BUILD SUCCEEDED ** after the implementation commit and the current evidence edits; non-fatal destination warnings are recorded in commands.json reviewerFinalResults.xcodebuildWorkspace."
+    },
+    "tierHProbe": "Recorded in manual-result.json and manual-output.log. Both actions exited 0 at the implementation commit."
+  },
+  "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+  "commandForm": "equivalent",
+  "commandNote": "The exact frozen form is blocked in the author session; see environment.json authorEnvironmentLimitations and commands.json requiredCommands.",
+  "exitCode": 0,
+  "status": "passed",
+  "startedAt": "2026-09-22T07:03:53.000Z",
+  "endedAt": "2026-09-22T07:03:54.000Z",
+  "declaredTests": 25,
+  "executedTests": 23,
+  "skippedTests": 2,
+  "executedCases": 33,
+  "failures": 0,
+  "compilerWarnings": 0,
+  "counting": "25 declared tests, of which 2 are default-skipped Tier-H probes: M1-035's manualRealAPIProbeRunsOneReviewerSelectedAction and M1-036's manualRealInjectionProbeRunsOneReviewerSelectedAction. Executed cases exceed executed tests because three tests are parameterized: 2, 6 and 6 cases.",
+  "scopeOfThisRecord": "The top-level counts and timestamps, including m1036Tests declared 13 / executed 12 / skipped 1, belong to the pre-correction green run of the first author session and are history. The committed test file declares 19 M1-036 tests and 31 package tests, as observed in reviewerFinal. The four correction records below are history in order; each earlier one is superseded by the next, and pureUnitSeamCorrection is resolved by reviewerFinal.",
+  "reviewCorrection": {
+    "status": "superseded",
+    "supersededBy": "cursorObservationCorrection",
+    "change": "The Tier-H move-and-restore probe was restructured so both events are created before anything is posted, the restore is requested through the injector, and a cleanup-only direct restore post is requested and reported if the injector's restore requests none. Four always-running sequencing tests were added; they use a recording post seam, so none of them can move the real cursor.",
+    "declaredTestsByConstruction": 29,
+    "declaredTestsByConstructionNote": "25 previous tests plus 4 new ones, one of which is parameterized with 2 cases. This is a count of declarations in the source, not an observed run result.",
+    "authorRun": "none",
+    "authorRunReason": "In the correction session every swift, make and python3 invocation was refused by the session's permission policy before it started, so the author compiled nothing and ran nothing. Only git and read-only file commands could run.",
+    "rootReviewerRunReported": "The root reviewer reported running 'env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform' against this corrected file: passed, 29 tests, 2 manual probes skipped. This is the reviewer's observation, relayed by the reviewer, not an author run, and it predates cursorObservationCorrection below."
+  },
+  "cursorObservationCorrection": {
+    "status": "superseded",
+    "supersededBy": "coreGraphicsInitializationCorrection",
+    "finding": "Root reviewer finding: the probe mapped its cursor read-back with 'switch CGEvent(source: nil)?.location { case .some(origin): ... }', a pattern the reviewer judged unsafe because it may be read as binding a new identifier rather than comparing with the captured origin, which would report every non-nil read-back as matchesOrigin.",
+    "change": "The mapping was extracted into the pure helper manualProbeCursorObservation(readBack:origin:), which compares with explicit ==, and the probe now calls it. One always-running test, cursorObservationComparesTheReadBackWithTheOrigin, covers the equal, different and nil read-backs. The real probe was not run.",
+    "declaredTestsByConstruction": 30,
+    "declaredTestsByConstructionNote": "The 29 tests of the reviewer's run plus 1 new unparameterized test; 28 executed and 2 default-skipped Tier-H probes are expected. This is a count of declarations in the source, not an observed run result.",
+    "authorRun": "none",
+    "authorRunReason": "In this session 'env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform' and 'swift format lint' on the test file were each refused by the permission policy before start with 'This command requires approval'.",
+    "productionCodeChanged": false
+  },
+  "coreGraphicsInitializationCorrection": {
+    "status": "failed_superseded",
+    "supersededBy": "pureUnitSeamCorrection",
+    "finding": "Root reviewer finding: the clean full suite hung indefinitely before output, with several concurrent M1-036 tests sampled in the first CoreGraphics/SkyLight initialization. See commands.json coreGraphicsInitializationCorrectionSession.",
+    "change": "Every automated M1-036 test-side CGEvent creation goes through the test-only SerializedTestEventCreation lock. One always-running test, everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate, was added; it pins which routes create inside the gate and asserts no timing property.",
+    "declaredTestsByConstruction": 31,
+    "declaredTestsByConstructionNote": "30 previous declarations plus 1 new unparameterized test; 29 executed and 2 default-skipped Tier-H probes are expected. A count of declarations, not an observed run.",
+    "authorRun": "none",
+    "authorRunReason": "swift build was refused by the permission policy before start, so nothing was compiled or run.",
+    "productionCodeChanged": false,
+    "reviewerOutcome": "failed: the gated tree built, and a clean full suite hung again. Superseded by pureUnitSeamCorrection."
+  },
+  "pureUnitSeamCorrection": {
+    "status": "reviewer_verified",
+    "resolvedBy": "reviewerFinal",
+    "reviewerOutcome": "passed: build exit 0, and the clean ordinary suite exited 0 with 31 declared, 29 ran, 2 manual probes skipped, 0 failures, no hang.",
+    "finding": "Post-fix sample: one M1-036 thread owned SerializedTestEventCreation while blocked in SLEventCreate -> CGSScoreboard -> SLSServerPort initialization, two ordinary M1-035 tests were blocked in hasAuthorizationForControlComputer -> TCCAccessRequest, and the other M1-036 event tests waited on the lock. See commands.json pureUnitSeamCorrectionSession.",
+    "change": "Ordinary M1-036 tests create no real CGEvent and call no CoreGraphics event-creation API: the environment creates and posts an opaque internal MacMouseMoveEventHandle, and ordinary tests use MacMouseMoveEventHandle.synthetic(). Removed: everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate and liveEnvironmentCreatesAMouseMovedEventAtTheRequestedPositionAndPostsNothing. Added: syntheticHandlesAreEqualOnlyToThemselves and the static source audit onlyTheTierHLiveRegionNamesLiveEventCreationPostingOrTheProductionSeam.",
+    "declaredTestsByConstruction": 31,
+    "declaredTestsByConstructionNote": "19 M1-036 declarations (2 removed, 2 added) plus 12 pre-existing. Confirmed by reviewerFinal.ordinarySuite: 31 declared, 29 executed, 2 skipped.",
+    "authorRun": "none",
+    "authorRunReason": "swift build, and a read-only grep, were refused by the permission policy before start ('This command requires approval'), so the author compiled and ran nothing; the reviewer's run in reviewerFinal is the result.",
+    "productionCodeChanged": true,
+    "productionCodeScope": "Internal event-handle seam only; no package or public declaration changed."
+  },
+  "m1036Tests": {
+    "declared": 13,
+    "executed": 12,
+    "skipped": 1,
+    "happyPath": [
+      "mouseMoveChecksTrustResolvesCreatesAndPostsExactlyOnceInThatOrder"
+    ],
+    "boundary": [
+      "normalizedBoundaryPositionsReachTheResolverUnchanged (6 cases: 0/0, 1/1, 0/1, 1/0, out-of-range -1/2, NaN/NaN)"
+    ],
+    "invalidInput": [
+      "nonMouseMoveDomainEventsFailClosedWithoutAnyPlatformWork (6 cases: mouseButton, scroll, key, clipboard, enterScreen, leaveScreen)"
+    ],
+    "permissionDenial": [
+      "accessibilityDenialReturnsTheFrozenPermissionFailureAndDoesNoEventWork"
+    ],
+    "positionResolverFailure": [
+      "unresolvablePlatformPositionFailsClosedBeforeAnyEventIsCreated"
+    ],
+    "eventCreationFailure": [
+      "eventCreationFailureIsDiagnosableAndPostsNothing"
+    ],
+    "callOrderAndNoPostOnFailure": [
+      "Asserted inside every test above via an ordered seam call log, not by counters. The happy path asserts the full [trustCheck, resolvePosition, makeEvent, post] sequence and object identity between the created and the posted event; each failure test asserts the exact truncated prefix and an empty posted-event list."
+    ],
+    "detachedNonMainActor": [
+      "injectionRunsOnADetachedNonMainActorTask"
+    ],
+    "statelessRepetitionAndIdempotency": [
+      "repeatedInjectionsAreStatelessAndCarryNoLatchedFailure"
+    ],
+    "privacyAndErrorEncoding": [
+      "everyFailureEncodesToTheClosedTaxonomyWithoutCoordinatesOrPlatformText"
+    ],
+    "productionDefaults": [
+      "productionDefaultResolvesNoPlatformPositionSoNothingIsEverPosted"
+    ],
+    "removedByPureUnitSeamCorrection": [
+      "liveEnvironmentCreatesAMouseMovedEventAtTheRequestedPositionAndPostsNothing",
+      "everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate"
+    ],
+    "addedByPureUnitSeamCorrection": [
+      "syntheticHandlesAreEqualOnlyToThemselves",
+      "onlyTheTierHLiveRegionNamesLiveEventCreationPostingOrTheProductionSeam"
+    ],
+    "manualProbeDefaultSkipAndUnknownAction": [
+      "manualProbeSelectionFailsClosedAndIsSkippedByDefault"
+    ],
+    "manualProbeSequencingAddedByReviewCorrection": [
+      "moveAndRestorePreparesBothEventsFirstAndRestoresThroughTheInjector",
+      "cleanupRequestsTheRestorePostWhenTheInjectorRestoreFails",
+      "moveThatFailsClosedPostsNothingAndOwesNoRestore",
+      "eventThatCannotBePreparedStopsTheRunBeforeAnyPost (2 cases: target creation fails, origin restore creation fails)"
+    ],
+    "cursorObservationAddedBySecondCorrection": [
+      "cursorObservationComparesTheReadBackWithTheOrigin"
+    ],
+    "creationSerializationBoundaryAddedByThirdCorrection": [
+      "everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate (removed by the pure-unit seam correction)"
+    ],
+    "defaultSkippedProbe": [
+      "manualRealInjectionProbeRunsOneReviewerSelectedAction"
+    ]
+  },
+  "cursorSafety": {
+    "claim": "No automated test posted a CGEvent, so no automated test could move the real cursor.",
+    "how": "In the committed test file every ordinary test uses MacMouseMoveEventHandle.synthetic() handles and a recording post closure, so no ordinary test creates or posts a real CGEvent. The one test that touches production defaults, productionDefaultResolvesNoPlatformPositionSoNothingIsEverPosted, stops at the permission check or at the unresolved resolver. The probe that can post is skipped unless MACKVM_M1_036_MANUAL_PROBE is set.",
+    "observedInThisRun": "First author run: the probe reported skipped and 'M1-036 manual probe' appeared zero times in the run log. Reviewer final ordinary suite: both manual probes skipped.",
+    "historicalNote": "liveEnvironmentCreatesAMouseMovedEventAtTheRequestedPositionAndPostsNothing, which created but never posted a live event, existed until the pure-unit seam correction removed it."
+  },
+  "regression": {
+    "preExistingTests": 12,
+    "result": "All 12 pre-existing MacPlatform tests, 11 executed cases plus the M1-035 default-skipped probe, still pass unchanged.",
+    "reviewerFinal": "All pre-existing MacPlatform tests passed within reviewerFinal.ordinarySuite, 0 failures.",
+    "contractsPackage": "KVMContracts is consumed unchanged and no contract file was modified. The reviewer's make verify swift-package-test:KVMContracts gate exited 0 in 753 ms."
+  },
+  "rootPackage": {
+    "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+    "form": "equivalent",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-09-22T07:06:26.000Z",
+    "endedAt": "2026-09-22T07:06:29.000Z",
+    "result": "15 tests passed, 0 failures, 0 compiler warnings. This is the run that proves the root package compiles the new MacPlatform source with warnings treated as errors, which is what the code-quality gate's blocked exact form would have proven."
+  }
+}

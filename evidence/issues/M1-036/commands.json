@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "branch": "feat/m1-036-mac-mouse-move-injector",
+  "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
+  "implementationCommit": "dbc45d4e04942a03a6e73b86420801802369673f",
+  "implementationCommitNote": "Created by the root reviewer at 2026-09-23T01:33:30Z and transcribed here from git. The author never writes to .git.",
+  "status": "reviewer_verified",
+  "statusNote": "The root reviewer validated implementation commit dbc45d4e04942a03a6e73b86420801802369673f: build exit 0, clean ordinary suite exit 0 (31 declared, 29 ran, 2 manual probes skipped, 0 failures), the exact xcodebuild workspace build exit 0 (BUILD SUCCEEDED), a post-commit make verify exit 0 with 19/19 gates at HEAD dbc45d4e04942a03a6e73b86420801802369673f, and both Tier-H probe actions exit 0 with the cursor restored. Five-axis verdict: Critical 0, High 0, Medium 0 unresolved, Low 1. See reviewerFinalResults. The author compiled and ran none of these; every earlier pending or refused record below is history and is superseded by reviewerFinalResults.",
+  "authorship": {
+    "implementationAuthor": "Claude Opus 5",
+    "reviewer": "root reviewer",
+    "detail": "Claude Opus 5 wrote the implementation, the tests, the component document and this evidence package, and is the sole author of repository content for this Issue. The root reviewer is the separate executor that reviews, runs validation and the Tier-H probe, stages, commits and manages the pull request. The root reviewer is not an independent external model.",
+    "authorDidNot": [
+      "commit",
+      "stage",
+      "push",
+      "branch",
+      "open or merge a pull request",
+      "write to .git",
+      "update external GitHub state",
+      "execute the Tier-H manual probe",
+      "move the real cursor"
+    ]
+  },
+  "filesChanged": [
+    "Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift",
+    "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+    "docs/components/M1-036-mac-mouse-move-injector.md",
+    "evidence/issues/M1-036/**"
+  ],
+  "exactFilesCompliance": "git status --porcelain was checked by the author after the change. The only new paths are the three Exact Files and evidence/issues/M1-036/. No other repository file was created, modified, or deleted.",
+  "protectedArtifacts": "MacKVM_M1-001_unblock.zip and mackvm-unblock/ were never read, opened, listed for content, written, staged, or deleted. They remain untracked and unchanged, and appear in git status exactly as they did at session start.",
+  "generatedProducts": "Packages/MacPlatform/.build and .build were written by the test runs and are covered by the existing **/.build/ ignore rule. artifacts/ is Git-ignored, so the author's make verify report is not committed.",
+  "environmentCaveat": "See environment.json authorEnvironmentLimitations. SwiftPM manifest evaluation and xcodebuild -workspace both fail for environmental reasons that M1-035 already established as reproducing on a pristine export of the base tree. Every exact frozen form that is blocked is recorded as blocked and is never claimed as passing on the strength of an author run.",
+  "requiredCommands": [
+    {
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "exitCode": 124,
+      "status": "blocked_environmental",
+      "startedAt": "2026-09-22T07:04:16.000Z",
+      "endedAt": "2026-09-22T07:06:16.000Z",
+      "result": "Failed at manifest evaluation with \"error: 'macplatform': Invalid manifest\" and \"sandbox-exec: sandbox_apply: Operation not permitted\". Tests from the already-built product did begin executing and were still printing pass lines when the command was terminated by a 120 s timeout, so the observed exit code 124 is the timeout's, not SwiftPM's. This run is not authoritative in any respect and no pass count is taken from it.",
+      "reviewerResolution": "Resolved. The exact form passed as the post-commit make verify gate swift-package-test:MacPlatform, exit 0 in 3290 ms (3646 ms in the earlier pre-commit sweep), and the clean ordinary suite in the --disable-sandbox form with both probe variables unset passed with 31 declared, 29 ran, 2 skipped, 0 failures. The exact form with --filter also ran both Tier-H probe actions at exit 0. See reviewerFinalResults."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T07:03:53.000Z",
+      "endedAt": "2026-09-22T07:03:54.000Z",
+      "result": "25 declared tests, 23 executed in 33 cases, 2 default-skipped Tier-H probes, 0 failures, 0 compiler warnings. Report: tests/results.json.",
+      "note": "--disable-sandbox only disables SwiftPM's own nested sandbox. It does not change package identity, target ownership, test selection, or any assertion."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "exitCode": 66,
+      "status": "blocked_environmental_preexisting",
+      "result": "xcodebuild: error: 'MacKVM.xcworkspace' is not a workspace file.",
+      "preexistingProof": "M1-035 established this by reproducing the identical failure against a pristine 'git archive | tar -x' export of its base commit, and with the outer harness sandbox disabled. The workspace files are untouched by this Issue, and the reviewer reported the same exact command succeeding for M1-035.",
+      "reviewerResolution": "Resolved. The root reviewer ran this exact command after implementation commit dbc45d4e04942a03a6e73b86420801802369673f and after the current evidence edits: exit 0, final line '** BUILD SUCCEEDED **'. See reviewerFinalResults.xcodebuildWorkspace, including its non-fatal warnings.",
+      "authorAttemptHistory": "The author's own attempt on 2026-09-23 was refused by the permission policy before start ('This command requires approval'). It produced no result and is history only."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T06:49:36.000Z",
+      "endedAt": "2026-09-22T06:49:36.000Z",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "reviewerResolution": "Also passed as the post-commit make verify gate manifest-validation, exit 0 in 53 ms."
+    },
+    {
+      "command": "make architecture-check",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T06:49:36.000Z",
+      "endedAt": "2026-09-22T06:49:36.000Z",
+      "result": "architecture check OK",
+      "coverage": "Scans Apps, Packages and reference for Swift sources, so both new Swift files are covered. It confirms MacPlatform imports no protocol module and that no Barrier token appears outside the adapter.",
+      "reviewerResolution": "Also passed as the post-commit make verify gate architecture-check, exit 0 in 334 ms."
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-036-author-report.json",
+      "form": "exact",
+      "exitCode": 2,
+      "status": "blocked_environmental",
+      "startedAt": "2026-09-22T07:08:24.000Z",
+      "endedAt": "2026-09-22T07:08:26.000Z",
+      "result": "Gates 1 to 3 passed: manifest-validation exit 0, docs-check exit 0, architecture-check exit 0. Gate 4 code-quality exited 1 and the pipeline stopped, leaving the remaining gates not-run. make itself returned 2.",
+      "failureCause": "Inside code-quality, swift-format-version exited 0 and swift-format-lint exited 0 with zero findings, which covers both new Swift files. Only the third sub-command, the sandboxed 'swift test -Xswiftc -warnings-as-errors', failed. Its --disable-sandbox equivalent passes with 15 tests and 0 compiler warnings; see supplementaryCommands.",
+      "reviewerResolution": "Resolved. The root reviewer's post-commit make verify at HEAD dbc45d4e04942a03a6e73b86420801802369673f exited 0 with 19/19 gates passed, swift-package-test:MacPlatform present exactly once. See reviewerFinalResults.makeVerify; the earlier pre-commit sweep is history in reviewerFinalResults.makeVerifyPreCommitHistory."
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T06:49:36.000Z",
+      "endedAt": "2026-09-22T06:49:37.000Z",
+      "result": "docs check OK",
+      "coverageNote": "docs-check reads git-tracked files, so the still-untracked new component document and this evidence package are not covered by that run. They were additionally validated by invoking the tool's own per-file checker on the new paths, and every JSON file in this package was parsed for validity and duplicate keys. See untrackedPathValidation."
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "No output and no findings. This is the exact lint argv the code-quality gate uses, so it covers both new Swift files.",
+      "note": "An initial run reported five findings on the new test file: one AddLines pair, two Indentation and one LineLength. Two expressions were rewrapped and the rerun is clean. No assertion was changed."
+    },
+    {
+      "command": "python3 Tools/code-quality/code-quality.py --repository-root .",
+      "exitCode": 1,
+      "status": "blocked_environmental",
+      "result": "swift-format-version exit 0, swift-format-lint exit 0 with zero findings, swift-test-warnings-as-errors exit 1 with a sandbox-exec failure. Only the sandboxed SwiftPM sub-command fails.",
+      "reviewerResolution": "Resolved. Passed as the make verify gate code-quality, exit 0 in 3119 ms."
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "startedAt": "2026-09-22T07:06:26.000Z",
+      "endedAt": "2026-09-22T07:06:29.000Z",
+      "result": "15 tests passed, 0 failures, 0 compiler warnings. The root package compiles the new MacPlatform source with warnings treated as errors."
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "No output. Recorded honestly: all four new paths are untracked, so the unstaged diff this command inspects is empty and the clean result is therefore weak evidence. The author did not stage anything in order to strengthen it, because staging is outside the author's authority.",
+      "reviewerResolution": "Resolved. The root reviewer ran git diff --cached --check before the implementation commit: exit 0, no output."
+    },
+    {
+      "command": "git status --porcelain",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Five untracked entries: the two protected owner artifacts unchanged, the two new Swift files, and evidence/issues/M1-036/. docs/components/M1-036-mac-mouse-move-injector.md was created after this observation and is the sixth. No tracked file is modified or deleted."
+    }
+  ],
+  "untrackedPathValidation": {
+    "method": "Tools/docs-check/docs-check.py was loaded as a module and its per-file checker run against the new untracked Markdown and JSON paths, because the gate itself only reads git-tracked files.",
+    "result": "No violations.",
+    "jsonValidity": "Every JSON file in this package was parsed with python3 json.load, which also rejects a file this package's own style forbids: none contains a duplicate key at the same level.",
+    "reviewerResolution": "Resolved. The make verify gate docs-check exited 0 in 107 ms, and the root reviewer parsed every M1-036 JSON file with jq at exit 0."
+  },
+  "tddSequence": {
+    "order": [
+      "1. Wrote the Exact Test File Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift.",
+      "2. Ran the test command with no production file present and recorded the objective missing-symbol compile failure in tests/red-phase.json, verifying by directory listing that Sources/MacPlatform contained only the pre-existing M1-035 and boundary sources.",
+      "3. Created Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift.",
+      "4. Ran the green test command; see tests/results.json.",
+      "5. Wrote docs/components/M1-036-mac-mouse-move-injector.md and this evidence package."
+    ],
+    "redToGreenTestEdits": {
+      "count": 2,
+      "detail": "Two mechanical edits, neither of which removed, relaxed, or conditionalized an assertion. One added an explicit [CoreErrorCode] annotation to an array literal whose element type was not inferable while the injector type was absent. One moved a Thread.isMainThread read into a synchronous nonisolated helper, because the SDK annotates that property unavailable from an asynchronous context; the observation is unchanged, only the call site is.",
+      "postGreenEdits": "Two further edits rewrapped expressions to satisfy swift-format line-length and indentation rules. No asserted value changed."
+    }
+  },
+  "manualProbeCommands": {
+    "environmentVariable": "MACKVM_M1_036_MANUAL_PROBE",
+    "actions": [
+      "read-origin",
+      "move-and-restore"
+    ],
+    "purpose": "Tier-H manual harness only. Not an automated acceptance command, not part of the Required Command sweep, and not a substitute for any gate. It exists because M1-036 adds no app wiring, so the manual step otherwise had no executable entry point.",
+    "defaultState": "Skipped when the variable is unset or empty, so no ordinary run can post an event or move the cursor. Observed skipped with its reason string in the green run.",
+    "exactForms": {
+      "readOrigin": "MACKVM_M1_036_MANUAL_PROBE=read-origin swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction",
+      "moveAndRestore": "MACKVM_M1_036_MANUAL_PROBE=move-and-restore swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction"
+    },
+    "authorRuns": [],
+    "authorDidNotRun": [
+      "read-origin",
+      "move-and-restore"
+    ],
+    "authorDidNotRunReason": "The dispatch instruction is explicit that the author must not execute the real probe; the reviewer executes it after code review. The author therefore moved no cursor and observed no OS behavior, and claims nothing about either. The probe's fail-closed parsing was instead proven by an ordinary always-running automated test, manualProbeSelectionFailsClosedAndIsSkippedByDefault, rather than by running the probe with a bad value.",
+    "artifacts": {
+      "machineReadableResult": "manual-result.json",
+      "machineReadableResultNote": "status reviewer_verified with both reviewer runs recorded in closed vocabulary.",
+      "sanitizedLog": "manual-output.log",
+      "sanitizedLogNote": "Exactly the two sanitized probe lines of the reviewer runs, one per line, with no coordinate or identifier.",
+      "screenshotOrVideo": "none-stored"
+    },
+    "reviewerRuns": {
+      "status": "passed",
+      "source": "root-reviewer",
+      "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+      "evidenceTimeUtc": "2026-09-23T01:34:27Z",
+      "runs": [
+        {
+          "command": "MACKVM_M1_036_MANUAL_PROBE=read-origin swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction",
+          "form": "exact",
+          "exitCode": 0,
+          "probeTestDurationSeconds": 0.025,
+          "output": "M1-036 manual probe: action=read-origin origin=readable preparation=notAttempted move=notAttempted restore=notAttempted cleanup=notRequired cursor=notObserved"
+        },
+        {
+          "command": "MACKVM_M1_036_MANUAL_PROBE=move-and-restore swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction",
+          "form": "exact",
+          "exitCode": 0,
+          "probeTestDurationSeconds": 0.057,
+          "output": "M1-036 manual probe: action=move-and-restore origin=readable preparation=eventsPrepared move=postRequested restore=postRequested cleanup=notRequired cursor=matchesOrigin"
+        }
+      ],
+      "notExecuted": "The optional unknown-action run, because fail-closed parsing is covered by the ordinary test manualProbeSelectionFailsClosedAndIsSkippedByDefault.",
+      "detail": "manual-result.json and manual.md."
+    }
+  },
+  "reviewCorrectionSession": {
+    "historyStatus": "superseded_by_reviewerFinalResults",
+    "observedOn": "2026-09-23",
+    "author": "Claude Opus 5",
+    "correction": "Root reviewer finding: the opt-in Tier-H move-and-restore probe must minimize the risk of leaving the cursor displaced. Both the target and the origin restore event are now created before anything is posted; the restore is requested through the M1-036 injector; and if the target post was requested but the injector's restore requested none, cleanup requests the pre-created origin restore directly, once, at the injector's tap, reports cleanup=fallbackPostRequested, and fails the run. No sleep was added and no step claims delivery.",
+    "filesTouched": [
+      "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+      "docs/components/M1-036-mac-mouse-move-injector.md",
+      "evidence/issues/M1-036/summary.md",
+      "evidence/issues/M1-036/commands.json",
+      "evidence/issues/M1-036/manual.md",
+      "evidence/issues/M1-036/manual-result.json",
+      "evidence/issues/M1-036/tests/results.json",
+      "evidence/issues/M1-036/tests/red-phase.json"
+    ],
+    "productionSourceChanged": false,
+    "commands": [
+      {
+        "command": "swift test --package-path Packages/MacPlatform",
+        "status": "not_run_permission_refused",
+        "result": "Refused by the session's permission policy before start: 'This command requires approval'. No approval channel exists in this non-interactive session."
+      },
+      {
+        "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "make architecture-check",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "python3 Tools/Backlog/validate_package.py",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "grep -c -E \".{101}\" Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+        "status": "passed",
+        "result": "0. An author-side line-length precheck against the swift-format default of 100 columns. It is not the lint gate and is not claimed as one."
+      },
+      {
+        "command": "git diff --check",
+        "status": "passed_weak",
+        "exitCode": 0,
+        "result": "No output. Weak evidence: every M1-036 path is untracked, so the unstaged diff this command inspects contains none of them."
+      },
+      {
+        "command": "git diff --no-index --check /dev/null <path>, once per path",
+        "status": "passed",
+        "paths": [
+          "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+          "docs/components/M1-036-mac-mouse-move-injector.md",
+          "evidence/issues/M1-036/summary.md",
+          "evidence/issues/M1-036/manual.md",
+          "evidence/issues/M1-036/commands.json",
+          "evidence/issues/M1-036/manual-result.json",
+          "evidence/issues/M1-036/environment.json",
+          "evidence/issues/M1-036/tests/results.json",
+          "evidence/issues/M1-036/tests/red-phase.json"
+        ],
+        "result": "No output for any path, so no whitespace error was reported in the untracked files themselves. commands.json was checked before this entry was added."
+      }
+    ],
+    "notClaimed": [
+      "compilation of the corrected test file",
+      "any test result for the corrected test file",
+      "swift format lint for the corrected test file",
+      "xcodebuild, make verify, make docs-check, code-quality, validate_package and architecture-check for the corrected tree",
+      "any execution of the Tier-H probe, either action"
+    ],
+    "rootReviewerRunReported": {
+      "command": "env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "result": "Reported by the root reviewer as passed with 29 tests, 2 manual probes skipped, against the files of this correction session. Relayed, not an author run."
+    }
+  },
+  "cursorObservationCorrectionSession": {
+    "historyStatus": "superseded_by_reviewerFinalResults",
+    "observedOn": "2026-09-23",
+    "author": "Claude Opus 5",
+    "correction": "Root reviewer finding: the probe's 'case .some(origin)' read-back switch was judged unsafe. It is replaced by the pure helper manualProbeCursorObservation(readBack:origin:), which compares with explicit ==, and the new always-running test cursorObservationComparesTheReadBackWithTheOrigin covers equal, different and nil read-backs.",
+    "filesTouched": [
+      "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+      "docs/components/M1-036-mac-mouse-move-injector.md",
+      "evidence/issues/M1-036/summary.md",
+      "evidence/issues/M1-036/commands.json",
+      "evidence/issues/M1-036/tests/results.json"
+    ],
+    "productionSourceChanged": false,
+    "commands": [
+      {
+        "command": "env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "swift format lint Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "plutil -lint evidence/issues/M1-036/commands.json evidence/issues/M1-036/tests/results.json",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "jq empty evidence/issues/M1-036/commands.json evidence/issues/M1-036/tests/results.json",
+        "status": "passed",
+        "exitCode": 0,
+        "result": "No output: both files parse as JSON. Run before this entry was added; re-run after it in the same session."
+      },
+      {
+        "command": "git diff --no-index --check /dev/null Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "grep -c -E \".{101}\" Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+        "status": "passed",
+        "result": "0. A line-length precheck only, not the lint gate."
+      }
+    ],
+    "notClaimed": [
+      "compilation of the corrected test file",
+      "any test result after this correction",
+      "swift format lint after this correction",
+      "any execution of the Tier-H probe, either action"
+    ]
+  },
+  "coreGraphicsInitializationCorrectionSession": {
+    "historyStatus": "failed_superseded_by_pureUnitSeamCorrectionSession",
+    "observedOn": "2026-09-23",
+    "author": "Claude Opus 5",
+    "finding": "Root reviewer High finding, reproduced twice from a clean test process: 'env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform' builds, then the Swift Testing bundle hangs indefinitely before output. The reviewer's one-second /usr/bin/sample of the live helper showed several concurrent M1-036 tests blocked in makeOpaqueStubEvent or MacMouseMoveInjectionEnvironment.live.makeMouseMoveEvent -> SLEventCreate / SLEventCreateMouseEvent -> CGSEventSourceForID -> CGSScoreboard -> SLSServerPort -> _dispatch_once_wait / __ulock_wait, with other tests, including the real M1-035 trust-read test, concurrent. The reviewer terminated only the hung Swift test PIDs. Relayed by the reviewer; the author did not observe the hang.",
+    "correction": "Every automated M1-036 test-side CGEvent creation (opaque stub, recording platform live creation, explicit live-environment test) goes through SerializedTestEventCreation, one test-only NSLock in the test file. New always-running test everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate pins the boundary with a task-local observer. No sleep, retry, timeout, production lock or test-order dependence. The opt-in manual probe is outside the gate and was not run.",
+    "filesTouched": [
+      "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+      "docs/components/M1-036-mac-mouse-move-injector.md",
+      "evidence/issues/M1-036/summary.md",
+      "evidence/issues/M1-036/commands.json",
+      "evidence/issues/M1-036/tests/results.json"
+    ],
+    "productionSourceChanged": false,
+    "commands": [
+      {
+        "command": "swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests 2>&1 | grep ... | head -30",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This Bash command contains multiple operations. The following part requires approval: swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests 2>&1'."
+      },
+      {
+        "command": "env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "status": "not_attempted",
+        "result": "Not attempted by the author after swift build was refused. The reviewer's run of this gated tree hung again; see reviewerResolution."
+      }
+    ],
+    "notClaimed": [
+      "compilation of the corrected test file",
+      "any test result after this correction, including that the hang is gone",
+      "swift format lint after this correction",
+      "any execution of the Tier-H probe, either action"
+    ],
+    "reviewerAction": "In a clean process, run 'env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform' and the exact frozen form, and confirm completion without a warm-up run: 31 declared tests, 29 executed, 2 default-skipped Tier-H probes, 0 failures.",
+    "reviewerResolution": "failed_superseded_by_pureUnitSeamCorrectionSession"
+  },
+  "pureUnitSeamCorrectionSession": {
+    "historyStatus": "resolved_by_reviewerFinalResults",
+    "observedOn": "2026-09-23",
+    "author": "Claude Opus 5",
+    "finding": "Relayed by the reviewer; the author did not observe it. The gated tree built successfully and a clean full suite hung again. The post-fix /usr/bin/sample showed one M1-036 thread owning SerializedTestEventCreation while blocked in SLEventCreate -> CGSScoreboard -> SLSServerPort initialization, two ordinary M1-035 tests concurrently blocked in hasAuthorizationForControlComputer -> TCCAccessRequest, and every other M1-036 event test waiting behind the test lock. Serializing only M1-036 event creation cannot break this cross-framework initialization cycle.",
+    "correction": "MacMouseMoveInjectionEnvironment now creates and posts an opaque internal MacMouseMoveEventHandle with identity equality. The live value wraps the real CGEvent from CGEventCreateMouseEvent and posts exactly that event, so CoreGraphics calls, arguments and order are unchanged; only the live seam in MacMouseMoveInjector.swift can wrap or unwrap an event. SerializedTestEventCreation, its boundary test, the opaque stub helper and the always-running live-creation test were removed. Ordinary tests create only MacMouseMoveEventHandle.synthetic() handles, which wrap no event. Real creation and posting remain only in the opt-in Tier-H probe, with pre-creation, restore through the injector, cleanup-only fallback, no sleep and closed vocabulary unchanged. New always-running tests: syntheticHandlesAreEqualOnlyToThemselves and the static source audit onlyTheTierHLiveRegionNamesLiveEventCreationPostingOrTheProductionSeam. M1-035 is not modified. No production or global lock, sleep, retry, unsafeBitCast, fake CF object or test-order dependence.",
+    "filesTouched": [
+      "Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift",
+      "Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+      "docs/components/M1-036-mac-mouse-move-injector.md",
+      "evidence/issues/M1-036/summary.md",
+      "evidence/issues/M1-036/commands.json",
+      "evidence/issues/M1-036/tests/results.json"
+    ],
+    "productionSourceChanged": true,
+    "productionSourceChangeScope": "Internal event-handle seam only. No package or public declaration changed, and no CGEvent, CGPoint or handle reaches the package surface.",
+    "commands": [
+      {
+        "command": "swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'."
+      },
+      {
+        "command": "grep -n -E '<live-token pattern>' Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift",
+        "status": "not_run_permission_refused",
+        "result": "Refused before start: 'This command requires approval'. The live-token check was done by reading the file only."
+      },
+      {
+        "command": "env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+        "status": "not_attempted",
+        "result": "Not attempted by the author after swift build was refused. The root reviewer's clean-process run is recorded in reviewerFinalResults."
+      }
+    ],
+    "notClaimed": [
+      "any author compilation or test run of the corrected production source or test file",
+      "any author execution of the Tier-H probe, either action"
+    ],
+    "reviewerResolution": "Resolved. The root reviewer's build exited 0 and the clean ordinary suite exited 0 with 31 declared, 29 ran, 2 manual probes skipped, 0 failures, with no warm-up run and no hang. See reviewerFinalResults."
+  },
+  "reviewerFinalResults": {
+    "status": "final_reviewer_reported",
+    "source": "Reported by the root reviewer, the separate executor that reviews, validates and commits; not an independent external model. The author, Claude Opus 5, transcribed these values and ran none of them. Where the reviewer reported no value, the field says so rather than supplying one.",
+    "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+    "evidenceTimeUtc": "2026-09-23T01:34:27Z",
+    "build": {
+      "command": "swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Build complete in 3.56s; no compile errors or warnings from repository code."
+    },
+    "ordinarySuite": {
+      "command": "env -u MACKVM_M1_036_MANUAL_PROBE -u MACKVM_M1_035_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "form": "equivalent",
+      "exitCode": 0,
+      "status": "passed",
+      "declaredTests": 31,
+      "executedTests": 29,
+      "skippedManualProbes": 2,
+      "failures": 0,
+      "swiftTestingRunSeconds": 0.006,
+      "result": "Clean ordinary suite after the pure-unit event-handle correction; no hang."
+    },
+    "xcodebuildWorkspace": {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "runOrder": "post_commit_after_evidence_edits",
+      "runOrderDetail": "Run by the root reviewer after implementation commit dbc45d4e04942a03a6e73b86420801802369673f and after the current evidence edits.",
+      "finalLine": "** BUILD SUCCEEDED **",
+      "selectedDestination": "Local Apple Silicon macOS destination; target arm64-apple-macos14.0 built successfully.",
+      "nonFatalWarnings": [
+        "Supported platforms were empty in IDERunDestination metadata.",
+        "Multiple matching macOS destinations were found and the first was selected."
+      ],
+      "approvalNote": "The first approval attempt timed out before any execution result, so it is not a build run and not a build failure. A single retry ran and passed."
+    },
+    "makeVerify": {
+      "command": "make verify",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "authoritative": true,
+      "runOrder": "post_commit_after_evidence_edits",
+      "runOrderDetail": "Rerun by the root reviewer after the current evidence edits, with HEAD still implementation commit dbc45d4e04942a03a6e73b86420801802369673f. This is the authoritative final make verify; the earlier pre-commit sweep is retained as history in makeVerifyPreCommitHistory.",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "reportPath": "artifacts/ci/m1-008-report.json",
+      "reportPathNote": "artifacts/ is Git-ignored; the report is not committed and not part of this evidence package.",
+      "reportCommitField": "dbc45d4e04942a03a6e73b86420801802369673f",
+      "reportOverallStatus": "passed",
+      "reportStartedAt": "2026-09-23T01:50:05.271+00:00",
+      "reportEndedAt": "2026-09-23T01:50:38.557+00:00",
+      "reportTimesNote": "Start and end times were read by the author from the ignored report; the commit field, overall status, gate count and durations were reported by the root reviewer and match that report.",
+      "gateDurationsMs": {
+        "manifest-validation": 53,
+        "docs-check": 126,
+        "architecture-check": 334,
+        "code-quality": 2577,
+        "tool-test-discovery": 48,
+        "evidence-test-discovery": 47,
+        "tool-test:architecture-check/tests/test_architecture_check.py": 605,
+        "tool-test:async-harness/tests/test_async_harness.py": 327,
+        "tool-test:cigates/tests/test_cigates.py": 318,
+        "tool-test:code-quality/tests/test_code_quality.py": 62,
+        "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py": 231,
+        "tool-test:docs-check/tests/test_docs_check.py": 133,
+        "evidence-test:M1-023/tests/test_register.py": 43,
+        "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py": 41,
+        "swift-package-test:KVMContracts": 467,
+        "swift-package-test:MacPlatform": 3290,
+        "repository-contract-tests": 22743,
+        "swift-test-targets": 701,
+        "native-arm64-build": 934
+      }
+    },
+    "makeVerifyPreCommitHistory": {
+      "historyStatus": "superseded_by_makeVerify",
+      "command": "make verify",
+      "form": "exact",
+      "exitCode": 0,
+      "status": "passed",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "reportPath": "artifacts/ci/m1-008-report.json",
+      "reportPathNote": "The same ignored path was overwritten by the post-commit run; the values below were read before that and are history.",
+      "reportStartedAt": "2026-09-23T01:31:39.424+00:00",
+      "reportEndedAt": "2026-09-23T01:32:13.912+00:00",
+      "reportCommitField": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
+      "runOrder": "pre_commit",
+      "runOrderDetail": "Read by the author from the ignored report: its commit field is the base commit and it ended at 2026-09-23T01:32:13Z, before implementation commit dbc45d4e04942a03a6e73b86420801802369673f was created at 2026-09-23T01:33:30Z. The gates therefore ran against the working tree that became the implementation commit, not against a checkout of the commit. Superseded by the post-commit run in makeVerify.",
+      "sandboxNote": "Run outside the nested Codex sandbox. The first sandboxed attempt failed only with 'sandbox-exec: sandbox_apply: Operation not permitted'; that environment attempt is not a product failure.",
+      "gateDurationsMs": {
+        "manifest-validation": 51,
+        "docs-check": 107,
+        "architecture-check": 239,
+        "code-quality": 3119,
+        "tool-test-discovery": 45,
+        "evidence-test-discovery": 45,
+        "tool-test:architecture-check/tests/test_architecture_check.py": 547,
+        "tool-test:async-harness/tests/test_async_harness.py": 303,
+        "tool-test:cigates/tests/test_cigates.py": 278,
+        "tool-test:code-quality/tests/test_code_quality.py": 60,
+        "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py": 212,
+        "tool-test:docs-check/tests/test_docs_check.py": 107,
+        "evidence-test:M1-023/tests/test_register.py": 40,
+        "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py": 39,
+        "swift-package-test:KVMContracts": 753,
+        "swift-package-test:MacPlatform": 3646,
+        "repository-contract-tests": 22827,
+        "swift-test-targets": 1074,
+        "native-arm64-build": 894
+      }
+    },
+    "stagedWhitespace": {
+      "command": "git diff --cached --check",
+      "runOrder": "pre_commit",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "No output."
+    },
+    "jsonParse": {
+      "command": "jq on every M1-036 JSON file",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    "tierHProbe": {
+      "status": "passed",
+      "detail": "manualProbeCommands.reviewerRuns, manual-result.json and manual-output.log."
+    },
+    "notReported": [],
+    "notReportedNote": "Every Required Command has a reviewer-reported result.",
+    "fiveAxisReview": {
+      "reviewer": "root reviewer",
+      "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "mediumUnresolved": 0,
+        "low": 1
+      },
+      "lowFinding": "Live CoreGraphics creation semantics are exercised only by the opt-in Tier-H probe, not by ordinary unit tests. Intentional, to avoid the proven clean-process CoreGraphics/TCC initialization deadlock; the successful real probe closes acceptance for this Issue. Retained as a documented test-boundary limitation, not a blocking defect.",
+      "axes": {
+        "sourceValidityAndTraceability": "pass: GitHub Issue 28 re-read, dependencies 10 and 23 previously closed, canonical/frozen architecture unchanged.",
+        "productAndArchitecture": "pass: KVMEvent-only boundary, protocol/core separation, no Barrier/network, M1-039 retains coordinate mapping, no public API added, no MainActor.",
+        "securityFailSafeCompatibility": "pass: accessibility denial and event-creation failure fail closed, no sensitive logs, restore safety verified, TLS untouched.",
+        "testsAndAcceptance": "pass with the results in this object.",
+        "scopeHygieneRollback": "pass: only the three Exact Files plus evidence, protected artifacts excluded, rollback is PR revert."
+      }
+    }
+  }
+}

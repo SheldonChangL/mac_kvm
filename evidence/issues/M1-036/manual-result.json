@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "artifactKind": "manual-verification-result",
+  "status": "reviewer_verified",
+  "statusMeaning": "The root reviewer executed the Tier-H probe on real macOS at the implementation commit and reported both runs below. The author executed none of these runs, moved no cursor, observed no OS behavior, and transcribed the reviewer's report only.",
+  "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+  "branch": "feat/m1-036-mac-mouse-move-injector",
+  "evidenceTimeUtc": "2026-09-23T01:34:27Z",
+  "evidenceTimeNote": "UTC time reported by the reviewer after both probe runs had completed. No per-run clock time was reported, so none is recorded and none is invented.",
+  "source": "root-reviewer",
+  "sourceNote": "Executed and reported by the root reviewer, the separate executor that reviews, validates and commits. The root reviewer is not an independent external model. The implementation author is Claude Opus 5.",
+  "probe": {
+    "test": "manualRealInjectionProbeRunsOneReviewerSelectedAction",
+    "environmentVariable": "MACKVM_M1_036_MANUAL_PROBE",
+    "actions": [
+      "read-origin",
+      "move-and-restore"
+    ],
+    "outputLineFormat": "M1-036 manual probe: action=<action> origin=<origin> preparation=<preparation> move=<step> restore=<step> cleanup=<cleanup> cursor=<cursor>",
+    "outputArtifact": "manual-output.log",
+    "outputArtifactNote": "manual-output.log contains exactly the two sanitized probe lines of the runs below, in run order, and nothing else."
+  },
+  "closedVocabulary": {
+    "action": [
+      "read-origin",
+      "move-and-restore"
+    ],
+    "origin": [
+      "readable",
+      "unreadable"
+    ],
+    "preparation": [
+      "notAttempted",
+      "eventsPrepared",
+      "eventCreationFailed"
+    ],
+    "moveAndRestoreStep": [
+      "notAttempted",
+      "postRequested",
+      "permission.accessibilityDenied",
+      "permission.capabilityUnavailable",
+      "lifecycle.subsystemUnavailable",
+      "internal.unclassified",
+      "internal.preconditionFailed"
+    ],
+    "moveAndRestoreStepNote": "Applies to both the move and the restore field. postRequested records a post request only; CGEventPost returns void and posting is asynchronous, so delivery is never claimed.",
+    "cleanup": [
+      "notRequired",
+      "fallbackPostRequested"
+    ],
+    "cleanupNote": "fallbackPostRequested means the target post was requested, the injector's restore requested none, and the probe's cleanup-only fallback requested the pre-created origin restore directly. The run exits 1 and the reviewer records it as a finding.",
+    "cursor": [
+      "matchesOrigin",
+      "differsFromOrigin",
+      "unreadable",
+      "notObserved"
+    ],
+    "commandForm": [
+      "exact",
+      "equivalent"
+    ],
+    "verdict": [
+      "passed",
+      "failed"
+    ]
+  },
+  "runs": [
+    {
+      "index": 1,
+      "action": "read-origin",
+      "command": "MACKVM_M1_036_MANUAL_PROBE=read-origin swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction",
+      "commandForm": "exact",
+      "exitCode": 0,
+      "probeTestDurationSeconds": 0.025,
+      "origin": "readable",
+      "preparation": "notAttempted",
+      "move": "notAttempted",
+      "restore": "notAttempted",
+      "cleanup": "notRequired",
+      "cursor": "notObserved",
+      "verdict": "passed",
+      "establishes": "The real cursor position is readable from the SwiftPM test process, and read-origin injects nothing."
+    },
+    {
+      "index": 2,
+      "action": "move-and-restore",
+      "command": "MACKVM_M1_036_MANUAL_PROBE=move-and-restore swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction",
+      "commandForm": "exact",
+      "exitCode": 0,
+      "probeTestDurationSeconds": 0.057,
+      "origin": "readable",
+      "preparation": "eventsPrepared",
+      "move": "postRequested",
+      "restore": "postRequested",
+      "cleanup": "notRequired",
+      "cursor": "matchesOrigin",
+      "verdict": "passed",
+      "establishes": "Through the real MacMouseMoveInjector.inject path and MacMouseMoveInjectionEnvironment.live: the live seam created both the target and the origin restore events before any post; the injector's Accessibility trust read passed, because move=postRequested is reachable only after it; the target post and the origin restore post were both requested; no cleanup fallback was required; and the immediate read-back matched the origin.",
+      "doesNotEstablish": "Delivery of either posted event. CGEventPost returns void and posting is asynchronous, so postRequested and matchesOrigin are a post request and an immediate observation, not a delivery guarantee. Nothing here is evidence about coordinate mapping, normalization, multi-display behavior or Retina scaling, which M1-039 owns, because the probe supplies its own position resolver."
+    }
+  ],
+  "reviewerObservation": {
+    "cursorRestored": true,
+    "immediateReadBackMatchedOrigin": true,
+    "cleanupFallbackRequired": false,
+    "note": "The reviewer reported that the cursor was restored and that the immediate closed readback also matched the original position."
+  },
+  "notExecuted": [
+    {
+      "action": "bogus-action",
+      "status": "not_executed",
+      "reason": "Optional unknown-action step. Not run because fail-closed parsing is covered by the always-running ordinary test manualProbeSelectionFailsClosedAndIsSkippedByDefault, which passed in the reviewer's ordinary suite."
+    }
+  ],
+  "tierHVerdict": "passed",
+  "tierHVerdictBasis": "The Acceptance Criterion 'Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證' is met: the root reviewer, not the author, executed both probe actions on real macOS at commit dbc45d4e04942a03a6e73b86420801802369673f, exit 0 each, and confirmed restore and fail-safe cleanup behavior.",
+  "sanitizationRule": "Only closed vocabulary from closedVocabulary, exact command strings, exit codes and durations are recorded. No coordinate, device unique identifier, user name, absolute home path, screenshot, platform error string, typed text, clipboard payload, or secret appears in this file or in manual-output.log.",
+  "artifactPolicy": {
+    "sanitizedLog": "manual-output.log",
+    "machineReadableResult": "manual-result.json",
+    "screenshotOrVideo": "none-stored",
+    "screenshotOrVideoRationale": "A capture would add the reviewer's screen contents to the repository without strengthening the result, which is carried by the exit codes and the closed probe fields."
+  },
+  "knownLimitationsToCarry": [
+    "CGEventPost returns void and posting is asynchronous, so the cursor field is an observation of an immediate read-back, not a delivery assertion.",
+    "The probe validates the production seams inside the SwiftPM test process, not the final application's signing identity. macOS Accessibility authorization is identity-specific.",
+    "Live CoreGraphics event creation and posting are exercised only by this opt-in Tier-H probe, not by ordinary unit tests; see summary.md Remaining risks."
+  ]
+}
