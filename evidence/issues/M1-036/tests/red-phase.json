@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "phase": "red",
+  "branch": "feat/m1-036-mac-mouse-move-injector",
+  "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
+  "implementationCommit": "pending",
+  "implementationCommitNote": "Not stamped. The author never writes to .git. The reviewer creates the commit; the SHA is transcribed afterwards.",
+  "recordedBefore": "Any content existed in Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift. The Sources directory held only AccessibilityPermissionService.swift (M1-035) and MacPlatform.swift, the pre-existing boundary-only source, verified by listing the directory in the same shell session immediately before this record was written.",
+  "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+  "commandForm": "equivalent",
+  "commandNote": "The exact frozen form is 'swift test --package-path Packages/MacPlatform'. It cannot evaluate a package manifest in this author session: it fails at manifest compilation with 'sandbox-exec: sandbox_apply: Operation not permitted' before any test target is built, so it cannot produce a red observation at all. The --disable-sandbox equivalent was used. It disables only SwiftPM's own nested sandbox and changes no package identity, target ownership, test selection, or assertion. See environment.json authorEnvironmentLimitations.",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "startedAt": "2026-09-22T06:39:43.000Z",
+  "endedAt": "2026-09-22T06:39:45.000Z",
+  "failureType": "SwiftCompilationError",
+  "failureStage": "emit-module",
+  "compilerErrorLineCount": 98,
+  "missingSymbolErrorCounts": {
+    "cannot find type 'MacMouseMoveInjector' in scope": 6,
+    "cannot find 'MacMouseMoveInjector' in scope": 4,
+    "cannot find 'MacMouseMoveInjectionEnvironment' in scope": 2,
+    "cannot find 'MacPlatformPositionResolver' in scope": 2
+  },
+  "cascadeErrorCounts": {
+    "cannot infer contextual base in reference to member": 66,
+    "note": "Cascade only. With the injector type absent the compiler cannot infer the contextual base of the frozen CoreError, KVMEvent and CGEventType member references the assertions use, so each asserted taxonomy value is reported as its own error."
+  },
+  "distinctMissingSymbols": [
+    "MacMouseMoveInjector",
+    "MacMouseMoveInjectionEnvironment",
+    "MacPlatformPositionResolver"
+  ],
+  "failureReason": "MacMouseMoveInjectorTests referenced the injector, its injected platform-position resolver, and its macOS event seam before any of them existed, so the test target failed to compile at emit-module and no assertion could be evaluated. No production file was created before this observation was recorded.",
+  "whyThisIsObjective": [
+    "The failure is a missing-symbol compile failure naming the three types the Issue requires, not a soft or interpretable result: exit code 1, zero assertions evaluated.",
+    "The assertions cannot be satisfied by a hard-coded success. The happy path asserts the exact ordered seam call log [trustCheck, resolvePosition, makeEvent, post] together with object identity between the created and the posted event, so an implementation that skips the trust read, skips the resolver, re-creates the event, or posts at a different tap fails.",
+    "Every failure path asserts the exact frozen CoreError code, domain, severity, retryDisposition and cleanupDisposition and the absence of an underlying diagnostic code, plus the exact truncated call log, so an implementation that returns a generic error or that keeps working after a failure fails.",
+    "The permission case asserts equality with AccessibilityTrustState.notTrusted.actionableFailure, the value M1-035 already emits, so a second permission error shape fails.",
+    "The boundary case asserts the resolver receives the NormalizedPoint value unchanged, so an implementation that clamps, scales, flips, or maps coordinates fails. That is M1-039's ownership, not this Issue's.",
+    "The privacy case asserts the encoded failure carries exactly four closed keys and contains neither the injected platform coordinate digits nor the domain coordinate digits nor any platform type name, so an implementation that attaches platform text or coordinates fails.",
+    "The detached case runs the whole call inside Task.detached and asserts it did not execute on the main thread, so annotating the type or the method @MainActor fails to compile."
+  ],
+  "regressionBaseline": "The 12 pre-existing MacPlatform tests, 11 executed cases plus the default-skipped M1-035 Tier-H probe, passed on the unmodified base commit ce06b3b0976366a47f4158d4fe2a28dc9bc72601 with the same equivalent command form, and are unchanged by this Issue.",
+  "remediation": "Added Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift with the injector, the injected platform-position resolver and its fail-closed production default, and the two-call macOS event seam with its live default. See results.json for the green run.",
+  "reviewCorrectionRedPhase": {
+    "status": "not_executed",
+    "reason": "The correction session's permission policy refused every swift invocation, so no red observation exists for the review correction and none is claimed.",
+    "editOrder": "Not test-first, recorded as it happened. The correction was made in three edits: (1) the makePermissions helper, which makeInjector now calls with trustedChecks .max or 0 in place of its inline Bool trust seam; (2) the probe's closed-vocabulary result types, ManualProbePostLedger and manualProbeLine; (3) manualProbeInjector, performManualMoveAndRestore, recordingPlatform and the four sequencing tests, in one edit. No suite run separated the tests from the harness code they exercise.",
+    "whyNoRedIsManufactured": "The correction is to Tier-H test harness code inside the Exact Test File, not to production behavior. The new tests constrain that harness; a red phase for them can only be produced by the reviewer, for example by reverting the cleanup branch in performManualMoveAndRestore and observing cleanupRequestsTheRestorePostWhenTheInjectorRestoreFails fail.",
+    "productionCodeChanged": false,
+    "productionCodeNote": "The correction changed only the Exact Test File, the component document and this evidence package. MacMouseMoveInjector.swift is unchanged, so the original red phase above still covers every production behavior."
+  },
+  "postRedTestFileEdits": {
+    "count": 1,
+    "detail": "One assertion in productionDefaultResolvesNoPlatformPositionSoNothingIsEverPosted was given an explicit [CoreErrorCode] type annotation. Under the red build the array literal had no inferable element type, which the compiler reported as \"missing argument label 'where:' in call\" on Array.contains. The annotation changes no asserted value.",
+    "notADilution": "No assertion was removed, relaxed, or made conditional between the red and green runs."
+  }
+}

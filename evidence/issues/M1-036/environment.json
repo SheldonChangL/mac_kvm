@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "role": "author",
+  "recordedAt": "2026-09-22T07:10:00.000Z",
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "kernelRelease": "25.6.0"
+  },
+  "hardware": {
+    "architecture": "arm64",
+    "model": "not_captured",
+    "cpuBrand": "not_captured",
+    "rosettaTranslated": "not_captured",
+    "note": "sysctl hw.model, machdep.cpu.brand_string and sysctl.proc_translated are refused in the author sandbox. The values are deliberately not reconstructed and no device unique identifier is recorded anywhere in this package. uname -m reports arm64."
+  },
+  "toolchain": {
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDriverVersion": "1.127.14.1",
+    "swiftFormatVersion": "6.2.3",
+    "pythonVersion": "3.9.6",
+    "xcodeVersion": "Xcode 26.2",
+    "xcodeBuildVersion": "17C52",
+    "macOSSDKVersion": "26.2",
+    "targetTriple": "arm64-apple-macosx26.0"
+  },
+  "repository": {
+    "branch": "feat/m1-036-mac-mouse-move-injector",
+    "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
+    "baseCommitNote": "Verified by the author with git rev-parse HEAD in this session. It is the merge commit of GitHub Issue #23 / M1-035.",
+    "implementationCommit": "pending",
+    "implementationCommitNote": "Not stamped and not guessed. The author never writes to .git. The reviewer creates the commit; the SHA is transcribed afterwards."
+  },
+  "dependencyVerification": {
+    "method": "Re-checked by the author in this session rather than accepted from the dispatch note.",
+    "M1-013": {
+      "consumedFrom": "Packages/KVMContracts/Sources/KVMContracts/KVMEvent.swift",
+      "factsRelied": "KVMEvent declares exactly seven cases, of which mouseMove(position: NormalizedPoint) is the one this injector accepts. NormalizedPoint's initializer maps NaN to 0 and clamps into 0...1, which is why the boundary test asserts the resolver receives the already-normalized value.",
+      "evidenceReadable": "evidence/issues/M1-013 contains summary.md, commands.json and tests/, all readable."
+    },
+    "M1-035": {
+      "consumedFrom": "Packages/MacPlatform/Sources/MacPlatform/AccessibilityPermissionService.swift",
+      "factsRelied": "AccessibilityPermissionService is package, Sendable and immutable; currentTrustState() reads trust without prompting; AccessibilityTrustState.notTrusted.actionableFailure is the frozen permission.accessibilityDenied CoreError this injector returns verbatim; and the internal AccessibilityPermissionEnvironment seam makes the denial path testable without depending on real machine trust.",
+      "evidenceReadable": "evidence/issues/M1-035 contains summary.md, commands.json, environment.json, manual.md, manual-result.json, manual-output.log and tests/, all readable."
+    },
+    "frozenTaxonomy": {
+      "consumedFrom": "Packages/KVMContracts/Sources/KVMContracts/CoreErrors.swift",
+      "factsRelied": "Every CoreErrorCode case, severity, retry and cleanup value this Issue emits already exists in the M1-015 taxonomy. No taxonomy case, diagnostics catalog entry, or underlying diagnostic code was added."
+    }
+  },
+  "sdkFactsVerifiedOnThisHost": {
+    "source": "MacOSX26.2.sdk CoreGraphics.framework/Headers, read directly by the author on this host.",
+    "CGEventCreateMouseEvent": "CG_EXTERN CGEventRef __nullable CGEventCreateMouseEvent(CGEventSourceRef __nullable source, CGEventType mouseType, CGPoint mouseCursorPosition, CGMouseButton mouseButton) API_AVAILABLE(macos(10.4));",
+    "eventSourceNullable": "The event source may be taken from another event, or may be NULL.",
+    "cursorPositionSemantics": "'mouseCursorPosition' should be the position of the mouse cursor in global coordinates.",
+    "mouseButtonIgnored": "'mouseButton' is ignored unless 'mouseType' is one of 'kCGEventOtherMouseDown', 'kCGEventOtherMouseDragged', or 'kCGEventOtherMouseUp'.",
+    "mouseButtonConsequence": "A mouse-moved event is none of those three, so the button argument passed by the live seam is documented-ignored rather than meaningful, and no button state is introduced by this Issue.",
+    "CGEventPost": "CG_EXTERN void CGEventPost(CGEventTapLocation tap, CGEventRef __nullable event) API_AVAILABLE(macos(10.4));",
+    "CGEventPostReturnsVoid": "The declaration returns void, so the SDK reports neither success nor failure of posting. This is the documented limitation recorded in the component document and is why the success value is named postRequested.",
+    "CGEventPostSemantics": "This function posts the specified event immediately before any event taps instantiated for that location, and the event passes through any such taps.",
+    "tapLocations": "typedef CF_ENUM(uint32_t, CGEventTapLocation) { kCGHIDEventTap = 0, kCGSessionEventTap, kCGAnnotatedSessionEventTap };",
+    "CGEventCreate": "Return a new event using the event source 'source'. If 'source' is NULL, the default source is used.",
+    "CGEventGetLocation": "Return the location of an event in global display coordinates. CGPointZero is returned if event is not a valid CGEventRef.",
+    "readBackUsage": "CGEventCreate plus CGEventGetLocation is how the Tier-H probe reads the current cursor position. It is used only by the default-skipped probe, never by production code and never by an automated assertion."
+  },
+  "displayAndInput": {
+    "applicable": false,
+    "authorReason": "Every automated test substitutes both macOS event seams, so no display topology, scale factor, or keyboard layout affects any automated result. No automated test posts an event, so no automated result depends on the cursor or on display geometry.",
+    "reviewerRequirement": "Display/layout metadata must be captured by the reviewer during the Tier-H manual probe recorded in manual.md, because that is the only step that moves a real cursor. Keyboard layout is not applicable: this Issue introduces no keyboard behavior.",
+    "reviewerOutcome": "pending"
+  },
+  "network": {
+    "applicable": false,
+    "reason": "M1-036 performs no network, transport, TLS, or peer communication. No peer, server build, or wire version participates in this Issue."
+  },
+  "peer": {
+    "applicable": false,
+    "reason": "No Barrier or Native Protocol peer is involved."
+  },
+  "accessibilityGrantState": {
+    "authorObservation": "not_recorded",
+    "reason": "The author's automated run never depends on it: the denial path is driven through the substituted M1-035 seam, and the two production-default tests are written to pass in either trust state without creating or posting an event. No trust state is claimed."
+  },
+  "authorEnvironmentLimitations": {
+    "swiftPackageManagerSandbox": "SwiftPM manifest evaluation fails in this session with 'sandbox-exec: sandbox_apply: Operation not permitted'. The exact frozen form 'swift test --package-path Packages/MacPlatform' therefore cannot produce an authoritative result here, and neither can the code-quality gate's 'swift test -Xswiftc -warnings-as-errors'. The --disable-sandbox equivalents were run instead and are labelled as such in commands.json. --disable-sandbox disables only SwiftPM's own nested sandbox; it changes no package identity, target ownership, test selection, or assertion.",
+    "xcodebuildWorkspace": "xcodebuild reports \"'MacKVM.xcworkspace' is not a workspace file\" and exits 66. M1-035 established by pristine-export reproduction that this is environmental and pre-existing; the workspace files are untouched by this Issue.",
+    "stuckTestProcess": "During the author sweep one 'swift test' invocation was terminated by the harness while its test binary was running. The orphaned test process held the Packages/MacPlatform/.build lock, so two subsequent invocations produced no test output until the orphan was cleared. This is a harness artifact of the author session, not a product behavior: after clearing it the same command exited 0 in about one second. No assertion, timeout, sleep, or retry was added to the product or to the tests in response.",
+    "consequence": "No blocked command is claimed as passing on the strength of an author run. Every blocked exact form is listed in commands.json reviewerPendingSummary.exactCommandsToRerun.",
+    "reviewCorrectionSession": "On 2026-09-23 the review-correction session, on the same host, could run only git and read-only file commands. Every swift, make, python3 and plutil invocation was refused by the session's permission policy before it started, so nothing was compiled, tested, linted or JSON-validated by tool in that session. See commands.json reviewCorrectionSession."
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-036",
+  "githubIssue": 28,
+  "status": "pending_reviewer",
+  "statusMeaning": "No manual verification has been performed. The author executed no real injection, moved no cursor, and observed no OS behavior. This file exists as the machine-readable slot the reviewer fills after running the Tier-H probe; every field below is deliberately empty rather than pre-filled with a plausible value.",
+  "commit": "pending",
+  "observationDay": "pending",
+  "reviewer": "pending",
+  "closedVocabulary": {
+    "action": [
+      "read-origin",
+      "move-and-restore"
+    ],
+    "origin": [
+      "readable",
+      "unreadable"
+    ],
+    "preparation": [
+      "notAttempted",
+      "eventsPrepared",
+      "eventCreationFailed"
+    ],
+    "moveAndRestoreStep": [
+      "notAttempted",
+      "postRequested",
+      "permission.accessibilityDenied",
+      "permission.capabilityUnavailable",
+      "lifecycle.subsystemUnavailable",
+      "internal.unclassified",
+      "internal.preconditionFailed"
+    ],
+    "moveAndRestoreStepNote": "Applies to both the move and the restore field. postRequested records a post request only; CGEventPost returns void, so delivery is never claimed.",
+    "cleanup": [
+      "notRequired",
+      "fallbackPostRequested"
+    ],
+    "cleanupNote": "fallbackPostRequested means the target post was requested, the injector's restore requested none, and the probe's cleanup-only fallback requested the pre-created origin restore directly. The run exits 1 and the reviewer records it as a finding.",
+    "cursor": [
+      "matchesOrigin",
+      "differsFromOrigin",
+      "unreadable",
+      "notObserved"
+    ]
+  },
+  "runs": [],
+  "authorRuns": {
+    "probeActionsExecuted": [],
+    "reason": "Both probe actions were left to the reviewer. read-origin injects nothing but is still a real-machine step, and move-and-restore moves the real cursor; the dispatch instruction is explicit that the author must not execute the real probe."
+  },
+  "sanitizationRule": "Only closed vocabulary from closedVocabulary may be recorded. No coordinate, device unique identifier, user name, absolute home path, screenshot, platform error string, typed text, clipboard payload, or secret may be added to this file.",
+  "knownLimitationsToCarry": [
+    "CGEventPost returns void and posting is asynchronous, so the cursor field is an unasserted observation of an immediate read-back. differsFromOrigin is an expected outcome of reading too early and is not a failure.",
+    "The probe validates the production seams inside the SwiftPM test process, not the final application's signing identity. macOS Accessibility authorization is identity-specific."
+  ]
+}
