@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-053",
+  "githubIssue": 29,
+  "commit": "5ca459acea932fd7324450d34224934ac12de22a",
+  "reviewer": "Codex root reviewer",
+  "reviewerDistinctFromAuthor": true,
+  "command": "env MACKVM_M1_053_MANUAL_PROBE=unique-pasteboard-round-trip swift test --package-path Packages/MacPlatform --filter manualUniquePasteboardProbeRunsTheRealAdapterPath",
+  "startedAt": "2026-09-23T05:54:05.060Z",
+  "endedAt": "2026-09-23T05:54:09.356Z",
+  "timestampNote": "UTC wrapper timestamps including orchestration overhead; not process runtime.",
+  "exitCode": 0,
+  "status": "passed",
+  "testsPassed": 1,
+  "failures": 0,
+  "reportedTestDurationSeconds": 0.014,
+  "pasteboard": {
+    "kind": "AppKit uniquely named private pasteboard",
+    "createdWith": "NSPasteboard.withUniqueName()",
+    "cleanup": "releaseGlobally() in defer",
+    "generalPasteboardTouched": false,
+    "nameRecorded": false
+  },
+  "sanitizedLine": "M1-053 manual probe: action=unique-pasteboard-round-trip initialRead=clipboard.unsupportedType markerWrite=written writeCountVsInitial=different readBack=markerMatched readCountVsWrite=equal oversizedWrite=clipboard.oversized countAfterOversizedVsWrite=equal readAfterOversized=markerMatched nonTextRead=clipboard.unsupportedType clearedRead=clipboard.unsupportedType",
+  "fields": {
+    "action": "unique-pasteboard-round-trip",
+    "initialRead": "clipboard.unsupportedType",
+    "markerWrite": "written",
+    "writeCountVsInitial": "different",
+    "readBack": "markerMatched",
+    "readCountVsWrite": "equal",
+    "oversizedWrite": "clipboard.oversized",
+    "countAfterOversizedVsWrite": "equal",
+    "readAfterOversized": "markerMatched",
+    "nonTextRead": "clipboard.unsupportedType",
+    "clearedRead": "clipboard.unsupportedType"
+  },
+  "matchesExpectedResult": true,
+  "verifies": [
+    "real AppKit read of UTF-8 plain text",
+    "real AppKit clear and write of UTF-8 plain text",
+    "real type advertisement for empty, plain-text and non-text content",
+    "real change count observed before read and after write",
+    "oversized write rejected before mutation on a real pasteboard",
+    "private pasteboard released in defer"
+  ],
+  "doesNotVerify": [
+    "general-pasteboard behavior",
+    "general-pasteboard access prompts under .default or .ask",
+    "a real .alwaysDeny state set in System Settings",
+    "app-bundle signing or permission identity"
+  ],
+  "screenshotOrVideo": "none; there is no UI and the closed machine-readable line records the observable path",
+  "privacy": "Closed vocabulary only. No clipboard text, bytes, hash, change-count value or pasteboard name is recorded."
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-053",
+  "githubIssue": 29,
+  "commit": "5ca459acea932fd7324450d34224934ac12de22a",
+  "reviewer": "Codex root reviewer",
+  "remediationAuthor": "Claude Opus 5.5",
+  "note": "Findings were found by the reviewer and fixed by the author before the implementation commit. They are history, not current failures.",
+  "history": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "category": "test-defect",
+      "command": "swift test --package-path Packages/MacPlatform",
+      "exitCode": 1,
+      "observed": {
+        "testsRun": 59,
+        "failedTests": 1,
+        "issues": 2,
+        "failedTest": "onlyTheTierHLiveRegionNamesARealPasteboard"
+      },
+      "cause": "The source audit's own expectation line above the Tier-H marker contained two forbidden tokens contiguously, so the audit matched its own source.",
+      "remediation": "Split every forbidden token into separate literals; the assertion was not removed or weakened.",
+      "status": "fixed",
+      "verification": "Current suite passes: 63 passed, 0 failures."
+    },
+    {
+      "id": "R2",
+      "severity": "high",
+      "category": "permission-scope",
+      "cause": "Explicit macOS 15.4+ NSPasteboard access behavior .alwaysDeny was not modeled, so a denied read degraded to internal.unclassified.",
+      "remediation": "Added an internal AppKit-free MacPasteboardReadAccess seam; the live seam maps only .alwaysDeny to explicitlyDenied behind if #available(macOS 15.4, *); readPlainText returns the frozen permission.capabilityUnavailable / error / userActionRequired / notRequired failure before any count, type or content observation; four deterministic tests added; writes are not blocked.",
+      "status": "fixed",
+      "verification": "Current suite passes: 63 passed, 0 failures. Real .alwaysDeny not exercised; see remainingRisks R-a."
+    },
+    {
+      "id": "R3",
+      "severity": "blocking",
+      "category": "formatting",
+      "command": "swift format lint --strict",
+      "observed": {
+        "findings": 3,
+        "lineLength": 2,
+        "trailingComma": 1
+      },
+      "remediation": "Formatting-only edits in the test file; no behavior or assertion change.",
+      "status": "fixed",
+      "verification": "make code-quality-check exit 0; strict lint 0 findings."
+    }
+  ],
+  "currentFindings": {
+    "critical": 0,
+    "high": 0,
+    "mediumUnresolved": 0
+  },
+  "remainingRisks": [
+    {
+      "id": "R-a",
+      "severity": "low",
+      "summary": "A real general-pasteboard .alwaysDeny state was not exercised; changing OS state and reading the global clipboard would be intrusive. Covered by the seam and compilation only.",
+      "status": "open"
+    },
+    {
+      "id": "R-b",
+      "severity": "low",
+      "summary": "changeCount is not an atomic transaction token; concurrent writers can change the pasteboard between observations.",
+      "status": "open"
+    },
+    {
+      "id": "R-c",
+      "severity": "low",
+      "summary": "NSPasteboard materializes the String before the byte limit can be checked.",
+      "status": "open"
+    },
+    {
+      "id": "R-d",
+      "severity": "low",
+      "summary": "The test file is intentionally verbose (1231 lines) and may carry maintainability cost; coverage and repository precedent support it.",
+      "status": "open"
+    }
+  ],
+  "remainingRisksNote": "None of these is permanently waived.",
+  "independentReviewComplete": false
+}
