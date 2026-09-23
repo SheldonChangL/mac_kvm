@@ -80,5 +80,28 @@
     }
   ],
   "remainingRisksNote": "None of these is permanently waived.",
-  "independentReviewComplete": false
+  "currentFindingsLow": 4,
+  "independentReviewComplete": true,
+  "independentReviewKind": "non-author Codex root reviewer review; not a human review",
+  "finalReview": {
+    "reviewer": "Codex root reviewer",
+    "distinctFromAuthor": true,
+    "humanReview": false,
+    "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+    "findings": {
+      "critical": 0,
+      "high": 0,
+      "mediumUnresolved": 0,
+      "low": 4,
+      "lowIds": ["R-a", "R-b", "R-c", "R-d"]
+    },
+    "axes": {
+      "sourceValidityAndTraceability": "pass: dependency Issues M1-035 and M1-052 closed; evidence readable; canonical, frozen and guardrail sources consistent; no conflict.",
+      "productAndArchitecture": "pass: Swift/AppKit MacPlatform backend only; no Barrier, NativeProtocol, network, KVMCore or UI change; package/internal only; no public contract.",
+      "securityFailSafeCompatibility": "pass: explicit alwaysDeny fails closed; no payload logging; redacted value; oversize rejected before mutation; ordered clear/write failure; macOS 14 availability safe; real unique-pasteboard cleanup passed.",
+      "testsValidationAcceptance": "pass: required commands passed at the implementation commit; Tier-H passed; make verify 19/19 at the evidence commit; every AC mapped.",
+      "scopeHygieneRollback": "pass: only the 3 Exact Files plus required evidence; secret and whitespace scans passed; owner artifacts not staged or modified; rollback additive; latest main unchanged; no merge conflict."
+    },
+    "historyPreserved": "R1, R2 (High) and R3 remain recorded above as fixed history."
+  }
 }

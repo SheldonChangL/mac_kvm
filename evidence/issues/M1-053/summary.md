@@ -7,7 +7,13 @@
 - Branch: `feat/m1-053-mac-pasteboard-adapter`
 - Base: `e84ecee5e269912e46298b3a48f8911c97f86c07`
 - Commit under test: `5ca459acea932fd7324450d34224934ac12de22a`
-- PR, CI and merge: **pending** at evidence creation.
+- Evidence commit verified: `b940d166bb68f1fa56572dc687bf5153cc6c6faf`
+- Status: **non-author review complete.** The Codex root reviewer's five-axis
+  review passed. `make verify` passed 19/19 at the evidence commit. Remote
+  `main` is still the base, with no merge conflict.
+- PR, GitHub CI and merge: **pending.** The evidence-finalization commit SHA is
+  not known yet. A final-head re-run and GitHub CI remain reviewer duties
+  before merge.
 - Authorship: **Claude Opus 5.5** authored all repository content: source,
   tests, the component document and this evidence. The **Codex root reviewer**
   found the review findings, ran every command and the Tier-H probe, and drove
@@ -57,7 +63,7 @@ modified, staged or deleted.
 | 1 | 所有 Focus 項目均有可定位的 implementation、test 或簽核證據 | **Met.** changeCount monitoring, plain-text read/write, and the permission/empty/invalid-data behaviors each have a source location and named tests. | component doc; `tests/results.json` `coverage` |
 | 2 | Happy path、boundary、invalid input、error/cancel/cleanup tests 全部通過 | **Met.** 63 passed, 0 failures, 3 opt-in probes skipped by default. Cancellation is not applicable (synchronous, no owned resource); cleanup and idempotency are covered by the repetition/recovery tests and the probe's `releaseGlobally()` defer. | `tests/results.json` |
 | 3 | Public behavior 與 CONTRACT_CATALOG／凍結 ADR 一致，沒有新增隱含 API | **Met.** Every declaration is `package` or narrower; no AppKit type on the package surface; no taxonomy case added; C-007 UTF-8-only and caller limit honored. Source/canonical/frozen review found no conflict. | component doc; source |
-| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at the implementation commit.** architecture-check 0; strict lint 0 findings; warnings-as-errors 0; xcodebuild `** BUILD SUCCEEDED **` with nonfatal destination warnings only, none attributed to M1-053; unit tests 0. `make verify` at the evidence head is **pending**. | `commands.json` |
+| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at the implementation commit.** architecture-check 0; strict lint 0 findings; warnings-as-errors 0; xcodebuild `** BUILD SUCCEEDED **` with nonfatal destination warnings only, none attributed to M1-053; unit tests 0. `make verify` 19/19 at evidence commit `b940d16`. | `commands.json` |
 | 5 | Production logs 不包含 typed text、clipboard payload、secret/private key 或可還原內容 | **Met.** No production logging call. Failure encoding, renderings, and `MacPasteboardText` redaction are tested. The probe output is closed vocabulary. | `tests/results.json` `privacy`; `manual-output.log` |
 | 6 | Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證 | **Met for the unique-pasteboard path:** the Codex root reviewer (not the author) ran the probe, which passed. **Not covered:** the general clipboard, access prompts, and a real `.alwaysDeny`. | `manual.md`; `tests/tier-h-probe.json` |
 
@@ -81,7 +87,8 @@ modified, staged or deleted.
 | 5 | `make architecture-check` | 0 | `commands.json` |
 | 6 | `make code-quality-check` | 0 — swift-format 6.2.3; strict lint 0; warnings-as-errors 0 | `commands.json` |
 | 7 | `git diff --check HEAD^ HEAD` | 0, no output | `commands.json` |
-| — | `make verify` at the evidence head | **pending** (reviewer) | — |
+| 8 | `git merge-tree FETCH_HEAD HEAD` at evidence commit `b940d16`, with remote `main` fetched at `e84ecee` (the base) | 0 — tree `0f57ab7a940359625fbebe7180d8c5e01ccc3cf3`, no conflict | `commands.json` |
+| 9 | `make verify` at evidence commit `b940d166bb68f1fa56572dc687bf5153cc6c6faf` | 0 — 19/19 gates passed; report `artifacts/ci/m1-008-report.json` (ignored), SHA-256 `ae6c6cd731704ed68be2cd7fa2b7b8f4c8ab9438916d456be3527d9ad54abc50` | `commands.json` `evidenceCommitCommands` |
 
 The timestamps in `commands.json` are UTC wrapper times that include
 orchestration overhead. They are not process-runtime claims.
@@ -132,8 +139,39 @@ orchestration overhead. They are not process-runtime claims.
 3. **Formatter: 3 findings** (two line-length, one trailing comma). Fixed with
    formatting-only edits.
 
-Current findings: Critical 0, High 0, Medium unresolved 0. **Independent review
-is not yet complete.** Details: `tests/review-findings.json`.
+## Final five-axis review (Codex root reviewer, evidence commit `b940d16`)
+
+This is a **non-author Codex review, not a human review.** The reviewer is
+distinct from the author.
+
+1. **Source validity and traceability: pass.** Dependency Issues M1-035 and
+   M1-052 are closed and their evidence is readable. The canonical, frozen and
+   guardrail sources are consistent, with no conflict.
+2. **Product and architecture: pass.** Only the Swift/AppKit `MacPlatform`
+   backend changed. There is no Barrier, NativeProtocol, network, KVMCore or UI
+   change. Declarations are package or internal only, and no public contract
+   is added.
+3. **Security, fail-safe and compatibility: pass.**
+   - An explicit `.alwaysDeny` fails closed.
+   - No payload is logged, and the read value is redacted.
+   - An oversized write is rejected before any mutation.
+   - A failed clear or write fails in a fixed order.
+   - The code is availability-safe on macOS 14.
+   - The real unique-pasteboard cleanup passed.
+4. **Tests, validation and acceptance: pass.** The required commands passed at
+   the implementation commit. The Tier-H probe passed. `make verify` passed
+   19/19 at the evidence commit. Every acceptance criterion is mapped.
+5. **Scope, hygiene and rollback: pass.**
+   - Only the 3 Exact Files and the required evidence changed.
+   - The secret and whitespace scans passed.
+   - The owner artifacts were not staged or modified.
+   - Rollback is additive.
+   - The latest `main` is unchanged, with no merge conflict.
+
+Current findings: Critical 0, High 0, Medium unresolved 0, **Low 4** — exactly
+the four listed under Known Limitations. The findings above remain on record as
+fixed history. **Independent (non-author) review: complete.** Details are in
+`tests/review-findings.json`.
 
 ## Scope exclusions (not implemented)
 
@@ -185,10 +223,11 @@ revert. None has been observed.
 ## Reviewer Required
 
 - **B:** full review of the implementation by a stronger model or an engineer.
-  The Codex root reviewer found and drove the three fixes; its final
-  independent verdict is **pending**.
+  The Codex root reviewer found and drove the three fixes. Its final non-author
+  five-axis review is **complete and passed**. It is a model review, not a human
+  review.
 - **H:** real-machine verification. The unique-pasteboard probe was executed
   by the reviewer and passed. General-clipboard prompts and a real
   `.alwaysDeny` remain unverified.
-- **No autonomous merge** (`low_model_autonomous_merge: false`). The
-  post-evidence `make verify`, the PR, CI and merge are pending.
+- **No autonomous merge** (`low_model_autonomous_merge: false`). The PR,
+  GitHub CI, merge, and a final-head re-run are pending as reviewer duties.

@@ -10,8 +10,9 @@
     "Packages/MacPlatform/Tests/MacPlatformTests/MacPasteboardAdapterTests.swift",
     "docs/components/M1-053-mac-pasteboard-adapter.md"
   ],
-  "status": "reviewer_reported_at_implementation_commit",
-  "statusNote": "Every command below was run by the Codex root reviewer at implementation commit 5ca459acea932fd7324450d34224934ac12de22a and transcribed by the author. The author, Claude Opus 5, had no shell tool in any M1-053 session and compiled, tested, linted or probed nothing. make verify at the eventual evidence head, PR, CI and merge are pending.",
+  "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+  "status": "reviewer_verified",
+  "statusNote": "Commands 1-7 were run by the Codex root reviewer at implementation commit 5ca459acea932fd7324450d34224934ac12de22a; the conflict check and make verify (19/19) were run by the same reviewer at evidence commit b940d166bb68f1fa56572dc687bf5153cc6c6faf. All were transcribed by the author, Claude Opus 5.5, who had no shell tool in any M1-053 session and ran nothing. PR, GitHub CI, merge and a final-head re-run remain pending.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus 5.5",
     "reviewer": "Codex root reviewer",
@@ -145,16 +146,75 @@
       "result": "no output"
     }
   ],
-  "pending": [
+  "evidenceCommitCommands": [
     {
-      "command": "make verify",
-      "status": "pending",
-      "note": "To be run by the reviewer at the eventual evidence head, after this evidence is committed."
+      "id": 8,
+      "command": "git merge-tree FETCH_HEAD HEAD",
+      "form": "conflict_check",
+      "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+      "startedAt": "2026-09-23T06:08:46.011Z",
+      "endedAt": "2026-09-23T06:08:49.802Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "fetchedRemoteMain": "e84ecee5e269912e46298b3a48f8911c97f86c07",
+        "remoteMainEqualsBranchBase": true,
+        "mergeTree": "0f57ab7a940359625fbebe7180d8c5e01ccc3cf3",
+        "conflicts": 0
+      }
     },
     {
-      "item": "pull request, CI, merge",
-      "status": "pending"
+      "id": 9,
+      "command": "make verify",
+      "form": "exact",
+      "evidenceCommit": "b940d166bb68f1fa56572dc687bf5153cc6c6faf",
+      "startedAt": "2026-09-23T06:09:04.809Z",
+      "endedAt": "2026-09-23T06:09:45.267Z",
+      "exitCode": 0,
+      "status": "passed",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "reportPath": "artifacts/ci/m1-008-report.json",
+      "reportPathNote": "Repository-relative; artifacts/ is Git-ignored and the report is not committed. The absolute path printed by the tool is deliberately not recorded.",
+      "reportSha256": "ae6c6cd731704ed68be2cd7fa2b7b8f4c8ab9438916d456be3527d9ad54abc50",
+      "gateDurationsMs": {
+        "manifest-validation": 68,
+        "docs-check": 129,
+        "architecture-check": 252,
+        "code-quality": 2573,
+        "tool-test-discovery": 48,
+        "evidence-test-discovery": 52,
+        "tool-test:architecture-check": 637,
+        "tool-test:async-harness": 348,
+        "tool-test:cigates": 309,
+        "tool-test:code-quality": 69,
+        "tool-test:diagnostic-bundle": 251,
+        "tool-test:docs-check": 124,
+        "evidence-test:M1-023": 48,
+        "evidence-test:M1-SCOPE-001": 60,
+        "swift-package-test:KVMContracts": 431,
+        "swift-package-test:MacPlatform": 479,
+        "repository-contract-tests": 25264,
+        "swift-test-targets": 766,
+        "native-arm64-build": 1003
+      }
     }
+  ],
+  "pending": [
+    {
+      "item": "pull request, GitHub CI, merge",
+      "status": "pending"
+    },
+    {
+      "item": "final-head re-run",
+      "status": "pending",
+      "note": "The evidence-finalization commit SHA is not known yet. Re-running the gates at the final head and GitHub CI remain reviewer duties before merge."
+    }
+  ],
+  "completed": [
+    "make verify at evidence commit b940d166bb68f1fa56572dc687bf5153cc6c6faf: 19/19",
+    "conflict check against remote main: no conflict",
+    "non-author Codex five-axis review: complete (tests/review-findings.json)"
   ],
   "authorCommandAttempts": [],
   "authorCommandAttemptsNote": "No shell tool was available to the author in any M1-053 session, so no author command result exists or is claimed.",
