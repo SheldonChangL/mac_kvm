@@ -166,8 +166,11 @@ whose unresolved resolver stops before creation), and that the live region names
 the production seam and the cursor read and holds exactly one test, the gated
 probe. It is static evidence only. It does not prove at run time that no
 framework call happens: the production-default test still makes M1-035's real,
-non-prompting trust read. Post-fix validation is the reviewer's clean-process
-full-suite run, which is pending.
+non-prompting trust read. The root reviewer's clean-process ordinary suite at
+commit `dbc45d4e04942a03a6e73b86420801802369673f` passed with no hang: 31
+declared, 29 ran, 2 manual probes skipped, 0 failures. Live creation and posting
+were then exercised by the reviewer's Tier-H probe; see
+`evidence/issues/M1-036/manual-result.json`.
 
 ## Resource ownership, cancellation, and cleanup
 

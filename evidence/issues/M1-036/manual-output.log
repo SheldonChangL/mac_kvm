@@ -1,0 +1,2 @@
+M1-036 manual probe: action=read-origin origin=readable preparation=notAttempted move=notAttempted restore=notAttempted cleanup=notRequired cursor=notObserved
+M1-036 manual probe: action=move-and-restore origin=readable preparation=eventsPrepared move=postRequested restore=postRequested cleanup=notRequired cursor=matchesOrigin

@@ -5,8 +5,8 @@
   "phase": "red",
   "branch": "feat/m1-036-mac-mouse-move-injector",
   "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
-  "implementationCommit": "pending",
-  "implementationCommitNote": "Not stamped. The author never writes to .git. The reviewer creates the commit; the SHA is transcribed afterwards.",
+  "implementationCommit": "dbc45d4e04942a03a6e73b86420801802369673f",
+  "implementationCommitNote": "Created by the root reviewer and transcribed here from git. The author never writes to .git.",
   "recordedBefore": "Any content existed in Packages/MacPlatform/Sources/MacPlatform/MacMouseMoveInjector.swift. The Sources directory held only AccessibilityPermissionService.swift (M1-035) and MacPlatform.swift, the pre-existing boundary-only source, verified by listing the directory in the same shell session immediately before this record was written.",
   "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
   "commandForm": "equivalent",
@@ -51,7 +51,13 @@
     "editOrder": "Not test-first, recorded as it happened. The correction was made in three edits: (1) the makePermissions helper, which makeInjector now calls with trustedChecks .max or 0 in place of its inline Bool trust seam; (2) the probe's closed-vocabulary result types, ManualProbePostLedger and manualProbeLine; (3) manualProbeInjector, performManualMoveAndRestore, recordingPlatform and the four sequencing tests, in one edit. No suite run separated the tests from the harness code they exercise.",
     "whyNoRedIsManufactured": "The correction is to Tier-H test harness code inside the Exact Test File, not to production behavior. The new tests constrain that harness; a red phase for them can only be produced by the reviewer, for example by reverting the cleanup branch in performManualMoveAndRestore and observing cleanupRequestsTheRestorePostWhenTheInjectorRestoreFails fail.",
     "productionCodeChanged": false,
-    "productionCodeNote": "The correction changed only the Exact Test File, the component document and this evidence package. MacMouseMoveInjector.swift is unchanged, so the original red phase above still covers every production behavior."
+    "productionCodeNote": "This first correction changed only the Exact Test File, the component document and this evidence package."
+  },
+  "pureUnitSeamCorrectionRedPhase": {
+    "status": "not_executed",
+    "reason": "The pure-unit seam correction's session refused every swift invocation, so no red observation exists for it and none is claimed.",
+    "productionCodeChanged": true,
+    "productionCodeNote": "MacMouseMoveInjector.swift changed only in its internal event seam, which now creates and posts an opaque MacMouseMoveEventHandle; the CoreGraphics calls, arguments and order are unchanged and no package or public declaration changed. The original red phase above still covers every injector behavior. Green for the committed tree is the root reviewer's run recorded in results.json reviewerFinal."
   },
   "postRedTestFileEdits": {
     "count": 1,

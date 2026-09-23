@@ -7,25 +7,21 @@ Branch: `feat/m1-036-mac-mouse-move-injector`
 
 Base commit: `ce06b3b0976366a47f4158d4fe2a28dc9bc72601`
 
-Implementation commit: `pending`. The author never writes to `.git`; the root
-reviewer creates the commit and the SHA is transcribed afterwards.
+Implementation commit: `dbc45d4e04942a03a6e73b86420801802369673f`, created by
+the root reviewer at `2026-09-23T01:33:30Z`.
 
-Status: **author complete, reviewer pending. Acceptance is not claimed.** The
-Tier-H manual probe has **not been executed** by anyone. The corrected test file
-has **not been compiled or run by the author**: in the correction session every
-`swift`, `make` and `python3` invocation was refused by the session's permission
-policy. See `commands.json` `reviewCorrectionSession`. The reviewer then found the
-clean full suite hanging, twice: the test-only creation gate did not fix it, and
-it is replaced by a pure-unit synthetic event-handle seam. **The clean full suite
-is pending post-fix validation by the reviewer** (see "Review correction:
-CoreGraphics first-initialization hang" and "Review correction: pure-unit event
-seam").
+Status: **reviewer verified.** The root reviewer validated the implementation
+commit and executed the Tier-H probe on real macOS; evidence time after the
+probes is `2026-09-23T01:34:27Z`. Five-axis verdict: Critical 0, High 0,
+Medium 0 unresolved, Low 1. No validation or manual verification is pending.
 
 Authorship and review: **Claude Opus 5** wrote the implementation, the tests, the
 component document and this evidence package, and is the sole author of
-repository content. The root reviewer is a separate executor that reviews,
-validates, stages, commits and manages the pull request. No review waiver is
-invoked.
+repository content. The **root reviewer** is the separate executor that reviews,
+validates, runs the Tier-H probe, stages, commits and manages the pull request;
+it is not an independent external model. Every result in "Final validation" is
+the root reviewer's, transcribed by the author, who compiled, ran and probed
+none of it. No review waiver is invoked.
 
 ## Deliverables
 
@@ -33,8 +29,8 @@ invoked.
 - `Packages/MacPlatform/Tests/MacPlatformTests/MacMouseMoveInjectorTests.swift`
 - `docs/components/M1-036-mac-mouse-move-injector.md`
 - `evidence/issues/M1-036/` — `summary.md`, `commands.json`, `environment.json`,
-  `manual.md`, `manual-result.json`, `tests/red-phase.json`,
-  `tests/results.json`
+  `manual.md`, `manual-result.json`, `manual-output.log`,
+  `tests/red-phase.json`, `tests/results.json`
 
 No other repository path was created, modified, or deleted. The two untracked
 owner artifacts at the repository root were not read, listed for content,
@@ -47,203 +43,146 @@ An immutable `Sendable` injector whose input boundary is domain-only. It accepts
 before touching macOS, reads Accessibility trust through the M1-035 service and
 fails closed on denial with that Issue's existing `permission.accessibilityDenied`
 value, asks an **injected** resolver for the platform position, creates a
-mouse-move `CGEvent` with documented public CoreGraphics API, and posts exactly
-that event once at `kCGHIDEventTap`. The success value is `postRequested`,
-because `CGEventPost` returns `void`. Design detail is in the component document.
+mouse-move `CGEvent` with documented public CoreGraphics API behind an opaque
+internal `MacMouseMoveEventHandle`, and posts exactly that event once at
+`kCGHIDEventTap`. The success value is `postRequested`, because `CGEventPost`
+returns `void`. Design detail is in the component document.
 
 Coordinate ownership was deliberately not taken: M1-039 owns logical, backing and
 wire separation, normalization, clamping, and multi-display and Retina behavior.
 The shipped default `MacPlatformPositionResolver.unresolved` resolves nothing, so
 production injection fails closed until M1-039 installs the real mapper.
 
-## Review correction: Tier-H move-and-restore safety
-
-The root reviewer required the opt-in probe to minimize any risk of leaving the
-cursor displaced. The probe now:
-
-1. creates both the target event and the origin restore event through the live
-   creation seam **before anything is posted**, and stops before any trust read
-   or post if either cannot be created;
-2. posts the target through the real `MacMouseMoveInjector.inject` path;
-3. requests the origin back through the same injector path whenever the target
-   post was requested; and
-4. **cleanup only**: if the target post was requested and the injector's restore
-   requested none, requests the pre-created origin restore directly, once, at
-   the injector's tap, reports `cleanup=fallbackPostRequested`, and fails the
-   run.
-
-Post requests are recorded by event identity at the post seam, independently of
-what `inject` reports. No sleep was added and no field claims delivery. The
-output line is closed vocabulary with no coordinate. The sequencing is covered by
-four new always-running tests that use a recording post seam and cannot move the
-real cursor. Production source is unchanged by the correction.
-
-## Review correction: CoreGraphics first-initialization hang
-
-The root reviewer reproduced twice, each from a clean test process, that
-`env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform`
-builds and then hangs indefinitely before any Swift Testing output. The
-reviewer's one-second `/usr/bin/sample` of the live helper showed several
-concurrent M1-036 tests blocked in the first CoreGraphics/SkyLight
-initialization (`makeOpaqueStubEvent` or
-`MacMouseMoveInjectionEnvironment.live.makeMouseMoveEvent` → `SLEventCreate` /
-`SLEventCreateMouseEvent` → `CGSEventSourceForID` → `CGSScoreboard` →
-`SLSServerPort` → `_dispatch_once_wait` / `__ulock_wait`), with other tests,
-including M1-035's real trust read, running concurrently. Warming the runtime by
-running one M1-036 event test first let the suite pass, which the reviewer
-rejected as a gate. The reviewer terminated only the hung test process IDs.
-
-Fix, test file only: every automated M1-036 test-side `CGEvent` creation (the
-opaque stub, the recording platform's live creation, and the explicit
-live-environment test) now goes through `SerializedTestEventCreation`, one
-test-only `NSLock`. Production source is unchanged and the live seam stays
-lock-free. No sleep, retry, timeout, production lock or test-order dependence was
-added. The opt-in manual probe stays outside the gate. The new always-running
-test `everyAutomatedEventCreationRouteCreatesInsideTheOneTestOnlyGate` pins the
-boundary through a task-local observer that sees only its own test's creations;
-it asserts which routes create inside the gate, not that the hang is gone,
-because a race's absence cannot be asserted deterministically.
-
-The author could not compile or run anything after that fix: `swift build` was
-refused by the session's permission policy. See `commands.json`
-`coreGraphicsInitializationCorrectionSession`. **The gate failed review; see the
-next section.**
-
-## Review correction: pure-unit event seam
-
-The reviewer's build of the gated tree succeeded, and a clean full suite hung
-again. The post-fix `/usr/bin/sample` showed one M1-036 thread owning
-`SerializedTestEventCreation` while blocked in `SLEventCreate` →
-`CGSScoreboard` → `SLSServerPort` initialization, two ordinary M1-035 tests
-concurrently blocked in `hasAuthorizationForControlComputer` →
-`TCCAccessRequest`, and every other M1-036 event test waiting on the gate.
-Serializing only M1-036's own creation cannot break that cross-framework
-initialization cycle, and M1-035 is not modified by this Issue.
-
-Fix, production seam and test file:
-
-- `MacMouseMoveInjectionEnvironment` now creates and posts an opaque `internal`
-  `MacMouseMoveEventHandle` whose `==` is identity. `live` wraps the real
-  `CGEvent` from `CGEventCreateMouseEvent` and its post seam posts exactly that
-  event, so the CoreGraphics calls, arguments and order are unchanged. Only the
-  live seam in `MacMouseMoveInjector.swift` can wrap or unwrap an event. No
-  handle, `CGEvent` or `CGPoint` reaches the package surface; nothing is public.
-- `SerializedTestEventCreation`, its boundary test, the opaque-stub helper and
-  the always-running live-creation test were removed. Ordinary tests create only
-  `MacMouseMoveEventHandle.synthetic()` handles, which wrap no event, and cover
-  creation, exact identity, creation failure, ordering, repetition and privacy.
-- Real creation and posting remain only in the opt-in Tier-H probe, skipped
-  unless `MACKVM_M1_036_MANUAL_PROBE` is set, with its safety unchanged:
-  pre-created target and restore before the target post, restore through the
-  injector, cleanup-only fallback, no sleep, closed vocabulary.
-- The explicit cursor read-back helper and its equal/different/nil test are
-  kept; they use `CGPoint` values only.
-- `onlyTheTierHLiveRegionNamesLiveEventCreationPostingOrTheProductionSeam` is a
-  static source audit of the test file: ordinary text names no event creation,
-  post, event source, production seam or the removed gate; the production
-  initializer is composed exactly once, by the production-default test; the
-  live region names the production seam and the cursor read and holds exactly
-  the one gated probe. It is static evidence only, not dynamic proof. The
-  production-default test still makes M1-035's real, non-prompting trust read.
-
-No sleep, retry, timeout, production lock, global lock, `unsafeBitCast`, fake
-CF object or test-order dependence was added. The M1-036 test file still
-declares 19 tests.
-
-**The clean full suite is pending post-fix validation by the reviewer.** The
-author could not compile or run anything after this fix either: `swift build`,
-and even a read-only `grep`, were refused by the session's permission policy
-with "This command requires approval". See `commands.json`
-`pureUnitSeamCorrectionSession`.
-
-## Acceptance criteria mapping
-
-| Issue criterion | Author verdict | Evidence |
-| --- | --- | --- |
-| Every Focus item has locatable implementation, test, or sign-off | Met by the author for the three Focus items: domain-only input (`nonMouseMoveDomainEventsFailClosedWithoutAnyPlatformWork`, boundary test), diagnosable creation failure (`eventCreationFailureIsDiagnosableAndPostsNothing`), no MainActor for high-frequency events (`injectionRunsOnADetachedNonMainActorTask`). | `tests/results.json` |
-| Happy path, boundary, invalid input, error/cancel/cleanup tests pass | **Reviewer pending for the corrected file.** Passed in the first author session: 25 declared, 23 executed, 0 failures. The root reviewer reported the corrected file passing with 29 tests, 2 manual probes skipped. The cursor-observation and creation-gate corrections each added one test; the package now declares 31 tests by construction, neither correction has been run by the author, and the reviewer's post-fix clean full suite is pending. Cancellation is not applicable; idempotency and the probe's cleanup sequencing are the cleanup coverage. | `tests/results.json` `reviewCorrection` |
-| Public behavior matches CONTRACT_CATALOG, no implicit new API | Met by construction: every declaration is `package` or narrower, no platform type on the package surface, nothing added to `KVMEvent` or any wire schema. | component document |
-| Architecture checker, lint, build, unit tests pass with no new warning | **Reviewer pending.** Not run for the corrected tree. | `commands.json` |
-| Production logs contain no typed text, clipboard payload, secret, or recoverable content | Met by construction: the component emits no log. A test asserts each failure encodes to four closed keys with no coordinate and no platform type name; a new test pins the probe's line to closed vocabulary. | `everyFailureEncodesToTheClosedTaxonomyWithoutCoordinatesOrPlatformText`, `cleanupRequestsTheRestorePostWhenTheInjectorRestoreFails` |
-| Manual/real-machine evidence verified by a non-executing reviewer | **OPEN. Not yet executed.** The author ran neither probe action and moved no cursor. | `manual.md`, `manual-result.json` |
-
-## Five-axis author evidence
-
-This is the author's own account for the reviewer to check, not an independent
-review.
-
-1. **Source validity and traceability.** The Issue file
-   `issues/M1/M1-036-mac-mouse-move-injector.md` and the M1-039 Issue's Exact
-   Files, which place `ClientCoordinateMapper.swift` in this same module, were
-   read before the correction. SDK facts are quoted from the installed
-   `MacOSX26.2.sdk` headers in `environment.json`. Every `CoreError` value used
-   already exists in `CoreErrors.swift`.
-2. **Product contract and architecture.** `KVMEvent` is the only Core-to-platform
-   input. No public declaration, protocol, transport, Barrier, networking or
-   TLS dependency is added, and no coordinate mapping is implemented.
-3. **Security, fail-safe and compatibility.** Every failure fails closed before
-   posting. Injection never prompts and never opens System Settings. No
-   permission decision is cached or bypassed, and TLS defaults are untouched.
-   The probe is skipped unless named, prepares both events before posting, and
-   always requests an origin restore once the move is requested.
-4. **Tests and validation.** The ordered seam log proves call order and that
-   nothing runs after a failure. The corrected file is **not validated by the
-   author**: compilation, tests, lint and gates are reviewer pending.
-5. **Scope, hygiene and rollback.** Only the three Exact Files and this evidence
-   directory are touched. The correction changes the test file, the component
-   document and this package, not production source.
-
-## Commands and results
-
-First author session, pre-correction, retained as history in `commands.json`:
-`python3 Tools/Backlog/validate_package.py` exit 0 (PACKAGE OK: 217 issues);
-`make architecture-check` exit 0; `swift format lint --recursive --strict` clean;
-`swift test --disable-sandbox --package-path Packages/MacPlatform` exit 0 with
-25 declared tests; the exact `swift test` and `xcodebuild` forms and
-`make verify` were blocked by that environment.
-
-Correction session, 2026-09-23:
+## Final validation (root reviewer, commit `dbc45d4`)
 
 | Command | Result |
 | --- | --- |
-| `swift test --package-path Packages/MacPlatform` | not run: refused by permission policy before start |
-| `swift test --disable-sandbox --package-path Packages/MacPlatform` | not run: refused before start |
-| `make architecture-check` | not run: refused before start |
-| `python3 Tools/Backlog/validate_package.py` | not run: refused before start |
-| `grep -c -E ".{101}"` on the test file | `0`; a line-length precheck only, not the lint gate |
-| `git diff --check` | exit 0, no output; weak, because every M1-036 path is untracked |
-| `git diff --no-index --check /dev/null <path>` for each M1-036 file except the unchanged source | no output for any path |
+| `swift build --disable-sandbox --package-path Packages/MacPlatform --build-tests` | exit 0; build complete in 3.56 s; no compile errors or warnings from repository code |
+| `env -u MACKVM_M1_036_MANUAL_PROBE -u MACKVM_M1_035_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform` | exit 0; 31 declared, 29 ran, 2 manual probes skipped, 0 failures; Swift Testing run 0.006 s; clean process, no hang |
+| `xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build` | exit 0; final line `** BUILD SUCCEEDED **`; target `arm64-apple-macos14.0` on the local Apple Silicon destination; non-fatal warnings noted below |
+| `make verify` (post-commit, authoritative) | exit 0; 19/19 gates passed at HEAD `dbc45d4`, including `swift-package-test:MacPlatform` (exact `swift test --package-path Packages/MacPlatform`, 3290 ms), `manifest-validation` (53 ms), `architecture-check` (334 ms), `code-quality` (2577 ms), `docs-check` (126 ms), `native-arm64-build` (934 ms); all 19 durations in `commands.json` `reviewerFinalResults.makeVerify` |
+| `git diff --cached --check` | exit 0, no output, before the implementation commit |
+| `jq` on every M1-036 JSON file | exit 0 |
+| `MACKVM_M1_036_MANUAL_PROBE=read-origin swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction` | exit 0; probe passed in 0.025 s |
+| `MACKVM_M1_036_MANUAL_PROBE=move-and-restore swift test --package-path Packages/MacPlatform --filter manualRealInjectionProbeRunsOneReviewerSelectedAction` | exit 0; probe passed in 0.057 s; cursor restored |
 
-The root reviewer said the MacPlatform suite passed 25 tests before the
-correction; that is the reviewer's observation, not an author run.
+`xcodebuild` notes: run after the implementation commit and after the current
+evidence edits. Xcode warned that supported platforms were empty in
+IDERunDestination metadata and that the first of multiple matching macOS
+destinations was selected; both warnings are non-fatal. The first approval
+attempt timed out before any execution result, so it is not a build failure; a
+single retry ran and passed. The author's own attempt was refused by the
+permission policy before start and is history only.
 
-The root reviewer then reported that
-`env -u MACKVM_M1_036_MANUAL_PROBE swift test --disable-sandbox --package-path Packages/MacPlatform`
-passed against the corrected file with 29 tests, 2 manual probes skipped.
+`make verify` notes: the authoritative run was rerun after the current evidence
+edits with HEAD still `dbc45d4`; its ignored report
+`artifacts/ci/m1-008-report.json` records commit `dbc45d4…` and overall status
+passed (`2026-09-23T01:50:05Z`–`01:50:38Z`). History: an earlier **pre-commit**
+sweep also passed 19/19 against the working tree that became `dbc45d4` (report
+commit `ce06b3b…`, ended `2026-09-23T01:32:13Z`), after a first attempt inside
+the nested Codex sandbox failed only with
+`sandbox-exec: sandbox_apply: Operation not permitted`. It is kept in
+`commands.json` `reviewerFinalResults.makeVerifyPreCommitHistory`.
 
-Cursor-observation correction, 2026-09-23: the probe's `case .some(origin)`
-read-back switch was replaced by the pure helper `manualProbeCursorObservation`,
-which compares with explicit `==`, and the always-running test
-`cursorObservationComparesTheReadBackWithTheOrigin` covers equal, different and
-nil read-backs. The probe was not run. The same `env -u ... swift test
---disable-sandbox` command and `swift format lint` on the test file were both
-refused by the permission policy before start, so nothing after this
-correction was compiled, linted or run by the author. See `commands.json`
-`cursorObservationCorrectionSession`.
+## Acceptance criteria mapping
+
+| # | Issue criterion | Verdict | Evidence |
+| --- | --- | --- | --- |
+| 1 | 所有 Focus 項目均有可定位的 implementation、test 或簽核證據 | **Met.** Domain-only input: `nonMouseMoveDomainEventsFailClosedWithoutAnyPlatformWork` and the boundary test. Diagnosable creation failure: `eventCreationFailureIsDiagnosableAndPostsNothing`. No MainActor for high-frequency events: `injectionRunsOnADetachedNonMainActorTask`. All passed in the reviewer's ordinary suite. | `tests/results.json` `reviewerFinal`, `m1036Tests` |
+| 2 | Happy path、boundary、invalid input、error/cancel/cleanup tests 全部通過 | **Met.** 31 declared, 29 ran, 2 manual probes skipped, 0 failures. Cancellation is not applicable (no asynchronous operation or owned resource); cleanup coverage is statelessness/idempotency plus the probe's restore and cleanup-only sequencing tests. | `tests/results.json` `reviewerFinal.ordinarySuite` |
+| 3 | Public behavior 與 CONTRACT_CATALOG／凍結 ADR 一致，沒有新增隱含 API | **Met.** Every declaration is `package` or narrower; no platform type or handle on the package surface; nothing added to `KVMEvent` or any wire schema. Reviewer product/architecture axis: pass, no public API added. | component document; `commands.json` `reviewerFinalResults.fiveAxisReview` |
+| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met** by build exit 0 with no repository-code warnings, the exact `xcodebuild` workspace build `** BUILD SUCCEEDED **` (only non-fatal Xcode destination-selection warnings, none from repository code), and post-commit `make verify` 19/19 (architecture-check, code-quality lint and `-warnings-as-errors`, native-arm64-build, MacPlatform exact-form tests). | `commands.json` `reviewerFinalResults` |
+| 5 | Production logs 不包含 typed text、clipboard payload、secret/private key 或可還原內容 | **Met.** The component emits no log. `everyFailureEncodesToTheClosedTaxonomyWithoutCoordinatesOrPlatformText` passed; the probe output in `manual-output.log` is closed vocabulary with no coordinate or identifier. Reviewer security axis: no sensitive logs. | `tests/results.json`; `manual-output.log` |
+| 6 | Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證 | **Met.** The root reviewer, not the author, ran both probe actions at `dbc45d4`, exit 0 each, and saw the cursor restored. **Post-request truth:** both the target move and the origin restore were *post-requested* (`move=postRequested restore=postRequested`), and the immediate read-back matched the origin (`cursor=matchesOrigin`), with `cleanup=notRequired`. **Delivery:** not claimed — `CGEventPost` is `void` and asynchronous, so no field asserts delivery. | `manual.md`, `manual-result.json`, `manual-output.log` |
+
+## Five-axis review (root reviewer, commit `dbc45d4`)
+
+1. **Source validity and traceability — pass.** GitHub Issue 28 re-read;
+   dependencies 10 and 23 previously closed; canonical/frozen architecture
+   unchanged.
+2. **Product contract and architecture — pass.** `KVMEvent`-only boundary,
+   protocol/core separation, no Barrier or network, M1-039 retains coordinate
+   mapping, no public API added, no MainActor.
+3. **Security, fail-safe and compatibility — pass.** Accessibility denial and
+   event-creation failure fail closed, no sensitive logs, restore safety
+   verified, TLS untouched.
+4. **Tests and acceptance — pass** with the results above.
+5. **Scope, hygiene and rollback — pass.** Only the three Exact Files plus
+   evidence; protected artifacts excluded; rollback is PR revert.
+
+Findings: Critical 0, High 0, Medium 0 unresolved, **Low 1** (see Remaining
+risks, item 1).
+
+## History of review corrections (superseded)
+
+Each correction below is retained as history. Every "pending" or "not run"
+statement it originally carried is superseded by "Final validation".
+
+1. **Tier-H move-and-restore safety.** The probe pre-creates both the target and
+   the origin restore events before any post, posts the target through
+   `MacMouseMoveInjector.inject`, requests the origin back through the injector
+   whenever the target post was requested, and — cleanup only — requests the
+   pre-created restore directly once if the injector's restore requested none,
+   reporting `cleanup=fallbackPostRequested` and failing the run. Four
+   always-running sequencing tests use a recording post seam. The reviewer then
+   reported 29 tests passing with 2 probes skipped for that tree.
+2. **Cursor observation.** The `case .some(origin)` read-back switch was replaced
+   by the pure helper `manualProbeCursorObservation`, compared with explicit `==`,
+   plus the test `cursorObservationComparesTheReadBackWithTheOrigin`.
+3. **CoreGraphics first-initialization hang — failed.** The reviewer reproduced
+   twice that a clean ordinary suite hung before any output, sampled in
+   `SLEventCreate` → `CGSScoreboard` → `SLSServerPort` initialization. A
+   test-only `SerializedTestEventCreation` lock was added; the reviewer's clean
+   run of that tree **hung again**, with one M1-036 thread holding the lock in
+   the same initialization and two M1-035 tests blocked in
+   `TCCAccessRequest`. This correction was removed.
+4. **Pure-unit event seam — resolved.** The internal environment now creates and
+   posts an opaque `MacMouseMoveEventHandle` with identity equality; `live` wraps
+   the real `CGEvent`, so CoreGraphics calls, arguments and order are unchanged,
+   and nothing reaches the package surface. Ordinary tests use only
+   `MacMouseMoveEventHandle.synthetic()`. The lock, its boundary test, the opaque
+   stub and the always-running live-creation test were removed;
+   `syntheticHandlesAreEqualOnlyToThemselves` and the static source audit
+   `onlyTheTierHLiveRegionNamesLiveEventCreationPostingOrTheProductionSeam` were
+   added. M1-036 declares 19 tests. **The reviewer's clean-process suite passed
+   with no hang** (31/29/2/0).
+
+In the sessions for corrections 1–4 the author's `swift`, `make` and `python3`
+invocations were refused by the permission policy, so the author compiled and ran
+none of them; the details are in `commands.json` under
+`reviewCorrectionSession`, `cursorObservationCorrectionSession`,
+`coreGraphicsInitializationCorrectionSession` and
+`pureUnitSeamCorrectionSession`, each now marked with its `historyStatus`.
+
+The first author session's pre-correction results (25 declared tests, exit 0 in
+the `--disable-sandbox` form; `validate_package.py` and `make architecture-check`
+exit 0; `swift format lint` clean; exact `swift test`, `xcodebuild` and
+`make verify` blocked by that environment) remain in `commands.json`
+`requiredCommands` and `supplementaryCommands` as history, each with its
+`reviewerResolution`.
 
 ## TDD
 
 The original red phase is in `tests/red-phase.json`: exit 1 at `emit-module`,
 naming the three missing types, recorded before any production file existed. The
-original green is in `tests/results.json`. The review correction was **not**
-test-first, and no red or green run exists for it; `tests/red-phase.json`
-`reviewCorrectionRedPhase` records the actual edit order.
+review corrections were **not** test-first and no red run exists for them; the
+file records the actual edit order. Green for the committed tree is the
+reviewer's run in `tests/results.json` `reviewerFinal`.
 
-## Tier-H manual probe — not yet executed
+## Tier-H manual probe — reviewer verified
 
-Steps, expected lines and the closed vocabulary are in `manual.md` and
-`manual-result.json`, which has `status: pending_reviewer` and an empty `runs`
-array. `manual-output.log` does not exist, because no run has produced output.
+| Run | Action | Exit | Sanitized line |
+| --- | --- | --- | --- |
+| 1 | `read-origin` | 0 | `action=read-origin origin=readable preparation=notAttempted move=notAttempted restore=notAttempted cleanup=notRequired cursor=notObserved` |
+| 2 | `move-and-restore` | 0 | `action=move-and-restore origin=readable preparation=eventsPrepared move=postRequested restore=postRequested cleanup=notRequired cursor=matchesOrigin` |
+
+The reviewer observed the cursor restored, and the immediate closed read-back
+matched the original position. No cleanup fallback was required. The optional
+unknown-action run was not executed because fail-closed parsing is covered by
+the ordinary test `manualProbeSelectionFailsClosedAndIsSkippedByDefault`, which
+passed. Environment: macOS 26.6.2 (25G83), arm64, Apple M4 Pro; display/layout
+**unavailable** (`system_profiler` returned no per-display entries); keyboard
+layout, network and peer not applicable.
 
 ## Scope
 
@@ -254,40 +193,31 @@ entries, input-state ledgers, and any protocol, network or TLS change.
 
 ## Remaining risks
 
-1. **The corrected test file is uncompiled and unrun by the author.** Compile
-   errors or swift-format findings are possible and would surface in the
-   reviewer's run.
-2. **Posting has no truthful success signal.** `CGEventPost` returns `void`, so
-   only requests are recorded.
+No Critical, High or Medium finding is unresolved.
+
+1. **Low (retained, non-blocking): live creation boundary.** Live CoreGraphics
+   event creation and posting are exercised only by the opt-in Tier-H probe, not
+   by ordinary unit tests. This is intentional, to avoid the proven
+   clean-process CoreGraphics/TCC initialization deadlock; the successful real
+   probe closes acceptance for this Issue. A regression in the `live` seam would
+   surface only in a Tier-H run or by source review.
+2. **No delivery signal.** `CGEventPost` returns `void`; evidence records post
+   requests and an immediate observation only.
 3. **The shipped default posts nothing** until M1-039 lands; real end-to-end
    movement in the app is unverifiable before then.
-4. **The probe's `cursor=` read-back is racy by design** and is not asserted.
-5. **Residual window:** if the test process is terminated between the target
-   post request and the restore request, no probe code runs any more.
-6. **`internal.unclassified` for creation failure** is a judgment call, because
-   the SDK documents no reason for a `NULL` return.
-7. **The creation gate failed and was removed; its replacement is
-   unvalidated.** The pure-unit handle seam was neither compiled nor run by the
-   author, so a compile error, a lint finding or a residual hang is possible. It
-   removes every M1-036 ordinary event creation, but not M1-035's real trust
-   reads or the production-default test's real trust read. If the hang can occur
-   without any event creation in the process, this fix will not remove it; only
-   the reviewer's clean-process full-suite run can show that. The file declares
-   19 M1-036 tests and 31 package tests by construction, not by an observed run.
-8. **Live creation is no longer asserted by an ordinary test.** That the live
-   seam creates a `.mouseMoved` event at the requested position, and posts the
-   wrapped event, is now exercised only by the opt-in Tier-H probe and by source
-   review.
-9. **The source audit is static.** It inspects names in the test file text, can
-   be defeated by indirection it does not name, and proves nothing about what a
-   framework does at run time.
+4. **Probe residual window.** If the test process is terminated between the
+   target post request and the restore request, no probe code runs any more.
+5. **Identity scope.** The probe ran in the SwiftPM test process; app-bundle
+   Accessibility authorization is not claimed.
+6. **Static source audit.** The ordinary-test audit inspects test-file text only
+   and proves nothing about framework behavior at run time.
 
 ## Rollback
 
-Revert the M1-036 pull request. That removes the injector, its tests, the probe
-and the document in one operation and leaves `MacPlatform` at its M1-035 state.
-Nothing persists and nothing is allocated across calls, so no runtime resource,
-permission grant or migration needs cleanup.
+Revert the M1-036 pull request. That removes the injector, its tests, the probe,
+the document and this evidence in one operation and leaves `MacPlatform` at its
+M1-035 state. Nothing persists and nothing is allocated across calls, so no
+runtime resource, permission grant or migration needs cleanup.
 
 ## Follow-up
 

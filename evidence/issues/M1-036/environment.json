@@ -15,7 +15,7 @@
     "model": "not_captured",
     "cpuBrand": "not_captured",
     "rosettaTranslated": "not_captured",
-    "note": "sysctl hw.model, machdep.cpu.brand_string and sysctl.proc_translated are refused in the author sandbox. The values are deliberately not reconstructed and no device unique identifier is recorded anywhere in this package. uname -m reports arm64."
+    "note": "Author session: sysctl hw.model, machdep.cpu.brand_string and sysctl.proc_translated were refused in the author sandbox and were not reconstructed; uname -m reported arm64. The reviewer-reported CPU is in reviewerEnvironment.hardware. No device unique identifier is recorded anywhere in this package."
   },
   "toolchain": {
     "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
@@ -31,8 +31,39 @@
     "branch": "feat/m1-036-mac-mouse-move-injector",
     "baseCommit": "ce06b3b0976366a47f4158d4fe2a28dc9bc72601",
     "baseCommitNote": "Verified by the author with git rev-parse HEAD in this session. It is the merge commit of GitHub Issue #23 / M1-035.",
-    "implementationCommit": "pending",
-    "implementationCommitNote": "Not stamped and not guessed. The author never writes to .git. The reviewer creates the commit; the SHA is transcribed afterwards."
+    "implementationCommit": "dbc45d4e04942a03a6e73b86420801802369673f",
+    "implementationCommitNote": "Created by the root reviewer at 2026-09-23T01:33:30Z and transcribed here from git. The author never writes to .git."
+  },
+  "reviewerEnvironment": {
+    "source": "root-reviewer",
+    "commit": "dbc45d4e04942a03a6e73b86420801802369673f",
+    "evidenceTimeUtc": "2026-09-23T01:34:27Z",
+    "evidenceTimeNote": "UTC time reported by the reviewer after the Tier-H probes completed.",
+    "os": {
+      "productName": "macOS",
+      "productVersion": "26.6.2",
+      "buildVersion": "25G83"
+    },
+    "hardware": {
+      "architecture": "arm64",
+      "cpu": "Apple M4 Pro"
+    },
+    "display": {
+      "status": "unavailable",
+      "reason": "system_profiler returned no per-display entries. Display and layout metadata are recorded as unavailable and are not reconstructed."
+    },
+    "keyboardLayout": {
+      "applicable": false,
+      "reason": "This Issue introduces no keyboard behavior."
+    },
+    "network": {
+      "applicable": false
+    },
+    "peer": {
+      "applicable": false
+    },
+    "accessibilityTrustOfProbeProcess": "trusted_implied",
+    "accessibilityTrustNote": "Not read separately. Implied by the move-and-restore line reporting move=postRequested, which the injector reaches only after its M1-035 trust read passes. It applies to the SwiftPM test process only, not to a signed app bundle."
   },
   "dependencyVerification": {
     "method": "Re-checked by the author in this session rather than accepted from the dispatch note.",
@@ -70,7 +101,7 @@
     "applicable": false,
     "authorReason": "Every automated test substitutes both macOS event seams, so no display topology, scale factor, or keyboard layout affects any automated result. No automated test posts an event, so no automated result depends on the cursor or on display geometry.",
     "reviewerRequirement": "Display/layout metadata must be captured by the reviewer during the Tier-H manual probe recorded in manual.md, because that is the only step that moves a real cursor. Keyboard layout is not applicable: this Issue introduces no keyboard behavior.",
-    "reviewerOutcome": "pending"
+    "reviewerOutcome": "unavailable: system_profiler returned no per-display entries during the reviewer Tier-H session; see reviewerEnvironment.display. Keyboard layout not applicable."
   },
   "network": {
     "applicable": false,
@@ -82,13 +113,14 @@
   },
   "accessibilityGrantState": {
     "authorObservation": "not_recorded",
-    "reason": "The author's automated run never depends on it: the denial path is driven through the substituted M1-035 seam, and the two production-default tests are written to pass in either trust state without creating or posting an event. No trust state is claimed."
+    "reason": "The author's automated run never depends on it: the denial path is driven through the substituted M1-035 seam, and the two production-default tests are written to pass in either trust state without creating or posting an event. No trust state is claimed by the author.",
+    "reviewerObservation": "trusted_implied for the SwiftPM test process during the Tier-H probe; see reviewerEnvironment.accessibilityTrustNote."
   },
   "authorEnvironmentLimitations": {
     "swiftPackageManagerSandbox": "SwiftPM manifest evaluation fails in this session with 'sandbox-exec: sandbox_apply: Operation not permitted'. The exact frozen form 'swift test --package-path Packages/MacPlatform' therefore cannot produce an authoritative result here, and neither can the code-quality gate's 'swift test -Xswiftc -warnings-as-errors'. The --disable-sandbox equivalents were run instead and are labelled as such in commands.json. --disable-sandbox disables only SwiftPM's own nested sandbox; it changes no package identity, target ownership, test selection, or assertion.",
     "xcodebuildWorkspace": "xcodebuild reports \"'MacKVM.xcworkspace' is not a workspace file\" and exits 66. M1-035 established by pristine-export reproduction that this is environmental and pre-existing; the workspace files are untouched by this Issue.",
     "stuckTestProcess": "During the author sweep one 'swift test' invocation was terminated by the harness while its test binary was running. The orphaned test process held the Packages/MacPlatform/.build lock, so two subsequent invocations produced no test output until the orphan was cleared. This is a harness artifact of the author session, not a product behavior: after clearing it the same command exited 0 in about one second. No assertion, timeout, sleep, or retry was added to the product or to the tests in response.",
-    "consequence": "No blocked command is claimed as passing on the strength of an author run. Every blocked exact form is listed in commands.json reviewerPendingSummary.exactCommandsToRerun.",
+    "consequence": "No blocked command is claimed as passing on the strength of an author run. The authoritative results are the root reviewer's; see commands.json reviewerFinalResults.",
     "reviewCorrectionSession": "On 2026-09-23 the review-correction session, on the same host, could run only git and read-only file commands. Every swift, make, python3 and plutil invocation was refused by the session's permission policy before it started, so nothing was compiled, tested, linted or JSON-validated by tool in that session. See commands.json reviewCorrectionSession."
   }
 }
