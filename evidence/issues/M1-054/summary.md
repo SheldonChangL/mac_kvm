@@ -9,12 +9,16 @@
 - Base: `5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb`
 - Implementation commit under test:
   `820c57b321611cc4065e1e6d0babfc0f92689146`.
-- Evidence commit: **pending**. Its SHA is not known when this package is
-  written.
-- Status: **reviewer validation complete at the implementation commit.** The
-  Codex root reviewer's five-axis review passed, with no Critical or High
-  finding. Pending: the evidence commit, push, PR, GitHub CI, a current-head
-  conflict check, a PR review comment, merge, and a post-merge audit.
+- Evidence commit: `7a91900bc46a0c2d00d63bfe2cf763be25ebdb60`.
+- Status: **reviewer validation complete at the evidence commit.** The Codex
+  root reviewer's five-axis review passed at the implementation commit, with
+  no Critical or High finding. At the evidence commit, `make verify` passed
+  19/19; latest `origin/main` equals the base, and the conflict count is zero.
+  Pending: push, PR, GitHub CI, a PR review comment, merge, and a post-merge
+  audit.
+- The SHA of the finalization commit that records this is not yet known.
+  Final-head verification and GitHub CI on the final head remain required
+  before merge.
 - Authorship: **Claude Opus** authored all repository content: source, tests,
   the component document and this evidence. The **Codex root reviewer**
   authored no repository content. It performed the review, ran every command,
@@ -104,6 +108,24 @@ Command 1 was run in its exact form. It resolves the repository-root
 Start and end timestamps were not captured, so they are recorded as `null` in
 `commands.json`.
 
+### Evidence commit validation
+
+All were run by the Codex root reviewer at evidence commit
+`7a91900bc46a0c2d00d63bfe2cf763be25ebdb60` (`HEAD`), after fetching
+`origin/main` at `5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb`, which equals the
+branch base.
+
+| # | Command | Exit | Result |
+| --- | --- | --- | --- |
+| 9 | `make verify` | 0 | 19/19 gates passed, the same 19 gate names as command 8; CI context commit equals the evidence commit; report `artifacts/ci/m1-008-report.json` (ignored, not committed), SHA-256 `77e93cfdd242ba49d1d2654b2d1432ba5a9254c6bef2c550617077e040a4bb1f` |
+| 10 | `git merge-base --is-ancestor origin/main HEAD` | 0 | `origin/main` is an ancestor of the evidence commit |
+| 11 | `git merge-tree origin/main HEAD` | 0 | tree `b52330027d04d53012cc335603b15d0947cf380a`; 0 conflicts |
+| 12 | `git diff --check origin/main..HEAD` | 0 | no output |
+
+Commands 9 and 11 were run outside the managed sandbox. The worktree
+contained only the protected untracked owner artifacts, which remained
+untouched and unstaged.
+
 ## Manual Verification
 
 None is required for M1-054. The Issue states that there are no mandatory
@@ -176,9 +198,9 @@ of the clipboard link. Loop rejection reuses the M1-052 `warning` severity.
 
 ## Rollback Instructions
 
-Revert implementation commit `820c57b321611cc4065e1e6d0babfc0f92689146` and
-the M1-054 evidence commit. There
-is no persistence, migration, wire format or runtime resource to clean up.
+Revert implementation commit `820c57b321611cc4065e1e6d0babfc0f92689146`,
+evidence commit `7a91900bc46a0c2d00d63bfe2cf763be25ebdb60` and the M1-054
+evidence finalization commit. There is no persistence, migration, wire format or runtime resource to clean up.
 Any Issue rollback condition would trigger this revert: a crash, a data leak, a
 silent trust bypass, weakened assertions, or deviation from the frozen
 contract. None has been observed.
@@ -187,8 +209,9 @@ contract. None has been observed.
 
 - **B:** full review by a stronger model or an engineer. The Codex root
   reviewer's non-author five-axis review is complete and passed. It is a model
-  review, not a human review.
+  review, not a human review. Reviewer validation at evidence commit
+  `7a91900bc46a0c2d00d63bfe2cf763be25ebdb60` is complete.
 - **No autonomous merge** (`low_model_autonomous_merge: false`). The following
-  remain reviewer duties: the evidence commit, push, PR, GitHub CI, a
-  current-head conflict check, a PR review comment, merge, and a post-merge
-  audit.
+  remain reviewer duties: push, PR, GitHub CI, a PR review comment, merge, and
+  a post-merge audit. The finalization commit SHA is not yet known; final-head
+  verification and GitHub CI on the final head are required before merge.

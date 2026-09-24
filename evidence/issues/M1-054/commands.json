@@ -10,10 +10,10 @@
     "Packages/KVMCore/Tests/KVMCoreTests/ClipboardLoopGuardTests.swift",
     "docs/components/M1-054-clipboard-loop-guard.md"
   ],
-  "evidenceCommit": null,
-  "evidenceCommitNote": "Not known at evidence-authorship time.",
+  "evidenceCommit": "7a91900bc46a0c2d00d63bfe2cf763be25ebdb60",
+  "evidenceCommitNote": "Evidence commit verified by the Codex root reviewer; see evidenceCommitCommands. The SHA of the finalization commit that records this is not known at authorship time.",
   "status": "reviewer_verified",
-  "statusNote": "All commands below were run by the Codex root reviewer against implementation commit 820c57b321611cc4065e1e6d0babfc0f92689146 and transcribed by the author, Claude Opus, who ran no commands.",
+  "statusNote": "Verified at evidence commit 7a91900bc46a0c2d00d63bfe2cf763be25ebdb60. requiredCommands and supplementaryCommands were run by the Codex root reviewer against implementation commit 820c57b321611cc4065e1e6d0babfc0f92689146; evidenceCommitCommands were run by the Codex root reviewer at evidence commit 7a91900bc46a0c2d00d63bfe2cf763be25ebdb60. All were transcribed by the author, Claude Opus, who ran no commands.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus",
     "reviewer": "Codex root reviewer",
@@ -176,21 +176,85 @@
       "reportSha256": "074c4c85a2cab9d1a2efe834b788283495654dc0d5e7032fdf9326a2260da6da"
     }
   ],
+  "evidenceCommitCommands": {
+    "commit": "7a91900bc46a0c2d00d63bfe2cf763be25ebdb60",
+    "latestMain": {
+      "ref": "origin/main",
+      "fetchedAt": "5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb",
+      "equalsBase": true
+    },
+    "worktreeNote": "The worktree contained only the protected untracked owner artifacts; they remained untouched and unstaged.",
+    "commands": [
+      {
+        "id": 9,
+        "command": "make verify",
+        "form": "exact",
+        "ranOutsideManagedSandbox": true,
+        "startedAt": null,
+        "endedAt": null,
+        "exitCode": 0,
+        "status": "passed",
+        "gatesPassed": 19,
+        "gatesTotal": 19,
+        "gatesNote": "The gate names are exactly the same 19 recorded in command 8.",
+        "ciContextCommit": "7a91900bc46a0c2d00d63bfe2cf763be25ebdb60",
+        "ciContextCommitEqualsEvidenceCommit": true,
+        "reportPath": "artifacts/ci/m1-008-report.json",
+        "reportPathNote": "Repository-relative; artifacts/ is Git-ignored and the report is not committed.",
+        "reportSha256": "77e93cfdd242ba49d1d2654b2d1432ba5a9254c6bef2c550617077e040a4bb1f"
+      },
+      {
+        "id": 10,
+        "command": "git merge-base --is-ancestor origin/main HEAD",
+        "purpose": "conflict check",
+        "startedAt": null,
+        "endedAt": null,
+        "exitCode": 0,
+        "status": "passed",
+        "result": "origin/main is an ancestor of the evidence commit"
+      },
+      {
+        "id": 11,
+        "command": "git merge-tree origin/main HEAD",
+        "purpose": "conflict check",
+        "ranOutsideManagedSandbox": true,
+        "startedAt": null,
+        "endedAt": null,
+        "exitCode": 0,
+        "status": "passed",
+        "result": {
+          "tree": "b52330027d04d53012cc335603b15d0947cf380a",
+          "conflicts": 0
+        }
+      },
+      {
+        "id": 12,
+        "command": "git diff --check origin/main..HEAD",
+        "startedAt": null,
+        "endedAt": null,
+        "exitCode": 0,
+        "status": "passed",
+        "result": "no output"
+      }
+    ]
+  },
   "pending": [
-    { "item": "evidence commit SHA", "status": "pending" },
     { "item": "push", "status": "pending" },
     { "item": "pull request", "status": "pending" },
     { "item": "GitHub CI", "status": "pending" },
-    { "item": "current-head conflict check", "status": "pending" },
     { "item": "PR review comment", "status": "pending" },
     { "item": "merge", "status": "pending" },
     { "item": "post-merge audit", "status": "pending" }
   ],
+  "pendingNote": "The finalization commit SHA is not yet known. Final-head verification and GitHub CI on the final head remain required before merge.",
   "completed": [
     "Required Commands 1-4 at implementation commit 820c57b321611cc4065e1e6d0babfc0f92689146: all exit 0",
     "make docs-check, make code-quality-check, git diff --check: all exit 0",
     "make verify: 19/19",
-    "non-author Codex five-axis review: pass (tests/review-findings.json)"
+    "non-author Codex five-axis review: pass (tests/review-findings.json)",
+    "evidence commit 7a91900bc46a0c2d00d63bfe2cf763be25ebdb60: make verify 19/19, exit 0",
+    "evidence-commit conflict check: origin/main 5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb equals base; merge-base --is-ancestor exit 0; merge-tree exit 0, 0 conflicts",
+    "evidence-commit git diff --check origin/main..HEAD: exit 0, no output"
   ],
   "authorCommandAttempts": [],
   "authorCommandAttemptsNote": "The author ran no commands, so no author command result exists or is claimed.",
