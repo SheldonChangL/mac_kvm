@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-054",
+  "githubIssue": 33,
+  "commit": "820c57b321611cc4065e1e6d0babfc0f92689146",
+  "source": "Codex root reviewer, transcribed by the author. Sanitized: no serial number, hardware UUID, device name, user name, home path or other private identifier is recorded.",
+  "timestamps": {
+    "firstCommandStartedAt": null,
+    "lastCommandEndedAt": null,
+    "note": "Not captured for these runs; no timestamp is inferred."
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83"
+  },
+  "hardware": {
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "swift": "6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "xcodebuildCompilerTarget": "arm64-apple-macos14.0"
+  },
+  "sandbox": {
+    "managedSandboxAttemptsFailed": true,
+    "cause": "nested-sandbox and user-Library restrictions",
+    "classification": "environment limitation, not a product failure",
+    "resolution": "equivalent direct reruns outside the managed sandbox passed"
+  },
+  "manualVerification": {
+    "required": false,
+    "note": "The Issue has no mandatory real-machine step. The guard has no platform, pasteboard, network, peer, display, keyboard or Accessibility dependency."
+  },
+  "network": {
+    "exercised": false,
+    "applicable": false
+  },
+  "peer": {
+    "exercised": false,
+    "applicable": false
+  }
+}

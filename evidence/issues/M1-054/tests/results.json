@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-054",
+  "githubIssue": 33,
+  "commit": "820c57b321611cc4065e1e6d0babfc0f92689146",
+  "source": "Codex root reviewer run, transcribed by the author.",
+  "command": "swift test --package-path Packages/KVMCore",
+  "ranOutsideManagedSandbox": true,
+  "startedAt": null,
+  "endedAt": null,
+  "timestampNote": "Not captured; no timestamp is inferred.",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "manifest": "repository-root Package.swift (Packages/KVMCore has no Package.swift)",
+    "build": "complete",
+    "buildSeconds": 2.42,
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "testsPassed": 47,
+    "failures": 0,
+    "skippedSystemOptIn": 1,
+    "note": "The suite totals are authoritative. The skipped test is a system opt-in test, skipped by default; it is not an M1-054 test."
+  },
+  "m1054DeclaredTests": {
+    "file": "Packages/KVMCore/Tests/KVMCoreTests/ClipboardLoopGuardTests.swift",
+    "countBySourceReading": 32,
+    "note": "Counted by the author by reading the test file. The reviewer did not report per-file pass counts. All 32 are ordinary tests with no opt-in gate, so they fall within the 47 passed.",
+    "coverage": {
+      "happyPath": [
+        "clipboardLoopGuardAdmitsFirstOutboundLocalPayload",
+        "clipboardLoopGuardAdmitsFirstInboundRemotePayload",
+        "clipboardLoopGuardAdmitsSuccessiveDistinctPayloadsInBothDirections",
+        "clipboardLoopGuardAdmitsContentAgainOnceOtherContentIntervened"
+      ],
+      "boundaryAndLimit": [
+        "clipboardLoopGuardAcceptsPayloadExactlyAtTheByteLimit",
+        "clipboardLoopGuardRejectsPayloadOneByteOverTheLimitInBothDirections",
+        "clipboardLoopGuardMeasuresUTF8BytesNotCharacters",
+        "clipboardLoopGuardAdmitsEmptyTextUnderTheSmallestLimit",
+        "clipboardLoopGuardOversizedRejectionMatchesTheM1052Codec",
+        "clipboardLoopGuardChecksSizeBeforeOriginAndIdentity"
+      ],
+      "originInvalidInput": [
+        "clipboardLoopGuardNeverSendsARemotePayloadBack",
+        "clipboardLoopGuardRejectsInboundPayloadClaimingLocalOrigin",
+        "clipboardLoopGuardAcceptsInboundFromAnyRemoteDevice"
+      ],
+      "loopSuppression": [
+        "clipboardLoopGuardSuppressesLocalEchoOfAnAppliedInboundPayload",
+        "clipboardLoopGuardSuppressesPeerEchoOfAnOutboundPayload",
+        "clipboardLoopGuardRejectsARepeatedTransactionEvenWithNewContent",
+        "clipboardLoopGuardRejectsARepeatedHashUnderANewTransaction",
+        "clipboardLoopGuardRejectsTheExactSamePayloadTwice",
+        "clipboardLoopGuardSuppressesDuplicateContentFromAnotherRemoteDevice",
+        "clipboardLoopGuardComparesHashesAsOpaqueExactValues",
+        "clipboardLoopGuardRemembersOnlyTheLastAdmittedIdentity"
+      ],
+      "cleanupStateIdempotency": [
+        "clipboardLoopGuardRejectionLeavesStateUnchanged",
+        "clipboardLoopGuardResetForgetsTheRememberedPayload",
+        "clipboardLoopGuardResetIsIdempotent",
+        "clipboardLoopGuardCopiesAreIndependentValues",
+        "clipboardLoopGuardIsDeterministicAcrossRepeatedRuns"
+      ],
+      "concurrency": [
+        "clipboardLoopGuardIsSendable",
+        "clipboardLoopGuardRunsOffTheMainThread",
+        "clipboardLoopGuardIndependentOwnersDoNotInterfere",
+        "clipboardLoopGuardSerializesThroughAnOwningActor"
+      ],
+      "privacy": [
+        "clipboardLoopGuardRejectionsRenderOnlyFixedTaxonomy",
+        "clipboardLoopGuardRedactsItsRememberedIdentity"
+      ]
+    },
+    "cancellation": "Not applicable: the guard is a synchronous value with no task, timer, I/O or owned resource, so there is nothing to cancel. The cleanup evidence is reset(), its idempotency, and state being unchanged by every rejection kind."
+  },
+  "focusMapping": {
+    "originTransactionIdAndHash": {
+      "implementation": "ClipboardLoopGuard.admitOutbound / admitInbound origin guard; admit(_:) transaction and hash comparison",
+      "tests": ["originInvalidInput", "loopSuppression"]
+    },
+    "samePayloadNotSentBack": {
+      "implementation": "admit(_:) rejects a remembered transaction ID or content hash; admitOutbound rejects non-local origin",
+      "tests": ["loopSuppression", "originInvalidInput"]
+    },
+    "oversizeRejectedWithoutLeakingContent": {
+      "implementation": "checkSize(of:limit:) runs first and throws the fixed clipboard.oversized taxonomy value",
+      "tests": ["boundaryAndLimit", "privacy"]
+    }
+  },
+  "gatesAndWarnings": {
+    "architectureCheck": "exit 0",
+    "strictLint": "exit 0, empty output",
+    "warningsAsErrors": "exit 0",
+    "xcodebuild": "** BUILD SUCCEEDED **; only nonfatal preexisting destination/platform-discovery warnings; no source warning attributed to M1-054",
+    "makeVerify": "19/19"
+  },
+  "productionLogPrivacy": "The guard contains no logging call and emits no diagnostic event. CoreError has only four fixed taxonomy fields. The guard's description, debugDescription and mirror are redacted.",
+  "tdd": {
+    "redRunRecorded": false,
+    "note": "The author could not run commands, so no red-phase run exists."
+  },
+  "privacy": "No clipboard text, hash, transaction ID, device ID or user data is recorded in this evidence."
+}

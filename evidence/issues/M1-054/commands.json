@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-054",
+  "githubIssue": 33,
+  "branch": "feat/m1-054-clipboard-loop-guard",
+  "baseCommit": "5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb",
+  "implementationCommit": "820c57b321611cc4065e1e6d0babfc0f92689146",
+  "implementationCommitFiles": [
+    "Packages/KVMCore/Sources/KVMCore/ClipboardLoopGuard.swift",
+    "Packages/KVMCore/Tests/KVMCoreTests/ClipboardLoopGuardTests.swift",
+    "docs/components/M1-054-clipboard-loop-guard.md"
+  ],
+  "evidenceCommit": null,
+  "evidenceCommitNote": "Not known at evidence-authorship time.",
+  "status": "reviewer_verified",
+  "statusNote": "All commands below were run by the Codex root reviewer against implementation commit 820c57b321611cc4065e1e6d0babfc0f92689146 and transcribed by the author, Claude Opus, who ran no commands.",
+  "authorship": {
+    "repositoryContentAuthor": "Claude Opus",
+    "reviewer": "Codex root reviewer",
+    "detail": "Claude Opus authored the source, test file, component document and this evidence package. The Codex root reviewer authored no repository content; it performed the review, ran every command, made the commit and performs the workflow operations.",
+    "authorDidNot": [
+      "run any shell command",
+      "compile or run tests",
+      "commit, stage, push or write to .git",
+      "open or merge a pull request",
+      "update GitHub state"
+    ]
+  },
+  "timestampNote": "Start and end timestamps were not captured for these runs, so startedAt and endedAt are null. No timestamp is inferred.",
+  "environmentNote": "Initial attempts inside the managed sandbox failed solely due to nested-sandbox and user-Library restrictions. This is an environment limitation, not a product failure. The equivalent direct reruns outside the managed sandbox, recorded below, passed.",
+  "requiredCommands": [
+    {
+      "id": 1,
+      "command": "swift test --package-path Packages/KVMCore",
+      "form": "exact",
+      "ranOutsideManagedSandbox": true,
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "build": "complete",
+        "buildSeconds": 2.42,
+        "swiftTestingTarget": "arm64e-apple-macos14.0",
+        "testsPassed": 47,
+        "failures": 0,
+        "skippedSystemOptIn": 1
+      },
+      "manifestNote": "Observed by the Codex root reviewer outside the managed sandbox: this exact command resolves the repository-root Package.swift and passes. The component document records the same fact.",
+      "report": "tests/results.json"
+    },
+    {
+      "id": 2,
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "ranOutsideManagedSandbox": true,
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "finalLine": "** BUILD SUCCEEDED **",
+        "compilerTarget": "arm64-apple-macos14.0",
+        "nonFatalWarnings": "preexisting destination/platform-discovery warnings only",
+        "newSourceWarningsAttributedToM1054": 0
+      }
+    },
+    {
+      "id": 3,
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "id": 4,
+      "command": "make architecture-check",
+      "form": "exact",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK"
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "id": 5,
+      "command": "make docs-check",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": "docs check OK"
+    },
+    {
+      "id": 6,
+      "command": "make code-quality-check",
+      "ranOutsideManagedSandbox": true,
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "subSteps": [
+        {
+          "name": "swift-format-version",
+          "exitCode": 0,
+          "stdoutSha256": "c55a2ec9b9d5ca78f4281349ef612925879d134e8c7f983e3b13d5a887a723d9"
+        },
+        {
+          "name": "swift-format-lint-strict",
+          "exitCode": 0,
+          "stdoutEmpty": true,
+          "stderrEmpty": true,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "swift-test-warnings-as-errors",
+          "exitCode": 0,
+          "stdoutLines": 100,
+          "stdoutSha256": "b38958c61cd263674aa2f0869be9d49aa4978a9c4dadef5930a0154dcd9c5ed3",
+          "stderrLines": 42,
+          "stderrSha256": "5ef097f9da31f30189a16f6d440a975c75322384b5a43450569a3d48364c77d2"
+        }
+      ],
+      "hashNote": "SHA-256 of command output streams as reported by the reviewer. e3b0c442... is the SHA-256 of empty input. No clipboard content was hashed."
+    },
+    {
+      "id": 7,
+      "command": "git diff --check 5ecdc30beb6607e66c3b9c8e53b3c3d20b52b5fb..820c57b321611cc4065e1e6d0babfc0f92689146",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "result": "no output"
+    },
+    {
+      "id": 8,
+      "command": "make verify",
+      "form": "exact",
+      "ranOutsideManagedSandbox": true,
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "status": "passed",
+      "gatesPassed": 19,
+      "gatesTotal": 19,
+      "gates": [
+        "manifest-validation",
+        "docs-check",
+        "architecture-check",
+        "code-quality",
+        "tool-test-discovery",
+        "evidence-test-discovery",
+        "tool-test:architecture-check",
+        "tool-test:async-harness",
+        "tool-test:cigates",
+        "tool-test:code-quality",
+        "tool-test:diagnostic-bundle",
+        "tool-test:docs-check",
+        "evidence-test:M1-023",
+        "evidence-test:M1-SCOPE-001",
+        "swift-package-test:KVMContracts",
+        "swift-package-test:MacPlatform",
+        "repository-contract-tests",
+        "swift-test-targets",
+        "native-arm64-build"
+      ],
+      "gatesNote": "These 19 gate names exactly match the Codex root reviewer's actual make verify output.",
+      "reportPath": "artifacts/ci/m1-008-report.json",
+      "reportPathNote": "Repository-relative; artifacts/ is Git-ignored and the report is not committed.",
+      "reportSha256": "074c4c85a2cab9d1a2efe834b788283495654dc0d5e7032fdf9326a2260da6da"
+    }
+  ],
+  "pending": [
+    { "item": "evidence commit SHA", "status": "pending" },
+    { "item": "push", "status": "pending" },
+    { "item": "pull request", "status": "pending" },
+    { "item": "GitHub CI", "status": "pending" },
+    { "item": "current-head conflict check", "status": "pending" },
+    { "item": "PR review comment", "status": "pending" },
+    { "item": "merge", "status": "pending" },
+    { "item": "post-merge audit", "status": "pending" }
+  ],
+  "completed": [
+    "Required Commands 1-4 at implementation commit 820c57b321611cc4065e1e6d0babfc0f92689146: all exit 0",
+    "make docs-check, make code-quality-check, git diff --check: all exit 0",
+    "make verify: 19/19",
+    "non-author Codex five-axis review: pass (tests/review-findings.json)"
+  ],
+  "authorCommandAttempts": [],
+  "authorCommandAttemptsNote": "The author ran no commands, so no author command result exists or is claimed.",
+  "reviewHistory": "tests/review-findings.json"
+}
