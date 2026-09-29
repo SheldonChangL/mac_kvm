@@ -1,7 +1,7 @@
 PYTHON ?= python3
 REPORT ?= artifacts/ci/m1-008-report.json
 
-.PHONY: verify backlog-check ci-gate-tests code-quality-check architecture-check docs-check
+.PHONY: verify backlog-check ci-gate-tests code-quality-check architecture-check docs-check e2e
 
 verify:
 	$(PYTHON) Tools/cigates/cigates.py --repository-root . --report "$(REPORT)"
@@ -20,3 +20,8 @@ architecture-check:
 
 docs-check:
 	$(PYTHON) Tools/docs-check/docs-check.py --repository-root .
+
+# ISSUE is passed unexpanded as one single-quoted argv value; run_e2e.py validates it.
+unexport ISSUE
+e2e:
+	$(PYTHON) Tools/Evidence/run_e2e.py --issue '$(subst ','\'',$(value ISSUE))'

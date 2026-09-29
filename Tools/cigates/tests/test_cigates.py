@@ -10,7 +10,7 @@ from unittest import mock
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 MODULE_PATH = REPOSITORY_ROOT / "Tools/cigates/cigates.py"
-EXPECTED_CUMULATIVE_GATE_COUNT = 19
+EXPECTED_CUMULATIVE_GATE_COUNT = 21
 
 spec = importlib.util.spec_from_file_location("cigates", MODULE_PATH)
 cigates = importlib.util.module_from_spec(spec)
@@ -310,6 +310,8 @@ class CIGateTests(unittest.TestCase):
                 "code-quality",
                 "tool-test-discovery",
                 "evidence-test-discovery",
+                "tool-test:Evidence/tests/test_run_e2e.py",
+                "tool-test:Evidence/tests/test_validate_evidence.py",
                 "tool-test:architecture-check/tests/test_architecture_check.py",
                 "tool-test:async-harness/tests/test_async_harness.py",
                 "tool-test:cigates/tests/test_cigates.py",
