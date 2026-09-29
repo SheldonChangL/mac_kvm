@@ -54,9 +54,9 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 
 ## Scope
 
-- Ubuntu LTS Server
-- 重跑核心 matrix
-- 列出與 Windows 差異
+- 真實 Ubuntu LTS Linux Barrier Server，不可用 mock 取代
+- 執行核心 matrix：mouse/buttons/scroll/keyboard/clipboard/TLS/reconnect
+- Windows 結果不可得且不在 M1 範圍（M1-SCOPE-001）；不做 Windows 比較
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E08 與所有 Architecture Guardrails。
 

@@ -54,9 +54,10 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 
 ## Scope
 
-- Windows 與 Linux Server 各至少一組
+- 至少一組真實 Linux Barrier Server capture，不可用 mock 取代
 - 移除 hostname/IP/clipboard/input content
 - 附 metadata 與 capture reproduction steps
+- Windows Server capture 不在 M1 範圍（M1-SCOPE-001）
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E03 與所有 Architecture Guardrails。
 

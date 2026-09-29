@@ -56,7 +56,8 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 ## Scope
 
 - 普通鍵、modifier、repeat、caps lock
-- 至少 Windows Server 一組
+- 至少一組真實 Linux Barrier Server keyboard fixture set，不可用 mock 取代
+- Windows Server keyboard fixture 不在 M1 範圍（M1-SCOPE-001）
 - 不可包含可識別文字內容
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E05 與所有 Architecture Guardrails。

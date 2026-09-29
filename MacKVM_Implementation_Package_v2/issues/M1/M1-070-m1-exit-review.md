@@ -54,9 +54,10 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 
 ## Scope
 
-- 逐條驗證 M1 exit criteria
+- 逐條驗證 M1-SCOPE-001 的 Linux-only M1 exit criteria
 - 所有 critical issue 無 open failure
 - Owner 決定 Go/No-Go，不以 issue closed 數代替品質
+- 不得以 M1 evidence 宣稱 Windows 相容；Windows 在 M1 未執行、未測試
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E00 與所有 Architecture Guardrails。
 

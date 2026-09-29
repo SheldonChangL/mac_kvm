@@ -6,10 +6,11 @@
     {
       "id": "M1",
       "name": "Mac Client MVP（Barrier 驗證）",
-      "goal": "使用既有 Windows/Linux Barrier Server 驗證第一方 macOS Client、KVM Core、Input Injection、Clipboard、TLS 與 Fail-safe。",
+      "goal": "使用既有真實 Linux Barrier Server 驗證第一方 macOS Client、KVM Core、Input Injection、Clipboard、TLS 與 Fail-safe。",
       "exit": [
         "Apple Silicon arm64 原生執行，不依賴 Rosetta。",
-        "Windows 與 Linux Barrier Server 均可控制 Mac 的 mouse、keyboard、scroll 與 UTF-8 clipboard。",
+        "真實 Linux Barrier Server 可控制 Mac 的 mouse、keyboard、scroll 與 UTF-8 clipboard。",
+        "Windows Barrier Server 在 M1 未執行、未測試；M1 evidence 不得宣稱 Windows 相容。",
         "Barrier wire code 僅存在 BarrierCompatibility；Core 僅接收 KVMEvent。",
         "TLS 預設開啟，未知/變更 fingerprint 不會被靜默接受。",
         "所有 disconnect/error/cancel/sleep 路徑均執行可重入的 input cleanup。",
@@ -793,9 +794,10 @@
       ],
       "goal": "擷取並 Sanitise Barrier Client Handshake Fixtures",
       "focus": [
-        "Windows 與 Linux Server 各至少一組",
+        "至少一組真實 Linux Barrier Server capture，不可用 mock 取代",
         "移除 hostname/IP/clipboard/input content",
-        "附 metadata 與 capture reproduction steps"
+        "附 metadata 與 capture reproduction steps",
+        "Windows Server capture 不在 M1 範圍（M1-SCOPE-001）"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -1119,7 +1121,8 @@
       "goal": "擷取並 Sanitise Barrier Keyboard Fixtures",
       "focus": [
         "普通鍵、modifier、repeat、caps lock",
-        "至少 Windows Server 一組",
+        "至少一組真實 Linux Barrier Server keyboard fixture set，不可用 mock 取代",
+        "Windows Server keyboard fixture 不在 M1 範圍（M1-SCOPE-001）",
         "不可包含可識別文字內容"
       ],
       "contract_refs": [],
@@ -3073,12 +3076,12 @@
     },
     {
       "id": "M1-068",
-      "title": "執行 Windows Barrier Server → Mac Client E2E",
+      "title": "記錄 Windows Barrier Server 不執行處置（M1 Windows Non-execution Disposition）",
       "milestone": "M1",
       "epic": "E08",
-      "kind": "e2e",
-      "component": "WindowsBarrierClientE2E",
-      "tier": "H",
+      "kind": "gate",
+      "component": "WindowsNonExecutionDisposition",
+      "tier": "C/H",
       "risk": "critical",
       "priority": "P0",
       "depends_on": [
@@ -3088,11 +3091,12 @@
         "M1-065",
         "M1-067"
       ],
-      "goal": "執行 Windows Barrier Server → Mac Client E2E",
+      "goal": "記錄 Product Owner 核准的 Windows Barrier Server 不執行處置（M1 Windows Non-execution Disposition）",
       "focus": [
-        "mouse/buttons/scroll/keyboard/clipboard/TLS/reconnect",
-        "記錄版本、OS、顯示器與 keyboard layout",
-        "保留 sanitized evidence"
+        "記錄 Product Owner 決策（2026-09-29，Issue #270）與 M1-SCOPE-001 ADR 引用",
+        "machine-readable disposition：`result.json` 的 disposition 為 `not_executed`，不得為 pass/fail 或相容性結論",
+        "Plan 與 README 明示 Windows 在 M1 未執行、未測試，不得宣稱 Windows 相容",
+        "Script 只驗證 disposition 記錄，不啟動、不連線、不執行任何 Windows 測試"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -3106,9 +3110,10 @@
         "evidence/e2e/M1-068/result.json"
       ],
       "commands": [
-        "make e2e ISSUE=M1-068",
+        "bash Tests/SystemTests/Scripts/M1-068-windows-barrier-client-e2-e.sh",
         "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M1-068/result.json",
         "python3 Tools/Backlog/validate_package.py",
+        "make docs-check",
         "make architecture-check"
       ],
       "issue_file": "issues/M1/M1-068-windows-barrier-client-e2-e.md",
@@ -3130,9 +3135,9 @@
       ],
       "goal": "執行 Linux Barrier Server → Mac Client E2E",
       "focus": [
-        "Ubuntu LTS Server",
-        "重跑核心 matrix",
-        "列出與 Windows 差異"
+        "真實 Ubuntu LTS Linux Barrier Server，不可用 mock 取代",
+        "執行核心 matrix：mouse/buttons/scroll/keyboard/clipboard/TLS/reconnect",
+        "Windows 結果不可得且不在 M1 範圍（M1-SCOPE-001）；不做 Windows 比較"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -3170,9 +3175,10 @@
       ],
       "goal": "完成 M1 Alpha Exit Review",
       "focus": [
-        "逐條驗證 M1 exit criteria",
+        "逐條驗證 M1-SCOPE-001 的 Linux-only M1 exit criteria",
         "所有 critical issue 無 open failure",
-        "Owner 決定 Go/No-Go，不以 issue closed 數代替品質"
+        "Owner 決定 Go/No-Go，不以 issue closed 數代替品質",
+        "不得以 M1 evidence 宣稱 Windows 相容；Windows 在 M1 未執行、未測試"
       ],
       "contract_refs": [],
       "source_refs": [],

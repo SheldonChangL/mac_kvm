@@ -16,8 +16,18 @@ M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 
 
 1. [`docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md`](../docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md)：M1-001 的 canonical architecture／MVP contract。
 2. `FROZEN_DECISIONS.md`：僅明確標記 frozen 的決策有約束力；可細化 canonical specification，但不可靜默牴觸。
-3. `PRODUCT_ROADMAP.md`：控制 milestone 與實作順序，不取代架構合約。
+3. `PRODUCT_ROADMAP.md`：控制 milestone 與實作順序，不取代架構合約；可由 accepted ADR 狹義 supersede。
 4. 本文件：只提供 traceability index。
+
+## M1 Validation Scope Supersession
+
+本節只記錄 supersession chain，不是產品合約；合約內容以下列 ADR 為準。
+
+- `docs/spec/CANONICAL_SPEC_SECTIONS_60_64.md` 與 `docs/adr/M1-001-product-contract.md` 保持不變，後者作為 Accepted historical context。
+- [`docs/adr/M1-SCOPE-001-linux-only-validation.md`](../docs/adr/M1-SCOPE-001-linux-only-validation.md)（Accepted 2026-09-29，Product Owner decision，Issue #270）僅 supersede M1 驗證條款：M1 goal/exit 的 Windows+Linux Barrier Server 要求、M1-024 Windows+Linux fixture、M1-040 Windows keyboard fixture、M1-068 Windows E2E execution、M1-069 Windows 比較、M1-070 舊 Windows+Linux exit criteria。
+- 受影響來源：`PRODUCT_ROADMAP.md` M1、`issues_manifest.json` 與 M1-024、M1-040、M1-068、M1-069、M1-070 Issue 檔。
+- M2、M4、M5 Windows 產品範圍不變。
+- Verification：`Tests/Contracts/test_m1_linux_only_validation_scope.py`。
 
 ## M1-001 Direct Traceability
 

@@ -12,12 +12,15 @@ M5 Production 1.0; Barrier optional only
 
 ## M1 — Mac Client MVP（Barrier 驗證）
 
-使用既有 Windows/Linux Barrier Server 驗證第一方 macOS Client、KVM Core、Input Injection、Clipboard、TLS 與 Fail-safe。
+使用既有真實 Linux Barrier Server 驗證第一方 macOS Client、KVM Core、Input Injection、Clipboard、TLS 與 Fail-safe。
+
+> M1 驗證範圍依 [`docs/adr/M1-SCOPE-001-linux-only-validation.md`](../docs/adr/M1-SCOPE-001-linux-only-validation.md)（Accepted 2026-09-29，Issue #270）：Windows 在 M1 未執行、未測試，不得以 M1 evidence 宣稱 Windows 相容。M2、M4、M5 的 Windows 產品範圍不變。
 
 ### Exit Criteria
 
 - [ ] Apple Silicon arm64 原生執行，不依賴 Rosetta。
-- [ ] Windows 與 Linux Barrier Server 均可控制 Mac 的 mouse、keyboard、scroll 與 UTF-8 clipboard。
+- [ ] 真實 Linux Barrier Server 可控制 Mac 的 mouse、keyboard、scroll 與 UTF-8 clipboard。
+- [ ] Windows Barrier Server 在 M1 未執行、未測試；M1 evidence 不得宣稱 Windows 相容。
 - [ ] Barrier wire code 僅存在 BarrierCompatibility；Core 僅接收 KVMEvent。
 - [ ] TLS 預設開啟，未知/變更 fingerprint 不會被靜默接受。
 - [ ] 所有 disconnect/error/cancel/sleep 路徑均執行可重入的 input cleanup。
