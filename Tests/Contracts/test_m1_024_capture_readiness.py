@@ -1,0 +1,461 @@
+import copy
+import hashlib
+import json
+import re
+import unittest
+from pathlib import Path
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+PACKAGE_ROOT = REPOSITORY_ROOT / "MacKVM_Implementation_Package_v2"
+LOCK = PACKAGE_ROOT / "toolchain.lock.json"
+EXAMPLE_LOCK = PACKAGE_ROOT / "toolchain.lock.example.json"
+MANIFEST = PACKAGE_ROOT / "issues_manifest.json"
+ADR = REPOSITORY_ROOT / "docs/adr/M1-CAPTURE-TOOLCHAIN-001-capture-readiness.md"
+
+EXAMPLE_LOCK_SHA256 = "0018c53bd7b61611e204861528f8aa0a17c11447ea537256afd210a55224cd96"
+M4_UNRESOLVED = "UNRESOLVED_UNTIL_M4-001"
+
+EXPECTED_LOCK = {
+    "schema_version": "1.0",
+    "lock_id": "M1-CAPTURE-TOOLCHAIN-001",
+    "status": "LOCKED",
+    "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
+    "scoped_issues": ["M1-024"],
+    "traceability": {
+        "github_issue": "#274",
+        "adr": "docs/adr/M1-CAPTURE-TOOLCHAIN-001-capture-readiness.md",
+    },
+    "macos_capture_host": {
+        "os": {"name": "macOS", "version": "26.6.2", "build": "25G83"},
+        "architecture": "arm64",
+        "swift": {
+            "compiler": "Apple Swift 6.2.3",
+            "driver": "swift-driver 1.127.14.1",
+            "target": "arm64-apple-macosx26.0",
+        },
+        "python": {"system": "3.9.6", "ci_homebrew": "3.14.7"},
+        "barrier_client": {
+            "executable": "barrierc",
+            "version": "2.4.0-release",
+            "protocol_version": "1.6",
+        },
+    },
+    "linux_peer": {
+        "os": {"name": "Ubuntu", "version": "22.04"},
+        "architecture": "x86_64",
+        "barrier_server": {
+            "executable": "barriers",
+            "version": "2.4.0-release",
+            "protocol_version": "1.6",
+        },
+        "capture_tools": {
+            "dumpcap_wireshark": {"version": "3.6.2", "package_version": "3.6.2-2"},
+            "tcpdump": {"version": "4.99.1"},
+        },
+    },
+    "barrier": {
+        "role": "EXTERNAL_TEST_PEER_ONLY",
+        "implementation_in_repository": "NONE_COPIED_LINKED_OR_BUNDLED",
+    },
+    "capture": {
+        "raw_capture_location": "OUTSIDE_REPOSITORY",
+        "retained_fixture_content": "ORDERED_DIRECTION_AND_UNINTERPRETED_APPLICATION_PAYLOAD_BYTES_ONLY",
+        "wire_semantics_asserted": False,
+        "windows_executed": False,
+    },
+    "privacy": {
+        "prohibited_content": [
+            "hostname",
+            "ip_address",
+            "username",
+            "path_containing_username",
+            "credential",
+            "key",
+            "token",
+            "certificate_identity",
+            "certificate_fingerprint",
+            "typed_text",
+            "clipboard_content",
+        ],
+    },
+    "drift_policy": {
+        "rule": "FAIL_CLOSED",
+        "statement": (
+            "Any OS, architecture, tool, Barrier or protocol version that differs "
+            "from this lock stops M1-024 capture; only a new Product Owner approved "
+            "ADR may change this lock."
+        ),
+    },
+    "m4_first_party_production_toolchain": {
+        "status": M4_UNRESOLVED,
+        "windows": M4_UNRESOLVED,
+        "linux": M4_UNRESOLVED,
+        "selected_by_this_lock": False,
+    },
+}
+
+ORIGINAL_EXACT_FILES = [
+    "Tests/SystemTests/Plans/M1-024-barrier-client-handshake-fixtures.md",
+    "Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
+    "evidence/e2e/M1-024/README.md",
+    "evidence/e2e/M1-024/result.json",
+]
+NEW_EXACT_FILES = [
+    "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/metadata.json",
+    "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+    "evidence/issues/M1-024/summary.md",
+    "evidence/issues/M1-024/commands.json",
+    "evidence/issues/M1-024/tests/e2e-validation.json",
+    "evidence/issues/M1-024/environment.json",
+    "evidence/issues/M1-024/manual.md",
+    "evidence/issues/M1-024/independent-review.md",
+]
+
+REQUIRED_M1_024_FOCUS = (
+    "Raw packet capture 保留在 repository 外，不得提交",
+    "handshake-capture.json 只保存有序 direction 與未解讀的 application-payload bytes，編碼方式記錄於 M1-024 plan",
+    "不得宣稱欄位意義、message code、endianness 或相容性",
+    "fixture、mandatory evidence package 與非實作者 independent review 屬本 Issue 範圍",
+    "Windows 在 M1 未執行，不得宣稱 Windows 結果",
+)
+CLAIM_SECTIONS = ("Outcome", "Scope", "Acceptance Criteria")
+NEGATION = re.compile(r"(?i)不|未|\bnot\b|\bno\b")
+WIRE_SEMANTIC_CLAIM = re.compile(
+    r"(?i)message code|endian|field (?:meaning|semantic)|欄位(?:意義|語意)|相容|compatib"
+)
+WINDOWS_CLAIM = re.compile(r"(?i)\bexecuted\b|\bpass(?:ed)?\b|compatib|已執行|通過|相容")
+
+REQUIRED_PROVENANCE = (
+    "controlled black-box capture",
+    "lawfully installed external Barrier macOS client (`barrierc`)",
+    "external Linux Barrier server (`barriers`)",
+    "evidence for a later independent first-party implementation",
+    "No first-party macOS Client participates in this capture",
+    "not frozen until M1-025",
+)
+FIRST_PARTY_CAPTURE_CLAIM = re.compile(
+    r"(?i)\b(?:against|produced by|generated by|captured (?:from|by)|from|by|with)\s+"
+    r"(?:the\s+)?first-party\s+(?:macOS|Mac)\s+client"
+    r"|(?:針對|對|由|來自)\s*第一方\s*(?:macOS|Mac)\s*Client"
+)
+
+IDENTIFYING_PATTERNS = {
+    "ipv4": re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
+    "ipv6": re.compile(r"(?i)\b(?:[0-9a-f]{1,4}:){2,7}[0-9a-f]{0,4}\b"),
+    "user path": re.compile(r"(?i)(?:/Users/|/home/|C:\\Users\\)[^/\s\\]+"),
+    "email": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
+    "local hostname": re.compile(r"(?i)\b[\w-]+\.(?:local|lan|internal|corp|home)\b"),
+    "certificate fingerprint": re.compile(r"(?i)\b(?:[0-9a-f]{2}:){7,}[0-9a-f]{2}\b|\b[0-9a-f]{32,}\b"),
+    "pem material": re.compile(r"-----BEGIN [A-Z ]+-----"),
+    "token": re.compile(r"\b(?:ghp_|gho_|github_pat_|sk-|xox[abp]-)[\w-]+"),
+}
+
+
+def section(text, heading, level="##"):
+    pattern = rf"(?ms)^{re.escape(level)} {re.escape(heading)}\n(.*?)(?=^{re.escape(level)} |\Z)"
+    match = re.search(pattern, text)
+    return match.group(1) if match else ""
+
+
+def bullets(text):
+    return [line[2:] for line in text.splitlines() if line.startswith("- ")]
+
+
+def identifying_content(text):
+    return sorted(name for name, pattern in IDENTIFYING_PATTERNS.items() if pattern.search(text))
+
+
+def shape_violations(actual, expected, path=""):
+    if isinstance(expected, dict):
+        if not isinstance(actual, dict):
+            return [f"value drift: {path}"]
+        violations = []
+        for key in sorted(actual.keys() - expected.keys()):
+            violations.append(f"unknown key: {path}{key}")
+        for key in sorted(expected.keys() - actual.keys()):
+            violations.append(f"missing key: {path}{key}")
+        for key in sorted(actual.keys() & expected.keys()):
+            violations.extend(shape_violations(actual[key], expected[key], f"{path}{key}."))
+        return violations
+    if type(actual) is not type(expected) or actual != expected:
+        return [f"value drift: {path.rstrip('.')}"]
+    return []
+
+
+def string_leaves(value, path=""):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield f"{path}{key}", key
+            yield from string_leaves(item, f"{path}{key}.")
+    elif isinstance(value, list):
+        for item in value:
+            yield from string_leaves(item, path)
+    elif isinstance(value, str):
+        yield path.rstrip("."), value
+
+
+def pinned(path):
+    value = EXPECTED_LOCK
+    for part in path.split("."):
+        if not isinstance(value, dict) or part not in value:
+            return None
+        value = value[part]
+    return value
+
+
+def lock_violations(lock):
+    violations = shape_violations(lock, EXPECTED_LOCK)
+    for path, text in string_leaves(lock):
+        # Pinned values were reviewed as non-identifying; e.g. the dotted swift-driver version.
+        if text == pinned(path) or text in EXPECTED_LOCK["privacy"]["prohibited_content"]:
+            continue
+        for name in identifying_content(text):
+            violations.append(f"identifying content: {path}: {name}")
+    return violations
+
+
+def issue_violations(entry, issue_text):
+    violations = []
+    issue_exact = [b.strip("`") for b in bullets(section(issue_text, "Exact Files"))]
+    if issue_exact != entry["exact_files"]:
+        violations.append("package/manifest exact files mismatch")
+    for label, exact in (("manifest", entry["exact_files"]), ("issue", issue_exact)):
+        if exact[: len(ORIGINAL_EXACT_FILES)] != ORIGINAL_EXACT_FILES:
+            violations.append(f"{label}: original exact files must remain first")
+        if exact != ORIGINAL_EXACT_FILES + NEW_EXACT_FILES:
+            violations.append(f"{label}: exact files must be original four plus eight new paths")
+        for path in NEW_EXACT_FILES:
+            if path not in exact:
+                violations.append(f"{label}: missing exact file {path}")
+    scope = bullets(section(issue_text, "Scope"))
+    for marker in REQUIRED_M1_024_FOCUS:
+        if marker not in entry["focus"] or marker not in scope:
+            violations.append(f"missing clarification: {marker}")
+    lines = [entry["title"], entry["goal"], *entry["focus"]]
+    for heading in CLAIM_SECTIONS:
+        lines.extend(section(issue_text, heading).splitlines())
+    for line in lines:
+        if NEGATION.search(line):
+            continue
+        if WIRE_SEMANTIC_CLAIM.search(line):
+            violations.append(f"claims wire semantics: {line}")
+        if "windows" in line.lower() and WINDOWS_CLAIM.search(line):
+            violations.append(f"claims Windows execution: {line}")
+    if "toolchain.lock.json" not in issue_text or "M1-CAPTURE-TOOLCHAIN-001" not in issue_text:
+        violations.append("issue must reference the capture toolchain lock and ADR")
+    return violations
+
+
+def provenance_violations(adr_text):
+    context = section(adr_text, "Context")
+    violations = [
+        f"missing provenance: {marker}" for marker in REQUIRED_PROVENANCE if marker not in context
+    ]
+    for match in FIRST_PARTY_CAPTURE_CLAIM.finditer(adr_text):
+        violations.append(f"claims first-party client capture: {match.group(0)}")
+    return violations
+
+
+class M1024CaptureReadinessTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.lock_bytes = LOCK.read_bytes()
+        cls.lock = json.loads(cls.lock_bytes)
+        cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        cls.entry = next(i for i in cls.manifest["issues"] if i["id"] == "M1-024")
+        cls.issue_text = (PACKAGE_ROOT / cls.entry["issue_file"]).read_text(encoding="utf-8")
+        cls.adr = ADR.read_text(encoding="utf-8")
+
+    def mutated(self, mutate):
+        lock = copy.deepcopy(self.lock)
+        mutate(lock)
+        return lock_violations(lock)
+
+    def test_lock_matches_closed_contract(self):
+        self.assertEqual(lock_violations(self.lock), [])
+
+    def test_lock_is_deterministic_json(self):
+        canonical = json.dumps(self.lock, indent=2, ensure_ascii=False) + "\n"
+        self.assertEqual(self.lock_bytes.decode("utf-8"), canonical)
+
+    def test_lock_rejects_missing_and_unknown_keys(self):
+        violations = self.mutated(lambda l: l["linux_peer"].pop("capture_tools"))
+        self.assertIn("missing key: linux_peer.capture_tools", violations)
+        violations = self.mutated(lambda l: l.update(notes="extra"))
+        self.assertIn("unknown key: notes", violations)
+        violations = self.mutated(lambda l: l["barrier"].update(source="vendored"))
+        self.assertIn("unknown key: barrier.source", violations)
+
+    def test_lock_rejects_unlocked_or_wrong_scope(self):
+        self.assertIn("value drift: status", self.mutated(lambda l: l.update(status="UNLOCKED")))
+        self.assertIn("value drift: scope", self.mutated(lambda l: l.update(scope="M1_ALL")))
+        self.assertIn(
+            "value drift: scoped_issues",
+            self.mutated(lambda l: l["scoped_issues"].append("M4-001")),
+        )
+
+    def test_lock_rejects_barrier_role_drift(self):
+        self.assertIn(
+            "value drift: barrier.role",
+            self.mutated(lambda l: l["barrier"].update(role="PRODUCT_COMPONENT")),
+        )
+        self.assertIn(
+            "value drift: barrier.implementation_in_repository",
+            self.mutated(lambda l: l["barrier"].update(implementation_in_repository="LINKED")),
+        )
+        self.assertIn(
+            "value drift: capture.raw_capture_location",
+            self.mutated(lambda l: l["capture"].update(raw_capture_location="REPOSITORY")),
+        )
+
+    def test_lock_rejects_missing_or_changed_tool_versions(self):
+        def missing(l):
+            del l["macos_capture_host"]["swift"]["driver"]
+
+        self.assertIn("missing key: macos_capture_host.swift.driver", self.mutated(missing))
+        for path, value in (
+            ("macos_capture_host.os.build", "25G84"),
+            ("macos_capture_host.barrier_client.version", "2.4.1-release"),
+            ("macos_capture_host.python.ci_homebrew", "3.14.8"),
+            ("linux_peer.barrier_server.protocol_version", "1.7"),
+            ("linux_peer.capture_tools.tcpdump.version", "4.99.2"),
+            ("linux_peer.capture_tools.dumpcap_wireshark.package_version", "3.6.2-3"),
+        ):
+            with self.subTest(path=path):
+                *parents, leaf = path.split(".")
+
+                def change(l):
+                    target = l
+                    for part in parents:
+                        target = target[part]
+                    target[leaf] = value
+
+                self.assertIn(f"value drift: {path}", self.mutated(change))
+
+    def test_lock_rejects_identifying_content(self):
+        for value, name in (
+            ("192.168.1.20", "ipv4"),
+            ("fe80::1:2:3", "ipv6"),
+            ("/Users/alice/capture.pcapng", "user path"),
+            ("/home/bob/capture.pcapng", "user path"),
+            ("peer@example.com", "email"),
+            ("capture-peer.local", "local hostname"),
+            ("AB:CD:EF:01:23:45:67:89:AB", "certificate fingerprint"),
+            ("-----BEGIN CERTIFICATE-----", "pem material"),
+            ("ghp_abcdefghijklmnop", "token"),
+        ):
+            with self.subTest(name=name):
+                violations = self.mutated(lambda l: l["linux_peer"]["os"].update(version=value))
+                self.assertIn("value drift: linux_peer.os.version", violations)
+                self.assertIn(f"identifying content: linux_peer.os.version: {name}", violations)
+        violations = self.mutated(lambda l: l.update(peer_address="10.0.0.5"))
+        self.assertIn("identifying content: peer_address: ipv4", violations)
+
+    def test_lock_preserves_m4_unresolved_status(self):
+        for key in ("status", "windows", "linux"):
+            with self.subTest(key=key):
+                violations = self.mutated(
+                    lambda l: l["m4_first_party_production_toolchain"].update({key: "CMAKE_CPP"})
+                )
+                self.assertIn(f"value drift: m4_first_party_production_toolchain.{key}", violations)
+        violations = self.mutated(
+            lambda l: l["m4_first_party_production_toolchain"].update(selected_by_this_lock=True)
+        )
+        self.assertIn("value drift: m4_first_party_production_toolchain.selected_by_this_lock", violations)
+        self.assertEqual(hashlib.sha256(EXAMPLE_LOCK.read_bytes()).hexdigest(), EXAMPLE_LOCK_SHA256)
+        self.assertEqual(json.loads(EXAMPLE_LOCK.read_text())["status"], M4_UNRESOLVED)
+
+    def test_m1_024_issue_and_manifest_agree(self):
+        self.assertEqual(issue_violations(self.entry, self.issue_text), [])
+        self.assertEqual(self.entry["exact_files"][:4], ORIGINAL_EXACT_FILES)
+        self.assertEqual(self.entry["exact_files"], ORIGINAL_EXACT_FILES + NEW_EXACT_FILES)
+
+    def test_issue_check_rejects_exact_files_drift(self):
+        entry = copy.deepcopy(self.entry)
+        entry["exact_files"].remove("evidence/issues/M1-024/independent-review.md")
+        violations = issue_violations(entry, self.issue_text)
+        self.assertIn("package/manifest exact files mismatch", violations)
+        self.assertIn(
+            "manifest: missing exact file evidence/issues/M1-024/independent-review.md", violations
+        )
+        entry = copy.deepcopy(self.entry)
+        entry["exact_files"] = NEW_EXACT_FILES + ORIGINAL_EXACT_FILES
+        violations = issue_violations(entry, self.issue_text)
+        self.assertIn("manifest: original exact files must remain first", violations)
+        text = self.issue_text.replace(
+            "- `evidence/issues/M1-024/manual.md`\n", "", 1
+        )
+        violations = issue_violations(self.entry, text)
+        self.assertIn("issue: missing exact file evidence/issues/M1-024/manual.md", violations)
+
+    def test_issue_check_rejects_wire_semantics_or_windows_claims(self):
+        entry = copy.deepcopy(self.entry)
+        entry["focus"].append("handshake fixture 證明 message code 與 endian 欄位意義")
+        entry["focus"].append("Windows Barrier Server executed and passed")
+        violations = issue_violations(entry, self.issue_text)
+        self.assertTrue(any(v.startswith("claims wire semantics:") for v in violations))
+        self.assertTrue(any(v.startswith("claims Windows execution:") for v in violations))
+        entry = copy.deepcopy(self.entry)
+        entry["focus"] = [f for f in entry["focus"] if f != REQUIRED_M1_024_FOCUS[0]]
+        violations = issue_violations(entry, self.issue_text)
+        self.assertIn(f"missing clarification: {REQUIRED_M1_024_FOCUS[0]}", violations)
+
+    def test_adr_is_accepted_with_required_sections(self):
+        self.assertIn(
+            "Accepted by Product Owner authorization on 2026-09-29", section(self.adr, "Status")
+        )
+        for heading in (
+            "Context",
+            "Decision",
+            "Selected alternative",
+            "Rejected alternatives",
+            "Security and privacy",
+            "Compatibility",
+            "M4 preservation",
+            "Consequences",
+            "Rollback",
+            "Traceability",
+        ):
+            with self.subTest(heading=heading):
+                self.assertTrue(section(self.adr, heading).strip())
+        for marker in (
+            "Issue #274",
+            M4_UNRESOLVED,
+            "MacKVM_Implementation_Package_v2/toolchain.lock.json",
+            "Tests/Contracts/test_m1_024_capture_readiness.py",
+            "does not change canonical or frozen product architecture",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, self.adr)
+
+    def test_adr_states_external_black_box_provenance(self):
+        self.assertEqual(provenance_violations(self.adr), [])
+        self.assertIsNone(FIRST_PARTY_CAPTURE_CLAIM.search(self.issue_text))
+
+    def test_provenance_check_rejects_first_party_client_capture_claims(self):
+        for claim in (
+            "handshake capture against the first-party macOS Client environment",
+            "fixture produced by the first-party macOS Client",
+            "bytes captured from the first-party Mac client",
+            "針對第一方 macOS Client 的 handshake capture",
+        ):
+            with self.subTest(claim=claim):
+                violations = provenance_violations(self.adr + f"\n{claim}\n")
+                self.assertTrue(
+                    any(v.startswith("claims first-party client capture:") for v in violations)
+                )
+        for marker in REQUIRED_PROVENANCE:
+            with self.subTest(marker=marker):
+                violations = provenance_violations(self.adr.replace(marker, "", 1))
+                self.assertIn(f"missing provenance: {marker}", violations)
+
+    def test_documents_have_no_identifying_content_or_placeholders(self):
+        for name, text in (("adr", self.adr), ("issue", self.issue_text)):
+            with self.subTest(document=name):
+                self.assertEqual(identifying_content(text), [])
+                self.assertIsNone(re.search(r"\b(?:TODO|TBD)\b", text))
+
+
+if __name__ == "__main__":
+    unittest.main()

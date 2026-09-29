@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "lock_id": "M1-CAPTURE-TOOLCHAIN-001",
+  "status": "LOCKED",
+  "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
+  "scoped_issues": [
+    "M1-024"
+  ],
+  "traceability": {
+    "github_issue": "#274",
+    "adr": "docs/adr/M1-CAPTURE-TOOLCHAIN-001-capture-readiness.md"
+  },
+  "macos_capture_host": {
+    "os": {
+      "name": "macOS",
+      "version": "26.6.2",
+      "build": "25G83"
+    },
+    "architecture": "arm64",
+    "swift": {
+      "compiler": "Apple Swift 6.2.3",
+      "driver": "swift-driver 1.127.14.1",
+      "target": "arm64-apple-macosx26.0"
+    },
+    "python": {
+      "system": "3.9.6",
+      "ci_homebrew": "3.14.7"
+    },
+    "barrier_client": {
+      "executable": "barrierc",
+      "version": "2.4.0-release",
+      "protocol_version": "1.6"
+    }
+  },
+  "linux_peer": {
+    "os": {
+      "name": "Ubuntu",
+      "version": "22.04"
+    },
+    "architecture": "x86_64",
+    "barrier_server": {
+      "executable": "barriers",
+      "version": "2.4.0-release",
+      "protocol_version": "1.6"
+    },
+    "capture_tools": {
+      "dumpcap_wireshark": {
+        "version": "3.6.2",
+        "package_version": "3.6.2-2"
+      },
+      "tcpdump": {
+        "version": "4.99.1"
+      }
+    }
+  },
+  "barrier": {
+    "role": "EXTERNAL_TEST_PEER_ONLY",
+    "implementation_in_repository": "NONE_COPIED_LINKED_OR_BUNDLED"
+  },
+  "capture": {
+    "raw_capture_location": "OUTSIDE_REPOSITORY",
+    "retained_fixture_content": "ORDERED_DIRECTION_AND_UNINTERPRETED_APPLICATION_PAYLOAD_BYTES_ONLY",
+    "wire_semantics_asserted": false,
+    "windows_executed": false
+  },
+  "privacy": {
+    "prohibited_content": [
+      "hostname",
+      "ip_address",
+      "username",
+      "path_containing_username",
+      "credential",
+      "key",
+      "token",
+      "certificate_identity",
+      "certificate_fingerprint",
+      "typed_text",
+      "clipboard_content"
+    ]
+  },
+  "drift_policy": {
+    "rule": "FAIL_CLOSED",
+    "statement": "Any OS, architecture, tool, Barrier or protocol version that differs from this lock stops M1-024 capture; only a new Product Owner approved ADR may change this lock."
+  },
+  "m4_first_party_production_toolchain": {
+    "status": "UNRESOLVED_UNTIL_M4-001",
+    "windows": "UNRESOLVED_UNTIL_M4-001",
+    "linux": "UNRESOLVED_UNTIL_M4-001",
+    "selected_by_this_lock": false
+  }
+}

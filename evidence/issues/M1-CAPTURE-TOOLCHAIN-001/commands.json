@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-CAPTURE-TOOLCHAIN-001",
+  "githubIssue": 274,
+  "implementationCommit": "60e8924c40f4536a72a06f1418a5aa5be78622c4",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 Tests/Contracts/test_m1_024_capture_readiness.py -v",
+      "startedAt": "2026-09-29T06:10:01.821Z",
+      "endedAt": "2026-09-29T06:10:01.969Z",
+      "exitCode": 0,
+      "result": "15 tests passed"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-29T06:10:01.832Z",
+      "endedAt": "2026-09-29T06:10:01.966Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-29T06:10:01.832Z",
+      "endedAt": "2026-09-29T06:10:02.020Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-29T06:10:01.832Z",
+      "endedAt": "2026-09-29T06:10:02.153Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-29T06:10:01.832Z",
+      "endedAt": "2026-09-29T06:10:01.913Z",
+      "exitCode": 0,
+      "result": "no output"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-capture-toolchain-001-report.json",
+      "startedAt": "2026-09-29T06:10:13.104Z",
+      "endedAt": "2026-09-29T06:10:49.152Z",
+      "exitCode": 0,
+      "result": "21/21 gates passed on exact commit, including repository-contract-tests, Swift package tests, swift-test-targets and native-arm64-build"
+    }
+  ]
+}

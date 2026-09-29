@@ -38,6 +38,7 @@ labels:
 ## Preconditions
 
 - 所有 dependencies 已完成：M1-023。
+- `MacKVM_Implementation_Package_v2/toolchain.lock.json`（M1-CAPTURE-TOOLCHAIN-001，僅限 M1 controlled Barrier black-box capture）狀態為 LOCKED；實際 OS、architecture、tool、Barrier 或 protocol version 與 lock 不符即停止（fail closed）。
 
 ## Exact Files
 
@@ -45,6 +46,14 @@ labels:
 - `Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh`
 - `evidence/e2e/M1-024/README.md`
 - `evidence/e2e/M1-024/result.json`
+- `Tests/Fixtures/Barrier/m1-024-linux-client-handshake/metadata.json`
+- `Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json`
+- `evidence/issues/M1-024/summary.md`
+- `evidence/issues/M1-024/commands.json`
+- `evidence/issues/M1-024/tests/e2e-validation.json`
+- `evidence/issues/M1-024/environment.json`
+- `evidence/issues/M1-024/manual.md`
+- `evidence/issues/M1-024/independent-review.md`
 
 Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴大 PR。
 
@@ -58,6 +67,11 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 - 移除 hostname/IP/clipboard/input content
 - 附 metadata 與 capture reproduction steps
 - Windows Server capture 不在 M1 範圍（M1-SCOPE-001）
+- Raw packet capture 保留在 repository 外，不得提交
+- handshake-capture.json 只保存有序 direction 與未解讀的 application-payload bytes，編碼方式記錄於 M1-024 plan
+- 不得宣稱欄位意義、message code、endianness 或相容性
+- fixture、mandatory evidence package 與非實作者 independent review 屬本 Issue 範圍
+- Windows 在 M1 未執行，不得宣稱 Windows 結果
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E03 與所有 Architecture Guardrails。
 
@@ -108,6 +122,7 @@ make architecture-check
 - [ ] `evidence/issues/M1-024/tests/`：machine-readable test report。
 - [ ] `evidence/issues/M1-024/environment.json`：OS/hardware/network/peer metadata。
 - [ ] `evidence/issues/M1-024/manual.md`：步驟、預期、實際、reviewer。
+- [ ] `evidence/issues/M1-024/independent-review.md`：非實作者 reviewer 的獨立驗證紀錄。
 
 ## Manual Verification
 

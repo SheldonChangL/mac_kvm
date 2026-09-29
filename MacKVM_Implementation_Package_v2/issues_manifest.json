@@ -797,7 +797,12 @@
         "至少一組真實 Linux Barrier Server capture，不可用 mock 取代",
         "移除 hostname/IP/clipboard/input content",
         "附 metadata 與 capture reproduction steps",
-        "Windows Server capture 不在 M1 範圍（M1-SCOPE-001）"
+        "Windows Server capture 不在 M1 範圍（M1-SCOPE-001）",
+        "Raw packet capture 保留在 repository 外，不得提交",
+        "handshake-capture.json 只保存有序 direction 與未解讀的 application-payload bytes，編碼方式記錄於 M1-024 plan",
+        "不得宣稱欄位意義、message code、endianness 或相容性",
+        "fixture、mandatory evidence package 與非實作者 independent review 屬本 Issue 範圍",
+        "Windows 在 M1 未執行，不得宣稱 Windows 結果"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -808,7 +813,15 @@
         "Tests/SystemTests/Plans/M1-024-barrier-client-handshake-fixtures.md",
         "Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
         "evidence/e2e/M1-024/README.md",
-        "evidence/e2e/M1-024/result.json"
+        "evidence/e2e/M1-024/result.json",
+        "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/metadata.json",
+        "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+        "evidence/issues/M1-024/summary.md",
+        "evidence/issues/M1-024/commands.json",
+        "evidence/issues/M1-024/tests/e2e-validation.json",
+        "evidence/issues/M1-024/environment.json",
+        "evidence/issues/M1-024/manual.md",
+        "evidence/issues/M1-024/independent-review.md"
       ],
       "commands": [
         "make e2e ISSUE=M1-024",
