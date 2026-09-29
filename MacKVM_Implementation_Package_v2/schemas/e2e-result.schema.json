@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MacKVM E2E Result Evidence",
+  "description": "Contract for evidence/e2e/<ISSUE>/result.json (M1-TOOLING-001). Tools/Evidence/validate_evidence.py enforces this contract directly with the Python standard library and additionally enforces rules JSON Schema cannot express: timestamps parse and startedAt <= endedAt, artifact paths under evidence/e2e/ match issueId, artifact files are regular non-symlink files whose SHA-256 and byteLength match, case ids are unique, the result file is not listed as its own artifact, and descriptive text contains no obvious secret or private-content markers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "issueId",
+    "status",
+    "startedAt",
+    "endedAt",
+    "commit",
+    "toolchain",
+    "environment",
+    "cases",
+    "artifacts",
+    "privacy",
+    "approvedDecisionRef"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "issueId": {
+      "type": "string",
+      "pattern": "^M[1-5]-[0-9]{3}$"
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "timed_out",
+        "cancelled",
+        "not_executed"
+      ]
+    },
+    "startedAt": {
+      "$ref": "#/$defs/utcTimestamp"
+    },
+    "endedAt": {
+      "$ref": "#/$defs/utcTimestamp"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pythonVersion",
+        "platform",
+        "machine"
+      ],
+      "properties": {
+        "pythonVersion": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "platform": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "machine": {
+          "$ref": "#/$defs/metadataText"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localOS",
+        "peerProduct",
+        "peerVersion",
+        "peerRole",
+        "peerOS",
+        "networkScope",
+        "tls"
+      ],
+      "properties": {
+        "localOS": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "peerProduct": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "peerVersion": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "peerRole": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "peerOS": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "networkScope": {
+          "$ref": "#/$defs/metadataText"
+        },
+        "tls": {
+          "$ref": "#/$defs/metadataText"
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "containsSensitiveData",
+        "containsTypedText",
+        "containsClipboardPayload",
+        "containsCredentials",
+        "containsKeyMaterial",
+        "containsHostnames",
+        "containsIPAddresses",
+        "rawCaptureCommitted",
+        "sanitizationReviewed"
+      ],
+      "properties": {
+        "containsSensitiveData": {
+          "const": false
+        },
+        "containsTypedText": {
+          "const": false
+        },
+        "containsClipboardPayload": {
+          "const": false
+        },
+        "containsCredentials": {
+          "const": false
+        },
+        "containsKeyMaterial": {
+          "const": false
+        },
+        "containsHostnames": {
+          "const": false
+        },
+        "containsIPAddresses": {
+          "const": false
+        },
+        "rawCaptureCommitted": {
+          "const": false
+        },
+        "sanitizationReviewed": {
+          "const": true
+        }
+      }
+    },
+    "approvedDecisionRef": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/decisionRef"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "not_executed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "maxItems": 0
+          },
+          "artifacts": {
+            "maxItems": 0
+          },
+          "approvedDecisionRef": {
+            "$ref": "#/$defs/decisionRef"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "cases": {
+            "minItems": 1
+          },
+          "approvedDecisionRef": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "passed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "status": {
+                  "const": "passed"
+                }
+              }
+            }
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "reviewStatus": {
+                  "const": "reviewed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "failed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "const": "failed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "timed_out"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "const": "timed_out"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "const": "cancelled"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?Z$"
+    },
+    "metadataText": {
+      "type": "string",
+      "pattern": "^[!-~]([ -~]{0,126}[!-~])?$"
+    },
+    "descriptionText": {
+      "type": "string",
+      "pattern": "^[!-~]([ -~]{0,198}[!-~])?$"
+    },
+    "decisionRef": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._#/-]{0,159}$"
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "exitCode",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "timed_out",
+            "cancelled"
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/descriptionText"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 255
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "timed_out"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "enum": [
+                  null,
+                  124
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "cancelled"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "enum": [
+                  null,
+                  130
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "byteLength",
+        "kind",
+        "reviewStatus"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 512,
+          "pattern": "^(evidence/e2e/M[1-5]-[0-9]{3}|Tests/Fixtures)(/[A-Za-z0-9_-][A-Za-z0-9._-]{0,127})+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "enum": [
+            "sanitized-fixture",
+            "sanitized-log",
+            "machine-report",
+            "manual-record"
+          ]
+        },
+        "reviewStatus": {
+          "enum": [
+            "reviewed",
+            "pending-review"
+          ]
+        }
+      }
+    }
+  }
+}
