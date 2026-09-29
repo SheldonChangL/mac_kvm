@@ -360,6 +360,55 @@ class JsonParsingTests(ValidatorTestCase):
 
     def test_deeply_nested_json(self):
         self.assert_raw_invalid(b"[" * 100000 + b"]" * 100000, "invalid_json")
+        self.assert_raw_invalid(b'{"a":' * 100000 + b"1" + b"}" * 100000, "invalid_json")
+
+    def assert_parse_invalid(self, raw, code):
+        with self.assertRaises(validate_evidence.ValidationError) as context:
+            validate_evidence.parse_json_bytes(raw)
+        self.assertEqual(context.exception.code, code)
+
+    def test_nesting_limit_boundary(self):
+        limit = validate_evidence.MAX_JSON_NESTING_DEPTH
+        for depth, accepted in ((limit, True), (limit + 1, False)):
+            arrays = b"[" * depth + b"]" * depth
+            objects = b'{"a":' * (depth - 1) + b"{}" + b"}" * (depth - 1)
+            mixed = b'{"a":[' * (depth // 2) + b"[]" * (depth % 2) + b"]}" * (depth // 2)
+            for raw in (arrays, objects, mixed):
+                with self.subTest(depth=depth, raw=raw[:12]):
+                    if accepted:
+                        validate_evidence.parse_json_bytes(raw)
+                    else:
+                        self.assert_parse_invalid(raw, "invalid_json")
+
+    def test_nesting_limit_ignores_string_contents(self):
+        limit = validate_evidence.MAX_JSON_NESTING_DEPTH
+        deep = "[" * (limit + 1)
+        for text in (
+            '["' + deep + '"]',
+            '{"' + deep + '": "' + "{" * (limit + 1) + '"}',
+            '["\\"' + deep + '"]',
+            '["\\\\\\"' + deep + '"]',
+            '["]]]]' + deep + '"]',
+        ):
+            with self.subTest(text=text[:12]):
+                self.assertEqual(len(validate_evidence.parse_json_bytes(text.encode("utf-8"))), 1)
+
+    def test_nesting_limit_counts_after_escaped_backslash(self):
+        limit = validate_evidence.MAX_JSON_NESTING_DEPTH
+        for depth, accepted in ((limit - 1, True), (limit, False)):
+            raw = b'["\\\\", ' + b"[" * depth + b"]" * depth + b"]"
+            with self.subTest(depth=depth):
+                if accepted:
+                    self.assertEqual(validate_evidence.parse_json_bytes(raw)[0], "\\")
+                else:
+                    self.assert_parse_invalid(raw, "invalid_json")
+
+    def test_nesting_limit_preserves_duplicate_and_non_finite_checks(self):
+        depth = validate_evidence.MAX_JSON_NESTING_DEPTH - 1
+        self.assert_parse_invalid(
+            b"[" * depth + b'{"a": 1, "a": 2}' + b"]" * depth, "duplicate_json_key"
+        )
+        self.assert_parse_invalid(b"[" * depth + b"[NaN]" + b"]" * depth, "non_finite_number")
 
 
 class ResultPathTests(ValidatorTestCase):

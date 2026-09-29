@@ -21,6 +21,7 @@ MAX_CASES = 256
 MAX_ARTIFACTS = 256
 MAX_EVIDENCE_ITEMS = 32
 MAX_ARTIFACT_PATH_LENGTH = 512
+MAX_JSON_NESTING_DEPTH = 64
 HASH_CHUNK_BYTES = 64 * 1024
 
 EXIT_OK = 0
@@ -166,11 +167,41 @@ def _parse_finite_float(text):
     return value
 
 
+_JSON_STRUCTURAL_CHARACTER = re.compile(r'[\[\]{}"\\]')
+
+
+def _check_json_nesting(text):
+    # Version-independent cap: json.loads recursion limits differ across
+    # Python releases, so reject deep nesting before parsing.
+    depth = 0
+    in_string = False
+    escaped_index = -1
+    for match in _JSON_STRUCTURAL_CHARACTER.finditer(text):
+        index = match.start()
+        if index == escaped_index:
+            continue
+        character = match.group()
+        if in_string:
+            if character == "\\":
+                escaped_index = index + 1
+            elif character == '"':
+                in_string = False
+        elif character == '"':
+            in_string = True
+        elif character in "[{":
+            depth += 1
+            if depth > MAX_JSON_NESTING_DEPTH:
+                raise ValidationError("invalid_json")
+        elif character in "]}":
+            depth -= 1
+
+
 def parse_json_bytes(data):
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
         raise ValidationError("invalid_json") from None
+    _check_json_nesting(text)
     try:
         return json.loads(
             text,

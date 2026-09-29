@@ -162,7 +162,12 @@ lie inside the repository. On success it prints
 
 Result file checks: inside the repository root, no symlink component, a
 regular file opened with `O_NOFOLLOW`, at most 1 MiB, strict UTF-8 JSON with no
-duplicate keys, `NaN`, `Infinity` or overflowing numbers.
+duplicate keys, `NaN`, `Infinity` or overflowing numbers, and at most
+`MAX_JSON_NESTING_DEPTH` (64) nested arrays/objects. The nesting cap is
+enforced by a linear pre-parse scan of the decoded text that ignores brackets
+inside JSON strings (including after escaped quotes and backslashes), so the
+result does not depend on the Python version's `json` recursion behaviour;
+exceeding it fails with `invalid_json`.
 
 Document rules (all objects have exactly the listed keys):
 
@@ -221,7 +226,10 @@ private data; sanitization review remains a human responsibility recorded by
 ## Validation coverage
 
 Validator tests cover happy paths for every status and both artifact roots,
-invalid and duplicate-key JSON, non-finite numbers, deep nesting, unknown and
+invalid and duplicate-key JSON, non-finite numbers, deep nesting (the
+nesting cap boundary and one over it for arrays, objects and mixed containers,
+brackets, escaped quotes and escaped backslashes inside strings, and
+duplicate-key/non-finite checks still applying within the cap), unknown and
 missing fields at every level, schema version, Issue and wrong Issue,
 timestamps and order, commit, metadata text, every privacy flag, case exit
 consistency and status mixing, `not_executed` decisions, artifact traversal,
