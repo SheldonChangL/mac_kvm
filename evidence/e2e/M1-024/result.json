@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "issueId": "M1-024",
+  "status": "passed",
+  "startedAt": "2026-09-30T07:35:03Z",
+  "endedAt": "2026-09-30T07:35:03Z",
+  "commit": "8b4170159b5d1ffda7d9ccbe550abbe80cf0dc40",
+  "toolchain": {
+    "pythonVersion": "3.9.6",
+    "platform": "Darwin 25.6.0",
+    "machine": "arm64"
+  },
+  "environment": {
+    "localOS": "macOS 26.6.2 build 25G83 arm64",
+    "peerProduct": "Barrier barriers external test peer",
+    "peerVersion": "2.4.0-release protocol 1.6",
+    "peerRole": "EXTERNAL_TEST_PEER_ONLY",
+    "peerOS": "Ubuntu 22.04 x86_64",
+    "networkScope": "peer loopback only through an encrypted local forward; no wider exposure",
+    "tls": "disabled for that observation only; product default stays enabled and unvalidated here"
+  },
+  "cases": [
+    {
+      "id": "fixture-format",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "7 ordered observations, both directions present, 1-based contiguous sequence",
+        "canonical base64 round-trips exactly; 133 aggregate payload bytes within bounds",
+        "no timestamp, address, port or transport metadata key exists in the fixture"
+      ]
+    },
+    {
+      "id": "fixture-metadata",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "metadata.json matches the repository fixture metadata schema with no extra key",
+        "recomputed payload digest and byte length 1079 match the recorded values",
+        "sanitization is recorded as sanitized with no sensitive data"
+      ]
+    },
+    {
+      "id": "toolchain-lock",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "capture toolchain lock is LOCKED and scoped to this Issue only",
+        "locked host, peer, Barrier and recorder versions match the lock exactly",
+        "lock records no wire semantics and no Windows execution"
+      ]
+    },
+    {
+      "id": "evidence-inputs",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "plan, script, e2e readme, summary, commands, environment, tests and manual are present",
+        "each author-phase record names a repository head that is an ancestor of, or equal to, the current head, and commands carries the current fixture digest",
+        "red phase 2, mutation 18 and green phase 16 records are complete and consistent",
+        "independent review file is written by the non-implementing reviewer: present=not yet"
+      ]
+    },
+    {
+      "id": "privacy-scan",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "identifying-pattern scan is clean over every present Exact File and the decoded payload",
+        "each hexadecimal digest in the files is a declared and verified digest value",
+        "the fixture pair is 1016 metadata bytes plus the recomputed payload digest"
+      ]
+    },
+    {
+      "id": "nonclaim-scan",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "no document line asserts field meaning, message code, endianness or compatibility",
+        "no document line asserts a Windows execution or pass result",
+        "observation boundaries are recorded as direction runs and not as messages"
+      ]
+    },
+    {
+      "id": "raw-capture-exclusion",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "no tracked repository path ends with a raw capture suffix",
+        "checked 528 tracked repository paths",
+        "the fixture directory holds only the metadata and the sanitized payload"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+      "sha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+      "byteLength": 1079,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/metadata.json",
+      "sha256": "804c0416118297435dc07f3cf3b35d26ec4ff262499f1bb8687505d689cd3ae8",
+      "byteLength": 1016,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    }
+  ],
+  "privacy": {
+    "containsSensitiveData": false,
+    "containsTypedText": false,
+    "containsClipboardPayload": false,
+    "containsCredentials": false,
+    "containsKeyMaterial": false,
+    "containsHostnames": false,
+    "containsIPAddresses": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": true
+  },
+  "approvedDecisionRef": null
+}
