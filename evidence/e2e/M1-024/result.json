@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issueId": "M1-024",
   "status": "passed",
-  "startedAt": "2026-09-30T07:35:03Z",
-  "endedAt": "2026-09-30T07:35:03Z",
-  "commit": "8b4170159b5d1ffda7d9ccbe550abbe80cf0dc40",
+  "startedAt": "2026-10-01T02:35:30Z",
+  "endedAt": "2026-10-01T02:35:30Z",
+  "commit": "710ce0be68e0df496c1600e2e8b643ae5209d774",
   "toolchain": {
     "pythonVersion": "3.9.6",
     "platform": "Darwin 25.6.0",
@@ -58,7 +58,7 @@
         "plan, script, e2e readme, summary, commands, environment, tests and manual are present",
         "each author-phase record names a repository head that is an ancestor of, or equal to, the current head, and commands carries the current fixture digest",
         "red phase 2, mutation 18 and green phase 16 records are complete and consistent",
-        "independent review file is written by the non-implementing reviewer: present=not yet"
+        "independent review file is written by the non-implementing reviewer: present=yes"
       ]
     },
     {
@@ -87,7 +87,7 @@
       "exitCode": 0,
       "evidence": [
         "no tracked repository path ends with a raw capture suffix",
-        "checked 528 tracked repository paths",
+        "checked 539 tracked repository paths",
         "the fixture directory holds only the metadata and the sanitized payload"
       ]
     }
