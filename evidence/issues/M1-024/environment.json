@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-024",
+  "repositoryHeadAtAuthorRun": "8b4170159b5d1ffda7d9ccbe550abbe80cf0dc40",
+  "toolchainLock": {
+    "lockId": "M1-CAPTURE-TOOLCHAIN-001",
+    "status": "LOCKED",
+    "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
+    "path": "MacKVM_Implementation_Package_v2/toolchain.lock.json"
+  },
+  "preCaptureMetadata": {
+    "recordedBeforeCapture": true,
+    "acceptedAttempt": "attempt 8",
+    "recordedBy": "capture producer, root session",
+    "note": "Every host and peer fact in this file was queried and recorded before the accepted attempt started. The earlier attempt 7 observation was superseded because the same facts had only been queried after it; its sanitized bytes were never committed and never entered git history."
+  },
+  "observationWindow": {
+    "timeBasis": "Capture-host UTC. The peer accept and disconnect entries are recorded at their equivalent capture-host local log time.",
+    "launcherStartedAt": "2026-09-30T07:01:02Z",
+    "clientLogStartedAt": "2026-09-30T07:01:03Z",
+    "serverAcceptedAt": "2026-09-30T07:01:05Z",
+    "terminationRequestedAt": "2026-09-30T07:01:07Z",
+    "serverDisconnectedAt": "2026-09-30T07:01:11Z",
+    "observedSeconds": 9,
+    "clientLogToDisconnectSeconds": 8,
+    "maximumSeconds": 15
+  },
+  "host": {
+    "os": "macOS",
+    "osVersion": "26.6.2",
+    "osBuild": "25G83",
+    "architecture": "arm64",
+    "hardware": {
+      "modelName": "MacBook Pro",
+      "modelIdentifier": "Mac16,7",
+      "chip": "Apple M4 Pro",
+      "totalCores": 14,
+      "performanceCores": 10,
+      "efficiencyCores": 4,
+      "memory": "24 GB"
+    },
+    "keyboard": {
+      "activeInputSourceId": "com.apple.keylayout.ZhuyinBopomofo",
+      "physicalLayoutRecorded": false,
+      "physicalLayout": "not captured",
+      "note": "This is the active logical input source reported before capture. It is not evidence of a physical keyboard form factor, so the physical layout stays unrecorded rather than inferred."
+    },
+    "display": {
+      "combinedDesktopBounds": {
+        "left": -1920,
+        "top": 0,
+        "right": 1728,
+        "bottom": 1117
+      },
+      "individualDisplaysRecorded": false,
+      "note": "Combined desktop coordinate bounds as reported immediately before capture. Per-display model and resolution were not reported, so none is recorded or derived from these bounds."
+    },
+    "barrierClient": {
+      "executable": "barrierc",
+      "version": "2.4.0-release",
+      "protocolVersion": "1.6",
+      "role": "EXTERNAL_TEST_PEER_ONLY"
+    }
+  },
+  "peer": {
+    "os": "Ubuntu",
+    "osVersion": "22.04",
+    "architecture": "x86_64",
+    "hardware": {
+      "cpuModel": "Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz",
+      "cpuArchitecture": "x86_64",
+      "logicalCpus": 4,
+      "memoryBytes": 16660443136
+    },
+    "display": {
+      "xDisplay": ":0",
+      "widthPixels": 1920,
+      "heightPixels": 1080,
+      "widthMillimeters": 508,
+      "heightMillimeters": 286,
+      "resolutionDpi": "96x96"
+    },
+    "keyboard": {
+      "rules": "evdev",
+      "model": "pc105",
+      "layouts": "cn,us,gb",
+      "variants": ""
+    },
+    "barrierServer": {
+      "executable": "barriers",
+      "version": "2.4.0-release",
+      "protocolVersion": "1.6",
+      "role": "EXTERNAL_TEST_PEER_ONLY"
+    }
+  },
+  "captureTools": {
+    "recorder": {
+      "name": "tcpdump",
+      "version": "4.99.1",
+      "interface": "peer loopback",
+      "linkType": "EN10MB",
+      "snapshotLength": 262144
+    },
+    "availableNotUsed": {
+      "name": "dumpcap and Wireshark",
+      "version": "3.6.2",
+      "used": false
+    },
+    "packets": {
+      "captured": 19,
+      "receivedByFilter": 38,
+      "droppedByKernel": 0
+    }
+  },
+  "network": {
+    "scope": "Peer loopback only, reached over an encrypted local forward; the capture ran on the peer loopback interface and no wider network path was used or recorded.",
+    "identifyingAddressesRecorded": false
+  },
+  "tls": {
+    "observationTlsEnabled": false,
+    "productDefaultTlsEnabled": true,
+    "productTlsValidatedByThisObservation": false,
+    "note": "Both external peers ran with encryption disabled for this single controlled observation so that application payload bytes were observable. The MacKVM product default stays TLS on and fail-closed; it is neither exercised nor validated by this observation."
+  },
+  "windows": {
+    "executed": false,
+    "resultClaimed": false,
+    "decisionRef": "docs/adr/M1-SCOPE-001-linux-only-validation.md"
+  },
+  "privacy": {
+    "typedTextRecorded": false,
+    "clipboardPayloadRecorded": false,
+    "credentialOrKeyMaterialRecorded": false,
+    "hostnameOrAddressRecorded": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": true
+  }
+}

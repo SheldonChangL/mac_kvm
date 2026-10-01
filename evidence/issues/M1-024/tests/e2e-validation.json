@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-024",
+  "repositoryHeadAtAuthorRun": "8b4170159b5d1ffda7d9ccbe550abbe80cf0dc40",
+  "redPhase": [
+    {
+      "phase": "initial-red",
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-29T23:19:10.755Z",
+      "endedAt": "2026-09-29T23:19:10.907Z",
+      "exitCode": 2,
+      "observed": "runner printed e2e error script_root_missing with e2e disposition error and e2e exit 66; Make exited 2; no result was generated"
+    },
+    {
+      "phase": "post-script-red",
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-29T23:29:49.455Z",
+      "endedAt": "2026-09-29T23:29:49.639Z",
+      "exitCode": 2,
+      "observed": "the first incomplete script exited 1 because the fixture was absent; runner disposition script_failed; Make exited 2; no result was generated; bash -n and git diff --check exited 0"
+    }
+  ],
+  "mutationChecks": [
+    {
+      "case": "unknown-top-level-key",
+      "mutation": "adds a fifth top-level key to the capture document",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json has an unknown key",
+      "resultWritten": false
+    },
+    {
+      "case": "unknown-observation-key",
+      "mutation": "adds a fourth key to one observation",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 1 has an unknown key",
+      "resultWritten": false
+    },
+    {
+      "case": "sequence-gap",
+      "mutation": "skips a sequence number in array order",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 3 sequence is not contiguous and 1-based",
+      "resultWritten": false
+    },
+    {
+      "case": "sequence-starts-at-zero",
+      "mutation": "renumbers the sequence to start at 0",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 1 sequence is not contiguous and 1-based",
+      "resultWritten": false
+    },
+    {
+      "case": "unknown-direction",
+      "mutation": "sets a direction outside the closed set",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 2 direction is not allowed",
+      "resultWritten": false
+    },
+    {
+      "case": "single-direction",
+      "mutation": "keeps observations of one direction only",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json must contain both directions",
+      "resultWritten": false
+    },
+    {
+      "case": "non-canonical-base64",
+      "mutation": "sets a padded payload whose final quantum has non-zero pad bits",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 3 payload is not canonical base64",
+      "resultWritten": false
+    },
+    {
+      "case": "empty-observation",
+      "mutation": "sets an observation payload to the empty string",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 1 payload is not canonical base64",
+      "resultWritten": false
+    },
+    {
+      "case": "oversized-observation",
+      "mutation": "sets one observation to 65537 decoded bytes",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json observation 1 payload size out of range",
+      "resultWritten": false
+    },
+    {
+      "case": "oversized-total",
+      "mutation": "sets the decoded total above 262144 bytes",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json aggregate payload exceeds 262144 bytes",
+      "resultWritten": false
+    },
+    {
+      "case": "embedded-ipv4-literal",
+      "mutation": "embeds an address literal in the decoded payload",
+      "exitCode": 1,
+      "observed": "rejected with: decoded application payload contains identifying content: ipv4",
+      "resultWritten": false
+    },
+    {
+      "case": "metadata-hash-mismatch",
+      "mutation": "changes one digit of the recorded payload digest",
+      "exitCode": 1,
+      "observed": "rejected with: metadata.json payload sha256 mismatch",
+      "resultWritten": false
+    },
+    {
+      "case": "metadata-length-mismatch",
+      "mutation": "records a byte length one larger than the payload",
+      "exitCode": 1,
+      "observed": "rejected with: metadata.json payload byteLength mismatch",
+      "resultWritten": false
+    },
+    {
+      "case": "metadata-extra-key",
+      "mutation": "adds a key the fixture metadata schema does not allow",
+      "exitCode": 1,
+      "observed": "rejected with: metadata.json has an unknown key",
+      "resultWritten": false
+    },
+    {
+      "case": "missing-payload-file",
+      "mutation": "removes the sanitized payload file from the fixture directory",
+      "exitCode": 1,
+      "observed": "rejected with: handshake-capture.json missing",
+      "resultWritten": false
+    },
+    {
+      "case": "provenance-malformed-head",
+      "mutation": "truncates repositoryHeadAtAuthorRun in commands.json to a short hex string",
+      "exitCode": 1,
+      "observed": "rejected with: commands.json repositoryHeadAtAuthorRun is not a full lowercase commit id",
+      "resultWritten": false
+    },
+    {
+      "case": "provenance-unresolvable-head",
+      "mutation": "sets repositoryHeadAtAuthorRun in environment.json to a well-formed commit id this repository cannot resolve",
+      "exitCode": 1,
+      "observed": "rejected with: environment.json repositoryHeadAtAuthorRun cannot be resolved in this repository",
+      "resultWritten": false
+    },
+    {
+      "case": "provenance-non-ancestor-head",
+      "mutation": "sets repositoryHeadAtAuthorRun in tests/e2e-validation.json to a real repository commit that is not an ancestor of the current head",
+      "exitCode": 1,
+      "observed": "rejected with: tests/e2e-validation.json repositoryHeadAtAuthorRun is not an ancestor of, or equal to, HEAD",
+      "resultWritten": false
+    }
+  ],
+  "greenPhase": [
+    {
+      "command": "bash -n Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
+      "startedAt": "2026-09-30T07:12:23.457Z",
+      "endedAt": "2026-09-30T07:12:23.502Z",
+      "exitCode": 0,
+      "observed": "bash -n parses the system script; no output"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-30T07:12:23.546Z",
+      "endedAt": "2026-09-30T07:12:23.660Z",
+      "exitCode": 0,
+      "observed": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-30T07:12:23.704Z",
+      "endedAt": "2026-09-30T07:12:24.168Z",
+      "exitCode": 0,
+      "observed": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-30T07:12:24.212Z",
+      "endedAt": "2026-09-30T07:12:24.417Z",
+      "exitCode": 0,
+      "observed": "docs check OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_024_capture_readiness.py'",
+      "startedAt": "2026-09-30T07:12:28.483Z",
+      "endedAt": "2026-09-30T07:12:28.637Z",
+      "exitCode": 0,
+      "observed": "Ran 15 tests, OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-30T07:12:28.690Z",
+      "endedAt": "2026-09-30T07:12:28.756Z",
+      "exitCode": 0,
+      "observed": "no whitespace error; no output"
+    },
+    {
+      "command": "swift build --disable-sandbox",
+      "startedAt": "2026-09-30T07:13:04.629Z",
+      "endedAt": "2026-09-30T07:13:07.277Z",
+      "exitCode": 0,
+      "observed": "Build complete; the only repository-attributable diagnostic is the SwiftPM unhandled-file notice naming 2 files under the system test target"
+    },
+    {
+      "command": "swift test --disable-sandbox",
+      "startedAt": "2026-09-30T07:13:07.326Z",
+      "endedAt": "2026-09-30T07:13:10.768Z",
+      "exitCode": 0,
+      "observed": "Test run with 47 tests passed"
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "startedAt": "2026-09-30T07:13:10.818Z",
+      "endedAt": "2026-09-30T07:13:15.171Z",
+      "exitCode": 0,
+      "observed": "Test run with 47 tests passed with warnings treated as errors; no compiler warning"
+    },
+    {
+      "command": "M1_024_FIXTURE_ROOT=\"$M1_024_MUTATION_DIR/case-control-unmutated\" bash Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
+      "startedAt": "2026-09-30T07:14:52.395Z",
+      "endedAt": "2026-09-30T07:14:52.580Z",
+      "exitCode": 0,
+      "observed": "control run against an unmutated private copy of the replacement fixture printed M1-024 fixture validation passed and wrote no result"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/mutate.py\" \"$PWD\" \"$M1_024_MUTATION_DIR\"",
+      "startedAt": "2026-09-30T07:14:52.630Z",
+      "endedAt": "2026-09-30T07:14:54.761Z",
+      "exitCode": 0,
+      "observed": "15 mutated private copies rebuilt from the replacement fixture were each rejected with their specific reason, the control was accepted, and no result or temporary file was left behind"
+    },
+    {
+      "command": "git status --porcelain",
+      "startedAt": "2026-09-30T07:17:04.363Z",
+      "endedAt": "2026-09-30T07:17:04.432Z",
+      "exitCode": 0,
+      "observed": "working tree shows only untracked M1-024 paths and owner artifacts"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/provenance_cases.py\" \"$PWD\"",
+      "startedAt": "2026-09-30T07:22:04.594Z",
+      "endedAt": "2026-09-30T07:22:07.559Z",
+      "exitCode": 0,
+      "observed": "each of the 3 provenance mutations was rejected with its specific reason and left no result file; each evidence file was restored to its original bytes and the validator accepted the package again"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/scan_exact_files.py\" \"$PWD\"",
+      "startedAt": "2026-09-30T07:22:44.808Z",
+      "endedAt": "2026-09-30T07:22:44.923Z",
+      "exitCode": 0,
+      "observed": "privacy scan over every present Exact File and the decoded payload reported no finding; 11 files scanned, 133 decoded payload bytes, 6 declared digests"
+    },
+    {
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-30T07:22:44.972Z",
+      "endedAt": "2026-09-30T07:22:45.402Z",
+      "exitCode": 0,
+      "observed": "e2e disposition passed and e2e exit 0; the script exited 0 and wrote evidence/e2e/M1-024/result.json"
+    },
+    {
+      "command": "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M1-024/result.json",
+      "startedAt": "2026-09-30T07:22:45.449Z",
+      "endedAt": "2026-09-30T07:22:45.554Z",
+      "exitCode": 0,
+      "observed": "evidence valid: issue=M1-024 status=passed"
+    }
+  ]
+}

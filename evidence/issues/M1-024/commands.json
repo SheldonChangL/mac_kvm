@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-024",
+  "githubIssue": 17,
+  "repositoryHeadAtAuthorRun": "8b4170159b5d1ffda7d9ccbe550abbe80cf0dc40",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "Darwin 25.6.0",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3"
+  },
+  "captureArtifacts": {
+    "fixtureSha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+    "fixtureByteLength": 1079,
+    "rawCaptureSha256": "836f3d55037f7936b9cc42f729dc490bb844b4b755b900e28eddfea118532c61",
+    "rawCaptureByteLength": 1731,
+    "rawCaptureCommitted": false,
+    "sanitizerScriptSha256": "d273a45575b75d433e07fb29fe6361aa9d76bf62a9585645affc19698be004a4",
+    "sanitizerSelfTestScriptSha256": "d8c5c6db42f0e2eac39946ded502e83795b70f7b0a2a8771da57db782b5f8794",
+    "sanitizerSelfTestChecksPassed": 21
+  },
+  "producerReported": {
+    "note": "Values reported and verified by the capture producer for the accepted attempt 8 observation. The implementation author ran no capture, peer or network command and read only the released sanitized document.",
+    "observationCount": 7,
+    "aggregatePayloadBytes": 133,
+    "packetsCaptured": 19,
+    "packetsReceivedByFilter": 38,
+    "packetsDroppedByKernel": 0,
+    "denylistHits": 0,
+    "cleanupVerified": true,
+    "rawTransferHashesMatched": true,
+    "windowsExecuted": false,
+    "tlsDisabledForObservationOnly": true
+  },
+  "rootReviewerVerification": {
+    "command": "make code-quality-check",
+    "runBy": "root reviewer session, outside the managed outer sandbox",
+    "startedAt": "2026-09-30T06:57:43Z",
+    "endedAt": "2026-09-30T06:57:45Z",
+    "exitCode": 0,
+    "steps": "swift-format-version exit 0; swift-format-lint exit 0; swift-test-warnings-as-errors exit 0",
+    "treeState": "the uncommitted author tree as it stood at that time, before the attempt 8 replacement document and the provenance rename were applied; the later edits touch only markdown, JSON and the local validator script, and no Swift source",
+    "note": "This resolves the author-session sandbox limitation for that tree. It is not a substitute for the fresh independent reviewer, who reruns every gate at the committed implementation head."
+  },
+  "commands": [
+    {
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-29T23:19:10.755Z",
+      "endedAt": "2026-09-29T23:19:10.907Z",
+      "exitCode": 2,
+      "result": "first red phase: runner error script_root_missing, runner exit 66, Make exit 2, no result generated"
+    },
+    {
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-29T23:29:49.455Z",
+      "endedAt": "2026-09-29T23:29:49.639Z",
+      "exitCode": 2,
+      "result": "second red phase: first incomplete script exit 1 with the fixture absent, runner disposition script_failed, Make exit 2, no result generated"
+    },
+    {
+      "command": "bash -n Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
+      "startedAt": "2026-09-30T07:12:23.457Z",
+      "endedAt": "2026-09-30T07:12:23.502Z",
+      "exitCode": 0,
+      "result": "the system script parses; no output"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-09-30T07:12:23.546Z",
+      "endedAt": "2026-09-30T07:12:23.660Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-09-30T07:12:23.704Z",
+      "endedAt": "2026-09-30T07:12:24.168Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-09-30T07:12:24.212Z",
+      "endedAt": "2026-09-30T07:12:24.417Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_024_capture_readiness.py'",
+      "startedAt": "2026-09-30T07:12:28.483Z",
+      "endedAt": "2026-09-30T07:12:28.637Z",
+      "exitCode": 0,
+      "result": "Ran 15 tests, OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-09-30T07:12:28.690Z",
+      "endedAt": "2026-09-30T07:12:28.756Z",
+      "exitCode": 0,
+      "result": "no whitespace error; no output"
+    },
+    {
+      "command": "make code-quality-check",
+      "startedAt": "2026-09-30T07:12:28.810Z",
+      "endedAt": "2026-09-30T07:12:31.487Z",
+      "exitCode": 2,
+      "result": "swift-format-version exit 0 and swift-format-lint exit 0; the swift test step exits 1 because SwiftPM's own manifest cache and sandbox are denied by this session environment, so the gate stops before evaluating any repository file"
+    },
+    {
+      "command": "swift build --disable-sandbox",
+      "startedAt": "2026-09-30T07:13:04.629Z",
+      "endedAt": "2026-09-30T07:13:07.277Z",
+      "exitCode": 0,
+      "result": "Build complete; the session-environment cache notices plus one SwiftPM unhandled-file notice naming 2 files under the system test target"
+    },
+    {
+      "command": "swift test --disable-sandbox",
+      "startedAt": "2026-09-30T07:13:07.326Z",
+      "endedAt": "2026-09-30T07:13:10.768Z",
+      "exitCode": 0,
+      "result": "Test run with 47 tests passed"
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "startedAt": "2026-09-30T07:13:10.818Z",
+      "endedAt": "2026-09-30T07:13:15.171Z",
+      "exitCode": 0,
+      "result": "Test run with 47 tests passed with warnings treated as errors; no compiler warning was emitted"
+    },
+    {
+      "command": "M1_024_FIXTURE_ROOT=\"$M1_024_MUTATION_DIR/case-control-unmutated\" bash Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh",
+      "startedAt": "2026-09-30T07:14:52.395Z",
+      "endedAt": "2026-09-30T07:14:52.580Z",
+      "exitCode": 0,
+      "result": "control run against an unmutated private copy of the replacement fixture printed M1-024 fixture validation passed and wrote no result"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/mutate.py\" \"$PWD\" \"$M1_024_MUTATION_DIR\"",
+      "startedAt": "2026-09-30T07:14:52.630Z",
+      "endedAt": "2026-09-30T07:14:54.761Z",
+      "exitCode": 0,
+      "result": "rebuilt the 15 mutated private copies and the control from the replacement fixture and reran the validator against each: 15 rejections with their specific reasons, control accepted, no result file and no temporary file left behind"
+    },
+    {
+      "command": "git status --porcelain",
+      "startedAt": "2026-09-30T07:17:04.363Z",
+      "endedAt": "2026-09-30T07:17:04.432Z",
+      "exitCode": 0,
+      "result": "working tree lists only the untracked M1-024 paths and the pre-existing owner artifacts this Issue does not touch"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/provenance_cases.py\" \"$PWD\"",
+      "startedAt": "2026-09-30T07:22:04.594Z",
+      "endedAt": "2026-09-30T07:22:07.559Z",
+      "exitCode": 0,
+      "result": "3 provenance mutations of repositoryHeadAtAuthorRun, one per evidence file, were each rejected with their specific reason and left no result file; every mutated file was restored to its original bytes"
+    },
+    {
+      "command": "python3 \"$M1_024_PRIVATE_TOOLS/scan_exact_files.py\" \"$PWD\"",
+      "startedAt": "2026-09-30T07:22:44.808Z",
+      "endedAt": "2026-09-30T07:22:44.923Z",
+      "exitCode": 0,
+      "result": "privacy scan over every present Exact File and over the decoded payload bytes reported no finding; 11 files scanned, 133 decoded payload bytes, 6 declared digests"
+    },
+    {
+      "command": "make e2e ISSUE=M1-024",
+      "startedAt": "2026-09-30T07:22:44.972Z",
+      "endedAt": "2026-09-30T07:22:45.402Z",
+      "exitCode": 0,
+      "result": "e2e script exit 0, e2e disposition passed, e2e exit 0; evidence/e2e/M1-024/result.json was written atomically"
+    },
+    {
+      "command": "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M1-024/result.json",
+      "startedAt": "2026-09-30T07:22:45.449Z",
+      "endedAt": "2026-09-30T07:22:45.554Z",
+      "exitCode": 0,
+      "result": "evidence valid: issue=M1-024 status=passed"
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "attempt": "First red run of make e2e ISSUE=M1-024 before any M1-024 implementation file existed",
+      "outcome": "runner error script_root_missing, runner exit 66, Make exit 2, no result generated",
+      "rootCause": "the directory Tests/SystemTests/Scripts did not exist, so the runner stopped before it could look up the M1-024 script",
+      "resolution": "the system script was authored at the exact path the runner resolves, which moved the failure to a missing fixture instead of a missing script root"
+    },
+    {
+      "attempt": "Second red run of make e2e ISSUE=M1-024 after the first incomplete system script existed",
+      "outcome": "script exit 1, runner disposition script_failed, Make exit 2, no result generated",
+      "rootCause": "the sanitized fixture pair had not been released yet, so the script failed closed on a missing input rather than reporting not executed",
+      "resolution": "the released sanitized bytes and their metadata were placed in the working tree, and the fail-closed behaviour on a missing fixture was kept and is now covered by the missing-payload-file mutation check"
+    },
+    {
+      "attempt": "Third red run of make e2e ISSUE=M1-024 after the fixture pair was placed in the working tree",
+      "outcome": "script exit 1 reporting that evidence/issues/M1-024/commands.json was missing, Make exit 2, no result generated",
+      "rootCause": "the evidence package was incomplete, and the script validates every required evidence input before it writes a result",
+      "resolution": "the remaining evidence files were authored from real tool output; exact timestamps for this run were not captured, so it is recorded here rather than in the machine-readable red phase"
+    },
+    {
+      "attempt": "First run of the private mutation harness",
+      "outcome": "14 of 15 mutations were rejected; the non-canonical base64 case exited 0 instead of failing",
+      "rootCause": "the harness mutated an unpadded base64 quantum, which stays canonical, so the mutated document was a valid fixture and the validator was right to accept it",
+      "resolution": "the harness was corrected to flip the pad bits of a padded quantum; the rerun rejected that case and every other case, and no validator rule was weakened"
+    },
+    {
+      "attempt": "Attempt 7 of the bounded observation, whose sanitized bytes were the previous uncommitted working-tree fixture",
+      "outcome": "the observation itself completed inside the bounded window and its sanitized document was well formed, but it was superseded; its bytes were never committed and never entered git history, and attempt 8 replaced them in the working tree",
+      "rootCause": "GitHub Issue 17 requires build, OS, hardware, network, keyboard layout, display and peer metadata to be recorded before capture; for attempt 7 those facts were only queried afterwards, so the procedure had a recording-order gap and retroactive conformance was never claimed",
+      "resolution": "the same non-sensitive host and peer facts were recorded first and are now in environment.json, then the identical verified procedure ran again as attempt 8, whose bytes are the fixture intended for commit; attempt 7 was set aside for that procedural gap alone and not for its content"
+    },
+    {
+      "attempt": "Author-phase commit self-reference in commands.json, environment.json and tests/e2e-validation.json",
+      "outcome": "each file recorded a commit that the validator required to equal the current head, which the resulting tree could never satisfy because committing those files moves the head",
+      "rootCause": "the author-phase records were labelled as the implementation commit although the author ran every check with the eleven implementation-author Exact Files still uncommitted, so the only truthful value available was the head they ran over",
+      "resolution": "the field is now repositoryHeadAtAuthorRun and the validator requires it to be a full commit id that is an ancestor of, or equal to, the current head, checked read-only with git merge-base --is-ancestor and failing closed when it is malformed, unresolvable or outside the current history"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "m1-024-linux-client-handshake",
+  "protocol": "barrier",
+  "provenance": {
+    "sourceKind": "black-box-capture",
+    "reference": "Controlled black-box observation per Tests/SystemTests/Plans/M1-024-barrier-client-handshake-fixtures.md: external Barrier macOS client barrierc 2.4.0-release protocol 1.6 to external Ubuntu 22.04 x86_64 Barrier server barriers 2.4.0-release protocol 1.6, observed on peer loopback. Ordered direction and uninterpreted payload bytes only; no field, message, endianness or compatibility claim. TLS disabled for this observation only; product TLS default stays enabled and unvalidated. Windows not executed."
+  },
+  "payload": {
+    "path": "handshake-capture.json",
+    "sha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+    "byteLength": 1079
+  },
+  "sanitization": {
+    "status": "sanitized",
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "ip-address",
+      "other-private-data"
+    ]
+  }
+}

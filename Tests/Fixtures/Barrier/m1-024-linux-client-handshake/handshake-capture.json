@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "captureId": "m1-024-linux-client-handshake",
+  "encoding": "base64",
+  "observations": [
+    {
+      "sequence": 1,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAC0JhcnJpZXIAAQAG"
+    },
+    {
+      "sequence": 2,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAGEJhcnJpZXIAAQAGAAAACW0xLWNsaWVudA=="
+    },
+    {
+      "sequence": 3,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABFFJTkY="
+    },
+    {
+      "sequence": 4,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAEkRJTkb4gAAADkAEXQAAAsEB6Q=="
+    },
+    {
+      "sequence": 5,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENJQUsAAAAEQ1JPUAAAAAhEU09QAAAAAAAAAARDQUxW"
+    },
+    {
+      "sequence": 6,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENBTFYAAAAEQ05PUA=="
+    },
+    {
+      "sequence": 7,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    }
+  ]
+}
