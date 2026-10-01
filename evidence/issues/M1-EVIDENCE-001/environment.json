@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-EVIDENCE-001",
+  "githubIssue": 249,
+  "repositoryHeadAtAuthorRun": "20c6854c24604f8ab35846ff4869ffaa45c36606",
+  "capturedAt": "2026-10-01T03:06:33Z",
+  "commitState": {
+    "committed": false,
+    "reason": "The author phase ran with the changed files uncommitted over the recorded head. Nothing was staged, committed, pushed, or changed on GitHub."
+  },
+  "host": {
+    "os": "macOS",
+    "osVersion": "26.6.2",
+    "architecture": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "displayLayout": {
+    "status": "not-exercised",
+    "reason": "Registry-only Issue; no input, screen-routing or display behavior is executed."
+  },
+  "network": {
+    "status": "not-exercised",
+    "identifyingAddressesRecorded": false,
+    "reason": "No capture, no peer connection and no network command were run by this Issue."
+  },
+  "peer": {
+    "status": "not-operated",
+    "product": null,
+    "version": null,
+    "os": null,
+    "tls": null,
+    "reason": "M1-024 owns the real Linux Barrier server observation this Issue registers; no peer was operated and no mock is substituted here."
+  },
+  "capture": {
+    "status": "not-performed",
+    "rawCaptureRequested": false,
+    "rawCaptureRecreated": false,
+    "reason": "The private raw capture, the peer configuration and the private capture logs were deleted by the capture producer after M1-024 merged. This Issue registers the sanitized fixture retained on main and requires no private raw material."
+  },
+  "tls": {
+    "observationTlsEnabled": null,
+    "productDefaultTlsEnabled": true,
+    "productTlsValidatedByThisIssue": false,
+    "note": "This Issue contains no Swift source, no package manifest and no build setting, so the MacKVM production TLS default is untouched and is not validated here. The single M1-024 observation it registers ran with encryption disabled and that limitation is recorded on the entry."
+  },
+  "windows": {
+    "executed": false,
+    "resultClaimed": false,
+    "decisionRef": "docs/adr/M1-SCOPE-001-linux-only-validation.md"
+  },
+  "sandboxLimitation": {
+    "swiftPackageManagerUsable": false,
+    "observedReason": "SwiftPM reports that its user-level configuration, security and cache directories are not accessible or not writable, and it cannot start its own nested sandbox inside the managed outer sandbox this session runs in.",
+    "affectedGates": [
+      "make code-quality-check",
+      "cigates code-quality",
+      "cigates swift-package-test:KVMContracts",
+      "cigates swift-package-test:MacPlatform",
+      "cigates swift-test-targets",
+      "cigates native-arm64-build",
+      "the Swift-invoking cases inside Tests/Contracts"
+    ],
+    "consequence": "Those gates stop before evaluating any repository file. They must be rerun at the implementation commit outside a SwiftPM-blocking sandbox."
+  },
+  "privacy": {
+    "typedTextRecorded": false,
+    "clipboardPayloadRecorded": false,
+    "credentialOrKeyMaterialRecorded": false,
+    "hostnameOrAddressRecorded": false,
+    "rawCaptureCommitted": false,
+    "ownerArtifactsOpened": false
+  }
+}

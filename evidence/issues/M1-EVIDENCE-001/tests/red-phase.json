@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-EVIDENCE-001",
+  "phase": "red",
+  "status": "expected_failure",
+  "method": "The pre-change evidence/registers/M1-023.json and docs/evidence/M1-023-barrier-evidence-register.md were restored from HEAD 20c6854c24604f8ab35846ff4869ffaa45c36606 into the working tree, the red commands below were run, and the modified copies were restored and confirmed byte-identical by SHA-256. No git index operation was performed and nothing was staged or committed.",
+  "attempts": [
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+      "registerState": "pre-change, entries empty, status initialized-no-approved-evidence",
+      "exitCode": 1,
+      "testsRun": 14,
+      "failures": 10,
+      "errors": 0,
+      "failureType": "AssertionFailure",
+      "failureReason": "seven failures report 'exactly one BARRIER-EVID-0001 entry must exist'; one reports the stale documentation sentence 'No approved wire evidence exists yet'; one reports the unnegated Windows sentence the pre-change documentation carried; one reports 'initialized-no-approved-evidence' != 'active'",
+      "passingTests": [
+        "test_approved_entries_carry_a_recorded_independent_review",
+        "test_consumers_remain_bounded_and_resolvable",
+        "test_prohibited_inferences_are_explicit",
+        "test_unknown_fields_remain_unknown_and_support_no_claim"
+      ],
+      "passingTestNote": "These four iterate over register entries or over approved entries only, so they pass vacuously while the register is empty. They become load-bearing once the entry exists."
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "registerState": "pre-change, entries empty, status initialized-no-approved-evidence",
+      "testFileState": "updated by this Issue",
+      "exitCode": 1,
+      "testsRun": 11,
+      "failures": 1,
+      "errors": 0,
+      "failureType": "AssertionFailure",
+      "failureReason": "test_register_and_documentation_define_fail_closed_contract reports 'initialized-no-approved-evidence' != 'active'",
+      "purpose": "Shows the updated M1-023 state assertions fail against the pre-change register rather than asserting whatever state happens to exist."
+    },
+    {
+      "command": "python3 <pre-change copy of evidence/issues/M1-023/tests/test_register.py> -v",
+      "registerState": "registered, one approved entry, status active",
+      "testFileState": "pre-change copy, restored from HEAD into the same directory under a non-discoverable name and deleted immediately after the run",
+      "exitCode": 1,
+      "testsRun": 11,
+      "failures": 2,
+      "errors": 0,
+      "failureType": "AssertionFailure",
+      "failureReason": "test_register_and_documentation_define_fail_closed_contract reports that entries is no longer the empty list; test_register_status_tracks_entry_presence reports 'status' does not match 'registered fixture must be a regular non-symlink file', because its in-memory register inherited the live active status and reached the fixture-integrity stage instead of the status rule it intended to exercise",
+      "purpose": "Shows both edits to the M1-023 assertions were forced by the registration rather than made for convenience, and identifies exactly which line of the status test had to pin its own status."
+    }
+  ],
+  "remediation": "Appended BARRIER-EVID-0001 to evidence/registers/M1-023.json and moved status to active; rewrote the register documentation to describe the registered state, the consumer boundaries, the direction-convention provenance, the deleted raw-capture disposition and the narrower rollback; updated the two M1-023 state assertions so that the status/entry-presence rule is exercised in both directions from a pinned in-memory status; and reran all three commands green.",
+  "reviewRemediationRedPhase": {
+    "method": "Before each new assertion was accepted, the wording it replaces was restored into the working tree from a backup taken first, outside the repository, and the suite was rerun. Both files were then restored from those backups and confirmed byte-identical by SHA-256. No git index operation was performed and nothing was staged or committed.",
+    "attempts": [
+      {
+        "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+        "state": "pre-fix transport.networkScope and provenance.producer restored into evidence/registers/M1-023.json, and the traceability section removed from MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md",
+        "exitCode": 1,
+        "testsRun": 18,
+        "failures": 3,
+        "errors": 0,
+        "failureType": "AssertionFailure",
+        "failureReason": "test_transport_scope_records_only_the_observed_peer_loopback_leg reports \"'no wider network path' unexpectedly found\"; test_producer_identity_names_durable_repository_evidence reports \"'root session' unexpectedly found in 'm1-024 capture producer, root session'\"; test_traceability_index_records_the_m1_024_to_m1_025_chain reports the missing section heading",
+        "purpose": "Shows each of the three new assertions fails against the wording it replaces rather than asserting whatever already happened to be there."
+      },
+      {
+        "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py",
+        "state": "post-fix, with a remediation sentence in summary.md that named Windows without a negation word",
+        "exitCode": 1,
+        "testsRun": 18,
+        "failures": 1,
+        "errors": 0,
+        "failureType": "AssertionFailure",
+        "failureReason": "test_no_windows_result_is_claimed_anywhere_in_the_registration reports 'evidence/issues/M1-EVIDENCE-001/summary.md asserts a Windows result'",
+        "purpose": "Shows the evidence package is still bound by the non-claim gate it defines."
+      }
+    ],
+    "restoredDigests": {
+      "evidence/registers/M1-023.json": "18a1f5de1bb44a7ae3c390146db5ede7491ad42f5490d8273466e50c65a78c5e",
+      "MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md": "7fa562db6562477943e1ea727ab4641742afaacf27bf6d56d6a096e00118ff3c"
+    },
+    "mutationCoverage": "test_claim_mapping_rejects_a_fixture_or_claim_that_drifts is the standing negative phase for the strengthened mapping: twelve in-memory mutations, six on the fixture and six on the entry, each required to be rejected. It fails if any check in claim_mapping_failures stops biting.",
+    "remediation": "Added the M1-024 -> M1-EVIDENCE-001 -> M1-025 traceability-index section and pointed the register documentation at it; strengthened the claim-to-fixture mapping to an exact claim-id to field-id to JSON-pointer mapping with pointer resolution, contiguity, ordered decoded lengths and direction-coverage checks plus twelve mutations; rewrote transport.networkScope to the observed peer-loopback leg with the wider leg recorded as encrypted and uncaptured; and replaced the 'root session' producer label with durable repository evidence references. All gates were then rerun; the results are in commands.json and tests/results.json."
+  },
+  "postRootVerifyRedPhase": {
+    "method": "Root ran `make verify` in this repository outside the managed sandbox and reported that tool-test:cigates/tests/test_cigates.py failed. The failure was reproduced here by running that gate's exact command against the unmodified Tools/cigates/tests/test_cigates.py before any edit, rather than accepting the report. No git index operation was performed and nothing was staged or committed.",
+    "attempts": [
+      {
+        "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_cigates.py'",
+        "state": "pre-fix Tools/cigates/tests/test_cigates.py, as it stands at HEAD 20c6854c24604f8ab35846ff4869ffaa45c36606, against the working tree that now carries evidence/issues/M1-EVIDENCE-001/tests/test_registration.py",
+        "exitCode": 1,
+        "testsRun": 23,
+        "failures": 1,
+        "errors": 0,
+        "failureType": "AssertionFailure",
+        "failureReason": "FAIL: test_cumulative_gate_inventory_is_the_expected_named_gates reports \"Lists differ\"; the actual inventory carries 'evidence-test:M1-EVIDENCE-001/tests/test_registration.py', which the expected list omits, and the per-gate run log in the same suite shows that gate executing as the twenty-second named gate",
+        "purpose": "Shows the inventory regression is stale with respect to the auto-discovered evidence gate this Issue adds, and that it is the only gate assertion that drifted."
+      }
+    ],
+    "remediation": "Inserted 'evidence-test:M1-EVIDENCE-001/tests/test_registration.py' once, at its discovered sort position between the M1-023 and M1-SCOPE-001 evidence gates, into the expected inventory in test_cumulative_gate_inventory_is_the_expected_named_gates, and moved EXPECTED_CUMULATIVE_GATE_COUNT from 21 to 22. The suite's existing assertEqual(len(names), len(set(names))) is what keeps the gate to exactly one occurrence, so no new assertion was added. Rerun green at 23 tests; the command and exit are in commands.json under postRootVerifyCommands.",
+    "notClaimed": "make verify was not rerun here. code-quality still fails in this session for the recorded environmental reason and cigates stops at the first failure, so the repaired gate would not be reached. No full-verify pass is claimed until root reruns it outside the managed sandbox."
+  }
+}

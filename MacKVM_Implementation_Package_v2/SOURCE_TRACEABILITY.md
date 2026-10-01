@@ -29,6 +29,26 @@ M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 
 - M2、M4、M5 Windows 產品範圍不變。
 - Verification：`Tests/Contracts/test_m1_linux_only_validation_scope.py`。
 
+## M1-024 → M1-EVIDENCE-001 → M1-025 Barrier Evidence Chain
+
+本節只記錄 Barrier wire evidence 的來源、登錄與 consumption gate 之間的 traceability，不是產品合約，也不凍結任何 wire contract。登錄內容與 entry contract 以 `evidence/registers/M1-023.json` 為準；M1-025 的合約內容仍由該 Issue 自行決定，本節不代替其執行。
+
+| Stage | Issue | Recorded artifact | Verification |
+|---|---|---|---|
+| Register contract | M1-023 | `evidence/registers/M1-023.json`、[`docs/evidence/M1-023-barrier-evidence-register.md`](../docs/evidence/M1-023-barrier-evidence-register.md) | `evidence/issues/M1-023/tests/test_register.py` |
+| Capture producer | M1-024 | `Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json`、[`evidence/issues/M1-024/summary.md`](../evidence/issues/M1-024/summary.md) | `Tests/Contracts/test_m1_024_capture_readiness.py` |
+| Independent review | M1-024 | [`evidence/issues/M1-024/independent-review.md`](../evidence/issues/M1-024/independent-review.md) | `evidence/issues/M1-EVIDENCE-001/tests/test_registration.py` |
+| Registration | M1-EVIDENCE-001（GitHub Issue #249） | `evidence/registers/M1-023.json` 內的 `BARRIER-EVID-0001` entry、[`evidence/issues/M1-EVIDENCE-001/summary.md`](../evidence/issues/M1-EVIDENCE-001/summary.md) | `evidence/issues/M1-EVIDENCE-001/tests/test_registration.py` |
+| Consumption gate | M1-025 | [`MacKVM_Implementation_Package_v2/issues/M1/M1-025-barrier-client-wire-contract.md`](issues/M1/M1-025-barrier-client-wire-contract.md)；`BARRIER-EVID-0001` 的 `frozenContractRefs` 與 `consumingTests` 在 M1-025 凍結 wire contract 並連結測試前維持空清單 | `evidence/issues/M1-EVIDENCE-001/tests/test_registration.py` |
+
+鏈路方向與邊界：
+
+- M1-024 產出 sanitized fixture 與獨立 review → M1-EVIDENCE-001（Issue #249）以 append-only 方式將其登錄為 `BARRIER-EVID-0001`，disposition `approved` → M1-025 只能從登錄且 `approved` 的 evidence 凍結 client wire contract。缺少登錄的 capture 不是實作輸入。
+- `BARRIER-EVID-0001` 的 `ambiguousFields` 一律維持 `status: unknown`，不得出現在任何 claim 的 `establishedFieldIds`；direction label 屬 capture provenance，不是對 payload 內容的分析結果。
+- 登錄採 append-only：更正以新的 reviewed entry 取代並將舊 entry 標為 `superseded`，不得改寫既有 entry 的 provenance、fixture digest 或 review 歷史。
+- M1 未執行、未測試 Windows（`docs/adr/M1-SCOPE-001-linux-only-validation.md`），本鏈路不記錄任何 Windows 結果，也不主張 Windows 相容。
+- 該觀測關閉 TLS 以便觀察 application payload；MacKVM production TLS 預設維持 enabled、fail-closed，且未被此 entry 驗證。
+
 ## M1-001 Direct Traceability
 
 | Requirement | Canonical source | Frozen refinement | Decision record | Verification |

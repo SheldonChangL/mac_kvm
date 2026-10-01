@@ -4,15 +4,17 @@
 
 `evidence/registers/M1-023.json` is the canonical, fail-closed index for
 Barrier wire evidence. It establishes the evidence contract before any wire
-codec is written. No approved wire evidence exists yet; the register therefore
-contains no wire claim, fixture, byte layout, field meaning, message code, or
-compatibility assertion.
+codec is written. The register holds no byte layout, field meaning, message
+code, or compatibility assertion: a registered entry records only what was
+observed and what remains unknown, and anything it does not record stays
+unsupported until new approved evidence supersedes that uncertainty.
 
-M1-024 owns the first controlled Windows/Linux server captures and sanitized
-handshake fixtures. Those artifacts must receive provenance and independent
-review, then an append-only register update, before M1-025 may use them to
-freeze a client wire contract. A capture or passing interaction that is absent
-from this register with disposition `approved` is not implementation input.
+M1-024 owns the first controlled Linux server capture and sanitized handshake
+fixture. M1-EVIDENCE-001 appended that fixture as `BARRIER-EVID-0001` after
+provenance and independent review, so the register now holds exactly one
+`approved` entry. A capture or passing interaction that is absent from this
+register with disposition `approved` is not implementation input, and M1-025
+may freeze a client wire contract only from registered `approved` evidence.
 
 ## Authority and source boundary
 
@@ -31,10 +33,12 @@ generated implementation artifacts, or decompiled material are prohibited.
 
 ## Register state and consumption rule
 
-The initial `status` is `initialized-no-approved-evidence` and `entries` is
-empty by design. This is a safety state, not an assertion that the protocol has
-no fields. It means every Barrier wire behavior remains unsupported and blocks
-codec work until evidence is captured and approved.
+The initial `status` was `initialized-no-approved-evidence` with `entries`
+empty by design. That was a safety state, not an assertion that the protocol
+has no fields: it meant every Barrier wire behavior remained unsupported and
+blocked codec work until evidence was captured and approved. The register is
+now `active` and holds the single registered entry described below. Every
+Barrier wire behavior that entry does not record remains unsupported.
 
 Only an entry whose `provenance.disposition` is exactly `approved` may support
 a wire contract or implementation. `pending-review`, `rejected`, `quarantined`,
@@ -52,6 +56,73 @@ and SHA-256 are verified with bounded streaming reads before an entry passes.
 Updates are append-only. Corrections add a replacement entry and mark the old
 entry `superseded`; they never rewrite the provenance, fixture digest, or review
 history of an accepted observation.
+
+## Registered evidence
+
+`BARRIER-EVID-0001` is the only entry. M1-EVIDENCE-001 appended it; M1-024
+produced it.
+
+- Producing Issue: `M1-024`; registering Issue: M1-EVIDENCE-001.
+- Fixture: `Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json`
+- Source: one controlled black-box observation of two lawfully installed
+  external Barrier programs, an external Barrier client against an external
+  Ubuntu 22.04 Barrier server, with TLS disabled for that observation only.
+- Transport scope: the recorder ran on the peer loopback interface and observed
+  the Barrier leg there only, so every retained byte comes from that
+  peer-loopback observation. The wider transport leg that reached the peer host
+  was an encrypted local forward whose contents the recorder did not capture;
+  no cleartext Barrier payload was observed or retained outside the
+  peer-loopback leg, and the register makes no claim about that encrypted leg.
+  No address, port or host name is recorded.
+- Coverage: seven contiguous uninterpreted application-payload runs in both
+  directions, 133 decoded bytes in total, inside one bounded connection window.
+- Review: `evidence/issues/M1-024/independent-review.md` records the
+  independent provenance, licensing, privacy and content review, and records
+  the pre-deletion re-derivation of the fixture from the raw capture by a party
+  that did not produce it.
+
+Three boundaries govern every consumer of that entry.
+
+1. Its `ambiguousFields` keep message code, field layout and widths, byte
+   order, framing and message boundaries, version negotiation, optional and
+   variant fields, and payload limits at `status: unknown`. None of those
+   identifiers may appear in an `establishedFieldIds` list.
+2. Its direction labels are capture provenance, not analysis. The capture
+   producer supplied the server test port of the endpoint role it operated, and
+   the sanitizer applied that producer-selected role; no direction label is
+   derived from payload content, and the opposite port selection yields a
+   structurally valid document with every label inverted.
+3. Windows was not executed in M1 under
+   `docs/adr/M1-SCOPE-001-linux-only-validation.md`, so this register records
+   no Windows result and asserts no Windows Barrier Server compatibility. That
+   ADR supersedes the Windows capture prerequisite this document previously
+   carried, so no Windows capture is required in M1.
+
+The private raw capture, the peer configuration and the private capture logs
+were deleted by the capture producer after M1-024 merged. They are not retained
+for this registration and must not be required or recreated. The sanitized
+fixture on `main` and the M1-024 independent review are the verification
+record; re-deriving the fixture from raw bytes is no longer repeatable.
+
+`nextEvidenceIssue` still names `M1-024`. That field records which Issue owns
+the next capture, no accepted source names a successor to M1-024, and
+M1-EVIDENCE-001 has no authority to invent one, so it is left untouched and
+raised as a follow-up rather than guessed.
+
+`frozenContractRefs` and `consumingTests` are both empty, which is the correct
+bounded state before M1-025 exists. Workflow step 7 is the only way they become
+non-empty: M1-025 freezes a separate wire contract and links its tests, and
+that link must leave the provenance, the fixture digest and the review history
+of this entry untouched.
+
+## Traceability index
+
+The M1-024 → M1-EVIDENCE-001 → M1-025 chain, its artifacts and the test that
+verifies each stage are indexed in
+`MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md`, under the
+`M1-024 → M1-EVIDENCE-001 → M1-025 Barrier Evidence Chain` section. That index
+is traceability only; it freezes no wire contract and carries no M1-025
+contract content.
 
 ## Required entry metadata
 
@@ -106,19 +177,38 @@ entry is rejected or quarantined and every consumer remains blocked.
 
 ## Validation coverage
 
-The issue evidence test validates:
+`evidence/issues/M1-023/tests/test_register.py` validates:
 
-- the canonical empty fail-closed state;
+- the fail-closed contract and the status/entry-presence consistency rule in
+  both directions;
+- every persisted entry, including streamed fixture digest and length checks
+  and the regular-file, no-symlink path rule;
 - a complete in-memory approved-entry happy path (never persisted as evidence);
 - missing peer/server version rejection;
 - enabled TLS without an observed version rejection;
 - sensitive or non-independently reviewed evidence rejection; and
 - rejection when an unknown field is promoted to an established claim.
 
-This Issue does not capture network traffic, operate a Barrier peer, or claim
+`evidence/issues/M1-EVIDENCE-001/tests/test_registration.py` validates the
+registration itself against the same validator: the registered entry, the
+fixture integrity, the recorded independent review, the unknown-field
+disjointness, the explicit prohibited inferences, the bounded consumer lists,
+the direction-convention provenance, the deleted-raw-capture statement, and the
+rule that no Windows result is claimed anywhere in the registration. It also
+maps each of the three stable claim ids to exactly the field identifiers and
+the exact fixture JSON pointers it is allowed to establish, resolves every
+pointer against the retained document, checks the decoded run lengths and their
+aggregate in observed order, checks that the recorded transport scope stays
+within what the recorder observed and names no endpoint, checks that the
+producer identity resolves to repository evidence, and checks the traceability
+index. A mutation suite confirms every one of those checks rejects a drifted
+fixture or a widened claim.
+
+Neither Issue captures network traffic, operates a Barrier peer, or claims
 protocol compatibility. Therefore peer execution, input cleanup, cancellation,
-and stuck-input checks are not applicable to this registry-only change; no mock
-is substituted for the real Windows/Linux captures required by M1-024.
+and stuck-input checks are not applicable to these registry-only changes; no
+mock is substituted for the real Linux capture required by M1-024, which
+`docs/adr/M1-SCOPE-001-linux-only-validation.md` scopes to Linux only.
 
 ## Registration workflow
 
@@ -140,3 +230,9 @@ adapter, and KVM Core continues to receive only `KVMEvent`.
 Rollback by reverting the M1-023 PR and blocking M1-024/M1-025 and all Barrier
 codec work until an equivalent fail-closed register is restored. No runtime,
 persisted user data, trust state, or input state requires cleanup.
+
+Rolling back the M1-EVIDENCE-001 registration instead is narrower: revert that
+append-only PR, which returns the register to `entries: []` and status
+`initialized-no-approved-evidence`, and keep M1-025 blocked. An accepted entry
+is never rewritten in place; a correction is a reviewed replacement entry that
+marks the earlier one `superseded`.
