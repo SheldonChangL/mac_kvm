@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-EVIDENCE-001",
+  "githubIssue": 249,
+  "repositoryHeadAtAuthorRun": "20c6854c24604f8ab35846ff4869ffaa45c36606",
+  "phase": "post-root-verify-ci-gate-inventory-fix",
+  "phaseNote": "Three review findings were addressed over the author-phase change and the gate set was rerun in full; those commands are in `commands`. A later blocking review finding, raised after root ran `make verify` outside the managed sandbox, is addressed in `postRootVerifyRemediation` and its commands are in `postRootVerifyCommands`. Every command, exit code and result in both arrays is from a run observed in this repository; no timing is carried forward by recall. Nothing was staged, committed or pushed, and no owner artifact was opened.",
+  "status": "focused-gates-passed-swift-gates-and-full-verify-not-rerun-here",
+  "statusNote": "`make verify` has not been rerun since the CI gate inventory regression was updated. The last full `make verify` observed in this repository is root's outside-sandbox run recorded in `postRootVerifyRemediation.trigger`, which failed on the stale inventory this change fixes. No full-verify pass may be claimed until root reruns it at the implementation head.",
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "registeredArtifact": {
+    "fixturePath": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+    "fixtureSha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+    "fixtureByteLength": 1079,
+    "recomputedInThisSession": true,
+    "note": "The digest and byte length were recomputed from the file as it stands in the tree with shasum -a 256 and wc -c, and they match the registered values, the fixture metadata.json, evidence/issues/M1-024/commands.json and evidence/issues/M1-024/independent-review.md. No new fixture and no capture byte is added by this Issue, and the remediation changed no fixture byte: the twelve claim-mapping mutations are deep copies held in memory only."
+  },
+  "commands": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py -v",
+      "startedAt": "2026-10-01T03:23:06.967Z",
+      "endedAt": "2026-10-01T03:23:07.014Z",
+      "exitCode": 0,
+      "result": "11 tests passed"
+    },
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+      "startedAt": "2026-10-01T03:23:07.015Z",
+      "endedAt": "2026-10-01T03:23:07.062Z",
+      "exitCode": 0,
+      "result": "18 tests passed, up from 14: the strengthened claim-to-fixture mapping plus test_claim_mapping_rejects_a_fixture_or_claim_that_drifts, test_transport_scope_records_only_the_observed_peer_loopback_leg, test_producer_identity_names_durable_repository_evidence and test_traceability_index_records_the_m1_024_to_m1_025_chain"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-10-01T03:23:07.062Z",
+      "endedAt": "2026-10-01T03:23:07.115Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-10-01T03:23:07.115Z",
+      "endedAt": "2026-10-01T03:23:07.243Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-10-01T03:23:07.243Z",
+      "endedAt": "2026-10-01T03:23:07.500Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-EVIDENCE-001/tests -p 'test_registration.py' -v",
+      "startedAt": "2026-10-01T03:23:07.500Z",
+      "endedAt": "2026-10-01T03:23:07.551Z",
+      "exitCode": 0,
+      "result": "18 tests passed; this is the exact command the CI evidence-test gate builds for this file"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-023/tests -p 'test_register.py' -v",
+      "startedAt": "2026-10-01T03:23:07.551Z",
+      "endedAt": "2026-10-01T03:23:07.593Z",
+      "exitCode": 0,
+      "result": "11 tests passed; CI evidence-test gate command"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-SCOPE-001/tests -p 'test_m1_014_exact_files.py' -v",
+      "startedAt": "2026-10-01T03:23:07.593Z",
+      "endedAt": "2026-10-01T03:23:07.630Z",
+      "exitCode": 0,
+      "result": "2 tests passed; CI evidence-test gate command, run to confirm this change breaks no existing evidence gate"
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-evidence-tests --expected-evidence-test-count 3",
+      "startedAt": "2026-10-01T03:23:07.630Z",
+      "endedAt": "2026-10-01T03:23:07.678Z",
+      "exitCode": 0,
+      "result": "evidence test discovery OK: 3 files, unchanged by the remediation"
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-tool-tests --expected-tool-test-count 8",
+      "startedAt": "2026-10-01T03:23:07.678Z",
+      "endedAt": "2026-10-01T03:23:07.722Z",
+      "exitCode": 0,
+      "result": "tool test discovery OK: 8 files, unchanged by this Issue"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_024_capture_readiness.py'",
+      "startedAt": "2026-10-01T03:23:07.722Z",
+      "endedAt": "2026-10-01T03:23:07.777Z",
+      "exitCode": 0,
+      "result": "15 tests passed; the M1-024 capture-readiness contract suite still accepts the fixture this Issue registers"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_001_product_contract.py'",
+      "startedAt": "2026-10-01T03:23:07.777Z",
+      "endedAt": "2026-10-01T03:23:07.813Z",
+      "exitCode": 0,
+      "result": "10 tests passed; run because the remediation edits MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md, which this suite reads"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_003_independent_implementation_policy.py'",
+      "startedAt": "2026-10-01T03:23:07.813Z",
+      "endedAt": "2026-10-01T03:23:07.850Z",
+      "exitCode": 0,
+      "result": "13 tests passed; second consumer of SOURCE_TRACEABILITY.md"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_linux_only_validation_scope.py'",
+      "startedAt": "2026-10-01T03:23:07.850Z",
+      "endedAt": "2026-10-01T03:23:07.893Z",
+      "exitCode": 0,
+      "result": "19 tests passed; third consumer of SOURCE_TRACEABILITY.md, and the suite that owns the M1 Validation Scope Supersession section the new section sits beside"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tools/Evidence/tests -p 'test_*.py'",
+      "startedAt": "2026-10-01T03:23:07.893Z",
+      "endedAt": "2026-10-01T03:23:12.529Z",
+      "exitCode": 0,
+      "result": "144 tests passed"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-10-01T03:23:12.529Z",
+      "endedAt": "2026-10-01T03:23:12.546Z",
+      "exitCode": 0,
+      "result": "no output"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+      "startedAt": "2026-10-01T03:23:24.036Z",
+      "endedAt": "2026-10-01T03:23:48.609Z",
+      "exitCode": 1,
+      "result": "88 tests, 9 failures, the same nine environmental failures as the author run and no new one: test_m1_004_repository_skeleton (2), test_m1_005_mac_arm64_build (1), test_m1_006_package_boundaries (3) and test_m1_007_test_targets (3). Every one is a subprocess that invokes SwiftPM and reports that the SwiftPM user-level configuration directory is not accessible or not writable. This Issue adds no Swift source, no package manifest and no build setting."
+    },
+    {
+      "command": "make code-quality-check",
+      "startedAt": "2026-10-01T03:23:48.609Z",
+      "endedAt": "2026-10-01T03:23:49.812Z",
+      "exitCode": 2,
+      "result": "environmental and unchanged: swift-format-version exit 0, swift-format-lint exit 0, swift-test-warnings-as-errors exit 1 because SwiftPM cannot start its own nested sandbox inside the managed outer sandbox this session runs in. The gate stops before evaluating any repository file."
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-evidence-001-remediation-report.json",
+      "startedAt": "2026-10-01T03:23:49.812Z",
+      "endedAt": "2026-10-01T03:23:51.568Z",
+      "exitCode": 2,
+      "result": "manifest-validation, docs-check and architecture-check PASSED with exit 0; code-quality FAILED with exit 1 for the environmental reason above and cigates stops at the first failure, so the gates after it were not reached in this session. The individual commands those later gates build were run separately above and the Swift ones remain unrun here. artifacts/ is gitignored, so the report adds no tracked file."
+    }
+  ],
+  "reviewRemediation": [
+    {
+      "finding": "MEDIUM traceability gap: Issue #249 scope requires updating M1-024/M1-025 traceability and evidence links, but MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md held no M1-024 -> M1-EVIDENCE-001/#249 -> BARRIER-EVID-0001/register/review -> M1-025 consumption-gate chain.",
+      "severity": "medium",
+      "result": "Added the 'M1-024 -> M1-EVIDENCE-001 -> M1-025 Barrier Evidence Chain' section: a stage table naming each Issue, the artifact it records and the test that verifies it, plus the chain direction and the append-only, unknown-field, Windows-non-execution and TLS boundaries. docs/evidence/M1-023-barrier-evidence-register.md gained a Traceability index section pointing at it, and summary.md records it as a deliverable and maps it to the Issue scope bullet. No M1-025 contract content was written and the packaged M1-025 Issue file was not modified. Verified by test_traceability_index_records_the_m1_024_to_m1_025_chain, which also requires every repository path the section names to resolve to a real non-symlink file."
+    },
+    {
+      "finding": "MEDIUM weak claim-to-fixture test: test_registered_claims_match_the_retained_fixture_bytes computed the exact decoded lengths and direction labels but asserted only an aggregate string, a count string and a path prefix, so a claim could have been repointed, reordered or widened without failing.",
+      "severity": "medium",
+      "result": "Replaced the aggregate checks with an exact total mapping in claim_mapping_failures(): each of BARRIER-EVID-0001-CLAIM-001/002/003 must establish exactly its intended establishedFieldIds and point at exactly its intended fixture JSON pointers, including all seven observation payload pointers in observed order and the two whole-observations pointers; every pointer is resolved with an RFC 6901 resolver and must resolve to the exact payload it names; the retained sequence must be contiguous and 1-based; the per-run decoded lengths must appear in observed order followed by their aggregate; no established identifier may be shared between claims; and coverage.direction must match the observed label set against entryContract.directions. No prose is parsed for meaning and no protocol semantics is added. test_claim_mapping_rejects_a_fixture_or_claim_that_drifts adds twelve mutations and requires each to be rejected."
+    },
+    {
+      "finding": "LOW overbroad network statement: transport.networkScope asserted 'no wider network path was used' although the observation was reached through an encrypted local forward.",
+      "severity": "low",
+      "result": "Rewritten to record what the recorder observed: it ran on the peer loopback interface and observed the Barrier leg there only, every retained byte comes from that peer-loopback observation, and the wider transport leg was an encrypted local forward whose contents the recorder did not capture, so no cleartext Barrier payload was observed or retained outside the peer-loopback leg and nothing is claimed about that encrypted leg. A matching limitation was added and the register documentation and summary.md were aligned. No endpoint identifier is introduced. Verified by test_transport_scope_records_only_the_observed_peer_loopback_leg, which rejects the old blanket wording and any IPv4 literal, IPv6-style token, :port suffix or host name."
+    },
+    {
+      "finding": "LOW unstable producer wording: provenance.producer named 'root session', an internal session label that no repository artifact pins.",
+      "severity": "low",
+      "result": "Replaced with the durable references evidence/issues/M1-024/summary.md and evidence/issues/M1-024/environment.json. The field stays a single string inside the closed entryContract.allowedObjectKeys shape and still differs from provenance.reviewer.identity, so the validator's producer-self-approval rule is unchanged. Verified by test_producer_identity_names_durable_repository_evidence."
+    },
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py",
+      "exitCode": 1,
+      "finding": "A sentence added to summary.md while writing up the remediation named Windows alongside no negation word and was rejected by the registration suite's own non-claim scan with 'evidence/issues/M1-EVIDENCE-001/summary.md asserts a Windows result'.",
+      "severity": "low",
+      "result": "The sentence was reworded to carry an explicit negation and the rerun passed. The evidence package is therefore still not exempt from the gate it defines."
+    }
+  ],
+  "remediatedAttempts": [
+    {
+      "finding": "The interrupted author phase left summary.md and manual.md describing commands.json, environment.json, tests/red-phase.json and tests/results.json, none of which existed.",
+      "severity": "high",
+      "result": "The red phase was reproduced by observation rather than by recall, the full gate set was rerun, and the four files were written from the observed exits."
+    },
+    {
+      "finding": "manual.md recorded the red phase as 14 tests with 9 failures and 1 error. The reproduced run is 14 tests with 10 failures and 0 errors.",
+      "severity": "medium",
+      "result": "manual.md and tests/red-phase.json were corrected to the observed counts and the failures were attributed to their individual causes."
+    },
+    {
+      "finding": "The register documentation asserted that the register contains no field meaning 'and it never will', which contradicts its own unchanged rule that an unknown remains unsupported only until new approved evidence supersedes it.",
+      "severity": "medium",
+      "result": "Rewritten to a present-tense statement that keeps the supersession path intact."
+    },
+    {
+      "finding": "The register documentation asserted the deleted private raw material is 'not held anywhere', which is not verifiable from this repository.",
+      "severity": "low",
+      "result": "Narrowed to the verifiable statement that it is not retained for this registration and must not be required or recreated."
+    },
+    {
+      "finding": "summary.md mapped AC4 to 'gates pass' without recording that the Swift-dependent gates cannot run in this session, and mapped AC7 to a test that checks consumer references resolve rather than that the consumer lists are empty.",
+      "severity": "medium",
+      "result": "Both mappings were narrowed to what the commands and the test actually establish."
+    },
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+      "exitCode": 1,
+      "finding": "A corrected manual.md sentence named Windows alongside no negation word and was rejected by the registration suite's own non-claim scan with 'evidence/issues/M1-EVIDENCE-001/manual.md asserts a Windows result'.",
+      "severity": "low",
+      "result": "The sentence was reworded to carry an explicit negation and the rerun passed. The evidence package is therefore not exempt from the gate it defines."
+    }
+  ],
+  "postRootVerifyRemediation": {
+    "trigger": {
+      "runBy": "root, in this repository, outside the managed sandbox this session runs in",
+      "command": "make verify",
+      "observed": "code-quality passed. tool-test:cigates/tests/test_cigates.py failed: test_cumulative_gate_inventory_is_the_expected_named_gates still expected the pre-change evidence gate list and omitted the newly auto-discovered evidence-test:M1-EVIDENCE-001/tests/test_registration.py gate.",
+      "note": "That run is root's, not this session's. Its output is recorded here as the reported trigger for this fix and is not restated as a result produced here. The code-quality and Swift gates still cannot run in this session for the environmental reason recorded in `commands`."
+    },
+    "finding": "BLOCKING stale CI gate inventory: adding evidence/issues/M1-EVIDENCE-001/tests/test_registration.py makes cigates auto-discover a twenty-second gate, but Tools/cigates/tests/test_cigates.py pinned the cumulative inventory at the previous twenty-one named gates, so the canonical inventory regression failed inside make verify.",
+    "severity": "blocking",
+    "result": "Tools/cigates/tests/test_cigates.py now expects `evidence-test:M1-EVIDENCE-001/tests/test_registration.py` exactly once, inserted at its discovered sort position between the M1-023 and M1-SCOPE-001 evidence gates, and EXPECTED_CUMULATIVE_GATE_COUNT moves from 21 to 22. No other line of the file and no production file changed. The test's own existing uniqueness assertion, assertEqual(len(names), len(set(names))), is what holds the gate to exactly one occurrence; no new assertion was added.",
+    "redPhase": {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_cigates.py'",
+      "stateOfTestFile": "pre-fix, as it stands at HEAD 20c6854c24604f8ab35846ff4869ffaa45c36606",
+      "exitCode": 1,
+      "testsRun": 23,
+      "failures": 1,
+      "errors": 0,
+      "failureType": "AssertionFailure",
+      "failureReason": "FAIL: test_cumulative_gate_inventory_is_the_expected_named_gates reports \"Lists differ\", the actual list carrying 'evidence-test:M1-EVIDENCE-001/tests/test_registration.py' that the expected list omits",
+      "purpose": "Reproduces root's reported failure inside the managed sandbox before the inventory is updated, so the fix is forced by the observed failure rather than by root's report alone."
+    }
+  },
+  "postRootVerifyCommands": [
+    {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_cigates.py' -v",
+      "startedAt": "2026-10-01T03:30:00.442Z",
+      "endedAt": "2026-10-01T03:30:00.746Z",
+      "exitCode": 0,
+      "result": "23 tests passed; the canonical CI gate inventory regression that root's outside-sandbox make verify failed on. This is the exact command the CI tool-test gate builds for this file."
+    },
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+      "startedAt": "2026-10-01T03:30:00.747Z",
+      "endedAt": "2026-10-01T03:30:00.796Z",
+      "exitCode": 0,
+      "result": "18 tests passed, unchanged by this fix"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-EVIDENCE-001/tests -p 'test_registration.py' -v",
+      "startedAt": "2026-10-01T03:30:00.797Z",
+      "endedAt": "2026-10-01T03:30:00.848Z",
+      "exitCode": 0,
+      "result": "18 tests passed; the CI evidence-test gate command for the newly discovered gate"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-023/tests -p 'test_register.py' -v",
+      "startedAt": "2026-10-01T03:30:00.848Z",
+      "endedAt": "2026-10-01T03:30:00.896Z",
+      "exitCode": 0,
+      "result": "11 tests passed; CI evidence-test gate command"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-SCOPE-001/tests -p 'test_m1_014_exact_files.py' -v",
+      "startedAt": "2026-10-01T03:30:00.896Z",
+      "endedAt": "2026-10-01T03:30:00.938Z",
+      "exitCode": 0,
+      "result": "2 tests passed; CI evidence-test gate command, run to confirm the inventory change breaks no existing evidence gate"
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-tool-tests --expected-tool-test-count 8",
+      "startedAt": "2026-10-01T03:30:00.938Z",
+      "endedAt": "2026-10-01T03:30:00.986Z",
+      "exitCode": 0,
+      "result": "tool test discovery OK: 8 files, unchanged by this fix"
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-evidence-tests --expected-evidence-test-count 3",
+      "startedAt": "2026-10-01T03:30:00.987Z",
+      "endedAt": "2026-10-01T03:30:01.039Z",
+      "exitCode": 0,
+      "result": "evidence test discovery OK: 3 files, the discovery count the updated inventory now agrees with"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-10-01T03:30:01.039Z",
+      "endedAt": "2026-10-01T03:30:01.095Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-10-01T03:30:01.095Z",
+      "endedAt": "2026-10-01T03:30:01.225Z",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-10-01T03:30:01.225Z",
+      "endedAt": "2026-10-01T03:30:01.476Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-10-01T03:30:01.476Z",
+      "endedAt": "2026-10-01T03:30:01.498Z",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ],
+  "notRerunHere": [
+    {
+      "command": "make verify",
+      "reason": "code-quality still fails in this session for the environmental reason recorded against `make code-quality-check` in `commands`: SwiftPM cannot start its own nested sandbox inside the managed outer sandbox, and cigates stops at the first failure, so the tool-test gate this fix repairs would not be reached. The fix was therefore verified by running that gate's exact command directly, and the full verify must be rerun by root outside the managed sandbox."
+    },
+    {
+      "command": "make code-quality-check",
+      "reason": "environmental and unchanged; see `commands`. This fix adds no Swift source, no package manifest and no build setting."
+    },
+    {
+      "command": "the Swift-dependent gates inside make verify",
+      "reason": "environmental and unchanged; see `commands`. They must be rerun at the implementation commit outside a SwiftPM-blocking sandbox."
+    }
+  ]
+}

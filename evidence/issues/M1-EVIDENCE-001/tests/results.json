@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-EVIDENCE-001",
+  "repositoryHeadAtAuthorRun": "20c6854c24604f8ab35846ff4869ffaa45c36606",
+  "commit": null,
+  "commitNote": "The author phase and this post-review remediation rerun both ran with the changed files uncommitted over the recorded head. Nothing was staged, committed or pushed.",
+  "phase": "post-root-verify-ci-gate-inventory-fix",
+  "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py -v",
+  "startedAt": "2026-10-01T03:30:00.747Z",
+  "endedAt": "2026-10-01T03:30:00.796Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 18,
+  "testsRunAtAuthorPhase": 14,
+  "tests": [
+    "test_approved_entries_carry_a_recorded_independent_review",
+    "test_claim_mapping_rejects_a_fixture_or_claim_that_drifts",
+    "test_consumers_remain_bounded_and_resolvable",
+    "test_direction_convention_is_recorded_as_capture_provenance",
+    "test_documentation_tracks_the_registered_state",
+    "test_m1_024_independent_review_remains_the_recorded_review_source",
+    "test_no_windows_result_is_claimed_anywhere_in_the_registration",
+    "test_producer_identity_names_durable_repository_evidence",
+    "test_prohibited_inferences_are_explicit",
+    "test_register_is_active_and_passes_the_m1_023_validator",
+    "test_registered_claims_match_the_retained_fixture_bytes",
+    "test_registered_entry_records_the_reviewed_linux_capture",
+    "test_registered_fixture_is_a_regular_file_with_matching_digest_and_length",
+    "test_registration_does_not_claim_the_raw_capture_is_retained",
+    "test_registration_records_the_windows_non_execution_disposition",
+    "test_traceability_index_records_the_m1_024_to_m1_025_chain",
+    "test_transport_scope_records_only_the_observed_peer_loopback_leg",
+    "test_unknown_fields_remain_unknown_and_support_no_claim"
+  ],
+  "addedByReviewRemediation": [
+    "test_claim_mapping_rejects_a_fixture_or_claim_that_drifts",
+    "test_producer_identity_names_durable_repository_evidence",
+    "test_traceability_index_records_the_m1_024_to_m1_025_chain",
+    "test_transport_scope_records_only_the_observed_peer_loopback_leg"
+  ],
+  "strengthenedByReviewRemediation": [
+    "test_registered_claims_match_the_retained_fixture_bytes"
+  ],
+  "claimMappingMutations": {
+    "note": "Every mutation is a deep copy held in memory. No fixture byte and no register byte on disk is modified by the suite, and each mutation must produce at least one mapping failure.",
+    "fixture": [
+      "drop_last_run",
+      "resize_a_run",
+      "reorder_runs",
+      "renumber_runs",
+      "collapse_directions",
+      "corrupt_a_payload"
+    ],
+    "entry": [
+      "repoint_a_claim",
+      "point_outside_the_fixture",
+      "widen_established_fields",
+      "reorder_established_fields",
+      "rename_a_claim",
+      "restate_the_aggregate"
+    ]
+  },
+  "dependentSuitesNote": "The suites timed at 03:30 were rerun in the post-root-verify CI gate inventory fix. The suites timed at 03:23 are the post-review-remediation runs; the inventory fix touches only Tools/cigates/tests/test_cigates.py, which none of them reads, so they were not rerun and their earlier exits stand. Both sets are in commands.json.",
+  "dependentSuites": [
+    {
+      "command": "python3 -m unittest discover -s Tools/cigates/tests -p 'test_cigates.py' -v",
+      "startedAt": "2026-10-01T03:30:00.442Z",
+      "endedAt": "2026-10-01T03:30:00.746Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 23,
+      "note": "The canonical CI gate inventory regression. It failed in root's outside-sandbox `make verify` because test_cumulative_gate_inventory_is_the_expected_named_gates still expected the pre-change evidence gate list; it now expects evidence-test:M1-EVIDENCE-001/tests/test_registration.py once and EXPECTED_CUMULATIVE_GATE_COUNT is 22. The red run and the fix are in red-phase.json under postRootVerifyRedPhase and in commands.json under postRootVerifyRemediation."
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-023/tests -p 'test_register.py' -v",
+      "startedAt": "2026-10-01T03:30:00.848Z",
+      "endedAt": "2026-10-01T03:30:00.896Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 11,
+      "note": "The M1-023 register suite whose two state assertions this Issue updates. It is the validator the registration suite reuses."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_024_capture_readiness.py'",
+      "startedAt": "2026-10-01T03:23:07.722Z",
+      "endedAt": "2026-10-01T03:23:07.777Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 15,
+      "note": "The M1-024 capture-readiness contract suite that guards the fixture this Issue registers."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_001_product_contract.py'",
+      "startedAt": "2026-10-01T03:23:07.777Z",
+      "endedAt": "2026-10-01T03:23:07.813Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 10,
+      "note": "Reads MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md, which the traceability remediation edits."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_003_independent_implementation_policy.py'",
+      "startedAt": "2026-10-01T03:23:07.813Z",
+      "endedAt": "2026-10-01T03:23:07.850Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 13,
+      "note": "Second consumer of SOURCE_TRACEABILITY.md."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_linux_only_validation_scope.py'",
+      "startedAt": "2026-10-01T03:23:07.850Z",
+      "endedAt": "2026-10-01T03:23:07.893Z",
+      "exitCode": 0,
+      "status": "passed",
+      "testsRun": 19,
+      "note": "Owns the M1 Validation Scope Supersession section the new traceability section sits beside, and rejects TODO/TBD placeholders in that file."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "registerId": "M1-023",
   "protocol": "barrier",
-  "status": "initialized-no-approved-evidence",
+  "status": "active",
   "nextEvidenceIssue": "M1-024",
   "authoritativePolicyRefs": [
     "docs/spec/CANONICAL_SPEC_SECTION_55.md#55-license-strategy",
@@ -162,5 +162,187 @@
       "consumingTests"
     ]
   },
-  "entries": []
+  "entries": [
+    {
+      "evidenceId": "BARRIER-EVID-0001",
+      "relatedIssue": "M1-024",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "Controlled black-box observation of two lawfully installed external Barrier programs on an isolated peer loopback, executed by the capture producer under Tests/SystemTests/Plans/M1-024-barrier-client-handshake-fixtures.md and bounded to one connection window. Direction labelling is capture provenance rather than analysis: the capture producer supplied the server test port of the endpoint role it operated, and the sanitizer applied that producer-selected server-port role to label every retained run. No direction label is derived from payload content."
+      },
+      "capture": {
+        "capturedAt": "2026-09-30T07:01:02Z",
+        "tools": [
+          {
+            "name": "tcpdump",
+            "version": "4.99.1"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "server",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported"
+        }
+      },
+      "transport": {
+        "networkScope": "The recorder ran on the peer loopback interface and observed the Barrier leg there only; every retained byte comes from that peer-loopback observation. The wider transport leg that reached that host was an encrypted local forward whose contents the recorder did not capture, so no cleartext Barrier payload was observed or retained outside the peer-loopback leg and nothing is claimed about that encrypted leg. No identifying address, port or host name was recorded.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on hosts under that owner's control, and only externally observable application payload bytes were recorded. No Barrier or Deskflow source, header, constant table, generated implementation artifact or decompiled material was read, copied, linked or bundled.",
+        "permittedUse": "Independent clean-room interoperability implementation inside the MacKVM Barrier Protocol Adapter only. This entry authorises no consumer yet: frozenContractRefs and consumingTests stay empty until M1-025 freezes a wire contract and names the tests that consume it.",
+        "producer": "M1-024 capture producer, recorded in evidence/issues/M1-024/summary.md and evidence/issues/M1-024/environment.json",
+        "reviewer": {
+          "identity": "M1-024 independent reviewer, fresh isolated non-producing session, recorded in evidence/issues/M1-024/independent-review.md",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-01T02:36:57Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "Allowlist sanitization by the capture producer's private temporary sanitizer, SHA-256 d273a45575b75d433e07fb29fe6361aa9d76bf62a9585645affc19698be004a4, whose self-test SHA-256 d8c5c6db42f0e2eac39946ded502e83795b70f7b0a2a8771da57db782b5f8794 passed 21 checks. The retained document keeps sequence numbers, direction labels and base64 application payload runs only; every packet header, address, port, timestamp and transport metadata key is dropped, and a private denylist scan over the decoded payload reported zero hits. Before the raw capture was deleted the independent reviewer re-ran that sanitizer over it and reproduced the retained document byte for byte.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "ip-address",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+        "sha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+        "byteLength": 1079
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "Seven contiguous application-payload runs numbered 1 through 7 were retained from a single bounded 9-second connection window.",
+          "Both direction labels occur and the retained labels alternate strictly, beginning with the run labelled server-to-client.",
+          "The retained runs decode to 15, 28, 8, 22, 36, 16 and 8 bytes in sequence order, totalling 133 bytes.",
+          "No input, clipboard or screen-switch traffic was observed inside the bounded window."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0001-CLAIM-001",
+            "assertion": "In this single observation the retained document holds exactly 7 application-payload runs whose decoded lengths are, in sequence order, 15, 28, 8, 22, 36, 16 and 8 bytes, totalling 133 bytes. The claim covers the retained bytes and their lengths only and asserts no field, message or framing meaning for any of them.",
+            "establishedFieldIds": [
+              "observed-payload-run-1",
+              "observed-payload-run-2",
+              "observed-payload-run-3",
+              "observed-payload-run-4",
+              "observed-payload-run-5",
+              "observed-payload-run-6",
+              "observed-payload-run-7"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/0/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/1/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/2/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/3/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/4/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/5/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/6/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0001-CLAIM-002",
+            "assertion": "The 7 retained runs form a contiguous 1-based sequence in the order the recorder observed them inside the bounded window, and both direction labels occur. Ordering is an observation of the capture; it is not evidence of a message boundary, a request-response pairing or a protocol state machine.",
+            "establishedFieldIds": [
+              "observed-run-ordering"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0001-CLAIM-003",
+            "assertion": "Every retained direction label was assigned from the capture producer's selected server test port, which is recorded as capture provenance, and no label was derived from payload content. The independent reviewer confirmed that the opposite server-port selection yields a structurally valid document of the same run count and the same aggregate length with all 7 labels inverted, so only the producer-recorded role reproduces the registered digest.",
+            "establishedFieldIds": [
+              "observed-run-direction-label"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "One observation of one external version pair on one locked host pair; it represents nothing beyond that observation.",
+        "The observation ran with encryption disabled so that application payload bytes were observable. No payload under TLS was observed, and the MacKVM production TLS default stays enabled, fail-closed and unvalidated by this entry.",
+        "The recorder observed only the peer-loopback Barrier leg. The encrypted local forward that reached that host was not captured, so nothing about that leg, its transport or its endpoints is observed or claimed here.",
+        "The window is bounded to the connection handshake; no input, clipboard or screen-switch traffic exists in the retained fixture.",
+        "The external programs reported protocol version 1.6 through their own command-line metadata. That is a report by the external binaries and establishes nothing about on-wire version negotiation.",
+        "peer.os.build records not-reported because the capture producer did not record a Linux peer OS build identifier before the observation and MacKVM_Implementation_Package_v2/toolchain.lock.json pins the peer OS by name and version only. The value is recorded as unreported rather than inferred.",
+        "Windows was not executed in M1 under docs/adr/M1-SCOPE-001-linux-only-validation.md; this entry claims no Windows result and no Windows Barrier Server compatibility.",
+        "The private raw capture, the peer configuration and the private capture logs were deleted by the capture producer after M1-024 merged. They are not retained, must not be required or recreated, and re-deriving this fixture from raw bytes is therefore no longer repeatable.",
+        "The pre-deletion independent re-derivation of this fixture from the raw capture, together with the independent provenance, licensing, privacy and content review, is recorded in evidence/issues/M1-024/independent-review.md, which is the verification record of record for this entry.",
+        "Direction labels rest on the capture producer's selected server test port rather than on anything inside an observation, so a consumer that relies on direction relies on capture provenance."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-message-code",
+          "observation": "The retained runs are uninterpreted bytes. No message code, message type or command identifier is identified anywhere in them.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-field-layout-and-widths",
+          "observation": "No field offset, field width, field order or record layout is identified inside any retained run.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-field-endianness",
+          "observation": "No multi-byte value is identified inside any retained run, so byte order is not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-message-framing-and-boundaries",
+          "observation": "A retained run is a direction run of the captured byte stream. Whether a run contains zero, one or several protocol messages is not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-protocol-version-negotiation-fields",
+          "observation": "No version field, negotiation exchange or version compatibility rule is identified inside any retained run.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-optional-and-variant-fields",
+          "observation": "Optionality, repetition, defaulting and variant selection are not observed; a single successful connection does not enumerate them.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-payload-length-and-limit-fields",
+          "observation": "Maximum payload length, allocation limits and oversize handling are not observed inside this bounded window.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer any Barrier field meaning, field identity, field width or field order from this entry.",
+        "Do not infer any Barrier message code, message type or message boundary from this entry.",
+        "Do not infer byte order or endianness for any value inside the retained payload runs.",
+        "Do not infer message framing, length prefixing or stream segmentation. A retained run is a direction run of the captured byte stream and is not a message.",
+        "Do not infer compatibility between Barrier and MacKVM, between Barrier versions, or between platforms.",
+        "Windows Barrier Server behavior must not be inferred from this entry; Windows was not executed in M1 and no Windows compatibility is claimed.",
+        "Do not infer TLS, certificate or trust behavior. TLS was disabled for this single observation and the product TLS default is neither exercised nor validated here.",
+        "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory. New approved evidence is the only way to supersede an unknown."
+      ],
+      "frozenContractRefs": [],
+      "consumingTests": []
+    }
+  ]
 }

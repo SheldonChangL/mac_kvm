@@ -10,7 +10,7 @@ from unittest import mock
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 MODULE_PATH = REPOSITORY_ROOT / "Tools/cigates/cigates.py"
-EXPECTED_CUMULATIVE_GATE_COUNT = 21
+EXPECTED_CUMULATIVE_GATE_COUNT = 22
 
 spec = importlib.util.spec_from_file_location("cigates", MODULE_PATH)
 cigates = importlib.util.module_from_spec(spec)
@@ -319,6 +319,7 @@ class CIGateTests(unittest.TestCase):
                 "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
                 "tool-test:docs-check/tests/test_docs_check.py",
                 "evidence-test:M1-023/tests/test_register.py",
+                "evidence-test:M1-EVIDENCE-001/tests/test_registration.py",
                 "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
                 "swift-package-test:KVMContracts",
                 "swift-package-test:MacPlatform",

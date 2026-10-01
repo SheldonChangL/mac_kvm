@@ -268,9 +268,17 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
             self.register["policy"]["unknownFieldPolicy"],
             "remain-unknown-and-block-wire-claim",
         )
-        self.assertEqual(self.register["entries"], [])
-        self.assertIn("No approved wire evidence exists yet", self.documentation)
+        self.assertEqual(
+            self.register["policy"]["mutationPolicy"],
+            "append-only-supersede-never-rewrite",
+        )
+        # The canonical register started empty and fail closed. M1-EVIDENCE-001
+        # appended the independently reviewed M1-024 capture, so the contract
+        # under test is now the registered state rather than the empty state.
+        self.assertEqual(self.register["status"], "active")
+        self.assertTrue(self.register["entries"])
         self.assertIn("M1-024", self.documentation)
+        self.assertIn("M1-EVIDENCE-001", self.documentation)
 
     def test_complete_approved_entry_is_accepted(self):
         validate_entry(self.register, self.sample_entry())
@@ -340,9 +348,16 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         entry = self.sample_entry()
         entry["provenance"]["disposition"] = "pending-review"
         register = copy.deepcopy(self.register)
+        register["status"] = "initialized-no-approved-evidence"
         register["entries"] = [entry]
         with self.assertRaisesRegex(ValueError, "status"):
             validate_register(register)
+
+        empty = copy.deepcopy(self.register)
+        empty["status"] = "active"
+        empty["entries"] = []
+        with self.assertRaisesRegex(ValueError, "status"):
+            validate_register(empty)
 
     def test_approved_entry_requires_at_least_one_wire_claim(self):
         entry = self.sample_entry()
