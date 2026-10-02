@@ -10,8 +10,6 @@ execution_tier: "C/H"
 low_model_autonomous_merge: false
 depends_on:
   - "M1-024"
-  - "M1-021"
-  - "M1-022"
 contract_refs:
   []
 source_refs:
@@ -41,7 +39,10 @@ labels:
 
 ## Preconditions
 
-- 所有 dependencies 已完成：M1-024, M1-021, M1-022。
+- 所有 dependencies 已完成：M1-024。
+- 修正前置條件：GitHub Issue #278（M1-WIRE-001，[`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`](../../../docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md)）已 merge，`evidence/registers/M1-023.json` 中 `BARRIER-EVID-0002` 的 disposition 為 `approved`，且 `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json` 存在。M1-WIRE-001 不在 70 筆 canonical manifest 中，而 manifest validator 只接受 manifest ID，因此此前置條件記錄於此而非 `depends_on`。若未滿足，停止。
+- Length-prefix width 前置條件（fail closed）：即使 M1-WIRE-001 已 merge 且 `BARRIER-EVID-0002` 為 `approved`，仍須在凍結 exact length-prefix width 前停止，除非另有 separately approved discriminating evidence（由 GitHub Issue #279（M1-WIRE-002，Acquire discriminating Barrier length-prefix evidence）取得，並在 `evidence/registers/M1-023.json` 中登錄為另一筆 disposition 為 `approved`、且能唯一確定該 width 的 entry）。GitHub Issue #279（M1-WIRE-002）是取得該 evidence 的 separately approved workflow；它不在 70 筆 canonical manifest 中，因此此 blocker 記錄於此而非 `depends_on`，且在 #279 完成並取得 `approved` entry 前，M1-025 不得完成 exact length-prefix width 凍結。`BARRIER-EVID-0002` 與 `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json` 只記錄 candidate 4-byte unsigned big-endian interpretation 可切分保留的 bytes，而較窄的 2-byte big-endian reading 同樣可切分全部 run，因此不足以證明 exact length-prefix width；未取得該 evidence 前，width 維持 unknown 並列為 blocker，不得推定。
+- 本 Issue 不依賴 M1-021 或 M1-022；本 Issue 凍結的 wire contract 是它們的前置條件，順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022。
 
 ## Exact Files
 
@@ -52,6 +53,8 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 ## Frozen Contract References
 
 - 本 Issue 不新增 public contract；如需要，停止並先建立 ADR/contract Issue。
+- Evidence 輸入僅限 `evidence/registers/M1-023.json` 中 disposition 為 `approved` 的 `BARRIER-EVID-0001`、`BARRIER-EVID-0002` 與 `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json`；未被這些 entry 的 claim 建立的欄位維持 unknown，不得猜測；exact length-prefix width 另受 Preconditions 的 fail-closed 前置條件限制。
+- M1-WIRE-001 提出的 fail-closed exact-supported-version policy（`exact-supported-version-fail-closed`）由本 Issue 採納或拒絕並記錄理由；不得宣稱一般版本協商或跨版本相容。
 
 ## Scope
 

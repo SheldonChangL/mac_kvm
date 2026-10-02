@@ -2,6 +2,8 @@
 
 依 topological order 執行；同時只能挑 dependencies 全部完成的 Issue。
 
+Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`](../docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md)）。修正 Issue GitHub Issue #278（M1-WIRE-001）不在 70 筆 canonical manifest 中，因此不出現在下表與 `depends_on`；M1-025 的 Preconditions 要求它已 merge，且 `BARRIER-EVID-0002` 的 disposition 為 `approved`。
+
 ## M1 — Mac Client MVP（Barrier 驗證）
 
 | Order | Issue | Tier | Risk | Title | Depends on |
@@ -26,7 +28,7 @@
 | 19 | [M1-016](issues/M1/M1-016-kvmprotocol-session.md) | B | critical | 定義 KVMProtocolSession Interface | M1-013, M1-015 |
 | 20 | [M1-017](issues/M1/M1-017-transport.md) | B | critical | 定義 Transport Interface 與 Byte Stream Semantics | M1-015 |
 | 21 | [M1-018](issues/M1/M1-018-kvmclock.md) | B | medium | 建立 Clock／Timeout／Scheduler 可測試抽象 | M1-015 |
-| 22 | [M1-021](issues/M1/M1-021-barrier-binary-codec.md) | B | high | 實作 Bounded BinaryReader／BinaryWriter | M1-015 |
+| 22 | [M1-025](issues/M1/M1-025-barrier-client-wire-contract.md) | C/H | critical | 凍結 Barrier Client Wire Contract v0.1 | M1-024 |
 | 23 | [M1-035](issues/M1/M1-035-accessibility-permission-service.md) | B/H | high | 實作 macOS Accessibility Permission Service | M1-006, M1-015 |
 | 24 | [M1-052](issues/M1/M1-052-clipboard-payload.md) | A | medium | 定義 ClipboardPayload 與 UTF-8 Text Codec | M1-013, M1-015 |
 | 25 | [M1-040](issues/M1/M1-040-barrier-keyboard-fixtures.md) | H | critical | 擷取並 Sanitise Barrier Keyboard Fixtures | M1-023, M1-024 |
@@ -37,9 +39,9 @@
 | 32 | [M1-020](issues/M1/M1-020-async-harness.md) | B | high | 建立 Deterministic Async Test Harness | M1-018, M1-019 |
 | 33 | [M1-054](issues/M1/M1-054-clipboard-loop-guard.md) | B | high | 實作 Clipboard Origin／Hash Loop Prevention 與 Size Limit | M1-052, M1-053 |
 | 34 | [M1-044](issues/M1/M1-044-mac-key-code-mapper.md) | B | critical | 實作 VirtualKey → macOS CGKeyCode Mapper（US Baseline） | M1-042, M1-035 |
-| 36 | [M1-022](issues/M1/M1-022-barrier-frame-reassembler.md) | B | critical | 實作 TCP Stream Frame Reassembler 與 Size Limits | M1-019, M1-020, M1-021 |
+| 36 | [M1-021](issues/M1/M1-021-barrier-binary-codec.md) | B | high | 實作 Bounded BinaryReader／BinaryWriter | M1-015, M1-025 |
 | 37 | [M1-045](issues/M1/M1-045-keyboard-layout-strategy.md) | C/H | critical | 建立 Keyboard Layout Strategy 與 Unsupported-layout 行為 | M1-044 |
-| 38 | [M1-025](issues/M1/M1-025-barrier-client-wire-contract.md) | C/H | critical | 凍結 Barrier Client Wire Contract v0.1 | M1-024, M1-021, M1-022 |
+| 38 | [M1-022](issues/M1/M1-022-barrier-frame-reassembler.md) | B | critical | 實作 TCP Stream Frame Reassembler 與 Size Limits | M1-019, M1-020, M1-021 |
 | 39 | [M1-026](issues/M1/M1-026-barrier-message-registry.md) | B | high | 實作 Barrier Message Registry 與 Unknown-message Policy | M1-025 |
 | 40 | [M1-027](issues/M1/M1-027-barrier-server-hello.md) | A | high | 實作 Barrier Server Hello Parser | M1-025, M1-026 |
 | 41 | [M1-028](issues/M1/M1-028-barrier-client-hello-back.md) | A | high | 實作 Barrier Client HelloBack Encoder | M1-025, M1-026 |

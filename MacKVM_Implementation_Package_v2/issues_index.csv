@@ -20,7 +20,7 @@ M2-015,實作 Screen Inventory 與 Display Change Monitor,M2,E10,P1,M,high,B/H,M
 M1-016,定義 KVMProtocolSession Interface,M1,E02,P1,S,critical,B,"M1-013,M1-015",issues/M1/M1-016-kvmprotocol-session.md
 M1-017,定義 Transport Interface 與 Byte Stream Semantics,M1,E02,P1,S,critical,B,M1-015,issues/M1/M1-017-transport.md
 M1-018,建立 Clock／Timeout／Scheduler 可測試抽象,M1,E02,P1,XS,medium,B,M1-015,issues/M1/M1-018-kvmclock.md
-M1-021,實作 Bounded BinaryReader／BinaryWriter,M1,E03,P1,S,high,B,M1-015,issues/M1/M1-021-barrier-binary-codec.md
+M1-025,凍結 Barrier Client Wire Contract v0.1,M1,E03,P0,M,critical,C/H,M1-024,issues/M1/M1-025-barrier-client-wire-contract.md
 M1-035,實作 macOS Accessibility Permission Service,M1,E04,P1,M,high,B/H,"M1-006,M1-015",issues/M1/M1-035-accessibility-permission-service.md
 M1-052,定義 ClipboardPayload 與 UTF-8 Text Codec,M1,E06,P1,XS,medium,A,"M1-013,M1-015",issues/M1/M1-052-clipboard-payload.md
 M1-040,擷取並 Sanitise Barrier Keyboard Fixtures,M1,E05,P0,M,critical,H,"M1-023,M1-024",issues/M1/M1-040-barrier-keyboard-fixtures.md
@@ -34,9 +34,9 @@ M1-020,建立 Deterministic Async Test Harness,M1,E02,P1,S,high,B,"M1-018,M1-019
 M1-054,實作 Clipboard Origin／Hash Loop Prevention 與 Size Limit,M1,E06,P1,S,high,B,"M1-052,M1-053",issues/M1/M1-054-clipboard-loop-guard.md
 M1-044,實作 VirtualKey → macOS CGKeyCode Mapper（US Baseline）,M1,E05,P1,S,critical,B,"M1-042,M1-035",issues/M1/M1-044-mac-key-code-mapper.md
 M2-018,實作 Corner Exclusion／Activation Cancellation Tests,M2,E10,P1,S,medium,A,"M2-017,M1-018",issues/M2/M2-018-edge-detector-tests.md
-M1-022,實作 TCP Stream Frame Reassembler 與 Size Limits,M1,E03,P1,S,critical,B,"M1-019,M1-020,M1-021",issues/M1/M1-022-barrier-frame-reassembler.md
+M1-021,實作 Bounded BinaryReader／BinaryWriter,M1,E03,P1,S,high,B,"M1-015,M1-025",issues/M1/M1-021-barrier-binary-codec.md
 M1-045,建立 Keyboard Layout Strategy 與 Unsupported-layout 行為,M1,E05,P1,M,critical,C/H,M1-044,issues/M1/M1-045-keyboard-layout-strategy.md
-M1-025,凍結 Barrier Client Wire Contract v0.1,M1,E03,P0,M,critical,C/H,"M1-024,M1-021,M1-022",issues/M1/M1-025-barrier-client-wire-contract.md
+M1-022,實作 TCP Stream Frame Reassembler 與 Size Limits,M1,E03,P1,S,critical,B,"M1-019,M1-020,M1-021",issues/M1/M1-022-barrier-frame-reassembler.md
 M1-026,實作 Barrier Message Registry 與 Unknown-message Policy,M1,E03,P1,S,high,B,M1-025,issues/M1/M1-026-barrier-message-registry.md
 M1-027,實作 Barrier Server Hello Parser,M1,E03,P1,S,high,A,"M1-025,M1-026",issues/M1/M1-027-barrier-server-hello.md
 M1-028,實作 Barrier Client HelloBack Encoder,M1,E03,P1,S,high,A,"M1-025,M1-026",issues/M1/M1-028-barrier-client-hello-back.md

@@ -11,10 +11,14 @@ unsupported until new approved evidence supersedes that uncertainty.
 
 M1-024 owns the first controlled Linux server capture and sanitized handshake
 fixture. M1-EVIDENCE-001 appended that fixture as `BARRIER-EVID-0001` after
-provenance and independent review, so the register now holds exactly one
-`approved` entry. A capture or passing interaction that is absent from this
-register with disposition `approved` is not implementation input, and M1-025
-may freeze a client wire contract only from registered `approved` evidence.
+provenance and independent review. M1-WIRE-001 (GitHub Issue #278) then
+appended `BARRIER-EVID-0002`, a conformance vector derived from the same
+fixture. It remained `pending-review` until its independent five-axis review
+was recorded in `evidence/issues/M1-WIRE-001/independent-review.md`; both
+entries are now `approved`, each only for its distinct recorded claims. A capture or
+passing interaction that is absent from this register with disposition
+`approved` is not implementation input, and M1-025 may freeze a client wire
+contract only from registered `approved` evidence.
 
 ## Authority and source boundary
 
@@ -37,8 +41,8 @@ The initial `status` was `initialized-no-approved-evidence` with `entries`
 empty by design. That was a safety state, not an assertion that the protocol
 has no fields: it meant every Barrier wire behavior remained unsupported and
 blocked codec work until evidence was captured and approved. The register is
-now `active` and holds the single registered entry described below. Every
-Barrier wire behavior that entry does not record remains unsupported.
+now `active` and holds the two entries described below. Every Barrier wire
+behavior that an `approved` entry does not record remains unsupported.
 
 Only an entry whose `provenance.disposition` is exactly `approved` may support
 a wire contract or implementation. `pending-review`, `rejected`, `quarantined`,
@@ -59,8 +63,9 @@ history of an accepted observation.
 
 ## Registered evidence
 
-`BARRIER-EVID-0001` is the only entry. M1-EVIDENCE-001 appended it; M1-024
-produced it.
+`BARRIER-EVID-0001` is the first entry and the only `approved` one.
+M1-EVIDENCE-001 appended it; M1-024 produced it. `BARRIER-EVID-0002`, described
+in the next section, follows it and does not change it.
 
 - Producing Issue: `M1-024`; registering Issue: M1-EVIDENCE-001.
 - Fixture: `Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json`
@@ -115,6 +120,40 @@ non-empty: M1-025 freezes a separate wire contract and links its tests, and
 that link must leave the provenance, the fixture digest and the review history
 of this entry untouched.
 
+### Derived conformance vector
+
+`BARRIER-EVID-0002` is a `sanitized-conformance-vector` entry appended by
+M1-WIRE-001 (GitHub Issue #278) under
+`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`.
+
+- It pins the same fixture path, SHA-256 and byte length as
+  `BARRIER-EVID-0001` and introduces no new byte. Its `relatedIssue` is
+  `M1-024`, the producer of the bytes, because the entry contract admits
+  canonical manifest ids only.
+- Its claims cite the fixture and the deterministic artifact
+  `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json`: a candidate
+  4-byte unsigned big-endian length-prefix interpretation partitions every
+  retained run with no remaining bytes, the first candidate frame in each
+  direction starts with the 7 marker bytes of the ASCII word Barrier, and the
+  4 bytes after the marker are `00 01 00 06`. The candidate interpretation is
+  not proof of the prefix width, because a narrower 2-byte big-endian reading
+  also partitions every run; the exact width stays unknown and blocked pending
+  separately approved discriminating evidence.
+- Its own `ambiguousFields` keep message codes, other field layout, the
+  uniqueness of the prefix width, maximum frame length, fragmentation, the
+  width and meaning of the version bytes, version negotiation and variant
+  fields at `status: unknown`.
+- It proposes, and does not decide, an exact-supported-version fail-closed
+  policy for M1-025.
+- It is not a correction of `BARRIER-EVID-0001`, so that entry is not marked
+  `superseded`, not rewritten and not upgraded, and its unknown fields stay
+  unknown in that entry.
+- It remained `pending-review`, and therefore non-consumable, until a reviewer
+  who was not the M1-WIRE-001 author recorded the review in
+  `evidence/issues/M1-WIRE-001/independent-review.md`. It is now `approved`
+  for its candidate-only claims; exact prefix width remains unknown and blocked
+  on GitHub Issue #279 (M1-WIRE-002).
+
 ## Traceability index
 
 The M1-024 → M1-EVIDENCE-001 → M1-025 chain, its artifacts and the test that
@@ -122,7 +161,8 @@ verifies each stage are indexed in
 `MacKVM_Implementation_Package_v2/SOURCE_TRACEABILITY.md`, under the
 `M1-024 → M1-EVIDENCE-001 → M1-025 Barrier Evidence Chain` section. That index
 is traceability only; it freezes no wire contract and carries no M1-025
-contract content.
+contract content. The corrected M1-WIRE-001 → M1-025 → M1-021 → M1-022 order is
+indexed in the section that follows it.
 
 ## Required entry metadata
 
@@ -204,6 +244,13 @@ producer identity resolves to repository evidence, and checks the traceability
 index. A mutation suite confirms every one of those checks rejects a drifted
 fixture or a widened claim.
 
+`Tests/Contracts/test_m1_wire_001_contract_sequence.py` validates the
+M1-WIRE-001 append: it pins `BARRIER-EVID-0001` byte for byte, re-derives the
+conformance artifact from the fixture, maps each `BARRIER-EVID-0002` claim to
+the exact fixture and artifact locations it cites, keeps that entry
+non-consumable until its independent review exists, and rejects drifted
+fixtures, artifacts and entries with in-memory mutations.
+
 Neither Issue captures network traffic, operates a Barrier peer, or claims
 protocol compatibility. Therefore peer execution, input cleanup, cancellation,
 and stuck-input checks are not applicable to these registry-only changes; no
@@ -236,3 +283,9 @@ append-only PR, which returns the register to `entries: []` and status
 `initialized-no-approved-evidence`, and keep M1-025 blocked. An accepted entry
 is never rewritten in place; a correction is a reviewed replacement entry that
 marks the earlier one `superseded`.
+
+Rolling back the M1-WIRE-001 append before it merges removes
+`BARRIER-EVID-0002` and leaves `BARRIER-EVID-0001` exactly as registered. After
+merge the register stays append-only, so the derived entry is marked `rejected`
+or `superseded` by a reviewed follow-up rather than deleted, and M1-025 stays
+blocked until approved evidence exists.

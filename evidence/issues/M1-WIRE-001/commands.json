@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-WIRE-001",
+  "githubIssue": 278,
+  "repositoryHeadAtAuthorRun": "99c9cbb110b04d3dd6713a632d3a98ba812e09fb",
+  "implementationCommit": null,
+  "commitNote": "The author changes are uncommitted over the recorded head. Nothing was staged, committed or pushed.",
+  "status": "not-run",
+  "statusNote": "Every command execution in the author session, including python3, make, shasum and git hash-object, was denied by the session permission policy. No command below was executed by the author, so no exit code, time or result is recorded and nothing is claimed to pass. Each command must be run and recorded before this evidence is complete.",
+  "toolchain": null,
+  "commands": [
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_m1_wire_001_contract_sequence.py' -v",
+      "purpose": "M1-WIRE-001 contract suite: derivation, fixture hash, register linkage, claim-to-byte mapping, unchanged BARRIER-EVID-0001, review gate, sequence, Swift ordering gate, TLS default, text checks and mutations.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-023/tests -p 'test_register.py' -v",
+      "purpose": "M1-023 validator over the register with the appended entry.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "python3 -m unittest discover -s evidence/issues/M1-EVIDENCE-001/tests -p 'test_registration.py' -v",
+      "purpose": "M1-EVIDENCE-001 registration suite, which scans the whole register, the register documentation and the existing traceability section.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "purpose": "All repository contract suites, including the M1-001, M1-003, M1-024 capture readiness and M1-SCOPE-001 suites that read the edited package files.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "purpose": "Manifest ids, dependencies, required headings and acyclic dependency graph.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "make docs-check",
+      "purpose": "Markdown and JSON hygiene. docs-check reads git-tracked files only, so new files are covered once they are tracked.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "make architecture-check",
+      "purpose": "Architecture boundary checker.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "git diff --check",
+      "purpose": "Whitespace errors in the change.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    },
+    {
+      "command": "make verify REPORT=artifacts/ci/m1-wire-001-report.json",
+      "purpose": "Full cumulative gate inventory.",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": null,
+      "result": "not-run"
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "artifactId": "m1-wire-001-barrier-frame-conformance",
+  "producingIssue": "M1-WIRE-001",
+  "githubIssue": 278,
+  "registerEntry": "BARRIER-EVID-0002",
+  "derivation": {
+    "deriver": "Tests/Contracts/test_m1_wire_001_contract_sequence.py",
+    "function": "derive_conformance",
+    "rule": "Decode every retained run of the approved sanitized fixture and partition it under one candidate framing interpretation, in which consecutive candidate frames each start with a 4-byte unsigned big-endian length prefix. Record each candidate frame by offset and length, and record the 7 marker bytes and the 4 bytes after them wherever a candidate frame payload starts with the marker. The interpretation is a candidate and does not establish the prefix width. No other payload byte is copied."
+  },
+  "derived": {
+    "byteSource": {
+      "evidenceId": "BARRIER-EVID-0001",
+      "fixturePath": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+      "fixtureSha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+      "fixtureByteLength": 1079
+    },
+    "candidateLengthPrefix": {
+      "interpretation": "candidate",
+      "widthBytes": 4,
+      "byteOrder": "big-endian",
+      "signedness": "unsigned",
+      "value": "count of bytes that follow the prefix in the same candidate frame",
+      "widthUniqueness": "unknown"
+    },
+    "runs": [
+      {
+        "sequence": 1,
+        "direction": "server-to-client",
+        "sourcePointer": "/observations/0/applicationPayloadBase64",
+        "byteLength": 15,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "0000000b",
+            "lengthValue": 11,
+            "payloadOffset": 4,
+            "payloadEndOffset": 15
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "direction": "client-to-server",
+        "sourcePointer": "/observations/1/applicationPayloadBase64",
+        "byteLength": 28,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000018",
+            "lengthValue": 24,
+            "payloadOffset": 4,
+            "payloadEndOffset": 28
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "direction": "server-to-client",
+        "sourcePointer": "/observations/2/applicationPayloadBase64",
+        "byteLength": 8,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 4,
+            "payloadEndOffset": 8
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "direction": "client-to-server",
+        "sourcePointer": "/observations/3/applicationPayloadBase64",
+        "byteLength": 22,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000012",
+            "lengthValue": 18,
+            "payloadOffset": 4,
+            "payloadEndOffset": 22
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "direction": "server-to-client",
+        "sourcePointer": "/observations/4/applicationPayloadBase64",
+        "byteLength": 36,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 4,
+            "payloadEndOffset": 8
+          },
+          {
+            "frameIndex": 1,
+            "prefixOffset": 8,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 12,
+            "payloadEndOffset": 16
+          },
+          {
+            "frameIndex": 2,
+            "prefixOffset": 16,
+            "lengthPrefixHex": "00000008",
+            "lengthValue": 8,
+            "payloadOffset": 20,
+            "payloadEndOffset": 28
+          },
+          {
+            "frameIndex": 3,
+            "prefixOffset": 28,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 32,
+            "payloadEndOffset": 36
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "direction": "client-to-server",
+        "sourcePointer": "/observations/5/applicationPayloadBase64",
+        "byteLength": 16,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 4,
+            "payloadEndOffset": 8
+          },
+          {
+            "frameIndex": 1,
+            "prefixOffset": 8,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 12,
+            "payloadEndOffset": 16
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "direction": "server-to-client",
+        "sourcePointer": "/observations/6/applicationPayloadBase64",
+        "byteLength": 8,
+        "frames": [
+          {
+            "frameIndex": 0,
+            "prefixOffset": 0,
+            "lengthPrefixHex": "00000004",
+            "lengthValue": 4,
+            "payloadOffset": 4,
+            "payloadEndOffset": 8
+          }
+        ]
+      }
+    ],
+    "markerObservations": [
+      {
+        "sequence": 1,
+        "frameIndex": 0,
+        "runOffset": 4,
+        "byteLength": 7,
+        "hex": "42617272696572",
+        "ascii": "Barrier"
+      },
+      {
+        "sequence": 2,
+        "frameIndex": 0,
+        "runOffset": 4,
+        "byteLength": 7,
+        "hex": "42617272696572",
+        "ascii": "Barrier"
+      }
+    ],
+    "versionByteObservations": [
+      {
+        "sequence": 1,
+        "frameIndex": 0,
+        "runOffset": 11,
+        "byteLength": 4,
+        "hex": "00010006"
+      },
+      {
+        "sequence": 2,
+        "frameIndex": 0,
+        "runOffset": 11,
+        "byteLength": 4,
+        "hex": "00010006"
+      }
+    ],
+    "alternativeReadings": [
+      {
+        "reading": "same 4 bytes read little-endian",
+        "widthBytes": 4,
+        "byteOrder": "little-endian",
+        "runsPartitioned": 0,
+        "runsTotal": 7
+      },
+      {
+        "reading": "narrower 2-byte big-endian prefix",
+        "widthBytes": 2,
+        "byteOrder": "big-endian",
+        "runsPartitioned": 7,
+        "runsTotal": 7
+      }
+    ],
+    "totals": {
+      "runs": 7,
+      "frames": 11,
+      "bytes": 133,
+      "prefixBytes": 44,
+      "payloadBytes": 89,
+      "minLengthValue": 4,
+      "maxLengthValue": 24
+    },
+    "runsWithMultipleCandidateFrames": [
+      5,
+      6
+    ]
+  },
+  "proposedVersionPolicy": {
+    "status": "proposed-for-M1-025-decision",
+    "decisionOwner": "M1-025",
+    "rule": "exact-supported-version-fail-closed",
+    "supportedVersionBytesHex": "00010006",
+    "statement": "Proposal only, for M1-025 to adopt or reject. If adopted, the client accepts a peer only when the 4 bytes after the marker equal 00 01 00 06 exactly, and rejects any other value with a typed error before it interprets any later frame. No version range, negotiation, downgrade or fallback is proposed, and no other version is claimed to interoperate."
+  },
+  "limits": [
+    "One observation of one external version pair on one locked host pair, re-read from the registered fixture without any new capture; it represents nothing beyond that observation.",
+    "All 11 candidate length values lie between 4 and 24, so the three high-order bytes of every candidate prefix are zero. The bytes therefore do not uniquely establish a 4-byte prefix width: a narrower 2-byte big-endian prefix also partitions all 7 runs, as alternativeReadings shows, so prefix width uniqueness stays unknown. The bytes also exercise no length value of 256 or more, no sign bit and no maximum frame length.",
+    "Under the candidate interpretation every retained run starts and ends on a candidate frame boundary. Runs 5 and 6 each carry several complete candidate frames, 4 and 2, so multiple complete candidate frames coalesced in a single retained run were observed. No candidate frame spans two retained runs, so fragmentation or split delivery was not observed and reassembly of a split frame is not exercised.",
+    "A retained run is a direction run of the captured TCP byte stream. Its boundaries are capture and read boundaries, not protocol frame boundaries in general.",
+    "Only the marker bytes and the 4 bytes after them are identified inside any frame payload. Every other payload byte stays uninterpreted and is recorded here by offset and length only.",
+    "The link between the 4 bytes after the marker and protocol version 1.6 rests only on the version the external programs reported through their own command-line metadata.",
+    "TLS was disabled for this single observation so that payload bytes were observable; the MacKVM production TLS default stays enabled, fail-closed and unvalidated by this artifact.",
+    "Windows was not executed in M1 under docs/adr/M1-SCOPE-001-linux-only-validation.md; no Windows result is recorded here."
+  ],
+  "nonClaims": [
+    "No message code, message type or message name is identified in any frame.",
+    "No exact length-prefix width is established. The 4-byte unsigned big-endian reading is a candidate interpretation that rejects the 4-byte little-endian reading only, and M1-025 must not freeze an exact prefix width from this artifact until separately approved discriminating evidence exists.",
+    "No field meaning, width or order is established inside any frame payload beyond the marker bytes and the 4 bytes after them.",
+    "No general version negotiation, version range, downgrade or mismatch behavior is claimed; one version value was observed.",
+    "No compatibility is claimed between Barrier versions, between Barrier and MacKVM, or between platforms.",
+    "No Windows result and no Windows Barrier Server compatibility is claimed.",
+    "No TLS, certificate or trust behavior is observed or claimed.",
+    "No parser, encoder, Swift source or public contract is introduced; M1-025 alone freezes the wire contract."
+  ]
+}

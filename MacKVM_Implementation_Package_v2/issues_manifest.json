@@ -997,41 +997,38 @@
       "low_model_autonomous_merge": false
     },
     {
-      "id": "M1-021",
-      "title": "實作 Bounded BinaryReader／BinaryWriter",
+      "id": "M1-025",
+      "title": "凍結 Barrier Client Wire Contract v0.1",
       "milestone": "M1",
       "epic": "E03",
-      "kind": "barrier",
-      "component": "BarrierBinaryCodec",
-      "tier": "B",
-      "risk": "high",
-      "priority": "P1",
+      "kind": "decision",
+      "component": "BarrierClientWireContract",
+      "tier": "C/H",
+      "risk": "critical",
+      "priority": "P0",
       "depends_on": [
-        "M1-015"
+        "M1-024"
       ],
-      "goal": "實作 Bounded BinaryReader／BinaryWriter",
+      "goal": "凍結 Barrier Client Wire Contract v0.1",
       "focus": [
-        "明確 endian",
-        "所有 read/write 有 bounds check",
-        "integer overflow/oversize 回傳 typed error"
+        "精確 frame layout、field width、endian、version behavior",
+        "列出 unknown/unsupported variants",
+        "後續 parser 只能依此文件與 fixtures"
       ],
       "contract_refs": [],
       "source_refs": [],
       "milestone_name": "Mac Client MVP（Barrier 驗證）",
       "epic_name": "Barrier Compatibility Evidence 與 Codec",
-      "size": "S",
+      "size": "M",
       "exact_files": [
-        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierBinaryCodec.swift",
-        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift",
-        "docs/components/M1-021-barrier-binary-codec.md"
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
       ],
       "commands": [
-        "swift test --package-path Packages/BarrierCompatibility",
-        "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+        "make docs-check",
         "python3 Tools/Backlog/validate_package.py",
         "make architecture-check"
       ],
-      "issue_file": "issues/M1/M1-021-barrier-binary-codec.md",
+      "issue_file": "issues/M1/M1-025-barrier-client-wire-contract.md",
       "topological_order": 22,
       "low_model_autonomous_merge": false
     },
@@ -1557,25 +1554,24 @@
       "low_model_autonomous_merge": false
     },
     {
-      "id": "M1-022",
-      "title": "實作 TCP Stream Frame Reassembler 與 Size Limits",
+      "id": "M1-021",
+      "title": "實作 Bounded BinaryReader／BinaryWriter",
       "milestone": "M1",
       "epic": "E03",
       "kind": "barrier",
-      "component": "BarrierFrameReassembler",
+      "component": "BarrierBinaryCodec",
       "tier": "B",
-      "risk": "critical",
+      "risk": "high",
       "priority": "P1",
       "depends_on": [
-        "M1-019",
-        "M1-020",
-        "M1-021"
+        "M1-015",
+        "M1-025"
       ],
-      "goal": "實作 TCP Stream Frame Reassembler 與 Size Limits",
+      "goal": "實作 Bounded BinaryReader／BinaryWriter",
       "focus": [
-        "處理 split/coalesced frames",
-        "最大 frame size",
-        "EOF 時保留明確 truncated-frame error"
+        "明確 endian",
+        "所有 read/write 有 bounds check",
+        "integer overflow/oversize 回傳 typed error"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -1583,9 +1579,9 @@
       "epic_name": "Barrier Compatibility Evidence 與 Codec",
       "size": "S",
       "exact_files": [
-        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierFrameReassembler.swift",
-        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierFrameReassemblerTests.swift",
-        "docs/components/M1-022-barrier-frame-reassembler.md"
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierBinaryCodec.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift",
+        "docs/components/M1-021-barrier-binary-codec.md"
       ],
       "commands": [
         "swift test --package-path Packages/BarrierCompatibility",
@@ -1593,7 +1589,7 @@
         "python3 Tools/Backlog/validate_package.py",
         "make architecture-check"
       ],
-      "issue_file": "issues/M1/M1-022-barrier-frame-reassembler.md",
+      "issue_file": "issues/M1/M1-021-barrier-binary-codec.md",
       "topological_order": 36,
       "low_model_autonomous_merge": false
     },
@@ -1634,40 +1630,43 @@
       "low_model_autonomous_merge": false
     },
     {
-      "id": "M1-025",
-      "title": "凍結 Barrier Client Wire Contract v0.1",
+      "id": "M1-022",
+      "title": "實作 TCP Stream Frame Reassembler 與 Size Limits",
       "milestone": "M1",
       "epic": "E03",
-      "kind": "decision",
-      "component": "BarrierClientWireContract",
-      "tier": "C/H",
+      "kind": "barrier",
+      "component": "BarrierFrameReassembler",
+      "tier": "B",
       "risk": "critical",
-      "priority": "P0",
+      "priority": "P1",
       "depends_on": [
-        "M1-024",
-        "M1-021",
-        "M1-022"
+        "M1-019",
+        "M1-020",
+        "M1-021"
       ],
-      "goal": "凍結 Barrier Client Wire Contract v0.1",
+      "goal": "實作 TCP Stream Frame Reassembler 與 Size Limits",
       "focus": [
-        "精確 frame layout、field width、endian、version behavior",
-        "列出 unknown/unsupported variants",
-        "後續 parser 只能依此文件與 fixtures"
+        "處理 split/coalesced frames",
+        "最大 frame size",
+        "EOF 時保留明確 truncated-frame error"
       ],
       "contract_refs": [],
       "source_refs": [],
       "milestone_name": "Mac Client MVP（Barrier 驗證）",
       "epic_name": "Barrier Compatibility Evidence 與 Codec",
-      "size": "M",
+      "size": "S",
       "exact_files": [
-        "docs/adr/M1-025-barrier-client-wire-contract.md"
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierFrameReassembler.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierFrameReassemblerTests.swift",
+        "docs/components/M1-022-barrier-frame-reassembler.md"
       ],
       "commands": [
-        "make docs-check",
+        "swift test --package-path Packages/BarrierCompatibility",
+        "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
         "python3 Tools/Backlog/validate_package.py",
         "make architecture-check"
       ],
-      "issue_file": "issues/M1/M1-025-barrier-client-wire-contract.md",
+      "issue_file": "issues/M1/M1-022-barrier-frame-reassembler.md",
       "topological_order": 38,
       "low_model_autonomous_merge": false
     },
