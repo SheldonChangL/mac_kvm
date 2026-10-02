@@ -41,6 +41,7 @@ labels:
 
 - 所有 dependencies 已完成：M1-019, M1-020, M1-021。
 - 對應的 Barrier wire contract 與 sanitized fixtures 已凍結；若沒有，停止。
+- 凍結 wire contract 前置條件：M1-025 的 `docs/adr/M1-025-barrier-client-wire-contract.md` 已 merge（經由 M1-021 依賴 M1-025）；length prefix、最大 frame size 與 truncated-frame 行為只依該 ADR 與 `evidence/registers/M1-023.json` 中 disposition 為 `approved` 的 evidence，不得由本 Issue 推定。順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`）。若沒有，停止。
 
 ## Exact Files
 

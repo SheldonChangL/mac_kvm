@@ -343,6 +343,194 @@
       ],
       "frozenContractRefs": [],
       "consumingTests": []
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0002",
+      "relatedIssue": "M1-024",
+      "source": {
+        "category": "sanitized-conformance-vector",
+        "acquisitionMethod": "Deterministic derivation by M1-WIRE-001 (GitHub Issue #278) from the approved sanitized fixture registered as BARRIER-EVID-0001. No new capture was made, no peer was operated and no new byte entered the repository: the derivation in Tests/Contracts/test_m1_wire_001_contract_sequence.py re-reads that fixture and writes evidence/issues/M1-WIRE-001/barrier-frame-conformance.json. relatedIssue records M1-024 because the bytes were produced by M1-024 and the entry contract admits canonical manifest Issue ids only, while M1-WIRE-001 sits outside the canonical manifest. Direction labels are copied unchanged from the fixture and remain capture provenance; no direction label is derived from payload content."
+      },
+      "capture": {
+        "capturedAt": "2026-09-30T07:01:02Z",
+        "tools": [
+          {
+            "name": "tcpdump",
+            "version": "4.99.1"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "server",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported"
+        }
+      },
+      "transport": {
+        "networkScope": "Unchanged from BARRIER-EVID-0001: every byte comes from the peer-loopback observation of the Barrier leg. The encrypted local forward that reached that host was not captured, and nothing is claimed about it. No identifying address, port or host name is recorded.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "No new observation was made. This entry re-reads only the approved sanitized fixture registered as BARRIER-EVID-0001, whose lawful-use record is unchanged. No Barrier or Deskflow source, header, constant table, generated implementation artifact or decompiled material was read, copied, linked or bundled.",
+        "permittedUse": "Input to the M1-025 wire contract decision inside the MacKVM Barrier Protocol Adapter only. This entry authorises no consumer: frozenContractRefs and consumingTests stay empty until M1-025 freezes a wire contract and names the tests that consume it, and the entry is non-consumable while its disposition is not approved. It does not establish an exact length-prefix width, so M1-025 must not consume it as proof of an exact prefix width.",
+        "producer": "M1-WIRE-001 implementation author (GitHub Issue #278), recorded in evidence/issues/M1-WIRE-001/summary.md",
+        "reviewer": {
+          "identity": "Codex independent reviewer, not the M1-WIRE-001 implementation author; five-axis review recorded in evidence/issues/M1-WIRE-001/independent-review.md",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-02T08:20:10Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "No new sanitization was needed because this entry introduces no new byte. The derived artifact records candidate frame offsets, lengths, candidate length-prefix values, the 7 marker bytes and the 4 bytes after them only; it copies no other payload byte and no payload text, and the deriving test rejects any printable payload text other than the marker in the artifact or in this entry.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json",
+        "sha256": "57a10c6f4ee04a6ba9725787d401b980188007e40690d66aee29090c90d266d2",
+        "byteLength": 1079
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "The 7 retained runs of BARRIER-EVID-0001 were re-read from the registered fixture without any new capture, and their 133 decoded bytes partition into 11 candidate frames under a candidate 4-byte unsigned big-endian length-prefix interpretation. A narrower 2-byte big-endian reading also partitions every run, so the prefix width is not uniquely established.",
+          "Under the candidate interpretation runs 5 and 6 each carry several complete candidate frames, 4 and 2, and no candidate frame spans two retained runs.",
+          "Two candidate frames, one under each direction label, begin with the same 7 marker bytes followed by the same 4 version bytes.",
+          "Every other payload byte is left uninterpreted and is recorded by offset and length only."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0002-CLAIM-001",
+            "assertion": "In this single observation a candidate framing interpretation, in which consecutive candidate frames each begin with a 4-byte unsigned big-endian length prefix whose value equals the number of bytes that follow it in that frame, partitions every one of the 7 retained runs exactly with zero remaining bytes. Under it the 7 runs hold 11 candidate frames, 1, 1, 1, 1, 4, 2 and 1 in sequence order, whose length values are 11, 24, 4, 18, 4, 4, 8, 4, 4, 4 and 4 and cover all 133 retained bytes. Reading the same first 4 bytes of each run as little-endian partitions none of the 7 runs. A narrower 2-byte big-endian reading also partitions all 7 runs, so this claim does not establish the prefix width and prefix width uniqueness stays unknown.",
+            "establishedFieldIds": [
+              "candidate-length-prefix-u32-big-endian-interpretation",
+              "candidate-frame-partition"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/0/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/1/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/2/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/3/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/4/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/5/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/6/applicationPayloadBase64",
+              "evidence/issues/M1-WIRE-001/barrier-frame-conformance.json#/derived/runs"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0002-CLAIM-002",
+            "assertion": "In this observation the first frame of run 1, labelled server-to-client, and the first frame of run 2, labelled client-to-server, each carry at run offset 4 the same 7 bytes 42 61 72 72 69 65 72, the ASCII spelling of the word Barrier, at the start of the frame payload. No other frame begins with those bytes. The claim states byte values and offsets only and assigns no message name or meaning to either frame.",
+            "establishedFieldIds": [
+              "observed-marker-bytes"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/0/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/1/applicationPayloadBase64",
+              "evidence/issues/M1-WIRE-001/barrier-frame-conformance.json#/derived/markerObservations"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0002-CLAIM-003",
+            "assertion": "In both marker-bearing frames the 4 bytes immediately after the marker, at run offsets 11 to 14, are 00 01 00 06. Read as two consecutive unsigned 16-bit big-endian integers they are 1 and 6, which coincides with the protocol version 1.6 that both external programs reported through their own command-line metadata. That coincidence is the only link between these bytes and a version; their width and meaning are left to M1-025, and no negotiation or other version is observed.",
+            "establishedFieldIds": [
+              "observed-version-bytes"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/0/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json#/observations/1/applicationPayloadBase64",
+              "evidence/issues/M1-WIRE-001/barrier-frame-conformance.json#/derived/versionByteObservations"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "One observation of one external version pair on one locked host pair, re-read without any new capture; it represents nothing beyond that observation.",
+        "All 11 candidate length values lie between 4 and 24, so the three high-order bytes of every candidate prefix are zero. These bytes therefore do not uniquely establish a 4-byte prefix width, because a narrower 2-byte big-endian prefix also partitions all 7 runs, and they exercise no length value of 256 or more, no sign bit and no maximum frame length.",
+        "Under the candidate interpretation every retained run starts and ends on a candidate frame boundary. Runs 5 and 6 each carry several complete candidate frames, 4 and 2, so multiple complete candidate frames coalesced in a single retained run were observed. No candidate frame spans two retained runs, so fragmentation or split delivery was not observed.",
+        "A retained run is a direction run of the captured TCP byte stream. Its boundaries are capture and read boundaries, not protocol frame boundaries in general.",
+        "Only the marker bytes and the 4 bytes after them are identified inside any frame payload; every other payload byte stays uninterpreted.",
+        "The link between the 4 bytes after the marker and protocol version 1.6 rests only on the version the external programs reported through their own command-line metadata.",
+        "The observation ran with encryption disabled so that application payload bytes were observable. No payload under TLS was observed, and the MacKVM production TLS default stays enabled, fail-closed and unvalidated by this entry.",
+        "Windows was not executed in M1 under docs/adr/M1-SCOPE-001-linux-only-validation.md; this entry claims no Windows result and no Windows Barrier Server compatibility.",
+        "The private raw capture was deleted after M1-024 merged. This entry needs no raw byte because it re-reads only the registered sanitized fixture, whose SHA-256 and byte length it pins.",
+        "BARRIER-EVID-0001 is not rewritten, upgraded or superseded by this entry; its unknown fields stay unknown in that entry, and this entry records its own claims and unknowns."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-message-code",
+          "observation": "No message code, message type or command identifier is identified in any frame, including the marker-bearing frames.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-field-layout-beyond-prefix-and-marker",
+          "observation": "No field offset, width, order or meaning is identified inside any frame payload beyond the marker bytes and the 4 bytes after them.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-length-prefix-width-uniqueness",
+          "observation": "Every candidate length value is below 256 and a narrower 2-byte big-endian reading also partitions all 7 runs, so these bytes do not decide between a 4-byte prefix and a narrower big-endian prefix preceded by zero bytes. The exact prefix width is unknown, and M1-025 must not freeze an exact prefix width from this entry until separately approved discriminating evidence exists.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-maximum-frame-length-and-oversize-behavior",
+          "observation": "No maximum frame length, allocation limit or oversize handling is observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-fragmentation-and-reassembly",
+          "observation": "Under the candidate interpretation no candidate frame spans two retained runs, so fragmentation or split delivery is not observed and reassembly of a split frame is not exercised. Runs 5 and 6 each carry several complete candidate frames, so coalescing of complete candidate frames within one retained run was observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-version-field-width-and-meaning",
+          "observation": "Whether the 4 bytes after the marker hold one value or two, and what they mean, is not established by these bytes alone.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-version-negotiation-and-mismatch-behavior",
+          "observation": "One version value is observed and both directions carry the same bytes; negotiation, downgrade and mismatch behavior are not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-optional-and-variant-fields",
+          "observation": "Optionality, repetition, defaulting and variant selection are not observed; a single successful connection does not enumerate them.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer any field meaning, width or order beyond the candidate length-prefix interpretation, the marker bytes and the 4 bytes after the marker that the claims name.",
+        "Do not infer any message code, message type or message name from any frame.",
+        "Do not infer an exact length-prefix width or treat the candidate 4-byte big-endian reading as proven; a narrower 2-byte big-endian reading partitions every run equally, and M1-025 must not freeze an exact prefix width from this entry.",
+        "Do not infer endianness, width or meaning for any other value; the 4 bytes after the marker are evidence as bytes, and their reading as 1 and 6 is only a coincidence with externally reported metadata.",
+        "Do not infer framing behavior that was not observed: candidate frames split across reads, a maximum frame length or a length value of 256 or more. The coalescing observed is limited to complete candidate frames inside runs 5 and 6.",
+        "Do not infer that a retained run or TCP read boundary is a protocol frame or message boundary in general; every run boundary falls on a candidate frame boundary here, and runs 5 and 6 each hold several candidate frames.",
+        "Do not infer general version negotiation, version ranges, downgrade, or compatibility between Barrier versions, between Barrier and MacKVM, or between platforms.",
+        "Windows Barrier Server behavior must not be inferred from this entry; Windows was not executed in M1 and no Windows compatibility is claimed.",
+        "Do not infer TLS, certificate or trust behavior. TLS was disabled for this single observation and the product TLS default is neither exercised nor validated here.",
+        "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory."
+      ],
+      "frozenContractRefs": [],
+      "consumingTests": []
     }
   ]
 }

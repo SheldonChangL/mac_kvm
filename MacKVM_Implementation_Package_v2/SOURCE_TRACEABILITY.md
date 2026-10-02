@@ -48,6 +48,25 @@ M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 
 - 登錄採 append-only：更正以新的 reviewed entry 取代並將舊 entry 標為 `superseded`，不得改寫既有 entry 的 provenance、fixture digest 或 review 歷史。
 - M1 未執行、未測試 Windows（`docs/adr/M1-SCOPE-001-linux-only-validation.md`），本鏈路不記錄任何 Windows 結果，也不主張 Windows 相容。
 - 該觀測關閉 TLS 以便觀察 application payload；MacKVM production TLS 預設維持 enabled、fail-closed，且未被此 entry 驗證。
+- M1-025 另需 GitHub Issue #278（M1-WIRE-001）append 的 `BARRIER-EVID-0002` 成為 `approved`；`BARRIER-EVID-0001` 不被改寫、升級或標為 `superseded`。順序與證據見下一節。
+
+## M1-WIRE-001 → M1-025 → M1-021 → M1-022 Barrier Wire Contract Sequence
+
+本節只記錄 GitHub Issue #278（M1-WIRE-001）修正後的 Barrier wire 順序與證據鏈，不是產品合約，也不凍結任何 wire contract。決策內容以 [`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`](../docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md) 為準；wire contract 仍由 M1-025 凍結。
+
+| Stage | Issue | Recorded artifact | Verification |
+|---|---|---|---|
+| Derived conformance evidence | M1-WIRE-001（GitHub Issue #278） | `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json`；`evidence/registers/M1-023.json` 內 append 的 `BARRIER-EVID-0002`（`BARRIER-EVID-0001` 逐位元組不變） | `Tests/Contracts/test_m1_wire_001_contract_sequence.py` |
+| Independent review | M1-WIRE-001 | `evidence/issues/M1-WIRE-001/independent-review.md`，由非實作者 reviewer 新增；新增前 `BARRIER-EVID-0002` 維持 `pending-review`，不可消費 | `Tests/Contracts/test_m1_wire_001_contract_sequence.py` |
+| Wire contract freeze | M1-025 | `docs/adr/M1-025-barrier-client-wire-contract.md`（M1-025 的 Exact File，尚未建立） | M1-025 Required Commands |
+| Bounded codec | M1-021 | M1-021 Exact Files | M1-021 Required Commands |
+| Frame reassembler | M1-022 | M1-022 Exact Files | M1-022 Required Commands |
+
+- `issues_manifest.json`：M1-025 的 `depends_on` 只剩 M1-024；M1-021 的 `depends_on` 為 M1-015、M1-025；M1-022 維持 M1-019、M1-020、M1-021。M1-WIRE-001 不在 70 筆 canonical manifest 中，validator 只接受 manifest ID，因此其前置關係記錄於 M1-025 Preconditions 與本節，而非 `depends_on`。
+- `topological_order` 只在三個位置間輪換：M1-025 為 22、M1-021 為 36、M1-022 為 38，其餘不變。Issue 檔、`issues_manifest.json`、`issues_index.csv` 與 `EXECUTION_ORDER.md` 同步。
+- Exact length-prefix width：`BARRIER-EVID-0002` 只記錄 candidate interpretation，width 維持 unknown。Owner-tracked follow-up blocker 為 GitHub Issue #279（M1-WIRE-002，Acquire discriminating Barrier length-prefix evidence），依賴 #278，並阻擋 M1-025 完成 exact width 凍結；#279 尚未完成，且與 M1-WIRE-001 相同不在 70 筆 canonical manifest 中，不列入任何 `depends_on`。
+- 版本：只記錄觀測到的 version bytes，以及交由 M1-025 採納或拒絕的 `exact-supported-version-fail-closed` 提案；不主張一般版本協商或跨版本相容。
+- M1 未執行 Windows（`docs/adr/M1-SCOPE-001-linux-only-validation.md`），本鏈路不記錄 Windows 結果。production TLS 預設維持 enabled、fail-closed，未被改變。
 
 ## M1-001 Direct Traceability
 

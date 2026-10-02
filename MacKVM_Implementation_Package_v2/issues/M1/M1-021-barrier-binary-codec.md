@@ -10,6 +10,7 @@ execution_tier: "B"
 low_model_autonomous_merge: false
 depends_on:
   - "M1-015"
+  - "M1-025"
 contract_refs:
   []
 source_refs:
@@ -37,8 +38,9 @@ labels:
 
 ## Preconditions
 
-- 所有 dependencies 已完成：M1-015。
+- 所有 dependencies 已完成：M1-015, M1-025。
 - 對應的 Barrier wire contract 與 sanitized fixtures 已凍結；若沒有，停止。
+- 凍結 wire contract 前置條件：M1-025 的 `docs/adr/M1-025-barrier-client-wire-contract.md` 已 merge；endian、width 與 bounds 只依該 ADR 與 `evidence/registers/M1-023.json` 中 disposition 為 `approved` 的 evidence，不得由本 Issue 推定。順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（`docs/adr/M1-WIRE-001-evidence-first-wire-contract-sequence.md`）。若沒有，停止。
 
 ## Exact Files
 
