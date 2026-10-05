@@ -171,3 +171,25 @@ Status: **NOT STARTED**. Raw data must not be deleted until this section records
 ## Checkpoint 3 — pre-merge review
 
 Status: **NOT STARTED**. No register entry, width ADR or M1-025 unblock is approved by Checkpoint 1.
+
+### Runtime attempt result — 2026-10-05T07:11:18Z
+
+- The approved one bounded capture attempt was started after pre-window gates passed.
+- During pre-window/runtime preparation, the producer fixed private tooling issues found by
+  reviewer checks before execution: graceful-only timeout wrapping, `prewindow` port control
+  arguments, macOS bracketed `ssh -G` loopback-forward parsing, empty failed-prewindow cleanup
+  reset safety, and Linux `barriers --version` nonzero-but-parseable compatibility. These fixes
+  were validated in private tooling tests only and do not approve any production code or width.
+- The runtime attempt stopped at the required connection gate with fixed label
+  `client-not-connected`. This is a source-validity stop under the approved plan because the
+  required Barrier runtime connection did not succeed inside the bounded attempt.
+- The Linux capture host reported no running evidence processes after emergency cleanup and
+  explicit cleanup. The retained raw file was only a pcap header (`24` bytes), so no stream
+  reconstruction, sanitizer output, privacy-scanned artifact, register entry or width ADR was
+  produced.
+- Raw data did not leave `role-capture`; no raw deletion was performed because Checkpoint 2 was
+  not reached.
+- The prior owner Barrier session was restored after the failed attempt. The macOS role reported
+  `barriers running` and `server listener up`; the Linux role reported `barrierc running` and
+  `connection established`.
+- M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains blocked.
