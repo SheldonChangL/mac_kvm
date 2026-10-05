@@ -1,0 +1,41 @@
+{
+  "issue": "M1-040-UNBLOCK-001",
+  "githubIssue": 282,
+  "commands": [
+    {
+      "command": "python3 -m unittest Tests/Contracts/test_m1_040_keyboard_capture_scope.py -v",
+      "exitCode": 0,
+      "result": "Ran 7 tests in 0.003s; OK"
+    },
+    {
+      "command": "python3 MacKVM_Implementation_Package_v2/tools/validate_package.py",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "exitCode": 1,
+      "result": "Managed-sandbox run failed because SwiftPM manifest evaluation hit sandbox-exec: sandbox_apply: Operation not permitted. The new M1-040-UNBLOCK-001 tests passed in that run; the exact command was rerun outside the sandbox below."
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "exitCode": 0,
+      "result": "Escalated rerun: Ran 115 tests in 20.693s; OK"
+    },
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "result": "Escalated run passed 23 gates: manifest-validation, docs-check, architecture-check, code-quality, tool/evidence discovery, all discovered tool/evidence tests, KVMContracts and MacPlatform Swift package tests, repository-contract-tests, swift-test-targets, native-arm64-build. CI report: artifacts/ci/m1-008-report.json"
+    }
+  ]
+}

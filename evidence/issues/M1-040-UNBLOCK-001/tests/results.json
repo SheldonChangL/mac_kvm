@@ -1,0 +1,15 @@
+{
+  "issue": "M1-040-UNBLOCK-001",
+  "tests": [
+    {
+      "name": "Tests.Contracts.test_m1_040_keyboard_capture_scope",
+      "status": "passed",
+      "testsRun": 7,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "notes": [
+    "The suite verifies the corrective ADR is Proposed, the lock remains unchanged, no keyboard fixture exists yet, and M1-040 remains incomplete before real capture."
+  ]
+}

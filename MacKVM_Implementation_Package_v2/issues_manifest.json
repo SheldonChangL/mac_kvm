@@ -1133,7 +1133,12 @@
         "普通鍵、modifier、repeat、caps lock",
         "至少一組真實 Linux Barrier Server keyboard fixture set，不可用 mock 取代",
         "Windows Server keyboard fixture 不在 M1 範圍（M1-SCOPE-001）",
-        "不可包含可識別文字內容"
+        "不可包含可識別文字內容",
+        "按鍵輸入只使用 capture 前宣告的 scripted key sequence，不得組成可識別文字",
+        "Raw packet capture 保留在 repository 外，不得提交",
+        "keyboard-capture.json 只保存有序 direction 與未解讀的 application-payload bytes",
+        "不得宣稱 key code 意義、message code、endianness 或相容性",
+        "M1-040-UNBLOCK-001 未經 Product Owner Accepted 且 toolchain.lock.json 未將 M1-040 列入 scoped_issues 前不得 capture"
       ],
       "contract_refs": [],
       "source_refs": [],
@@ -1144,7 +1149,15 @@
         "Tests/SystemTests/Plans/M1-040-barrier-keyboard-fixtures.md",
         "Tests/SystemTests/Scripts/M1-040-barrier-keyboard-fixtures.sh",
         "evidence/e2e/M1-040/README.md",
-        "evidence/e2e/M1-040/result.json"
+        "evidence/e2e/M1-040/result.json",
+        "Tests/Fixtures/Barrier/m1-040-linux-keyboard/metadata.json",
+        "Tests/Fixtures/Barrier/m1-040-linux-keyboard/keyboard-capture.json",
+        "evidence/issues/M1-040/summary.md",
+        "evidence/issues/M1-040/commands.json",
+        "evidence/issues/M1-040/tests/e2e-validation.json",
+        "evidence/issues/M1-040/environment.json",
+        "evidence/issues/M1-040/manual.md",
+        "evidence/issues/M1-040/independent-review.md"
       ],
       "commands": [
         "make e2e ISSUE=M1-040",
