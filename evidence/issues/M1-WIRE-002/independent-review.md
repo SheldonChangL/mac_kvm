@@ -146,6 +146,28 @@ FINAL: **capture MAY proceed for one bounded attempt after all pre-window checks
 
 Status: **NOT STARTED**. Raw data must not be deleted until this section records an independent reproduction on the capture host.
 
+### Preparation progress — 2026-10-05T06:18:22Z
+
+- The owner authorized installation of the Linux normal-use tools and temporary pause,
+  backup and subsequent restoration of the existing owner Barrier session.
+- The producer verified official Ubuntu packages `xdotool 1:3.20160805.1-4`,
+  `libxdo3 1:3.20160805.1-4` and `xclip 0.13-2`; package verification reported no differences.
+- Private backups and restoration scripts exist on both roles. The reviewer inspected the
+  macOS restore script; it checks prior file hashes and restores prior configuration before
+  restarting previously active components. Runtime restoration remains unexecuted.
+- The prior Linux session was stopped with TERM. The reviewer stopped the prior macOS
+  session with TERM after an AppleEvent quit returned without stopping the processes, then
+  independently confirmed all three Barrier process names and Barrier listeners absent.
+- Repository sanitizer checkpoint `270671d` passed all 23 `make verify` gates before capture.
+  Its SHA-256 is `6b3179b32741e523ffba49b81abb37195a1dd12f06e32a4d1acec6a024614e6b`.
+- A private pure-function tooling library passed 62 tests independently, including the
+  Linux-loopback packet-counter regression (19 captured, 38 received, zero dropped).
+- **Open High, runtime draft:** an unfinished capture-agent draft contains SIGKILL cleanup
+  paths. It is not approved for execution. Its replacement and timeout wrappers require
+  review against the graceful-stop condition before capture may start.
+- No capture outcome, fixture, register entry, prefix width or M1-025 unblock is approved.
+  Capture has not started. Checkpoints 2 and 3 remain NOT STARTED.
+
 ## Checkpoint 3 — pre-merge review
 
 Status: **NOT STARTED**. No register entry, width ADR or M1-025 unblock is approved by Checkpoint 1.
