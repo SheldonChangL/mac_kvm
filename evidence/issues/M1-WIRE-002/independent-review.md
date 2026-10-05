@@ -75,6 +75,73 @@ APPROVED subject to all of the following:
 - APPROVE: bounded-experiment honest limit matches the corrected #279 discrimination requirement.
 - FINAL: **capture MAY proceed once the producer completes and records all pre-window environment/source-validity checks.**
 
+## Checkpoint 1 addendum — amended-topology re-review
+
+- Re-reviewed at: `2026-10-05T00:00:44Z`
+- Plan: `evidence/issues/M1-WIRE-002/discrimination-plan.md`
+- Verdict: **RE-APPROVED FOR ONE BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+- Medium findings: **0 open**
+- Low findings: **0 open**
+
+This addendum supersedes the original Checkpoint 1 topology, raw-generator-location and
+cleartext-leg statements wherever they differ. It does not change the fixed partition
+predicate, completeness rules, FIN requirement, failure codes or fail-closed outcome rule.
+It approves no predicted result and no prefix width. `M1-025` remains blocked.
+
+### Five-axis amended-plan review
+
+1. **Source validity / traceability — APPROVED.** The plan remains grounded in GitHub #279,
+   the registered sanitized evidence and the accepted M1-WIRE-001 ADR. Linux package
+   provenance and the official-upstream-DMG-to-installed-binary macOS hash chain must be
+   rechecked and recorded before the window opens. The recorded macOS CLI `--version` abort is
+   disclosed; any hash, bundle-version or runtime-connection mismatch is a STOP.
+2. **Product contract / architecture boundaries — APPROVED.** The change is evidence-only and
+   adds no production Swift, parser, codec, framer or reassembler. Barrier traffic crosses
+   hosts only inside SSH. The client generator remains normal-use synthetic clipboard input.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS remains enabled and
+   fail closed. Barrier cleartext is accurately bounded to two host-local loopback legs: the
+   uncaptured macOS client-to-SSH-listener leg and the captured Linux sshd-exit-to-server leg.
+   Both endpoints are checked as loopback-only, no wildcard/LAN listener is allowed, SSH
+   forwarding is fail-fast, Windows is not executed, and any failed pre-window check is a STOP.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both readings
+   still receive identical complete Linux-loopback direction streams. Explicit FIN in both
+   directions remains required; RST does not qualify. Both-succeed, both-fail, incomplete,
+   sanitizer mismatch or non-reproducible results stop the issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** Raw capture stays on
+   `role-capture`; generator bytes are created on `role-client` and are not committed. Only
+   sanitized allowlisted output may leave the capture host, after privacy checks and before the
+   recorded bounded deletion. The plan does not touch existing evidence entries or the
+   M1-WIRE-001 ADR.
+
+### Resolved amended-plan finding
+
+- **High — resolved before re-approval:** the first topology amendment incorrectly said
+  Barrier cleartext existed only on Linux loopback. An SSH local forward also has an
+  uncaptured cleartext macOS loopback leg from the Barrier client to the SSH listener. The plan
+  now records both host-local cleartext legs, captures only the Linux leg, forbids wildcard/LAN
+  listener binding, requires loopback-only endpoints and requires fail-fast forwarding.
+
+### Resolved editorial finding
+
+- **Low — resolved after re-approval:** the introductory topology sentence was wrapped and
+  stop condition 5's singular/plural wording was corrected without changing meaning.
+
+### Re-approval conditions
+
+- The producer records every section 6 validity check before the capture timestamp.
+- The macOS listener and Linux destination are both verified loopback-only; no wildcard or LAN
+  bind is accepted.
+- The SSH forward is configured fail-fast and the inter-host leg is verified encrypted.
+- The exact official provenance hashes in the plan are rechecked; any mismatch stops.
+- The Barrier runtime connection must succeed once inside the bounded attempt; failure stops
+  without an unreviewed retry.
+- The one predeclared capture window uses Linux loopback only and requires qualifying FINs.
+- Checkpoints 2 and 3 remain mandatory and are not started by this approval.
+
+FINAL: **capture MAY proceed for one bounded attempt after all pre-window checks pass.**
+
 ## Checkpoint 2 — pre-deletion re-derivation
 
 Status: **NOT STARTED**. Raw data must not be deleted until this section records an independent reproduction on the capture host.

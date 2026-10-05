@@ -1,11 +1,19 @@
 # M1-WIRE-002 Discrimination Plan (capture preparation only)
 
-GitHub Issue #279. Status: **pre-capture plan approved at 2026-10-02T08:41:12Z for one bounded capture
-attempt**, as recorded by the independent reviewer (Codex, who is not the capture author) in
-`evidence/issues/M1-WIRE-002/independent-review.md`. The approval authorizes no predicted
-outcome and no width. Capture has not started. This plan predicts no result
-and does not claim that `M1-025` is unblocked. `M1-025` stays blocked until a separately
-reviewed outcome says otherwise.
+GitHub Issue #279. Status: **amended after Checkpoint 1; re-approved for one bounded capture
+attempt at 2026-10-05T00:00:44Z.** The independent reviewer (Codex, who is not the capture
+author) recorded a pre-capture approval at 2026-10-02T08:41:12Z and an amended-topology
+re-approval at 2026-10-05T00:00:44Z in `evidence/issues/M1-WIRE-002/independent-review.md`.
+This amendment changes the capture topology (section 6): `role-server == role-capture` on
+Linux, `role-client` on macOS, an SSH local forward as the encrypted inter-host leg, Barrier
+cleartext only on two host-local loopback legs (macOS client to the SSH listener, and Linux
+sshd forward exit to the Barrier server), and the Linux loopback leg as the only captured leg.
+The amendment also places the synthetic generator on `role-client` and updates the
+source-validity checks for macOS client provenance. Capture has not started. All pre-window
+checks in section 6 remain mandatory, and any failure is a STOP before the window opens. No
+approval authorizes a predicted outcome or a width. This plan predicts no result and does not
+claim that `M1-025` is unblocked. `M1-025` stays blocked until a separately reviewed outcome
+says otherwise.
 
 ## 1. Boundaries
 
@@ -14,12 +22,18 @@ reviewed outcome says otherwise.
   `evidence/issues/M1-WIRE-001/barrier-frame-conformance.json`, documented product behavior, and
   black-box observation. No Barrier or Deskflow source, source-derived writeup, decompiled,
   disassembled, patched, hooked or instrumented output is consulted or produced.
-- **Platforms.** Linux and/or macOS hosts that the owner controls. No Windows host is used.
+- **Platforms.** One Linux host (`role-server == role-capture`) and one macOS host
+  (`role-client`), both controlled by the owner. No Windows host is used.
 - **No production code.** No Swift, parser, codec, framer or reassembler is added or changed.
   The partition walks below are evidence-only contract test helpers in Python stdlib.
 - **TLS.** The MacKVM production TLS default stays enabled and fail-closed, and no MacKVM
   configuration, code or default changes. Any cleartext Barrier setting exists only inside the
-  bounded, isolated, disposable evidence leg in section 6 and is torn down afterwards.
+  bounded, isolated, disposable evidence legs in section 6 and is torn down afterwards. Between
+  hosts, that Barrier traffic travels only inside the encrypted SSH local forward. It is
+  cleartext only on two host-local loopback legs: the macOS Barrier client to the SSH
+  local-forward listener on `role-client`, and the Linux sshd forward exit to the Barrier server
+  on `role-server`. Both forward endpoints use loopback addresses only. Only the Linux loopback
+  leg is captured.
 - **No predicted bytes.** This plan names observable conditions only. It does not predict any
   wire byte, length value, message, message type or payload layout.
 
@@ -49,11 +63,20 @@ not, STOP and revise this plan before any capture.
 
 ## 3. Normal-use candidate action
 
-- **Action.** Ordinary Barrier clipboard sharing between a server-role and a client-role host,
-  using the product's documented clipboard feature from the normal desktop session.
-- **Data.** Deterministic, synthetic, non-personal text made on the capture host by a recorded
-  generator (fixed ASCII pattern, fixed seed, recorded size and SHA-256). No real user data,
-  no clipboard history, and no other application content is used.
+- **Action.** Ordinary Barrier clipboard sharing between `role-server` (Linux) and
+  `role-client` (macOS), using the product's documented clipboard feature from the normal
+  desktop session.
+- **Data.** Deterministic, synthetic, non-personal text made on `role-client` by a recorded
+  generator (fixed ASCII pattern, fixed seed). The generator may run on `role-client` because
+  its content is deliberately non-personal test data. `manual.md` and `environment.json` record
+  the generator recipe and version, the size ladder, and the SHA-256 of each generated value.
+  Only that metadata is committed. No generated value, and never a real clipboard value, is
+  committed. No real user data, no clipboard history, and no other application content is used.
+- **Data path.** The generator bytes intentionally travel the encrypted application path
+  (macOS clipboard → Barrier client → macOS loopback → SSH local forward → Linux loopback →
+  Barrier server).
+  This is the observation itself. It is not raw capture data leaving a host. No raw capture
+  leaves `role-capture` (section 6).
 - **Size ladder.** A short, recorded sequence of increasing synthetic sizes, from small to
   large (multi-megabyte at most), each copied once, so that the product has the chance to emit
   diverse frame lengths. The ladder is exploratory: no size is claimed to produce any specific
@@ -69,7 +92,10 @@ not, STOP and revise this plan before any capture.
 ### 4.1 Stream construction
 
 - The unit of analysis is the **complete ordered application byte stream per direction** of
-  each in-scope TCP connection (server-to-client and client-to-server).
+  each in-scope TCP connection (server-to-client and client-to-server). In-scope connections
+  are on the Linux loopback leg between the sshd forward exit and the Barrier server. The
+  forward relays an ordered byte stream. The plan does not assume that its segment boundaries
+  match anything on the encrypted leg, and segment boundaries carry no meaning either way.
 - The stream is built by ordering TCP segment payloads by sequence number and concatenating
   them. Retransmitted duplicates must be byte-identical and are counted once. Any conflicting
   overlap or sequence gap fails the completeness checks in section 5.
@@ -116,32 +142,81 @@ A direction stream is analyzable only if all of the following hold. Otherwise ST
 the stream as incomplete. Partial streams are never analyzed for width.
 
 1. The connection lifecycle is bounded inside the capture window: the connection start
-   (handshake) and an externally observed close (FIN in both directions) are both captured.
+   (handshake) and an externally observed close (FIN in both directions) of the loopback-leg
+   connection are both captured.
    An explicit RST counts only if the reviewer agrees before capture that it is an equally
    explicit end condition. A timeout or "capture stopped" is not an end condition.
 2. There are no sequence gaps from the first payload byte to the close, and no conflicting
    overlaps.
 3. The capture tool reports zero dropped packets, and the snap length captures full segments.
-4. The in-scope connection is identified only by the configured Barrier port inside the
-   window. Every in-scope connection in the window is analyzed. Cherry-picking is not allowed.
+4. The in-scope connection is identified only by the loopback interface and the configured
+   Barrier server port (recorded as a placeholder) inside the window. Every in-scope connection
+   in the window is analyzed. Cherry-picking is not allowed.
 5. The sanitizer round-trip check in section 6 passes for every stream.
 
 ## 6. Capture topology and handling
 
-**Roles (sanitized labels only):** `role-server` (Barrier server), `role-client` (Barrier
-client), `role-capture` (the host that runs the capture tool and keeps raw data; it may be
-`role-server` or `role-client`). Real host names, users, addresses and interfaces are never
-written to committed files. Placeholders follow the `M1-024` convention.
+**Roles (sanitized labels only), fixed topology:**
+- `role-server == role-capture`: one Linux host. It runs the Barrier server and the capture
+  tool, and it keeps all raw data. On this host the capture tool runs without root, using
+  packet-capture capabilities only.
+- `role-client`: one macOS host. It runs the Barrier client, the SSH local-forward listener and
+  the synthetic generator. No capture runs on macOS, because macOS cannot capture BPF traffic
+  non-interactively.
+- Real users, host names, IP addresses, interfaces and ports are never written to committed
+  files. Placeholders follow the `M1-024` convention.
 
-**Isolation:** a dedicated, disposable evidence environment on an isolated link or segment with
-no route to other networks. Any Barrier cleartext setting is applied only here and is recorded
-as an evidence-only leg with its start/end UTC and teardown.
+**Legs:**
+- **Uncaptured cleartext leg (macOS loopback):** on `role-client`, the Barrier client connects
+  to the SSH local-forward listener. The listener binds a loopback address only, never a
+  wildcard or LAN address. Barrier traffic is cleartext on this host-local leg. It is not
+  captured and not analyzed.
+- **Encrypted inter-host leg:** the SSH channel from `role-client` to `role-server`. Barrier
+  traffic between hosts exists only inside this SSH channel. This leg is not captured and not
+  analyzed.
+- **Captured cleartext leg (Linux loopback):** on `role-server`, the sshd forward exit connects
+  to the Barrier server at a loopback destination address only. Barrier traffic is cleartext on
+  this host-local leg. This is the only leg that is captured and analyzed.
 
-**Validity checks before the window opens (recorded in `environment.json`):** OS name/version
-per role. Barrier package or build version and its origin and package SHA-256, as reported
-by the product's own metadata. Capture tool name/version. Sanitizer version and SHA-256.
-Clocks in UTC. Capture filter limited to the configured Barrier port. Isolated-segment check.
-The reviewer approval timestamp is earlier than the capture start.
+**Isolation:** a dedicated, disposable evidence configuration. The Barrier cleartext setting is
+applied only to this evidence configuration. Barrier cleartext exists only on the two
+host-local loopback legs above, which have no route off their hosts, and its only inter-host
+path is the encrypted SSH forward. Both legs are recorded as evidence-only legs with their
+start/end UTC and teardown.
+
+**Validity checks before the window opens (recorded in `environment.json`):**
+- OS name/version per role.
+- `role-server` Barrier provenance: the official Ubuntu Barrier package name, version, origin
+  and package SHA-256, as reported by the package manager's own metadata.
+- `role-client` Barrier provenance: the exact hash chain from the official upstream Barrier
+  v2.4.0 DMG asset (size and SHA-256) to the installed `barrierc` and `barriers` binaries
+  (each byte-identical to the DMG copy, with recorded SHA-256), plus the app bundle version
+  `2.4.0-release`. This chain is the accepted macOS client provenance. The values the reviewer
+  verified are: DMG size 29056360, DMG SHA-256
+  `af938d17dcea5701da7a990705acbd0686dfedfdbcd64721666ae0bef7644ba9`; `barrierc` SHA-256
+  `53369a4579223e0f8742b897d96b6a9a6c3abc9f6ef9c4fec2779b0ef7bd5715`; `barriers` SHA-256
+  `2ad6d3b9b9d6dd8cb4bb403cea91f026d896842c5ba0134891daf90f8ef846b5`. They are re-checked
+  inside the bounded attempt, and any mismatch is a STOP (stop condition 1).
+- **Recorded limitation:** on macOS, `barrierc --version` from the CLI aborts and reports no
+  version. This is recorded as a limitation in `environment.json` and `manual.md`, not hidden
+  and not worked around. The hash chain and bundle version above stand in for it. The GUI
+  launch runs.
+- **Runtime connection success** is still required: inside the bounded attempt, the macOS
+  client must connect through the forward to the Linux server and the product must report the
+  connection. If the connection fails, STOP (stop condition 1). Retries outside the recorded
+  window are not allowed.
+- Capture tool name/version and its non-root capability configuration on `role-capture`.
+  Sanitizer version and SHA-256. Generator recipe/version. Clocks in UTC.
+- The capture filter is limited to the loopback interface and the configured Barrier server port.
+- An SSH-forward check: the inter-host leg is the SSH channel only.
+- A loopback-only binding check on both forward endpoints: on `role-client`, the SSH
+  local-forward listener is bound to a loopback address only and not to a wildcard or LAN
+  address; on `role-server`, the forward destination is a loopback address only.
+- An SSH forward fail-fast check: the SSH session is configured to exit if the local forward
+  cannot be established (for example `ExitOnForwardFailure yes`), so it never runs without the
+  forward.
+- If any of these checks fails, STOP before the window opens.
+- The reviewer re-approval timestamp for this amended plan is earlier than the capture start.
 
 **Strict time window:** one capture window with a fixed maximum duration that is recorded before
 start and enforced by a timeout wrapper. The window opens before connect and closes after the
@@ -149,11 +224,15 @@ observed close. If the time runs out first, the streams are incomplete (section 
 
 **Cancellation and cleanup:** on any abort, stop the capture, record the reason and UTC time,
 keep the partial raw data on `role-capture` under the same deletion process, and do not analyze
-it for width. Afterwards, in all cases, clear the synthetic clipboard, restore or destroy the
-disposable Barrier configuration, tear down the isolated segment, and record each step.
+it for width. Afterwards, in all cases, clear the synthetic clipboard on both roles, delete
+the local generator output on `role-client`, restore or destroy the disposable Barrier
+configuration on both roles, tear down the SSH local forward, and record each step.
 
-**Raw data location:** raw captures and the synthetic generator output never leave
-`role-capture`. Only sanitizer output leaves it.
+**Raw data location:** raw captures never leave `role-capture`. Only sanitizer output leaves
+it. The synthetic generator output is made on `role-client`. It reaches `role-server` only as
+Barrier application traffic through the encrypted SSH forward, as section 3 describes, and is
+never copied anywhere as a file. Only generator metadata (recipe, version, size ladder,
+SHA-256) is committed.
 
 **Allowlist sanitizer (runs on `role-capture`):**
 - It keeps per-direction stream byte lengths, connection lifecycle facts, and frame
@@ -181,7 +260,10 @@ disposable Barrier configuration, tear down the isolated segment, and record eac
 
 ## 7. Reviewer checkpoints
 
-1. **Before capture:** approve this plan (checklist below). No capture or SSH before it.
+1. **Before capture:** approve this plan (checklist below). No capture or SSH before it. The
+   2026-10-02T08:41:12Z approval came before the topology amendment. The topology amendment
+   was re-approved at 2026-10-05T00:00:44Z, as recorded in `independent-review.md`. Capture
+   may proceed only after all section 6 pre-window checks pass.
 2. **Before raw deletion:** independent re-derivation on `role-capture` (section 6).
 3. **Before merge:** register entry, sanitized fixture, hashes, privacy scan, ADR (only if
    exactly one width survives), and test results agree.
@@ -192,20 +274,23 @@ On any of these: STOP. Record it in `evidence/issues/M1-WIRE-002/summary.md`, ap
 the register as accepted width evidence, write no width ADR, and keep `M1-025` blocked.
 
 1. Provenance (Barrier build origin, version, host environment, capture chain) is unavailable
-   or invalid.
+   or invalid. For `role-client` this includes any break in the official-DMG-to-binary hash
+   chain or a bundle version other than `2.4.0-release`. The recorded CLI `--version` abort
+   alone is not a stop. A runtime connection failure inside the bounded attempt is a stop.
 2. The observation cannot be produced safely through normal use without unsafe, unbounded or
    non-product behavior.
 3. Source contamination: Barrier/Deskflow source, a source-derived writeup, or decompiled or
    instrumented output was consulted or could have influenced the plan, capture or derivation.
 4. Telling the readings apart would require a Windows host.
-5. The only path weakens production TLS or a fail-closed default, or goes beyond a bounded,
-   isolated, documented evidence-only cleartext leg.
+5. The only path weakens production TLS or a fail-closed default, or goes beyond bounded,
+   isolated, documented evidence-only cleartext legs.
 6. Raw data leaves `role-capture` before allowlist sanitization, or the sanitized output fails
    the privacy scan.
 7. After capture, both readings partition all required streams, or neither does.
 
 Plan-specific stops that use the same handling: R0 fails; a completeness precondition
-(section 5) fails; the sanitizer round trip differs; the reviewer re-derivation disagrees; the
+(section 5) fails; a loopback-only binding or SSH forward fail-fast check (section 6) fails;
+the sanitizer round trip differs; the reviewer re-derivation disagrees; the
 capture window or cleanup cannot be bounded. A stop is a valid result and is not bypassed by
 changing this plan after capture.
 
@@ -253,8 +338,8 @@ Reviewer (not the capture author): ____________ UTC: ____________
 
 - [ ] APPROVE / [ ] REJECT: clean-room boundary holds. No source, decompiled or instrumented
       input was used. Linux/macOS only. No Windows. No production Swift.
-- [ ] APPROVE / [ ] REJECT: MacKVM production TLS stays on and fail-closed. Any cleartext
-      Barrier leg is bounded, isolated, evidence-only and torn down.
+- [ ] APPROVE / [ ] REJECT: MacKVM production TLS stays on and fail-closed. Both host-local
+      cleartext Barrier loopback legs are bounded, isolated, evidence-only and torn down.
 - [ ] APPROVE / [ ] REJECT: R0, the Reading B rule, matches the recorded `M1-WIRE-001` 2-byte
       big-endian algorithm.
 - [ ] APPROVE / [ ] REJECT: the clipboard action is normal use with deterministic synthetic
@@ -266,7 +351,15 @@ Reviewer (not the capture author): ____________ UTC: ____________
       ≥ 65536 alone are not proof.
 - [ ] APPROVE / [ ] REJECT: completeness preconditions, including the bounded lifecycle and
       the externally observed close (and whether RST qualifies), are sufficient.
-- [ ] APPROVE / [ ] REJECT: topology, validity checks, time window, cancellation and cleanup.
+- [ ] APPROVE / [ ] REJECT: the amended topology (`role-server == role-capture` on Linux,
+      `role-client` on macOS, SSH local forward as the encrypted inter-host leg, cleartext only
+      on the macOS and Linux host-local loopback legs, the Linux loopback leg as the only
+      captured leg), validity checks (including macOS hash-chain provenance, the recorded CLI
+      `--version` limitation, the required runtime connection success, loopback-only bindings
+      on both forward endpoints with no wildcard/LAN listener, and SSH forward fail-fast), time
+      window, cancellation and cleanup.
+- [ ] APPROVE / [ ] REJECT: the synthetic generator on `role-client` is acceptable, only
+      generator metadata is committed, and no raw capture leaves `role-capture`.
 - [ ] APPROVE / [ ] REJECT: raw data stays on `role-capture`, the allowlist sanitizer round
       trip is sound, the privacy scan is adequate, re-derivation happens before deletion, and
       the deletion record makes no secure-erasure claim.
