@@ -1,5 +1,6 @@
 import copy
 import csv
+import base64
 import hashlib
 import json
 import re
@@ -34,6 +35,7 @@ NEW_EXACT_FILES = [
     "evidence/issues/M1-040/manual.md",
     "evidence/issues/M1-040/independent-review.md",
 ]
+REVIEW = REPOSITORY_ROOT / "evidence/issues/M1-040/independent-review.md"
 REQUIRED_FOCUS = (
     "按鍵輸入只使用 capture 前宣告的 scripted key sequence，不得組成可識別文字",
     "Raw packet capture 保留在 repository 外，不得提交",
@@ -47,6 +49,13 @@ REQUIRED_STOP_CONDITIONS = (
     "宣告的 fixture 與 evidence 檔案不是來自真實 Linux Barrier Server capture 時，不得宣稱 M1-040 完成。",
 )
 COMPLETION_KEYS = ("status", "state", "completed", "done", "closed")
+IDENTIFYING_PATTERNS = {
+    "ipv4": re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
+    "email": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
+    "user path": re.compile(r"(?i)(?:/Users/|/home/|C:\\Users\\)[^/\s\\]+"),
+    "token": re.compile(r"\b(?:ghp_|gho_|github_pat_|sk-|xox[abp]-)[\w-]+"),
+    "pem material": re.compile(r"-----BEGIN [A-Z ]+-----"),
+}
 
 
 def section(text, heading, level="##"):
@@ -69,7 +78,32 @@ def completion_blockers(adr_text, lock, root=REPOSITORY_ROOT):
     for path in NEW_EXACT_FILES:
         if not (root / path).is_file():
             blockers.append(f"missing {path}")
+    review_path = root / "evidence/issues/M1-040/independent-review.md"
+    if review_path.is_file():
+        review_text = review_path.read_text(encoding="utf-8")
+        if "APPROVED FOR M1-040 MERGE" not in review_text:
+            blockers.append("independent review not approved")
+        if re.search(r"(?m)^## High findings\n\n(?!None\.)", review_text):
+            blockers.append("independent review has high findings")
+        if re.search(r"(?m)^## Critical findings\n\n(?!None\.)", review_text):
+            blockers.append("independent review has critical findings")
     return blockers
+
+
+def identifying_content(text):
+    findings = []
+    for name, pattern in IDENTIFYING_PATTERNS.items():
+        for match in pattern.finditer(text):
+            if name == "ipv4":
+                context = text[max(0, match.start() - 80) : match.end() + 80].lower()
+                # Dotted tool versions such as Swift driver 1.127.14.1 are not
+                # retained network addresses. They are pinned public toolchain
+                # versions and intentionally recorded for drift checks.
+                if any(marker in context for marker in ("swift", "driver", "python", "version")):
+                    continue
+            findings.append(name)
+            break
+    return sorted(findings)
 
 
 def scope_violations(entry, issue_text):
@@ -121,11 +155,42 @@ class M1040KeyboardCaptureScopeTests(unittest.TestCase):
             "Any OS, architecture, tool, Barrier or protocol version that differs from this lock stops every capture scoped by this lock; only a new Product Owner approved ADR may change this lock.",
         )
 
-    def test_no_keyboard_fixture_or_evidence_exists_yet(self):
-        self.assertFalse((REPOSITORY_ROOT / FIXTURE_DIR).exists())
+    def test_keyboard_fixture_and_evidence_exist_after_real_capture(self):
         for path in ORIGINAL_EXACT_FILES + NEW_EXACT_FILES:
             with self.subTest(path=path):
-                self.assertFalse((REPOSITORY_ROOT / path).exists())
+                self.assertTrue((REPOSITORY_ROOT / path).is_file())
+
+    def test_keyboard_fixture_is_sanitized_uninterpreted_payload(self):
+        capture_path = REPOSITORY_ROOT / FIXTURE_DIR / "keyboard-capture.json"
+        metadata_path = REPOSITORY_ROOT / FIXTURE_DIR / "metadata.json"
+        capture_bytes = capture_path.read_bytes()
+        capture = json.loads(capture_bytes)
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        self.assertEqual(capture["schemaVersion"], 1)
+        self.assertEqual(capture["captureId"], "m1-040-linux-keyboard")
+        self.assertEqual(capture["encoding"], "base64")
+        observations = capture["observations"]
+        self.assertGreaterEqual(len(observations), 10)
+        total_payload_bytes = 0
+        directions = set()
+        for expected_sequence, observation in enumerate(observations, 1):
+            self.assertEqual(observation["sequence"], expected_sequence)
+            self.assertEqual(set(observation), {"sequence", "direction", "applicationPayloadBase64"})
+            self.assertIn(observation["direction"], {"server-to-client", "client-to-server"})
+            directions.add(observation["direction"])
+            payload = base64.b64decode(observation["applicationPayloadBase64"], validate=True)
+            self.assertGreater(len(payload), 0)
+            total_payload_bytes += len(payload)
+        self.assertEqual(directions, {"server-to-client", "client-to-server"})
+        self.assertGreaterEqual(total_payload_bytes, 128)
+        self.assertEqual(metadata["schemaVersion"], 1)
+        self.assertEqual(metadata["fixtureId"], "m1-040-linux-keyboard")
+        self.assertEqual(metadata["protocol"], "barrier")
+        self.assertEqual(metadata["payload"]["path"], "keyboard-capture.json")
+        self.assertEqual(metadata["payload"]["sha256"], hashlib.sha256(capture_bytes).hexdigest())
+        self.assertEqual(metadata["payload"]["byteLength"], len(capture_bytes))
+        self.assertEqual(metadata["sanitization"]["status"], "sanitized")
+        self.assertIs(metadata["sanitization"]["containsSensitiveData"], False)
 
     def test_issue_and_manifest_declare_scope_and_stop_conditions(self):
         self.assertEqual(scope_violations(self.entry, self.issue_text), [])
@@ -145,10 +210,25 @@ class M1040KeyboardCaptureScopeTests(unittest.TestCase):
 
     def test_m1_040_cannot_be_claimed_complete_before_real_fixture(self):
         blockers = completion_blockers(self.adr, self.lock)
-        self.assertIn(f"missing {FIXTURE_DIR}/keyboard-capture.json", blockers)
-        self.assertNotIn("adr not accepted", blockers)
-        self.assertNotIn("lock does not scope M1-040", blockers)
-        self.assertIn(f"missing {FIXTURE_DIR}/keyboard-capture.json", blockers)
+        self.assertEqual(blockers, [])
+
+    def test_independent_review_approves_without_critical_or_high_findings(self):
+        review = REVIEW.read_text(encoding="utf-8")
+        self.assertIn("Reviewer: Claude independent reviewer", review)
+        self.assertIn("APPROVED FOR M1-040 MERGE", review)
+        self.assertRegex(review, r"(?m)^## Critical findings\n\nNone\.")
+        self.assertRegex(review, r"(?m)^## High findings\n\nNone\.")
+
+    def test_evidence_has_no_identifying_content_or_raw_capture(self):
+        paths = [REPOSITORY_ROOT / path for path in ORIGINAL_EXACT_FILES + NEW_EXACT_FILES]
+        combined = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in paths)
+        self.assertEqual(identifying_content(combined), [])
+        tracked = (REPOSITORY_ROOT / ".git").exists()
+        self.assertTrue(tracked)
+        for path in REPOSITORY_ROOT.rglob("*"):
+            if ".git" in path.parts:
+                continue
+            self.assertFalse(path.name.endswith((".pcap", ".pcapng", ".cap")))
 
     def test_index_row_still_agrees_with_manifest(self):
         with INDEX.open(encoding="utf-8-sig", newline="") as handle:

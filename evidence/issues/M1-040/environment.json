@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-040",
+  "repositoryHeadAtAuthorRun": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+  "toolchainLock": {
+    "lockId": "M1-CAPTURE-TOOLCHAIN-001",
+    "status": "LOCKED",
+    "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
+    "path": "MacKVM_Implementation_Package_v2/toolchain.lock.json"
+  },
+  "preCaptureMetadata": {
+    "recordedBeforeCapture": true,
+    "recordedBy": "root session",
+    "note": "Host and peer lock facts were checked before the accepted capture; identifying host, address and username values are deliberately not retained."
+  },
+  "host": {
+    "os": "macOS",
+    "osVersion": "26.6.2",
+    "osBuild": "25G83",
+    "architecture": "arm64",
+    "barrierClient": {
+      "executable": "barrierc",
+      "version": "2.4.0-release",
+      "role": "EXTERNAL_TEST_PEER_ONLY"
+    },
+    "keyboard": {
+      "scriptedInputSource": "Linux server side only",
+      "typedTextRecorded": false
+    }
+  },
+  "peer": {
+    "os": "Ubuntu",
+    "osVersion": "22.04",
+    "architecture": "x86_64",
+    "barrierServer": {
+      "executable": "barriers",
+      "version": "2.4.0-release",
+      "protocolVersion": "1.6",
+      "role": "EXTERNAL_TEST_PEER_ONLY"
+    },
+    "keyboard": {
+      "scriptTool": "xdotool",
+      "scriptedSequence": "Right Arrow; Shift+Left Arrow; Caps Lock; Caps Lock; Down Arrow repeat hold",
+      "formsIdentifiableText": false
+    }
+  },
+  "captureTools": {
+    "recorder": {
+      "name": "tcpdump",
+      "version": "4.99.1",
+      "interface": "Linux peer network interface",
+      "packetCount": 109
+    },
+    "availableNotUsed": {
+      "name": "dumpcap and Wireshark",
+      "version": "3.6.2",
+      "used": false
+    }
+  },
+  "network": {
+    "scope": "Existing user-confirmed Barrier server/client session; retained repository evidence contains no address or port value.",
+    "identifyingAddressesRecorded": false
+  },
+  "tls": {
+    "observationTlsEnabled": false,
+    "productDefaultTlsEnabled": true,
+    "productTlsValidatedByThisObservation": false
+  },
+  "windows": {
+    "executed": false,
+    "resultClaimed": false,
+    "decisionRef": "docs/adr/M1-SCOPE-001-linux-only-validation.md"
+  },
+  "privacy": {
+    "typedTextRecorded": false,
+    "clipboardPayloadRecorded": false,
+    "credentialOrKeyMaterialRecorded": false,
+    "hostnameOrAddressRecorded": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": true
+  }
+}

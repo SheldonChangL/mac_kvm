@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "m1-040-linux-keyboard",
+  "protocol": "barrier",
+  "provenance": {
+    "sourceKind": "black-box-capture",
+    "reference": "Controlled black-box observation per Tests/SystemTests/Plans/M1-040-barrier-keyboard-fixtures.md: external Linux Barrier server barriers 2.4.0-release protocol 1.6 sending a predeclared non-text scripted keyboard sequence to external macOS Barrier client barrierc 2.4.0-release. Ordered direction and uninterpreted payload bytes only; no key-code, message-code, endianness or compatibility claim. TLS disabled for this observation only; product TLS default stays enabled and unvalidated. Windows not executed.",
+    "capturedAt": "2026-10-06T03:31:00Z"
+  },
+  "payload": {
+    "path": "keyboard-capture.json",
+    "sha256": "2b759895a9ba4d7171a89ccacbb74989a72ef3cad5714d577ee291ccfb612a0e",
+    "byteLength": 8090
+  },
+  "sanitization": {
+    "status": "sanitized",
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "ip-address",
+      "other-private-data"
+    ]
+  }
+}
