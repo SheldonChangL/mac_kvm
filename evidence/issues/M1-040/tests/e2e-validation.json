@@ -1,0 +1,33 @@
+{
+  "issue": "M1-040",
+  "phase": "implementation-author",
+  "fixture": {
+    "observations": 62,
+    "decodedPayloadBytes": 744,
+    "directions": [
+      "client-to-server",
+      "server-to-client"
+    ],
+    "keyboardCaptureSha256": "2b759895a9ba4d7171a89ccacbb74989a72ef3cad5714d577ee291ccfb612a0e",
+    "metadataSha256": "139173391eff53f076cbcc5f6a1b1bd2e033ee872c67dbcb465d8ee7c489ebbc"
+  },
+  "checks": [
+    {
+      "id": "fixture-format",
+      "status": "passed"
+    },
+    {
+      "id": "privacy-redaction",
+      "status": "passed"
+    },
+    {
+      "id": "non-claims",
+      "status": "passed"
+    },
+    {
+      "id": "raw-capture-exclusion",
+      "status": "passed"
+    }
+  ],
+  "independentReview": "pending"
+}

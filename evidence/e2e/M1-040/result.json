@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "issueId": "M1-040",
+  "status": "passed",
+  "startedAt": "2026-10-06T08:52:54Z",
+  "endedAt": "2026-10-06T08:52:54Z",
+  "commit": "b5bc58951942b7e947b916fe2ebf0ee9c5c1c155",
+  "toolchain": {
+    "pythonVersion": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64"
+  },
+  "environment": {
+    "localOS": "macOS 26.6.2 build 25G83 arm64",
+    "peerProduct": "Barrier barriers external test peer",
+    "peerVersion": "2.4.0-release protocol 1.6",
+    "peerRole": "EXTERNAL_TEST_PEER_ONLY",
+    "peerOS": "Ubuntu 22.04 x86_64",
+    "networkScope": "existing user-confirmed Barrier server/client session; repository retains no address or port value",
+    "tls": "disabled for observation only; product default stays enabled and unvalidated here"
+  },
+  "cases": [
+    {
+      "id": "fixture-format",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "62 ordered observations",
+        "744 aggregate payload bytes",
+        "both directions present"
+      ]
+    },
+    {
+      "id": "privacy-scan",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "no tracked raw capture suffix",
+        "no identifying pattern in retained evidence",
+        "metadata marks sensitive data false"
+      ]
+    },
+    {
+      "id": "nonclaim-scan",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "fixture stores direction and uninterpreted payload only",
+        "no Windows result claimed",
+        "no key-code or compatibility semantics asserted"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tests/Fixtures/Barrier/m1-040-linux-keyboard/keyboard-capture.json",
+      "sha256": "2b759895a9ba4d7171a89ccacbb74989a72ef3cad5714d577ee291ccfb612a0e",
+      "byteLength": 8090,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m1-040-linux-keyboard/metadata.json",
+      "sha256": "139173391eff53f076cbcc5f6a1b1bd2e033ee872c67dbcb465d8ee7c489ebbc",
+      "byteLength": 1053,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    }
+  ],
+  "privacy": {
+    "containsSensitiveData": false,
+    "containsTypedText": false,
+    "containsClipboardPayload": false,
+    "containsCredentials": false,
+    "containsKeyMaterial": false,
+    "containsHostnames": false,
+    "containsIPAddresses": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": true
+  },
+  "approvedDecisionRef": null
+}

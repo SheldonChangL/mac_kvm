@@ -1,0 +1,61 @@
+{
+  "issue": "M1-040",
+  "repositoryHeadAtAuthorRun": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+  "privateCapture": {
+    "rawCaptureLocation": "OUTSIDE_REPOSITORY",
+    "rawCaptureCommitted": false,
+    "packetCount": 109,
+    "retainedObservationRuns": 62,
+    "retainedApplicationPayloadBytes": 744
+  },
+  "commands": [
+    {
+      "command": "sw_vers -productVersion; sw_vers -buildVersion; uname -m; /usr/bin/python3 --version; swift --version; plutil -p /Applications/Barrier.app/Contents/Info.plist; strings /Applications/Barrier.app/Contents/MacOS/barrierc | rg \"2\\.4\\.0|Barrier 2\\.4\\.0\"",
+      "startedAt": "2026-10-06T02:52:00Z",
+      "endedAt": "2026-10-06T02:53:00Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "macOS host matched locked OS 26.6.2 build 25G83, arm64, Python 3.9.6 and Swift 6.2.3/driver 1.127.14.1. Barrier app metadata/strings identified 2.4.0-release; no private host/address/user value retained."
+    },
+    {
+      "command": "ssh $M1_040_SSH_TARGET \". /etc/os-release; uname -m; barriers --version; tcpdump --version; dumpcap --version; dpkg-query -W -f=${Version} wireshark-common; getcap /usr/bin/tcpdump; getcap /usr/bin/dumpcap; tcpdump -D; pgrep -x barriers; pgrep -x tcpdump\"",
+      "startedAt": "2026-10-06T02:53:00Z",
+      "endedAt": "2026-10-06T02:54:00Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "Linux peer matched locked Ubuntu 22.04, x86_64, barriers 2.4.0-release protocol 1.6, tcpdump 4.99.1, dumpcap 3.6.2, wireshark-common 3.6.2-2; tcpdump/dumpcap capabilities present; no identifying host/address value retained."
+    },
+    {
+      "command": "PRIVATE: tcpdump in peer mktemp directory, then DISPLAY=:0 xdotool key Right; key shift+Left; key Caps_Lock; key Caps_Lock; keydown Down; sleep 1; keyup Down",
+      "startedAt": "2026-10-06T03:31:00Z",
+      "endedAt": "2026-10-06T03:31:09Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "Raw pcap stayed outside repository; private sanitizer retained 62 direction runs and 744 application payload bytes from 109 captured packets."
+    },
+    {
+      "command": "python3 /private/tmp/m1_040_generate.py",
+      "startedAt": "2026-10-06T08:20:00Z",
+      "endedAt": "2026-10-06T08:21:00Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "Generated keyboard-capture.json sha256 2b759895a9ba4d7171a89ccacbb74989a72ef3cad5714d577ee291ccfb612a0e and metadata.json sha256 139173391eff53f076cbcc5f6a1b1bd2e033ee872c67dbcb465d8ee7c489ebbc. The generator is private and not a repository artifact; repository validation is performed by the committed M1-040 e2e script."
+    },
+    {
+      "command": "make e2e ISSUE=M1-040",
+      "startedAt": "2026-10-06T08:24:00Z",
+      "endedAt": "2026-10-06T08:24:01Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "e2e disposition: passed; e2e exit: 0"
+    },
+    {
+      "command": "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M1-040/result.json",
+      "startedAt": "2026-10-06T08:24:01Z",
+      "endedAt": "2026-10-06T08:24:01Z",
+      "commit": "e6220368ca7a9d28906ff26de35ba41d245219bc",
+      "exitCode": 0,
+      "result": "evidence valid: issue=M1-040 status=passed"
+    }
+  ]
+}
