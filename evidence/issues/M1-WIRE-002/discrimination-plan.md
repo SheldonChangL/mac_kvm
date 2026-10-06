@@ -1,6 +1,13 @@
 # M1-WIRE-002 Discrimination Plan (capture preparation only)
 
-GitHub Issue #279. Status: **amended after Checkpoint 1; re-approved for one bounded capture
+GitHub Issue #279. Current status: **attempt 1 STOPPED (`client-not-connected`,
+2026-10-05T07:09:55Z); the attempt-1 approval is consumed; a second attempt is proposed in
+section 11 and is NOT approved.** No capture, SSH session or Barrier evidence configuration
+may start for attempt 2 until the independent reviewer records a new approval for section 11.
+Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
+historical attempt-1 plan.
+
+Attempt-1 status (historical): **amended after Checkpoint 1; re-approved for one bounded capture
 attempt at 2026-10-05T00:00:44Z.** The independent reviewer (Codex, who is not the capture
 author) recorded a pre-capture approval at 2026-10-02T08:41:12Z and an amended-topology
 re-approval at 2026-10-05T00:00:44Z in `evidence/issues/M1-WIRE-002/independent-review.md`.
@@ -263,7 +270,8 @@ SHA-256) is committed.
 1. **Before capture:** approve this plan (checklist below). No capture or SSH before it. The
    2026-10-02T08:41:12Z approval came before the topology amendment. The topology amendment
    was re-approved at 2026-10-05T00:00:44Z, as recorded in `independent-review.md`. Capture
-   may proceed only after all section 6 pre-window checks pass.
+   may proceed only after all section 6 pre-window checks pass. That approval was consumed by
+   attempt 1. Attempt 2 needs a new Checkpoint 1 decision on section 11.
 2. **Before raw deletion:** independent re-derivation on `role-capture` (section 6).
 3. **Before merge:** register entry, sanitized fixture, hashes, privacy scan, ADR (only if
    exactly one width survives), and test results agree.
@@ -368,3 +376,111 @@ Reviewer (not the capture author): ____________ UTC: ____________
 - [ ] APPROVE / [ ] REJECT: the honest limit (section 10) is acceptable as meeting #279's
       discrimination requirement.
 - [ ] FINAL: capture MAY proceed / capture MUST NOT proceed (`M1-025` stays blocked).
+
+## 11. Amended second-attempt plan (proposed, pending independent review)
+
+Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
+records no capture, fixture, register entry, ADR or width.
+
+### 11.1 Attempt 1 is preserved as historical evidence
+
+- Attempt 1 ran under the 2026-10-05T00:00:44Z re-approval and stopped at the required runtime
+  connection gate with fixed label `client-not-connected` (2026-10-05T07:09:55Z). That stop was
+  source-validity stop condition 1 (section 8) and is a valid, final result for attempt 1.
+- The attempt-1 records stay as written: `summary.md` (stop reason, evidence handling,
+  restoration) and the `Runtime attempt result — 2026-10-05T07:11:18Z` entry in
+  `independent-review.md`. They are not rewritten, reinterpreted or reused as capture input.
+  The 24-byte header-only raw file from attempt 1 is not analyzed and is not an input to
+  attempt 2.
+- The cause of `client-not-connected` is not established in this repository. This amendment
+  does not claim one and does not depend on one.
+
+### 11.2 Why a new reviewer approval is required
+
+- Both prior approvals (2026-10-02T08:41:12Z and 2026-10-05T00:00:44Z) authorized exactly one
+  bounded attempt. That attempt has been used. Its re-approval conditions state that a runtime
+  connection failure "stops without an unreviewed retry".
+- Section 6 forbids retries outside the recorded window, and section 8 says a stop is not
+  bypassed by changing the plan after the fact. A second attempt is therefore a new bounded
+  experiment, not a continuation of attempt 1, and needs its own independent approval.
+- The baseline in 11.3 is new to the plan, so the reviewer must check it against the
+  clean-room, TLS and privacy boundaries before it is used.
+- Required ordering: the reviewer (not the capture author) records a Checkpoint 1 decision for
+  this section in `independent-review.md`, with a UTC timestamp that is later than this
+  amendment's commit and earlier than any attempt-2 pre-window check. Without that record,
+  attempt 2 MUST NOT start.
+
+### 11.3 Second-attempt baseline: the owner-confirmed normal-use session
+
+- The owner has confirmed a working Barrier normal-use session with the Linux host as Barrier
+  server and the macOS host as Barrier client. Attempt 2 may use that session's installed
+  products and normal-use pairing as its baseline, only after the fresh pre-window checks in
+  11.4 pass.
+- **Recorded discrepancy for the reviewer:** the attempt-1 restoration record lists the
+  restored owner session as `barriers` (server) on the macOS role and `barrierc` (client) on
+  the Linux role, which is the opposite direction. This amendment does not resolve that
+  difference. Fresh check 11.4(2) decides it at runtime. If the observed direction is not
+  Linux server to macOS client, STOP before the window opens.
+- Using the owner session as a baseline does not relax anything else. Sections 1–10 stay in
+  force for attempt 2, including: Linux/macOS only, no Windows; no Barrier or Deskflow source,
+  source-derived writeup, decompiled or instrumented material; no production Swift; MacKVM
+  production TLS stays enabled and fail-closed, and no MacKVM configuration, code or default
+  changes; no predicted wire byte, length, message, layout or proving threshold; the section 6
+  topology, loopback-only legs, SSH-forward fail-fast, raw locality, sanitizer, privacy scan
+  and bounded deletion; and the fixed section 4 predicate, section 5 completeness rules and
+  the FIN-in-both-directions requirement (RST does not qualify).
+- The owner session is never captured as-is. Barrier cleartext is permitted only inside the
+  disposable evidence configuration on the two host-local loopback legs of section 6. The
+  owner's own configuration is backed up before attempt 2 and restored afterwards, and each
+  step is recorded, as in attempt 1.
+
+### 11.4 Fresh pre-window checks for attempt 2
+
+All of the following are performed fresh for attempt 2 and recorded with UTC timestamps in
+`environment.json` and `manual.md` before the capture window opens. Results from attempt 1 do
+not satisfy any of them. Any failure is a STOP before the window opens, and no capture
+starts.
+
+1. The new reviewer approval for section 11 exists and its timestamp precedes this check.
+2. Baseline session check: on the unmodified owner session, the Linux role runs the Barrier
+   server, the macOS role runs the Barrier client, and the product reports the client as
+   connected. Only process names and product connection status are recorded; no address,
+   host name, user name or port value is written to committed files.
+3. All section 6 validity checks, re-run in full: OS versions, Linux package provenance, the
+   exact macOS official-DMG-to-binary hash chain and bundle version `2.4.0-release`, capture
+   tool and non-root capability, sanitizer version and SHA-256, generator recipe and version,
+   UTC clocks, the loopback-only capture filter, SSH-forward-only inter-host leg, loopback-only
+   bindings on both forward endpoints, and SSH forward fail-fast.
+4. The owner configuration backup and restore procedure on both roles is re-verified before
+   the baseline session is paused.
+5. The fixed maximum window duration and the graceful-only stop and timeout wrappers that were
+   reviewed for attempt 1 are recorded unchanged, or any change is listed for the reviewer.
+
+### 11.5 Attempt-2 limits and outcome handling
+
+- Exactly one bounded attempt. The runtime connection through the evidence configuration must
+  succeed once inside the window; if it does not, STOP with a fixed label, restore the owner
+  session, and record the result. A third attempt requires another plan amendment and another
+  independent approval.
+- Attempt 2 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+  `BARRIER-EVID-0001`, `BARRIER-EVID-0002` and the `M1-WIRE-001` ADR stay unchanged.
+- `M1-025` stays blocked until a register entry with accepted, independently reviewed
+  discriminating width evidence exists. A connection success, a long candidate length, or a
+  completed attempt without exactly one surviving reading does not unblock it.
+
+### 11.6 Reviewer decision for section 11
+
+Reviewer (not the capture author) records the decision in `independent-review.md`:
+
+- [ ] APPROVE / [ ] REJECT: attempt 1 is preserved unchanged and is not reused as capture input.
+- [ ] APPROVE / [ ] REJECT: the owner-confirmed Linux-server to macOS-client session is an
+      acceptable normal-use baseline, and the recorded direction discrepancy is handled by
+      fresh check 11.4(2).
+- [ ] APPROVE / [ ] REJECT: sections 1–10 boundaries apply unchanged: no Windows, no source,
+      no production Swift, no production TLS or default change, no byte prediction.
+- [ ] APPROVE / [ ] REJECT: the 11.4 fresh pre-window checks are complete and each failure
+      stops before the window opens.
+- [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
+- [ ] FINAL: attempt 2 MAY proceed after all 11.4 checks pass / attempt 2 MUST NOT proceed
+      (`M1-025` stays blocked).
