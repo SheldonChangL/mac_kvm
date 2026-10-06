@@ -213,6 +213,22 @@ timestamps before the capture window opens:
 - APPROVE: exactly one second bounded attempt; any further retry needs a new review.
 - FINAL: **attempt 2 MAY proceed after all 11.4 checks pass.**
 
+### Attempt-2 pre-window result — 2026-10-06T09:02:48Z
+
+- The reviewer performed the first fresh section 11.4 pre-window check against the Linux role
+  over the owner-authorized SSH access.
+- Result: **STOP before the capture window opened**.
+- Fixed stop label: `baseline-direction-mismatch`.
+- Evidence: the Linux role reported a running Barrier client process connected to a remote
+  server. Section 11.4(2) required the baseline to be Linux Barrier server to macOS Barrier
+  client. The observed direction therefore matched the attempt-1 restoration direction, not
+  the approved section-11 baseline.
+- No capture window was opened. No SSH evidence configuration, disposable cleartext leg,
+  tcpdump/dumpcap capture, raw file, sanitized fixture, register entry or width ADR was
+  produced for attempt 2.
+- `M1-025` remains blocked. A further retry requires a new plan amendment and a new
+  independent approval; it is not authorized by this section-11 approval.
+
 ### Preparation progress — 2026-10-05T06:18:22Z
 
 - The owner authorized installation of the Linux normal-use tools and temporary pause,
