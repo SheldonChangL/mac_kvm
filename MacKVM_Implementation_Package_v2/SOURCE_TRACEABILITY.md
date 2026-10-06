@@ -29,6 +29,22 @@ M1-002 獨立 review 發現的 High 已由 Issue #234／PR #235 修正並獨立 
 - M2、M4、M5 Windows 產品範圍不變。
 - Verification：`Tests/Contracts/test_m1_linux_only_validation_scope.py`。
 
+## M1-040 Keyboard Capture Scope Corrective Chain
+
+本節只記錄 M1-040 source-validity corrective work；不是 M1-040 完成證據，也不宣稱任何 keyboard fixture 已存在。
+
+| Stage | Issue | Recorded artifact | Verification |
+|---|---|---|---|
+| Corrective decision | M1-040-UNBLOCK-001（GitHub Issue #282） | [`docs/adr/M1-040-UNBLOCK-001-keyboard-capture-scope.md`](../docs/adr/M1-040-UNBLOCK-001-keyboard-capture-scope.md)（Status: Accepted） | `Tests/Contracts/test_m1_040_keyboard_capture_scope.py` |
+| Future capture owner | M1-040（GitHub Issue #25） | Declared future fixture paths in [`MacKVM_Implementation_Package_v2/issues/M1/M1-040-barrier-keyboard-fixtures.md`](issues/M1/M1-040-barrier-keyboard-fixtures.md) and `issues_manifest.json` | `Tests/Contracts/test_m1_040_keyboard_capture_scope.py` |
+
+Boundary:
+
+- The corrective ADR is `Accepted` by Product Owner authorization on 2026-10-06. It authorizes M1-040 source/manifest paths and toolchain-lock scope, but it does not complete M1-040 without the real fixture/evidence package and independent review.
+- M1-040 remains blocked until a Product Owner-accepted decision scopes the capture lock to M1-040, a real Linux Barrier Server keyboard capture is produced under that lock, and the non-implementing independent review is recorded.
+- The declared future fixture path is `Tests/Fixtures/Barrier/m1-040-linux-keyboard/`; those files are intentionally absent before the real capture.
+- M1-SCOPE-001 remains the source for Linux-only M1 validation. Windows is not executed in M1 and this chain records no Windows result.
+
 ## M1-024 → M1-EVIDENCE-001 → M1-025 Barrier Evidence Chain
 
 本節只記錄 Barrier wire evidence 的來源、登錄與 consumption gate 之間的 traceability，不是產品合約，也不凍結任何 wire contract。登錄內容與 entry contract 以 `evidence/registers/M1-023.json` 為準；M1-025 的合約內容仍由該 Issue 自行決定，本節不代替其執行。

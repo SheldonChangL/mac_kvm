@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted by Product Owner authorization on 2026-09-29, tracked in GitHub Issue #274.
+Accepted by Product Owner authorization on 2026-09-29, tracked in GitHub Issue #274. Amended by accepted ADR M1-040-UNBLOCK-001 on 2026-10-06 to also scope M1-040 keyboard capture without changing pinned tool versions.
 
 ## Decision owners
 
@@ -23,12 +23,12 @@ M1-024 as originally written also listed only four Exact Files, while its Expect
 
 ## Decision
 
-- Add [`MacKVM_Implementation_Package_v2/toolchain.lock.json`](../../MacKVM_Implementation_Package_v2/toolchain.lock.json) as a closed, deterministic lock with `lock_id` `M1-CAPTURE-TOOLCHAIN-001`, status `LOCKED` and scope `M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY`. Its only scoped Issue is M1-024.
+- Add [`MacKVM_Implementation_Package_v2/toolchain.lock.json`](../../MacKVM_Implementation_Package_v2/toolchain.lock.json) as a closed, deterministic lock with `lock_id` `M1-CAPTURE-TOOLCHAIN-001`, status `LOCKED` and scope `M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY`. Its scoped Issues are M1-024 and M1-040.
 - The lock pins exactly the verified OS, architecture, Swift, Python, Barrier and capture tool versions listed in Context. Unknown or missing keys are invalid.
 - Barrier has the role `EXTERNAL_TEST_PEER_ONLY`. No Barrier implementation is copied, linked or bundled into the repository.
 - Raw packet capture stays outside the repository and is never committed. The retained fixture contains only ordered direction plus uninterpreted application payload bytes. No field meaning, message code, endianness or compatibility is asserted by the lock or the fixture.
 - Windows is not executed in M1; the lock records `windows_executed` as false.
-- Drift fails closed: any OS, architecture, tool, Barrier or protocol version that differs from the lock stops M1-024 capture. Only a new Product Owner approved ADR may change the lock.
+- Drift fails closed: any OS, architecture, tool, Barrier or protocol version that differs from the lock stops every capture scoped by this lock. Only a new Product Owner approved ADR may change the lock.
 - M1-024 keeps its original four Exact Files first and adds exactly the two fixture files and the six evidence files (`summary.md`, `commands.json`, `tests/e2e-validation.json`, `environment.json`, `manual.md`, `independent-review.md`). The package Issue and `issues_manifest.json` are updated identically, including the clarifications above. The mandatory evidence package and the non-implementing independent review are in M1-024 scope.
 - [`Tests/Contracts/test_m1_024_capture_readiness.py`](../../Tests/Contracts/test_m1_024_capture_readiness.py) enforces the lock contract, the Issue/manifest agreement and the claim prohibitions with the Python standard library only.
 
@@ -79,7 +79,7 @@ No compatibility claim is made. The retained fixture is uninterpreted bytes, and
 
 ## Consequences
 
-- M1-024 capture can start once the actual environment matches the lock exactly.
+- M1-024 and M1-040 captures can start once their Issue dependencies are satisfied and the actual environment matches the lock exactly.
 - Any tool upgrade on either machine blocks capture until a new ADR updates the lock.
 - M1-024 PRs are larger but fully declared: two fixture files and six evidence files.
 

@@ -4,7 +4,8 @@
   "status": "LOCKED",
   "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
   "scoped_issues": [
-    "M1-024"
+    "M1-024",
+    "M1-040"
   ],
   "traceability": {
     "github_issue": "#274",
@@ -80,7 +81,7 @@
   },
   "drift_policy": {
     "rule": "FAIL_CLOSED",
-    "statement": "Any OS, architecture, tool, Barrier or protocol version that differs from this lock stops M1-024 capture; only a new Product Owner approved ADR may change this lock."
+    "statement": "Any OS, architecture, tool, Barrier or protocol version that differs from this lock stops every capture scoped by this lock; only a new Product Owner approved ADR may change this lock."
   },
   "m4_first_party_production_toolchain": {
     "status": "UNRESOLVED_UNTIL_M4-001",
