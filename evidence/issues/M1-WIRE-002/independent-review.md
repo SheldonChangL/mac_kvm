@@ -302,6 +302,28 @@ timestamps before the capture window opens:
 - APPROVE: exactly one third bounded attempt; any further retry needs a new review.
 - FINAL: **attempt 3 MAY proceed after all 12.5 checks pass.**
 
+### Attempt-3 preparation progress — 2026-10-06T09:15:07Z
+
+- Fresh baseline direction check passed: macOS role reported a Barrier server listener and
+  Linux role reported a Barrier client process connected to a remote server. No committed
+  address, host name, user name or port value is recorded.
+- Linux package/capture-tool provenance check passed for the installed Ubuntu packages:
+  Barrier 2.4.0+dfsg-2, tcpdump 4.99.1-3ubuntu0.2, wireshark-common/dumpcap 3.6.2-2,
+  xclip 0.13-2 and xdotool 1:3.20160805.1-4. tcpdump and dumpcap reported packet-capture
+  capabilities.
+- macOS Barrier binary hash-chain spot check passed for the installed Barrier 2.4.0-release
+  app binaries: `barriers` SHA-256
+  `2ad6d3b9b9d6dd8cb4bb403cea91f026d896842c5ba0134891daf90f8ef846b5`, `barrierc` SHA-256
+  `53369a4579223e0f8742b897d96b6a9a6c3abc9f6ef9c4fec2779b0ef7bd5715`.
+- SSH remote-forward loopback check passed without changing Linux `sshd_config`: a temporary
+  macOS-initiated SSH session with fail-fast forwarding created a Linux loopback-only remote
+  listener, verified by the Linux socket table, and was then torn down.
+- Remaining before any capture window: re-verify owner configuration backup/restore on both
+  roles, review any private tooling changes for remote-forward role mapping and graceful-only
+  cleanup, record the fixed window duration, and produce `environment.json`/`manual.md`.
+- No capture window has opened. No raw capture, sanitized fixture, register entry, width ADR or
+  `M1-025` unblock is approved.
+
 ### Preparation progress — 2026-10-05T06:18:22Z
 
 - The owner authorized installation of the Linux normal-use tools and temporary pause,
