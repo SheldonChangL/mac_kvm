@@ -21,7 +21,7 @@ EXPECTED_LOCK = {
     "lock_id": "M1-CAPTURE-TOOLCHAIN-001",
     "status": "LOCKED",
     "scope": "M1_CONTROLLED_BARRIER_BLACK_BOX_CAPTURE_ONLY",
-    "scoped_issues": ["M1-024"],
+    "scoped_issues": ["M1-024", "M1-040"],
     "traceability": {
         "github_issue": "#274",
         "adr": "docs/adr/M1-CAPTURE-TOOLCHAIN-001-capture-readiness.md",
@@ -83,7 +83,7 @@ EXPECTED_LOCK = {
         "rule": "FAIL_CLOSED",
         "statement": (
             "Any OS, architecture, tool, Barrier or protocol version that differs "
-            "from this lock stops M1-024 capture; only a new Product Owner approved "
+            "from this lock stops every capture scoped by this lock; only a new Product Owner approved "
             "ADR may change this lock."
         ),
     },

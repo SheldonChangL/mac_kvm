@@ -71,8 +71,8 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 - Raw packet capture 保留在 repository 外，不得提交
 - keyboard-capture.json 只保存有序 direction 與未解讀的 application-payload bytes
 - 不得宣稱 key code 意義、message code、endianness 或相容性
-- M1-040-UNBLOCK-001 未經 Product Owner Accepted 且 toolchain.lock.json 未將 M1-040 列入 scoped_issues 前不得 capture
-- 上列 fixture 與 evidence 路徑由 M1-040-UNBLOCK-001（Proposed）宣告，capture 環境以 toolchain.lock.json（M1-CAPTURE-TOOLCHAIN-001）為準
+- M1-040-UNBLOCK-001 已由 Product Owner Accepted，且 toolchain.lock.json 已將 M1-040 列入 scoped_issues；capture 前仍須確認實際環境與 lock 完全一致
+- 上列 fixture 與 evidence 路徑由 M1-040-UNBLOCK-001（Accepted）宣告，capture 環境以 toolchain.lock.json（M1-CAPTURE-TOOLCHAIN-001）為準
 - 只建立或修改「Exact Files」列出的檔案；其他檔案如需變更，先停止並提出 follow-up。
 - 遵守 E05 與所有 Architecture Guardrails。
 
@@ -149,8 +149,7 @@ make architecture-check
 - 無法寫出會先失敗、能客觀驗證需求的測試。
 - 發現安全、授權、資料隱私或 stuck-input 風險未被規格涵蓋。
 - 沒有指定的實機／權限／對端／憑證環境，不能以 mock 宣稱完成。
-- `docs/adr/M1-040-UNBLOCK-001-keyboard-capture-scope.md` 尚未由 Product Owner Accepted。
-- `toolchain.lock.json` 的 `scoped_issues` 未包含 M1-040，或實際環境與 lock 不一致。
+- 實際 capture 環境與 `toolchain.lock.json` 不一致。
 - Scripted key sequence 未於 capture 前宣告，或會組成可識別文字。
 - 宣告的 fixture 與 evidence 檔案不是來自真實 Linux Barrier Server capture 時，不得宣稱 M1-040 完成。
 

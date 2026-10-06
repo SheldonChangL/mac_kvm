@@ -14,8 +14,8 @@ MANIFEST = PACKAGE_ROOT / "issues_manifest.json"
 INDEX = PACKAGE_ROOT / "issues_index.csv"
 ADR = REPOSITORY_ROOT / "docs/adr/M1-040-UNBLOCK-001-keyboard-capture-scope.md"
 
-# Pinned while M1-040-UNBLOCK-001 is Proposed; only an accepted ADR may change the lock.
-LOCK_SHA256 = "a5d3136d86e25bf7db31d25a22f547a31111c63b0995809b3978ac2a6fec5fc4"
+# Pinned after M1-040-UNBLOCK-001 Product Owner acceptance.
+LOCK_SHA256 = "d9bc1e84dd4d9618c37d1dd6d4600a1ad6a97d8edc464673fb47c2b7f7a3057d"
 
 ORIGINAL_EXACT_FILES = [
     "Tests/SystemTests/Plans/M1-040-barrier-keyboard-fixtures.md",
@@ -39,11 +39,10 @@ REQUIRED_FOCUS = (
     "Raw packet capture 保留在 repository 外，不得提交",
     "keyboard-capture.json 只保存有序 direction 與未解讀的 application-payload bytes",
     "不得宣稱 key code 意義、message code、endianness 或相容性",
-    "M1-040-UNBLOCK-001 未經 Product Owner Accepted 且 toolchain.lock.json 未將 M1-040 列入 scoped_issues 前不得 capture",
+    "M1-040-UNBLOCK-001 已由 Product Owner Accepted，且 toolchain.lock.json 已將 M1-040 列入 scoped_issues；capture 前仍須確認實際環境與 lock 完全一致",
 )
 REQUIRED_STOP_CONDITIONS = (
-    "`docs/adr/M1-040-UNBLOCK-001-keyboard-capture-scope.md` 尚未由 Product Owner Accepted。",
-    "`toolchain.lock.json` 的 `scoped_issues` 未包含 M1-040，或實際環境與 lock 不一致。",
+    "實際 capture 環境與 `toolchain.lock.json` 不一致。",
     "Scripted key sequence 未於 capture 前宣告，或會組成可識別文字。",
     "宣告的 fixture 與 evidence 檔案不是來自真實 Linux Barrier Server capture 時，不得宣稱 M1-040 完成。",
 )
@@ -105,19 +104,22 @@ class M1040KeyboardCaptureScopeTests(unittest.TestCase):
         cls.issue_text = (PACKAGE_ROOT / cls.entry["issue_file"]).read_text(encoding="utf-8")
         cls.adr = ADR.read_text(encoding="utf-8")
 
-    def test_adr_is_proposed_not_accepted(self):
+    def test_adr_is_accepted_and_declares_future_paths(self):
         status = section(self.adr, "Status")
-        self.assertIn("Proposed, pending Product Owner approval", status)
+        self.assertIn("Accepted by Product Owner authorization", status)
         self.assertIn("Issue #282", status)
-        self.assertNotIn("Accepted by", status)
         for path in NEW_EXACT_FILES:
             with self.subTest(path=path):
-                self.assertIn(path, section(self.adr, "Decision (proposed)"))
+                self.assertIn(path, section(self.adr, "Decision"))
 
-    def test_lock_is_not_silently_changed(self):
+    def test_lock_scopes_m1_040_after_acceptance(self):
         self.assertEqual(hashlib.sha256(self.lock_bytes).hexdigest(), LOCK_SHA256)
-        self.assertEqual(self.lock["scoped_issues"], ["M1-024"])
+        self.assertEqual(self.lock["scoped_issues"], ["M1-024", "M1-040"])
         self.assertEqual(self.lock["lock_id"], "M1-CAPTURE-TOOLCHAIN-001")
+        self.assertEqual(
+            self.lock["drift_policy"]["statement"],
+            "Any OS, architecture, tool, Barrier or protocol version that differs from this lock stops every capture scoped by this lock; only a new Product Owner approved ADR may change this lock.",
+        )
 
     def test_no_keyboard_fixture_or_evidence_exists_yet(self):
         self.assertFalse((REPOSITORY_ROOT / FIXTURE_DIR).exists())
@@ -143,14 +145,7 @@ class M1040KeyboardCaptureScopeTests(unittest.TestCase):
 
     def test_m1_040_cannot_be_claimed_complete_before_real_fixture(self):
         blockers = completion_blockers(self.adr, self.lock)
-        self.assertIn("adr not accepted", blockers)
-        self.assertIn("lock does not scope M1-040", blockers)
         self.assertIn(f"missing {FIXTURE_DIR}/keyboard-capture.json", blockers)
-        accepted = self.adr.replace(
-            "Proposed, pending Product Owner approval.", "Accepted by Product Owner.", 1
-        )
-        lock = dict(self.lock, scoped_issues=["M1-024", "M1-040"])
-        blockers = completion_blockers(accepted, lock)
         self.assertNotIn("adr not accepted", blockers)
         self.assertNotIn("lock does not scope M1-040", blockers)
         self.assertIn(f"missing {FIXTURE_DIR}/keyboard-capture.json", blockers)
