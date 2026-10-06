@@ -9,8 +9,9 @@ A second attempt was proposed in `discrimination-plan.md` section 11, independen
 for one bounded attempt, and stopped during pre-window checks before capture opened. See
 "Attempt 2 (pre-window stop)" below.
 
-A third attempt is proposed in `discrimination-plan.md` section 12. It is NOT approved and
-NOT started. See "Attempt 3 preparation" below.
+A third attempt was proposed in `discrimination-plan.md` section 12, independently approved
+for one bounded attempt, and executed. It stopped with a non-discriminating
+`STOP-BOTH-SUCCEED` result. See "Attempt 3 (non-discriminating stop)" below.
 
 ## Attempt 1 (historical)
 
@@ -61,18 +62,24 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   approval.
 - `M1-025` remains blocked until accepted discriminating evidence exists.
 
-## Attempt 3 preparation
+## Attempt 3 (non-discriminating stop)
 
 - Plan: `discrimination-plan.md` section 12 (repository documentation only).
-- Attempt 3 requires a new independent Checkpoint 1 decision recorded in
-  `independent-review.md` before any pre-window check, capture, SSH evidence configuration or
-  disposable cleartext leg starts.
-- Proposed baseline: the observed owner normal-use direction, macOS Barrier server to Linux
-  Barrier client. The evidence topology would use a macOS-initiated SSH remote forward so the
-  only captured cleartext leg remains on Linux loopback between the Linux Barrier client and
-  the Linux remote-forward listener.
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-06T09:13:06Z`, approving one third bounded attempt only after all section 12.5
+  pre-window checks pass.
+- Pre-window checks recorded in `independent-review.md` passed for baseline direction, Linux
+  package/capture capabilities, macOS Barrier binary hashes and SSH remote-forward loopback.
+- Runtime result: `STOP-BOTH-SUCCEED`.
+- Meaning: the complete sanitized attempt-3 streams were analyzed by the approved
+  `walk(S, 4)` and `walk(S, 2)` predicates, and both readings succeeded on every stream.
+  Therefore the attempt did not discriminate the length-prefix width.
+- Sanitized stop evidence: `attempt3/sanitized.json`.
+- Consequence: STOP after sanitizer analysis. No accepted fixture, register entry, width ADR
+  or `M1-025` unblock was produced for attempt 3.
 - Unchanged boundaries: attempts 1 and 2 remain stopped; no Windows, no Barrier or Deskflow
   source, no production Swift, no MacKVM production TLS or default change, no byte prediction,
   no capture before reviewer approval, and no `M1-025` unblock without accepted
   discriminating evidence.
-- No capture, fixture, register entry or ADR has been produced for attempt 3.
+- Raw capture remains on `role-capture` pending independent Checkpoint 2 re-derivation and
+  deletion review. Raw capture is not committed.
