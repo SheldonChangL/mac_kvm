@@ -146,6 +146,89 @@ FINAL: **capture MAY proceed for one bounded attempt after all pre-window checks
 
 Status: **NOT STARTED**. Raw data must not be deleted until this section records an independent reproduction on the capture host.
 
+## Checkpoint 1 addendum — second-attempt plan review
+
+- Reviewed at: `2026-10-06T09:00:59Z`
+- Plan commit reviewed: `60cb8b71a4c2a561e4295982ee843e9047b92c2e`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 11
+- Verdict: **APPROVED FOR ONE SECOND BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 11 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. `M1-025` remains blocked until accepted discriminating evidence is
+registered and independently reviewed.
+
+### Five-axis section-11 review
+
+1. **Source validity / traceability — APPROVED.** Attempt 1 remains preserved as stopped
+   evidence and is not reused as capture input. The consumed attempt-1 approval, the
+   `client-not-connected` stop label, and the absence of accepted width evidence are all kept
+   visible. Section 11 correctly requires this new approval before any attempt-2 pre-window
+   check, capture, SSH session or evidence configuration starts.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no byte, message, layout, chunking or width prediction.
+3. **Security, fail-safe and compatibility — APPROVED.** MacKVM production TLS and fail-closed
+   defaults remain unchanged. The owner-confirmed normal-use session is allowed only as a
+   baseline; it is not captured as-is. Any attempt-2 evidence configuration must still satisfy
+   the section 6 topology, loopback-only endpoints, SSH-forward fail-fast, raw locality,
+   sanitizer, privacy scan and bounded deletion rules.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** The fixed
+   section 4 predicate, section 5 completeness preconditions and FIN-in-both-directions
+   requirement still govern the outcome. A connection success, a long candidate length, or a
+   completed non-discriminating run still does not unblock `M1-025`.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation that prepares a second attempt. It adds no fixture, ADR, register entry or raw
+   artifact. A third attempt is explicitly disallowed without another plan amendment and
+   another independent approval.
+
+### Required attempt-2 pre-window checks
+
+Attempt 2 may proceed only if every section 11.4 check passes and is recorded with UTC
+timestamps before the capture window opens:
+
+- this approval exists and predates the check;
+- the baseline direction is verified as Linux Barrier server to macOS Barrier client; if the
+  direction is the attempt-1 restoration direction, STOP before the window opens;
+- all section 6 validity checks are re-run in full, including OS versions, Linux package
+  provenance, macOS official-DMG-to-installed-binary hash chain, capture tool capability,
+  sanitizer identity, generator identity, UTC clocks, loopback-only capture filter,
+  SSH-forward-only inter-host leg, loopback-only bindings and SSH forward fail-fast;
+- owner configuration backup and restore procedures are re-verified on both roles;
+- the fixed maximum window duration and graceful-only stop/timeout wrappers are recorded
+  unchanged, or any change is brought back for review before execution.
+
+### Reviewer decision for section 11
+
+- APPROVE: attempt 1 is preserved unchanged and is not reused as capture input.
+- APPROVE: the owner-confirmed Linux-server to macOS-client session is an acceptable
+  normal-use baseline, and the recorded direction discrepancy is handled by fresh check 11.4(2).
+- APPROVE: sections 1–10 boundaries apply unchanged: no Windows, no source, no production
+  Swift, no production TLS or default change, no byte prediction.
+- APPROVE: the 11.4 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one second bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 2 MAY proceed after all 11.4 checks pass.**
+
+### Attempt-2 pre-window result — 2026-10-06T09:02:48Z
+
+- The reviewer performed the first fresh section 11.4 pre-window check against the Linux role
+  over the owner-authorized SSH access.
+- Result: **STOP before the capture window opened**.
+- Fixed stop label: `baseline-direction-mismatch`.
+- Evidence: the Linux role reported a running Barrier client process connected to a remote
+  server. Section 11.4(2) required the baseline to be Linux Barrier server to macOS Barrier
+  client. The observed direction therefore matched the attempt-1 restoration direction, not
+  the approved section-11 baseline.
+- No capture window was opened. No SSH evidence configuration, disposable cleartext leg,
+  tcpdump/dumpcap capture, raw file, sanitized fixture, register entry or width ADR was
+  produced for attempt 2.
+- `M1-025` remains blocked. A further retry requires a new plan amendment and a new
+  independent approval; it is not authorized by this section-11 approval.
+
 ### Preparation progress — 2026-10-05T06:18:22Z
 
 - The owner authorized installation of the Linux normal-use tools and temporary pause,
