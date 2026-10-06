@@ -1,9 +1,11 @@
 # M1-WIRE-002 Discrimination Plan (capture preparation only)
 
 GitHub Issue #279. Current status: **attempt 1 STOPPED (`client-not-connected`,
-2026-10-05T07:09:55Z); the attempt-1 approval is consumed; a second attempt is proposed in
-section 11 and is NOT approved.** No capture, SSH session or Barrier evidence configuration
-may start for attempt 2 until the independent reviewer records a new approval for section 11.
+2026-10-05T07:09:55Z); attempt 2 STOPPED during pre-window check
+(`baseline-direction-mismatch`, 2026-10-06T09:02:48Z); both approvals are consumed; a third
+attempt is proposed in section 12 and is NOT approved.** No capture, SSH session or Barrier
+evidence configuration may start for attempt 3 until the independent reviewer records a new
+approval for section 12.
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -483,4 +485,155 @@ Reviewer (not the capture author) records the decision in `independent-review.md
       stops before the window opens.
 - [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
 - [ ] FINAL: attempt 2 MAY proceed after all 11.4 checks pass / attempt 2 MUST NOT proceed
+      (`M1-025` stays blocked).
+
+## 12. Amended third-attempt plan (proposed, pending independent review)
+
+Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
+records no capture, fixture, register entry, ADR or width.
+
+### 12.1 Attempts 1 and 2 are preserved as stopped
+
+- Attempt 1 ran under the 2026-10-05T00:00:44Z re-approval and stopped at the required runtime
+  connection gate with fixed label `client-not-connected` (2026-10-05T07:09:55Z). Its 24-byte
+  header-only raw file is not analyzed and is not an input to attempt 3.
+- Attempt 2 ran only to the section 11.4 pre-window baseline check and stopped before the
+  capture window opened with fixed label `baseline-direction-mismatch`
+  (2026-10-06T09:02:48Z). No SSH evidence configuration, disposable cleartext leg, raw
+  capture, fixture, register entry or width ADR was produced.
+- Both stops remain valid final results for their attempts. This amendment does not rewrite,
+  reinterpret or reuse them as capture input.
+- Section 11's Linux-server to macOS-client baseline is not rescued or retried. Section 12 is
+  a new bounded experiment based only on the observed normal-use direction from the attempt-2
+  pre-window check: macOS Barrier server to Linux Barrier client. No Barrier or Deskflow source
+  or source-derived material is used.
+
+### 12.2 Why a new reviewer approval is required
+
+- Section 11 approved exactly one second bounded attempt and explicitly said any further retry
+  requires another plan amendment and another independent approval. That approval was consumed
+  by the `baseline-direction-mismatch` stop.
+- Section 8 says a stop is not bypassed by changing the plan after the fact. Attempt 3 is
+  therefore a new bounded experiment, not a continuation of attempts 1 or 2.
+- Required ordering: the reviewer (not the capture author) records a Checkpoint 1 decision for
+  this section in `independent-review.md`, with a UTC timestamp later than this amendment's
+  commit and earlier than any attempt-3 pre-window check. Without that record, attempt 3 MUST
+  NOT start.
+
+### 12.3 Third-attempt baseline and topology
+
+Attempt 3 may use the observed owner normal-use direction, macOS Barrier server to Linux
+Barrier client, only after the fresh pre-window checks in 12.5 pass.
+
+Roles for attempt 3:
+
+- `role-server`: macOS host. It runs the Barrier server in the disposable evidence
+  configuration. No capture runs on macOS.
+- `role-client == role-capture`: Linux host. It runs the Barrier client, the capture tool and
+  the raw/sanitization workflow. Raw capture data stays on this host.
+
+Legs for attempt 3:
+
+- **Captured cleartext leg (Linux loopback):** the Linux Barrier client connects to a Linux
+  loopback remote-forward listener served by the Linux SSH daemon. This is the only leg that is
+  captured and analyzed.
+- **Encrypted inter-host leg:** a macOS-initiated SSH session to the Linux host carries the
+  remote forward. Barrier traffic between hosts exists only inside this SSH channel.
+- **Uncaptured cleartext leg (macOS loopback):** the macOS SSH client remote-forward exit
+  connects to the macOS Barrier server at a loopback destination only. This leg is not captured
+  or analyzed.
+
+The evidence configuration must not modify Linux `sshd_config`. If remote forwarding is not
+allowed, the listener is not loopback-only, the macOS destination is not loopback-only, or the
+SSH session cannot be configured fail-fast, STOP before the capture window opens.
+
+The owner session is never captured as-is. Barrier cleartext is permitted only inside the
+disposable evidence configuration on the two host-local loopback legs above. The owner's own
+configuration is backed up before attempt 3 and restored afterwards, with each step recorded.
+
+### 12.4 Mapping of sections 1–10 under attempt 3
+
+Sections 1–10 remain in force unless this section explicitly remaps a role or leg:
+
+- Sections 1 and 8: Linux/macOS only; no Windows; no Barrier or Deskflow source,
+  source-derived writeup, decompiled or instrumented material; no production Swift; MacKVM
+  production TLS stays enabled and fail-closed, and no MacKVM configuration, code or default
+  changes.
+- Section 3: the deterministic synthetic generator remains on the macOS host. The normal-use
+  data path becomes macOS clipboard -> Barrier server -> macOS loopback -> SSH remote forward
+  -> Linux loopback -> Barrier client. Only generator metadata is committed.
+- Section 4.1: the in-scope connection is the complete ordered application byte stream per
+  direction on the Linux loopback leg between the Barrier client and the remote-forward
+  listener. Packet, read, run and capture-tool record boundaries still carry no frame meaning.
+- Sections 4.2 and 4.3: the `walk(S, 4)` and `walk(S, 2)` predicate is unchanged. Both
+  readings receive identical complete bytes. Exactly one success is required; both-success,
+  both-fail or incomplete results STOP.
+- Section 5: FIN in both directions remains required; RST does not qualify. The in-scope
+  connection is identified by Linux loopback interface plus a documented remote-forward
+  listener port placeholder. Cherry-picking is not allowed.
+- Section 6 validity checks are remapped to the roles above. Linux provenance applies to the
+  official Ubuntu Barrier client binary. macOS provenance applies to the official upstream DMG
+  hash chain, with `barriers` as the server binary of interest and the recorded CLI
+  `--version` limitation still disclosed.
+- The sanitizer and privacy scan keep the same allowlist policy. Any change from a "server
+  port" placeholder to a "remote-forward listener port" placeholder is a sanitizer identity
+  change that must be listed for reviewer approval before execution.
+
+### 12.5 Fresh pre-window checks for attempt 3
+
+All of the following are performed fresh for attempt 3 and recorded with UTC timestamps in
+`environment.json` and `manual.md` before the capture window opens. Results from attempts 1 or
+2 do not satisfy any of them. Any failure is a STOP before the window opens, and no capture
+starts.
+
+1. The new reviewer approval for section 12 exists and its timestamp precedes this check.
+2. Baseline session check: on the unmodified owner session, the macOS role runs the Barrier
+   server, the Linux role runs the Barrier client, and the product reports the client as
+   connected. Only process names and product connection status are recorded; no address,
+   host name, user name or port value is written to committed files.
+3. All role-remapped section 6 validity checks are re-run in full: OS versions, Linux package
+   provenance, macOS official-DMG-to-binary hash chain and bundle version `2.4.0-release`,
+   capture tool and non-root capability, sanitizer version and SHA-256, generator recipe and
+   version, UTC clocks, the Linux-loopback capture filter, SSH-only inter-host leg,
+   loopback-only bindings on the Linux remote-forward listener and macOS forward destination,
+   and SSH forward fail-fast.
+4. Linux SSH daemon policy is checked without changing it. If remote forwarding is unavailable
+   or cannot be made loopback-only without configuration changes, STOP.
+5. The owner configuration backup and restore procedure on both roles is re-verified before
+   the baseline session is paused.
+6. The fixed maximum window duration and the graceful-only stop and timeout wrappers are
+   recorded. Any private tooling change caused by switching from local forward to remote
+   forward, changing roles, changing port-placeholder meaning, or changing capture filters
+   must be listed for reviewer approval before execution. Unreviewed tooling MUST NOT run.
+
+### 12.6 Attempt-3 limits and outcome handling
+
+- Exactly one bounded attempt. The runtime connection through the evidence configuration must
+  succeed once inside the window; if it does not, STOP with a fixed label, restore the owner
+  session, and record the result. A fourth attempt requires another plan amendment and another
+  independent approval.
+- Attempt 3 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+  `BARRIER-EVID-0001`, `BARRIER-EVID-0002` and the `M1-WIRE-001` ADR stay unchanged.
+- `M1-025` stays blocked until a register entry with accepted, independently reviewed
+  discriminating width evidence exists. A connection success, a long candidate length, or a
+  completed attempt without exactly one surviving reading does not unblock it.
+
+### 12.7 Reviewer decision for section 12
+
+Reviewer (not the capture author) records the decision in `independent-review.md`:
+
+- [ ] APPROVE / [ ] REJECT: attempts 1 and 2 are preserved unchanged and are not reused as
+      capture input.
+- [ ] APPROVE / [ ] REJECT: the observed macOS-server to Linux-client direction is an
+      acceptable normal-use baseline for a new bounded experiment.
+- [ ] APPROVE / [ ] REJECT: the remote-forward topology keeps the only captured cleartext leg
+      on Linux loopback, keeps inter-host traffic inside SSH, and requires loopback-only
+      bindings on both hosts.
+- [ ] APPROVE / [ ] REJECT: sections 1–10 boundaries apply unchanged except for the explicit
+      role and leg remapping in 12.4.
+- [ ] APPROVE / [ ] REJECT: the 12.5 fresh pre-window checks are complete and each failure
+      stops before the window opens.
+- [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
+- [ ] FINAL: attempt 3 MAY proceed after all 12.5 checks pass / attempt 3 MUST NOT proceed
       (`M1-025` stays blocked).

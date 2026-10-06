@@ -9,6 +9,9 @@ A second attempt was proposed in `discrimination-plan.md` section 11, independen
 for one bounded attempt, and stopped during pre-window checks before capture opened. See
 "Attempt 2 (pre-window stop)" below.
 
+A third attempt is proposed in `discrimination-plan.md` section 12. It is NOT approved and
+NOT started. See "Attempt 3 preparation" below.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -57,3 +60,19 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   MacKVM production TLS or default change, no byte prediction, and no capture before reviewer
   approval.
 - `M1-025` remains blocked until accepted discriminating evidence exists.
+
+## Attempt 3 preparation
+
+- Plan: `discrimination-plan.md` section 12 (repository documentation only).
+- Attempt 3 requires a new independent Checkpoint 1 decision recorded in
+  `independent-review.md` before any pre-window check, capture, SSH evidence configuration or
+  disposable cleartext leg starts.
+- Proposed baseline: the observed owner normal-use direction, macOS Barrier server to Linux
+  Barrier client. The evidence topology would use a macOS-initiated SSH remote forward so the
+  only captured cleartext leg remains on Linux loopback between the Linux Barrier client and
+  the Linux remote-forward listener.
+- Unchanged boundaries: attempts 1 and 2 remain stopped; no Windows, no Barrier or Deskflow
+  source, no production Swift, no MacKVM production TLS or default change, no byte prediction,
+  no capture before reviewer approval, and no `M1-025` unblock without accepted
+  discriminating evidence.
+- No capture, fixture, register entry or ADR has been produced for attempt 3.
