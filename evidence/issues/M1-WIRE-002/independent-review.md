@@ -324,6 +324,25 @@ timestamps before the capture window opens:
 - No capture window has opened. No raw capture, sanitized fixture, register entry, width ADR or
   `M1-025` unblock is approved.
 
+### Attempt-3 runtime result — 2026-10-06T09:15Z
+
+- One bounded attempt-3 capture window was opened after the section 12 approval and the
+  pre-window checks above.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `4199`, with SHA-256
+  `778143c8feadf9c119d599222fa0a864069ae61ca0a4ff1efafca91a77681f26`. Raw capture was not
+  copied into the repository.
+- The approved stream analyzer was copied to `role-capture` and run there. Only the sanitized
+  JSON output was copied back into the repository.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt3/sanitized.json`, byte length
+  `20077`, SHA-256 `cf781d4fdee3e97d633d3c74c28f4737300e8cf1553af9e2d1d627ba9755cbd3`.
+- Analyzer result: `STOP-BOTH-SUCCEED`. The capture reconstructed one complete connection with
+  `client-to-server` and `server-to-client` streams. Both `walk(S, 4)` and `walk(S, 2)`
+  succeeded on every stream.
+- This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+- Raw deletion was not performed in this change because independent Checkpoint 2 re-derivation
+  and deletion review are not complete.
+
 ### Preparation progress — 2026-10-05T06:18:22Z
 
 - The owner authorized installation of the Linux normal-use tools and temporary pause,
