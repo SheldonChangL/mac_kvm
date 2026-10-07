@@ -2,10 +2,11 @@
 
 GitHub Issue #279. Current status: **attempt 1 STOPPED (`client-not-connected`,
 2026-10-05T07:09:55Z); attempt 2 STOPPED during pre-window check
-(`baseline-direction-mismatch`, 2026-10-06T09:02:48Z); both approvals are consumed; a third
-attempt is proposed in section 12 and is NOT approved.** No capture, SSH session or Barrier
-evidence configuration may start for attempt 3 until the independent reviewer records a new
-approval for section 12.
+(`baseline-direction-mismatch`, 2026-10-06T09:02:48Z); attempt 3 STOPPED after sanitizer
+analysis (`STOP-BOTH-SUCCEED`, 2026-10-06T09:15Z); all three approvals are consumed; a fourth
+attempt is proposed in section 13 and is NOT approved.** No capture, SSH session or Barrier
+evidence configuration may start for attempt 4 until the independent reviewer records a new
+approval for section 13.
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -636,4 +637,186 @@ Reviewer (not the capture author) records the decision in `independent-review.md
       stops before the window opens.
 - [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
 - [ ] FINAL: attempt 3 MAY proceed after all 12.5 checks pass / attempt 3 MUST NOT proceed
+      (`M1-025` stays blocked).
+
+## 13. Amended fourth-attempt plan (proposed, pending independent review)
+
+Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
+records no capture, fixture, register entry, ADR or width.
+
+### 13.1 Attempts 1 through 3 are preserved as stopped
+
+- Attempt 1 stopped at the required runtime connection gate with fixed label
+  `client-not-connected` (2026-10-05T07:09:55Z). It produced no analyzable stream and is not an
+  input to attempt 4.
+- Attempt 2 stopped before the capture window opened with fixed label
+  `baseline-direction-mismatch` (2026-10-06T09:02:48Z). It produced no raw capture, fixture,
+  register entry or width ADR and is not an input to attempt 4.
+- Attempt 3 opened one bounded capture window and produced sanitized stop evidence with result
+  `STOP-BOTH-SUCCEED`. It is accepted only as non-discriminating stop evidence. It produced no
+  fixture, register entry, width ADR or `M1-025` unblock.
+- Attempt 3 raw cleanup source is currently unavailable on `role-capture`: the previously
+  recorded raw and sanitizer working files under the attempt-3 temporary directory were not
+  present when rechecked. This plan does not treat Checkpoint 2 re-derivation or deletion as
+  complete. If those files are later restored, they must be reviewed under the Checkpoint 2
+  rules for attempt 3; otherwise the loss remains a recorded evidence-handling limitation.
+- This amendment does not rewrite, reinterpret or reuse attempts 1 through 3 as capture input.
+  A fourth attempt is a new bounded experiment based only on the current observed normal-use
+  direction and the unchanged section 4 predicate.
+
+### 13.2 Why a new reviewer approval is required
+
+- Section 12 approved exactly one third bounded attempt and explicitly said any fourth attempt
+  requires another plan amendment and another independent approval. That approval was consumed
+  by the `STOP-BOTH-SUCCEED` result.
+- Section 8 says a stop is not bypassed by changing the plan after the fact. Attempt 4 is
+  therefore a new bounded experiment, not a continuation of attempt 3.
+- Required ordering: the reviewer (not the capture author) records a Checkpoint 1 decision for
+  this section in `independent-review.md`, with a UTC timestamp later than this amendment's
+  commit and earlier than any attempt-4 pre-window check. Without that record, attempt 4 MUST
+  NOT start.
+
+### 13.3 Fourth-attempt baseline and discriminating trigger
+
+Attempt 4 may use the currently observed owner normal-use direction, macOS Barrier server to
+Linux Barrier client, only after the fresh pre-window checks in 13.6 pass.
+
+The attempt-3 sanitized streams were complete but too small to discriminate: both `walk(S, 4)`
+and `walk(S, 2)` succeeded on every stream. Attempt 4 therefore adds a predeclared
+normal-use trigger whose purpose is to verify that synthetic clipboard payload actually crosses
+the Barrier connection during the bounded capture window. This is a causal trigger, not a byte
+or width prediction.
+
+The trigger is:
+
+1. create deterministic, synthetic, non-personal UTF-8 clipboard text on the macOS server;
+2. place that value on the macOS system clipboard by normal OS clipboard APIs;
+3. move Barrier focus to the Linux client using normal product interaction;
+4. request the Linux clipboard through normal Linux desktop clipboard APIs;
+5. record only metadata: size, SHA-256, UTC step times and whether the Linux-side hash matched
+   the generated value.
+
+The generated value and Linux-side clipboard material are temporary evidence data. They are
+not committed, not copied into the repository, and are deleted or cleared during cleanup. A
+hash match is required only to prove that the normal-use trigger occurred; it is not evidence
+of any prefix width. If the Linux-side clipboard request cannot retrieve the synthetic value
+without product modification, source-code inspection, packet injection, instrumentation or
+non-normal Barrier behavior, STOP before analyzing for width.
+
+### 13.4 Topology for attempt 4
+
+Roles for attempt 4:
+
+- `role-server`: macOS host. It runs the Barrier server in the disposable evidence
+  configuration and creates the synthetic clipboard value. No capture runs on macOS.
+- `role-client == role-capture`: Linux host. It runs the Barrier client, the capture tool, the
+  Linux clipboard request and the raw/sanitization workflow. Raw capture data stays on this
+  host.
+
+Legs for attempt 4 are the same role-remapped legs as section 12:
+
+- **Captured cleartext leg (Linux loopback):** the Linux Barrier client connects to a Linux
+  loopback remote-forward listener served by the Linux SSH daemon. This is the only leg that is
+  captured and analyzed.
+- **Encrypted inter-host leg:** a macOS-initiated SSH session to the Linux host carries the
+  remote forward. Barrier traffic between hosts exists only inside this SSH channel.
+- **Uncaptured cleartext leg (macOS loopback):** the macOS SSH client remote-forward exit
+  connects to the macOS Barrier server at a loopback destination only. This leg is not captured
+  or analyzed.
+
+The evidence configuration must not modify Linux `sshd_config`. If remote forwarding is not
+allowed, the listener is not loopback-only, the macOS destination is not loopback-only, or the
+SSH session cannot be configured fail-fast, STOP before the capture window opens.
+
+### 13.5 Mapping of sections 1–10 under attempt 4
+
+Sections 1–10 remain in force unless this section explicitly remaps a role, leg or trigger:
+
+- Sections 1 and 8: Linux/macOS only; no Windows; no Barrier or Deskflow source,
+  source-derived writeup, decompiled or instrumented material; no production Swift; MacKVM
+  production TLS stays enabled and fail-closed, and no MacKVM configuration, code or default
+  changes.
+- Section 3: the deterministic synthetic generator remains on the macOS host. The normal-use
+  data path is macOS clipboard -> Barrier server -> macOS loopback -> SSH remote forward ->
+  Linux loopback -> Barrier client -> Linux clipboard request. Only generator and hash
+  metadata is committed.
+- Section 4.1: the in-scope connection is the complete ordered application byte stream per
+  direction on the Linux loopback leg between the Barrier client and the remote-forward
+  listener. Packet, read, run and capture-tool record boundaries still carry no frame meaning.
+- Sections 4.2 and 4.3: the `walk(S, 4)` and `walk(S, 2)` predicate is unchanged. Both
+  readings receive identical complete bytes. Exactly one success is required; both-success,
+  both-fail or incomplete results STOP.
+- Section 5: FIN in both directions remains required; RST does not qualify. The in-scope
+  connection is identified by Linux loopback interface plus a documented remote-forward
+  listener port placeholder. Cherry-picking is not allowed.
+- Section 6 validity checks are remapped to the roles above. Linux provenance applies to the
+  official Ubuntu Barrier client binary plus the Linux clipboard request tool. macOS provenance
+  applies to the official upstream DMG hash chain, with `barriers` as the server binary of
+  interest and the recorded CLI `--version` limitation still disclosed.
+- The sanitizer and privacy scan keep the same allowlist policy. The Linux clipboard hash and
+  generated value metadata are evidence metadata only and are not parsed as protocol bytes.
+
+### 13.6 Fresh pre-window checks for attempt 4
+
+All of the following are performed fresh for attempt 4 and recorded with UTC timestamps in
+`environment.json` and `manual.md` before the capture window opens. Results from attempts 1,
+2 or 3 do not satisfy any of them. Any failure is a STOP before the window opens, and no
+capture starts.
+
+1. The new reviewer approval for section 13 exists and its timestamp precedes this check.
+2. Baseline session check: on the unmodified owner session, the macOS role runs the Barrier
+   server, the Linux role runs the Barrier client, and the product reports the client as
+   connected. Only process names and product connection status are recorded; no address,
+   host name, user name or port value is written to committed files.
+3. All role-remapped section 6 validity checks are re-run in full: OS versions, Linux package
+   provenance, macOS official-DMG-to-binary hash chain and bundle version `2.4.0-release`,
+   capture tool and non-root capability, sanitizer version and SHA-256, generator recipe and
+   version, Linux clipboard request tool identity, UTC clocks, the Linux-loopback capture
+   filter, SSH-only inter-host leg, loopback-only bindings on the Linux remote-forward listener
+   and macOS forward destination, and SSH forward fail-fast.
+4. Linux SSH daemon policy is checked without changing it. If remote forwarding is unavailable
+   or cannot be made loopback-only without configuration changes, STOP.
+5. The owner configuration backup and restore procedure on both roles is re-verified before
+   the baseline session is paused.
+6. The fixed maximum window duration, synthetic clipboard size ladder, graceful-only stop and
+   timeout wrappers, and clipboard cleanup steps are recorded. Any private tooling change
+   caused by the clipboard trigger, remote-forward role mapping, port-placeholder meaning, or
+   capture filters must be listed for reviewer approval before execution. Unreviewed tooling
+   MUST NOT run.
+
+### 13.7 Attempt-4 limits and outcome handling
+
+- Exactly one bounded attempt. The runtime connection through the evidence configuration must
+  succeed once inside the window, and the Linux clipboard request must retrieve the generated
+  value by hash. If either condition does not hold, STOP with a fixed label, restore the owner
+  session, and record the result.
+- Attempt 4 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+  `BARRIER-EVID-0001`, `BARRIER-EVID-0002` and the `M1-WIRE-001` ADR stay unchanged.
+- `M1-025` stays blocked until a register entry with accepted, independently reviewed
+  discriminating width evidence exists. A connection success, a clipboard hash match, a long
+  candidate length, or a completed attempt without exactly one surviving reading does not
+  unblock it.
+
+### 13.8 Reviewer decision for section 13
+
+Reviewer (not the capture author) records the decision in `independent-review.md`:
+
+- [ ] APPROVE / [ ] REJECT: attempts 1 through 3 are preserved unchanged and are not reused as
+      capture input.
+- [ ] APPROVE / [ ] REJECT: the attempt-3 raw cleanup limitation is disclosed and does not
+      masquerade as a completed Checkpoint 2 result.
+- [ ] APPROVE / [ ] REJECT: the observed macOS-server to Linux-client direction is an
+      acceptable normal-use baseline for a new bounded experiment.
+- [ ] APPROVE / [ ] REJECT: the clipboard trigger is normal product use, records only metadata,
+      and predicts no byte, frame, message, chunking or width result.
+- [ ] APPROVE / [ ] REJECT: the remote-forward topology keeps the only captured cleartext leg
+      on Linux loopback, keeps inter-host traffic inside SSH, and requires loopback-only
+      bindings on both hosts.
+- [ ] APPROVE / [ ] REJECT: sections 1–10 boundaries apply unchanged except for the explicit
+      role, leg and trigger remapping in 13.5.
+- [ ] APPROVE / [ ] REJECT: the 13.6 fresh pre-window checks are complete and each failure
+      stops before the window opens.
+- [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
+- [ ] FINAL: attempt 4 MAY proceed after all 13.6 checks pass / attempt 4 MUST NOT proceed
       (`M1-025` stays blocked).
