@@ -577,6 +577,64 @@ timestamps before the capture window opens:
 - This is a source-validity stop before analyzable stream construction. No accepted fixture,
   register entry, width ADR or `M1-025` unblock is approved.
 
+## Checkpoint 1 addendum — sixth-attempt plan review
+
+- Reviewed at: `2026-10-07T04:45:04Z`
+- Plan commit reviewed: `18defbdb72d1`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 15
+- Verdict: **APPROVED FOR ONE SIXTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 15 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock.
+
+### Five-axis section-15 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 5 remain preserved as
+   stopped evidence and are not reused as capture input. The large-config path uses a
+   disposable normal Barrier configuration only; no Barrier or Deskflow source, source-derived
+   writeup, decompiled output, instrumentation, or byte prediction is used.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking or width claim.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS and fail-closed defaults
+   remain unchanged. Barrier cleartext remains bounded to host-local loopback legs and SSH
+   carries inter-host traffic. Synthetic config labels are non-personal and temporary.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; both-succeed, both-fail, incomplete, sanitizer mismatch,
+   config rejection or non-reproducible results stop the issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation preparing a sixth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. Any seventh attempt requires a new amendment and review.
+
+FINAL: **attempt 6 MAY proceed after all 15.5 checks pass.**
+
+### Attempt-6 runtime result — 2026-10-07T04:47Z
+
+- One bounded attempt-6 capture window was opened after the section 15 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `2561`, with SHA-256
+  `57a6299efa5b0de97ea10daf86ae3be1709a546bcf88108d31bff9a2405ffbe2`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `27 packets captured`, `54 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The synthetic config contained `3000` synthetic screens, byte length `849708`, and SHA-256
+  `a6fd0eb521adc7d188e6a76218edc3ff649868fef9d371e77abc31051ebd1746`.
+- Runtime connection succeeded, but the large config did not produce a large captured
+  application stream.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt6/sanitized.json`, byte length
+  `15085`, SHA-256 `2907fbda2b8e7d25e2cd005ce821214c1506831bae3a38b9d1fe66be25af195c`.
+- Analyzer result: `STOP-BOTH-SUCCEED`. The capture reconstructed one complete connection with
+  FIN observed in both directions and no RST. The `client-to-server` stream length was `120`
+  bytes and the `server-to-client` stream length was `187` bytes. Both `walk(S, 4)` and
+  `walk(S, 2)` succeeded on every stream.
+- This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.

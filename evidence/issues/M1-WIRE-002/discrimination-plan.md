@@ -4,10 +4,11 @@ GitHub Issue #279. Current status: **attempt 1 STOPPED (`client-not-connected`,
 2026-10-05T07:09:55Z); attempt 2 STOPPED during pre-window check
 (`baseline-direction-mismatch`, 2026-10-06T09:02:48Z); attempt 3 STOPPED after sanitizer
 analysis (`STOP-BOTH-SUCCEED`, 2026-10-06T09:15Z); attempt 4 STOPPED after sanitizer analysis
-(`STOP-BOTH-SUCCEED`, 2026-10-07T00:48Z); all four approvals are consumed; a fifth attempt is
-proposed in section 14 and is NOT approved.** No capture, SSH session or Barrier evidence
-configuration may start for attempt 5 until the independent reviewer records a new approval for
-section 14.
+(`STOP-BOTH-SUCCEED`, 2026-10-07T00:48Z); attempt 5 STOPPED before analyzable stream
+construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); all five approvals are
+consumed; a sixth attempt is proposed in section 15 and is NOT approved.** No capture, SSH
+session or Barrier evidence configuration may start for attempt 6 until the independent
+reviewer records a new approval for section 15.
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -1005,3 +1006,83 @@ Reviewer (not the capture author) records the decision in `independent-review.md
 - [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
 - [ ] FINAL: attempt 5 MAY proceed after all 14.6 checks pass / attempt 5 MUST NOT proceed
       (`M1-025` stays blocked).
+
+## 15. Amended sixth-attempt plan (proposed, pending independent review)
+
+Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
+records no capture, fixture, register entry, ADR or width.
+
+### 15.1 Attempts 1 through 5 are preserved as stopped
+
+- Attempts 1 through 5 remain valid final results for their attempts and are not reused as
+  capture input.
+- Attempt 5 proved that the advertised file-transfer options are not usable in this Barrier
+  2.4.0 runtime path: both roles stopped with `setDropTarget not implemented`, no in-scope
+  packet was captured, and no sanitized artifact was produced.
+
+### 15.2 Why a new reviewer approval is required
+
+- Section 14 approved exactly one fifth bounded attempt and said any further retry requires
+  another plan amendment and another independent approval. That approval was consumed by the
+  attempt-5 stop.
+- Required ordering: the reviewer records a Checkpoint 1 decision for this section in
+  `independent-review.md`, with a UTC timestamp later than this amendment's commit and earlier
+  than any attempt-6 pre-window check. Without that record, attempt 6 MUST NOT start.
+
+### 15.3 Sixth-attempt evidence strategy
+
+Attempt 6 may use a disposable, synthetic Barrier server configuration containing many
+synthetic screen entries, aliases and links. This is a normal Barrier configuration input, not
+source inspection, packet injection, instrumentation or patched binary behavior.
+
+The evidence hypothesis is narrow: a larger normal server configuration may produce larger or
+differently structured handshake/configuration streams than clipboard sharing. This is only a
+causal hypothesis. It predicts no byte, message, frame count, chunking behavior or prefix
+width.
+
+The trigger is:
+
+1. generate a deterministic disposable config on the macOS server role;
+2. include the real client screen label plus many synthetic non-personal screen labels,
+   aliases and links;
+3. start the disposable macOS Barrier server with this config;
+4. connect the Linux Barrier client through the existing Linux-loopback remote-forward capture
+   topology;
+5. record only metadata: config size, SHA-256, synthetic screen count and whether the client
+   connected.
+
+If Barrier rejects the config, truncates names, refuses connection, crashes, requires source
+inspection, requires patched binaries, or needs product behavior outside normal config parsing,
+STOP before analyzing for width.
+
+### 15.4 Topology and unchanged rules
+
+Roles and legs match sections 12 through 14: macOS is `role-server`, Linux is
+`role-client == role-capture`, the only captured cleartext leg is Linux loopback, inter-host
+traffic is inside SSH, and the macOS forward exit uses loopback. Sections 1 through 10 remain
+in force: no Windows, no Barrier/Deskflow source, no production Swift, no MacKVM TLS/default
+change, fixed `walk(S, 4)`/`walk(S, 2)` predicate, complete FIN-bounded streams only, raw
+stays on `role-capture`, sanitizer allowlist only.
+
+### 15.5 Fresh pre-window checks for attempt 6
+
+All checks are performed fresh and recorded before the capture window opens:
+
+1. The new reviewer approval for section 15 exists and predates the check.
+2. Baseline session check confirms macOS server to Linux client owner session.
+3. OS versions, Linux package provenance, macOS official-DMG-to-binary hash chain, capture
+   capabilities, analyzer identity, UTC clocks, SSH remote-forward loopback binding and
+   fail-fast behavior are rechecked.
+4. The disposable config generator records its recipe, config byte length, SHA-256 and
+   synthetic screen count.
+5. Owner session backup/restore and graceful stop/timeout wrappers are reverified.
+
+### 15.6 Attempt-6 limits and outcome handling
+
+- Exactly one bounded attempt. If runtime connection fails or the config is rejected, STOP with
+  a fixed label and restore the owner session.
+- Attempt 6 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+- `M1-025` stays blocked until a register entry with accepted, independently reviewed
+  discriminating width evidence exists. A connection success, a large config, a long candidate
+  length, or a completed attempt without exactly one surviving reading does not unblock it.

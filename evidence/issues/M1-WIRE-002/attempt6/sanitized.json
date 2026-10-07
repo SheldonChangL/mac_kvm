@@ -1,0 +1,625 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "id": "m1-wire-002-stream-analysis",
+    "version": "1"
+  },
+  "input": {
+    "format": "pcap-classic-microsecond",
+    "linkType": "EN10MB",
+    "network": "IPv4-TCP",
+    "byteLength": 2561,
+    "sha256": "57a6299efa5b0de97ea10daf86ae3be1709a546bcf88108d31bff9a2405ffbe2",
+    "recordCount": 27
+  },
+  "serverPort": "<configured-barrier-server-port>",
+  "sanitizer": {
+    "retainedPositions": "length-prefix-bytes-read-by-either-raw-walk",
+    "fillByte": "0x00",
+    "markerBytesRetained": false,
+    "roundTrip": "sanitized-walks-equal-raw-walks"
+  },
+  "connections": [
+    {
+      "label": "connection-1",
+      "lifecycle": {
+        "synObserved": {
+          "client-to-server": true,
+          "server-to-client": true
+        },
+        "finObserved": {
+          "client-to-server": true,
+          "server-to-client": true
+        },
+        "rstObserved": false
+      },
+      "streams": [
+        {
+          "direction": "client-to-server",
+          "from": "role-client",
+          "to": "role-server",
+          "byteLength": 120,
+          "completeness": {
+            "startedAtSyn": true,
+            "endedAtFin": true,
+            "sequenceGaps": 0,
+            "conflictingOverlaps": 0,
+            "identicalRetransmittedBytes": 0
+          },
+          "sanitized": {
+            "byteLength": 120,
+            "sha256": "bd39316d65a0dd809e148f9113c1c1d9702f7d364d9f79f3412b77f752001d42",
+            "retainedByteCount": 40,
+            "base64": "AAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAA"
+          },
+          "walks": {
+            "raw": {
+              "width4": {
+                "width": 4,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    30
+                  ],
+                  [
+                    34,
+                    18
+                  ],
+                  [
+                    56,
+                    4
+                  ],
+                  [
+                    64,
+                    4
+                  ],
+                  [
+                    72,
+                    4
+                  ],
+                  [
+                    80,
+                    4
+                  ],
+                  [
+                    88,
+                    4
+                  ],
+                  [
+                    96,
+                    4
+                  ],
+                  [
+                    104,
+                    4
+                  ],
+                  [
+                    112,
+                    4
+                  ]
+                ],
+                "finalOffset": 120
+              },
+              "width2": {
+                "width": 2,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    2,
+                    30
+                  ],
+                  [
+                    34,
+                    0
+                  ],
+                  [
+                    36,
+                    18
+                  ],
+                  [
+                    56,
+                    0
+                  ],
+                  [
+                    58,
+                    4
+                  ],
+                  [
+                    64,
+                    0
+                  ],
+                  [
+                    66,
+                    4
+                  ],
+                  [
+                    72,
+                    0
+                  ],
+                  [
+                    74,
+                    4
+                  ],
+                  [
+                    80,
+                    0
+                  ],
+                  [
+                    82,
+                    4
+                  ],
+                  [
+                    88,
+                    0
+                  ],
+                  [
+                    90,
+                    4
+                  ],
+                  [
+                    96,
+                    0
+                  ],
+                  [
+                    98,
+                    4
+                  ],
+                  [
+                    104,
+                    0
+                  ],
+                  [
+                    106,
+                    4
+                  ],
+                  [
+                    112,
+                    0
+                  ],
+                  [
+                    114,
+                    4
+                  ]
+                ],
+                "finalOffset": 120
+              }
+            },
+            "sanitized": {
+              "width4": {
+                "width": 4,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    30
+                  ],
+                  [
+                    34,
+                    18
+                  ],
+                  [
+                    56,
+                    4
+                  ],
+                  [
+                    64,
+                    4
+                  ],
+                  [
+                    72,
+                    4
+                  ],
+                  [
+                    80,
+                    4
+                  ],
+                  [
+                    88,
+                    4
+                  ],
+                  [
+                    96,
+                    4
+                  ],
+                  [
+                    104,
+                    4
+                  ],
+                  [
+                    112,
+                    4
+                  ]
+                ],
+                "finalOffset": 120
+              },
+              "width2": {
+                "width": 2,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    2,
+                    30
+                  ],
+                  [
+                    34,
+                    0
+                  ],
+                  [
+                    36,
+                    18
+                  ],
+                  [
+                    56,
+                    0
+                  ],
+                  [
+                    58,
+                    4
+                  ],
+                  [
+                    64,
+                    0
+                  ],
+                  [
+                    66,
+                    4
+                  ],
+                  [
+                    72,
+                    0
+                  ],
+                  [
+                    74,
+                    4
+                  ],
+                  [
+                    80,
+                    0
+                  ],
+                  [
+                    82,
+                    4
+                  ],
+                  [
+                    88,
+                    0
+                  ],
+                  [
+                    90,
+                    4
+                  ],
+                  [
+                    96,
+                    0
+                  ],
+                  [
+                    98,
+                    4
+                  ],
+                  [
+                    104,
+                    0
+                  ],
+                  [
+                    106,
+                    4
+                  ],
+                  [
+                    112,
+                    0
+                  ],
+                  [
+                    114,
+                    4
+                  ]
+                ],
+                "finalOffset": 120
+              }
+            }
+          }
+        },
+        {
+          "direction": "server-to-client",
+          "from": "role-server",
+          "to": "role-client",
+          "byteLength": 187,
+          "completeness": {
+            "startedAtSyn": true,
+            "endedAtFin": true,
+            "sequenceGaps": 0,
+            "conflictingOverlaps": 0,
+            "identicalRetransmittedBytes": 0
+          },
+          "sanitized": {
+            "byteLength": 187,
+            "sha256": "2e34db31fa4140b9a7b4649b3ab5bfe2307605d76c4ce9177e9ef00d9b0615c2",
+            "retainedByteCount": 36,
+            "base64": "AAAACwAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAA=="
+          },
+          "walks": {
+            "raw": {
+              "width4": {
+                "width": 4,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    11
+                  ],
+                  [
+                    15,
+                    4
+                  ],
+                  [
+                    23,
+                    4
+                  ],
+                  [
+                    31,
+                    4
+                  ],
+                  [
+                    39,
+                    112
+                  ],
+                  [
+                    155,
+                    4
+                  ],
+                  [
+                    163,
+                    4
+                  ],
+                  [
+                    171,
+                    4
+                  ],
+                  [
+                    179,
+                    4
+                  ]
+                ],
+                "finalOffset": 187
+              },
+              "width2": {
+                "width": 2,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    2,
+                    11
+                  ],
+                  [
+                    15,
+                    0
+                  ],
+                  [
+                    17,
+                    4
+                  ],
+                  [
+                    23,
+                    0
+                  ],
+                  [
+                    25,
+                    4
+                  ],
+                  [
+                    31,
+                    0
+                  ],
+                  [
+                    33,
+                    4
+                  ],
+                  [
+                    39,
+                    0
+                  ],
+                  [
+                    41,
+                    112
+                  ],
+                  [
+                    155,
+                    0
+                  ],
+                  [
+                    157,
+                    4
+                  ],
+                  [
+                    163,
+                    0
+                  ],
+                  [
+                    165,
+                    4
+                  ],
+                  [
+                    171,
+                    0
+                  ],
+                  [
+                    173,
+                    4
+                  ],
+                  [
+                    179,
+                    0
+                  ],
+                  [
+                    181,
+                    4
+                  ]
+                ],
+                "finalOffset": 187
+              }
+            },
+            "sanitized": {
+              "width4": {
+                "width": 4,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    11
+                  ],
+                  [
+                    15,
+                    4
+                  ],
+                  [
+                    23,
+                    4
+                  ],
+                  [
+                    31,
+                    4
+                  ],
+                  [
+                    39,
+                    112
+                  ],
+                  [
+                    155,
+                    4
+                  ],
+                  [
+                    163,
+                    4
+                  ],
+                  [
+                    171,
+                    4
+                  ],
+                  [
+                    179,
+                    4
+                  ]
+                ],
+                "finalOffset": 187
+              },
+              "width2": {
+                "width": 2,
+                "result": "success",
+                "frames": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    2,
+                    11
+                  ],
+                  [
+                    15,
+                    0
+                  ],
+                  [
+                    17,
+                    4
+                  ],
+                  [
+                    23,
+                    0
+                  ],
+                  [
+                    25,
+                    4
+                  ],
+                  [
+                    31,
+                    0
+                  ],
+                  [
+                    33,
+                    4
+                  ],
+                  [
+                    39,
+                    0
+                  ],
+                  [
+                    41,
+                    112
+                  ],
+                  [
+                    155,
+                    0
+                  ],
+                  [
+                    157,
+                    4
+                  ],
+                  [
+                    163,
+                    0
+                  ],
+                  [
+                    165,
+                    4
+                  ],
+                  [
+                    171,
+                    0
+                  ],
+                  [
+                    173,
+                    4
+                  ],
+                  [
+                    179,
+                    0
+                  ],
+                  [
+                    181,
+                    4
+                  ]
+                ],
+                "finalOffset": 187
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outcome": {
+    "result": "STOP-BOTH-SUCCEED",
+    "discriminating": false,
+    "succeedingWidths": [
+      4,
+      2
+    ],
+    "width4": {
+      "succeedsOnEveryStream": true,
+      "failingStreams": []
+    },
+    "width2": {
+      "succeedsOnEveryStream": true,
+      "failingStreams": []
+    }
+  },
+  "nonClaims": [
+    "No Barrier message, field, type, marker or semantic meaning is asserted.",
+    "A succeeding width is a partition fact over these streams only; it is not a width decision, ADR, register entry or M1-025 unblock.",
+    "Capture-tool dropped-packet counts are not visible in a classic pcap and are not verified by this helper.",
+    "Marker and version bytes are not retained; only prefix positions read by either walk keep original bytes.",
+    "IPv4 and TCP checksums are not validated."
+  ]
+}
