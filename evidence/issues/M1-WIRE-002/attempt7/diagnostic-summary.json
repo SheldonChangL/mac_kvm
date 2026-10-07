@@ -1,0 +1,330 @@
+{
+  "input": {
+    "byteLength": 854578,
+    "format": "pcap-classic-microsecond",
+    "linkType": "EN10MB",
+    "network": "IPv4-TCP",
+    "recordCount": 169,
+    "sha256": "490714785d07380d04c71a2beb503258783f418f0721834cbffde1ca9e2859dc"
+  },
+  "outcome": {
+    "discriminating": true,
+    "result": "DISCRIMINATING",
+    "succeedingWidths": [
+      4
+    ],
+    "width2": {
+      "failingStreams": [
+        {
+          "connection": "connection-1",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-2",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-3",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-4",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-5",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-6",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-7",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-8",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-9",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-10",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-11",
+          "direction": "client-to-server"
+        },
+        {
+          "connection": "connection-12",
+          "direction": "client-to-server"
+        }
+      ],
+      "succeedsOnEveryStream": false
+    },
+    "width4": {
+      "failingStreams": [],
+      "succeedsOnEveryStream": true
+    }
+  },
+  "sanitized_bytes": 1187597,
+  "sanitized_sha256": "70c0a5930dd75cce1ae9d3536aaaa6f360fdb53e68aa15c8e0d4bd3f2f49c705",
+  "streams": [
+    {
+      "byteLength": 70019,
+      "connection": "connection-1",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-1",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-2",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-2",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-3",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-3",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-4",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-4",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-5",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-5",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-6",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-6",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-7",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-7",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-8",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-8",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-9",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-9",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-10",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-10",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-11",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-11",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    },
+    {
+      "byteLength": 70019,
+      "connection": "connection-12",
+      "direction": "client-to-server",
+      "width2": "failure",
+      "width2Failure": {
+        "available": 12503,
+        "declared": 24929,
+        "offset": 57514,
+        "reason": "overrun"
+      },
+      "width4": "success"
+    },
+    {
+      "byteLength": 23,
+      "connection": "connection-12",
+      "direction": "server-to-client",
+      "width2": "success",
+      "width2Failure": null,
+      "width4": "success"
+    }
+  ]
+}

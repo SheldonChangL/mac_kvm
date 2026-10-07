@@ -7,9 +7,9 @@ analysis (`STOP-BOTH-SUCCEED`, 2026-10-06T09:15Z); attempt 4 STOPPED after sanit
 (`STOP-BOTH-SUCCEED`, 2026-10-07T00:48Z); attempt 5 STOPPED before analyzable stream
 construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); attempt 6 STOPPED after
 sanitizer analysis (`STOP-BOTH-SUCCEED`, 2026-10-07T04:47Z); all six approvals are consumed; a
-seventh attempt is proposed in section 16 and is NOT approved.** No capture, SSH session or
-Barrier evidence configuration may start for attempt 7 until the independent reviewer records a
-new approval for section 16.
+seventh attempt STOPPED after runtime protocol error before accepted runtime connection success
+(`protocol-error-before-runtime-connection-success`, 2026-10-07T05:45Z); all seven approvals
+are consumed; no eighth attempt is proposed.**
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -385,8 +385,10 @@ Reviewer (not the capture author): ____________ UTC: ____________
 
 ## 11. Amended second-attempt plan (proposed, pending independent review)
 
-Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
-records no capture, fixture, register entry, ADR or width.
+Status: **STOPPED.** This section was approved for one bounded attempt, which ran at
+`2026-10-07T05:44:59Z` and stopped at `2026-10-07T05:45:33Z` with
+`protocol-error-before-runtime-connection-success`. It records no accepted fixture, register
+entry, ADR or width.
 
 ### 11.1 Attempt 1 is preserved as historical evidence
 

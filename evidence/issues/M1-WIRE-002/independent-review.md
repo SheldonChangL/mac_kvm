@@ -692,6 +692,31 @@ Reviewer decision for section 16:
 - APPROVE: exactly one seventh bounded attempt; any further retry needs a new review.
 - FINAL: **attempt 7 MAY proceed after all 16.5 checks pass.**
 
+### Attempt-7 runtime result — 2026-10-07T05:45Z
+
+- One bounded attempt-7 capture window was opened after the section 16 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `854578`, with SHA-256
+  `490714785d07380d04c71a2beb503258783f418f0721834cbffde1ca9e2859dc`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `169 packets captured`, `338 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The synthetic client screen name was `70000` bytes, with SHA-256
+  `77bd9c6f87d1ad04ed3ca8de8ac34d46bac2824b4539b001f0e5a2fe0c24e9bc`.
+- The disposable server config was `210491` bytes, with SHA-256
+  `251efacfabe6bc6f21b00e140a011b379f5be69f8f3e5a7e6d02ffef84934d42`.
+- Runtime connection did **not** satisfy the approved gate: the server accepted TCP
+  connections but logged `protocol error from client "<unknown>"`; the client logged `server
+  reported a protocol error` and exited by timeout with code `124`.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt7/sanitized.json`, byte length
+  `1187597`, SHA-256 `70c0a5930dd75cce1ae9d3536aaaa6f360fdb53e68aa15c8e0d4bd3f2f49c705`.
+- Analyzer result: `DISCRIMINATING`. Width 4 succeeded on every stream; width 2 failed on
+  every client-to-server stream. The first recorded width-2 failure was `connection-1`,
+  `client-to-server`, offset `57514`, reason `overrun`, declared `24929`, available `12503`.
+- This diagnostic analyzer result is **not accepted width evidence** because the runtime gate
+  stopped first. No accepted fixture, register entry, width ADR or `M1-025` unblock is
+  approved.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.

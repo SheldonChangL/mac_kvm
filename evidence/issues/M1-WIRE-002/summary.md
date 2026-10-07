@@ -26,6 +26,11 @@ A sixth attempt was proposed in `discrimination-plan.md` section 15, independent
 for one bounded attempt, and executed. It stopped with a non-discriminating
 `STOP-BOTH-SUCCEED` result. See "Attempt 6 (non-discriminating stop)" below.
 
+A seventh attempt was proposed in `discrimination-plan.md` section 16, independently approved
+for one bounded attempt, and executed. Its analyzer result was mechanically discriminating, but
+the attempt stopped before accepted runtime connection success because the Barrier runtime
+reported protocol errors. See "Attempt 7 (runtime protocol-error stop)" below.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -91,6 +96,30 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
 - Sanitized stop evidence: `attempt6/sanitized.json`.
 - Consequence: STOP after sanitizer analysis. No accepted fixture, register entry, width ADR
   or `M1-025` unblock was produced for attempt 6.
+- Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
+  MacKVM production TLS or default change, no byte prediction, no capture before reviewer
+  approval, and no `M1-025` unblock without accepted discriminating evidence.
+- `M1-025` remains blocked until accepted discriminating evidence exists.
+
+## Attempt 7 (runtime protocol-error stop)
+
+- Plan: `discrimination-plan.md` section 16 (repository documentation only).
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-07T05:40:47Z`, approving one seventh bounded attempt only after all section 16.5
+  pre-window checks pass.
+- Added trigger: deterministic, synthetic, non-personal `70000`-byte Barrier client screen name
+  supplied through normal Barrier configuration and command-line inputs.
+- Runtime result: `protocol-error-before-runtime-connection-success`.
+- Meaning: the disposable server accepted TCP connections, but the server reported `protocol
+  error from client "<unknown>"` and the client reported `server reported a protocol error`.
+  The approved section-16 runtime gate required connection success, so the attempt stops even
+  though the sanitized analyzer result was mechanically discriminating.
+- Sanitized stop evidence: `attempt7/sanitized.json`.
+- Diagnostic analyzer result: `DISCRIMINATING`; width 4 succeeded on every stream and width 2
+  failed on every client-to-server stream. This is not accepted width evidence because the
+  runtime gate stopped first.
+- Consequence: STOP after runtime protocol error. No accepted fixture, register entry, width
+  ADR or `M1-025` unblock was produced for attempt 7.
 - Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
   MacKVM production TLS or default change, no byte prediction, no capture before reviewer
   approval, and no `M1-025` unblock without accepted discriminating evidence.

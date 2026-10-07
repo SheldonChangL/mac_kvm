@@ -1,0 +1,45 @@
+{
+  "attempt": 7,
+  "barrierOrDeskflowSourceConsulted": false,
+  "config": {
+    "byteLength": 210491,
+    "sha256": "251efacfabe6bc6f21b00e140a011b379f5be69f8f3e5a7e6d02ffef84934d42"
+  },
+  "issue": "M1-WIRE-002",
+  "longName": {
+    "byteLength": 70000,
+    "generator": "ASCII literal prefix m1w7- followed by repeated lowercase a to 70000 bytes",
+    "sha256": "77bd9c6f87d1ad04ed3ca8de8ac34d46bac2824b4539b001f0e5a2fe0c24e9bc"
+  },
+  "platformScope": [
+    "macOS",
+    "Linux"
+  ],
+  "ports": "placeholdered; real values are not committed",
+  "rawCapture": {
+    "byteLength": 854578,
+    "packetCounters": {
+      "captured": 169,
+      "droppedByKernel": 0,
+      "receivedByFilter": 338
+    },
+    "sha256": "490714785d07380d04c71a2beb503258783f418f0721834cbffde1ca9e2859dc",
+    "storage": "role-capture only; not committed"
+  },
+  "runtime": {
+    "clientExitCode": 124,
+    "clientLogSummary": "server reported a protocol error",
+    "serverLogSummary": "protocol error from client <unknown>",
+    "stopLabel": "protocol-error-before-runtime-connection-success"
+  },
+  "sanitizedArtifact": {
+    "byteLength": 1187597,
+    "path": "evidence/issues/M1-WIRE-002/attempt7/sanitized.json",
+    "sha256": "70c0a5930dd75cce1ae9d3536aaaa6f360fdb53e68aa15c8e0d4bd3f2f49c705"
+  },
+  "timestampUtc": {
+    "attemptDone": "2026-10-07T05:45:33Z",
+    "attemptStarted": "2026-10-07T05:44:59Z"
+  },
+  "windows": "not run"
+}
