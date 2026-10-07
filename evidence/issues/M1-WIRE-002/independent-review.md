@@ -476,6 +476,87 @@ timestamps before the capture window opens:
 - Raw deletion was not performed in this change because independent Checkpoint 2 re-derivation
   and deletion review are not complete.
 
+## Checkpoint 1 addendum — fifth-attempt plan review
+
+- Reviewed at: `2026-10-07T04:32:25Z`
+- Plan commit reviewed: `8e84c3174ef8`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 14
+- Verdict: **APPROVED FOR ONE FIFTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 14 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. `M1-025` remains blocked until accepted discriminating evidence is
+registered and independently reviewed.
+
+### Five-axis section-14 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 4 remain preserved as
+   stopped evidence and are not reused as capture input. The file-transfer path is based on
+   the observed command-line capability advertised by both macOS and Linux Barrier binaries,
+   not on Barrier or Deskflow source, source-derived writeup, decompiled output,
+   instrumentation, or byte prediction.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking or width claim. File transfer is a normal-use candidate action
+   only if it can be initiated without non-product behavior.
+3. **Security, fail-safe and compatibility — APPROVED.** MacKVM production TLS and fail-closed
+   defaults remain unchanged. Barrier cleartext remains bounded to host-local loopback legs:
+   the captured Linux Barrier-client-to-remote-forward-listener leg and the uncaptured macOS
+   remote-forward-exit-to-Barrier-server leg. Inter-host traffic must be inside SSH. Synthetic
+   file content is non-personal, temporary, cleared during cleanup and never committed; only
+   metadata may be committed.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; RST does not qualify. Both-succeed, both-fail,
+   incomplete, sanitizer mismatch, file-transfer trigger failure or non-reproducible results
+   stop the issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation that prepares a fifth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. A sixth attempt is explicitly disallowed without another plan amendment and
+   another independent approval.
+
+### Required attempt-5 pre-window checks
+
+Attempt 5 may proceed only if every section 14.6 check passes and is recorded with UTC
+timestamps before the capture window opens:
+
+- this approval exists and predates the check;
+- the baseline direction is verified as macOS Barrier server to Linux Barrier client;
+- both role binaries advertise `--enable-drag-drop` and `--drop-dir`;
+- all role-remapped section 6 validity checks are re-run in full, including OS versions,
+  Linux package provenance, macOS official-DMG-to-installed-binary hash chain, capture tool
+  capability, sanitizer identity, generator identity, Linux file-hash tool identity, UTC
+  clocks, loopback-only capture filter, SSH-forward-only inter-host leg, loopback-only
+  bindings and SSH forward fail-fast;
+- Linux SSH daemon policy is checked without changing it;
+- owner configuration backup and restore procedures are re-verified on both roles;
+- the fixed maximum window duration, synthetic file size ladder, graceful-only stop/timeout
+  wrappers, disposable drop directory, file cleanup steps and UI drag automation method are
+  recorded;
+- any private tooling change caused by the file-transfer trigger or role mapping is reviewed
+  before execution.
+
+### Reviewer decision for section 14
+
+- APPROVE: attempts 1 through 4 are preserved unchanged and are not reused as capture input.
+- APPROVE: Barrier file drag-and-drop is an acceptable normal-use candidate action only if both
+  binaries advertise the required options and the action can be initiated without source
+  inspection, instrumentation, packet injection or patched binaries.
+- APPROVE: the file-transfer trigger records only metadata and predicts no byte, frame,
+  message, chunking or width result.
+- APPROVE: the remote-forward topology keeps the only captured cleartext leg on Linux
+  loopback, keeps inter-host traffic inside SSH, and requires loopback-only bindings on both
+  hosts.
+- APPROVE: sections 1–10 boundaries apply unchanged except for the explicit role, leg and
+  trigger remapping in 14.5.
+- APPROVE: the 14.6 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one fifth bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 5 MAY proceed after all 14.6 checks pass.**
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
