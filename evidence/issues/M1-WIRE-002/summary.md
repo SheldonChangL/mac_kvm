@@ -13,6 +13,9 @@ A third attempt was proposed in `discrimination-plan.md` section 12, independent
 for one bounded attempt, and executed. It stopped with a non-discriminating
 `STOP-BOTH-SUCCEED` result. See "Attempt 3 (non-discriminating stop)" below.
 
+A fourth attempt is proposed in `discrimination-plan.md` section 13 and has a new
+Checkpoint 1 approval in `independent-review.md`. It has not opened a capture window yet.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -83,3 +86,20 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   discriminating evidence.
 - Raw capture remains on `role-capture` pending independent Checkpoint 2 re-derivation and
   deletion review. Raw capture is not committed.
+- Follow-up rechecks could not find the previously recorded attempt-3 raw and sanitizer
+  working files on `role-capture`. Checkpoint 2 remains incomplete; this is recorded as an
+  evidence-handling limitation, not as a completed deletion/re-derivation result.
+
+## Attempt 4 (approved, not yet started)
+
+- Plan: `discrimination-plan.md` section 13 (repository documentation only).
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-07T00:41:22Z`, approving one fourth bounded attempt only after all section 13.6
+  pre-window checks pass.
+- Added trigger: deterministic synthetic macOS clipboard text must be requested from the Linux
+  client through normal Barrier clipboard sharing, and only metadata such as size, SHA-256 and
+  hash-match status may be recorded.
+- Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
+  MacKVM production TLS or default change, no byte prediction, no capture before reviewer
+  approval, and no `M1-025` unblock without accepted discriminating evidence.
+- `M1-025` remains blocked until accepted discriminating evidence exists.
