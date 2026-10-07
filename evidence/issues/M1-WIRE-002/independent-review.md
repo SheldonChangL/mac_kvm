@@ -557,6 +557,26 @@ timestamps before the capture window opens:
 - APPROVE: exactly one fifth bounded attempt; any further retry needs a new review.
 - FINAL: **attempt 5 MAY proceed after all 14.6 checks pass.**
 
+### Attempt-5 runtime result — 2026-10-07T04:36Z
+
+- One bounded attempt-5 capture window was started after the section 14 approval and fresh
+  pre-window checks.
+- Fixed stop label: `file-transfer-runtime-unsupported`.
+- The macOS Barrier server binary advertised `--enable-drag-drop` and `--drop-dir`, but the
+  disposable evidence server stopped at runtime with `setDropTarget not implemented`.
+- The Linux Barrier client binary advertised `--enable-drag-drop` and `--drop-dir`, but the
+  disposable evidence client reported that drag-and-drop is not supported on Linux and stopped
+  at runtime with `setDropTarget not implemented`.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `24`, with SHA-256
+  `704e5e5b3234433c01fcfd1b20a306e77e985038120492dc53965c3edd38a4ea`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `0 packets captured`, `0 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The approved stream analyzer was run on `role-capture` and rejected the raw pcap with
+  `no-in-scope-connection`; no sanitized output was produced.
+- This is a source-validity stop before analyzable stream construction. No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
