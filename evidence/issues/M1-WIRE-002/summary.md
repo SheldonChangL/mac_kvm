@@ -17,6 +17,11 @@ A fourth attempt was proposed in `discrimination-plan.md` section 13, independen
 for one bounded attempt, and executed. It stopped with a non-discriminating
 `STOP-BOTH-SUCCEED` result. See "Attempt 4 (non-discriminating stop)" below.
 
+A fifth attempt was proposed in `discrimination-plan.md` section 14, independently approved
+for one bounded attempt, and stopped before analyzable stream construction because Barrier
+drag-and-drop/file-transfer is not implemented in the tested runtime path. See
+"Attempt 5 (runtime unsupported stop)" below.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -110,6 +115,30 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
 - Sanitized stop evidence: `attempt4/sanitized.json`.
 - Consequence: STOP after sanitizer analysis. No accepted fixture, register entry, width ADR
   or `M1-025` unblock was produced for attempt 4.
+- Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
+  MacKVM production TLS or default change, no byte prediction, no capture before reviewer
+  approval, and no `M1-025` unblock without accepted discriminating evidence.
+- `M1-025` remains blocked until accepted discriminating evidence exists.
+
+## Attempt 5 (runtime unsupported stop)
+
+- Plan: `discrimination-plan.md` section 14 (repository documentation only).
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-07T04:32:25Z`, approving one fifth bounded attempt only after all section 14.6
+  pre-window checks pass.
+- Added trigger: Barrier file drag-and-drop / file-transfer path using synthetic, non-personal
+  file content, enabled only in the disposable evidence configuration. Only metadata such as
+  file size, SHA-256 and hash-match status may be recorded.
+- Verified planning source: both macOS and Linux Barrier binaries advertise `--enable-drag-drop`
+  and `--drop-dir` in their command-line help.
+- Runtime result: `file-transfer-runtime-unsupported`.
+- Meaning: the advertised file-transfer options are not usable in this tested Barrier runtime
+  path. macOS server stopped with `setDropTarget not implemented`; Linux client reported
+  drag-and-drop is not supported on Linux and also stopped with `setDropTarget not implemented`.
+- Raw capture was only a 24-byte pcap header with zero packets captured; analyzer rejected it
+  with `no-in-scope-connection`; no sanitized artifact was produced.
+- Consequence: STOP before stream analysis. No accepted fixture, register entry, width ADR or
+  `M1-025` unblock was produced for attempt 5.
 - Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
   MacKVM production TLS or default change, no byte prediction, no capture before reviewer
   approval, and no `M1-025` unblock without accepted discriminating evidence.

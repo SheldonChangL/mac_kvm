@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-WIRE-002",
+  "attempt": 5,
+  "roleLabelsOnly": true,
+  "windowsExecuted": false,
+  "barrierOrDeskflowSourceConsulted": false,
+  "productionCodeChanged": false,
+  "productionTLSDefaultChanged": false,
+  "roles": {
+    "role-server": {
+      "platform": "macOS",
+      "barrierRole": "server",
+      "captureRunsHere": false,
+      "barrierBundleVersion": "2.4.0-release",
+      "barriersSha256": "2ad6d3b9b9d6dd8cb4bb403cea91f026d896842c5ba0134891daf90f8ef846b5",
+      "barriercSha256": "53369a4579223e0f8742b897d96b6a9a6c3abc9f6ef9c4fec2779b0ef7bd5715",
+      "advertisedOptions": [
+        "--enable-drag-drop",
+        "--drop-dir"
+      ],
+      "runtimeResult": "setDropTarget not implemented"
+    },
+    "role-client-role-capture": {
+      "platform": "Ubuntu Linux",
+      "barrierRole": "client",
+      "captureRunsHere": true,
+      "kernelFamily": "Linux 6.8.0-138-generic",
+      "packages": {
+        "barrier": "2.4.0+dfsg-2 amd64",
+        "tcpdump": "4.99.1-3ubuntu0.2 amd64",
+        "wireshark-common": "3.6.2-2 amd64",
+        "xclip": "0.13-2 amd64",
+        "xdotool": "1:3.20160805.1-4 amd64"
+      },
+      "captureCapabilities": {
+        "tcpdump": "cap_net_admin,cap_net_raw=eip",
+        "dumpcap": "cap_net_admin,cap_net_raw=eip"
+      },
+      "advertisedOptions": [
+        "--enable-drag-drop",
+        "--drop-dir"
+      ],
+      "runtimeResult": "drag-and-drop not supported on linux; setDropTarget not implemented"
+    }
+  },
+  "topology": {
+    "capturedLeg": "Linux loopback between Barrier client and SSH remote-forward listener",
+    "interHostLeg": "SSH remote forward",
+    "uncapturedLeg": "macOS loopback between SSH remote-forward exit and Barrier server",
+    "linuxRemoteForwardListener": "loopback-only",
+    "macosForwardDestination": "loopback-only",
+    "committedAddressesPortsAndHostnames": "redacted/placeholders only"
+  },
+  "tools": {
+    "streamAnalyzer": {
+      "pathOnRoleCapture": "redacted",
+      "sha256": "6b3179b32741e523ffba49b81abb37195a1dd12f06e32a4d1acec6a024614e6b",
+      "version": "1"
+    },
+    "tcpdump": {
+      "interface": "loopback",
+      "snapLength": 0,
+      "filter": "tcp port <configured-barrier-server-port>"
+    }
+  },
+  "trigger": {
+    "syntheticFileSizeBytes": 1048576,
+    "syntheticFileSha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+    "linuxDropFileCount": 0,
+    "hashMatch": false
+  },
+  "rawCapture": {
+    "stayedOnRoleCapture": true,
+    "committed": false,
+    "byteLength": 24,
+    "sha256": "704e5e5b3234433c01fcfd1b20a306e77e985038120492dc53965c3edd38a4ea",
+    "packetCounters": {
+      "captured": 0,
+      "receivedByFilter": 0,
+      "droppedByKernel": 0
+    }
+  },
+  "analyzer": {
+    "exitCode": 65,
+    "error": "no-in-scope-connection",
+    "sanitizedOutputProduced": false
+  }
+}
