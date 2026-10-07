@@ -22,6 +22,9 @@ for one bounded attempt, and stopped before analyzable stream construction becau
 drag-and-drop/file-transfer is not implemented in the tested runtime path. See
 "Attempt 5 (runtime unsupported stop)" below.
 
+A sixth attempt is proposed in `discrimination-plan.md` section 15 and has a new Checkpoint 1
+approval in `independent-review.md`. It has not opened a capture window yet.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -69,6 +72,19 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
 - Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
   MacKVM production TLS or default change, no byte prediction, and no capture before reviewer
   approval.
+- `M1-025` remains blocked until accepted discriminating evidence exists.
+
+## Attempt 6 (approved, not yet started)
+
+- Plan: `discrimination-plan.md` section 15 (repository documentation only).
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-07T04:45:04Z`, approving one sixth bounded attempt only after all section 15.5
+  pre-window checks pass.
+- Added trigger: disposable large synthetic Barrier server configuration with many non-personal
+  screen entries, aliases and links, using normal config parsing only.
+- Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
+  MacKVM production TLS or default change, no byte prediction, no capture before reviewer
+  approval, and no `M1-025` unblock without accepted discriminating evidence.
 - `M1-025` remains blocked until accepted discriminating evidence exists.
 
 ## Attempt 3 (non-discriminating stop)

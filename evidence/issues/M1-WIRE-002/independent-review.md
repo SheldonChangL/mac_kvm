@@ -577,6 +577,42 @@ timestamps before the capture window opens:
 - This is a source-validity stop before analyzable stream construction. No accepted fixture,
   register entry, width ADR or `M1-025` unblock is approved.
 
+## Checkpoint 1 addendum — sixth-attempt plan review
+
+- Reviewed at: `2026-10-07T04:45:04Z`
+- Plan commit reviewed: `18defbdb72d1`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 15
+- Verdict: **APPROVED FOR ONE SIXTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 15 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock.
+
+### Five-axis section-15 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 5 remain preserved as
+   stopped evidence and are not reused as capture input. The large-config path uses a
+   disposable normal Barrier configuration only; no Barrier or Deskflow source, source-derived
+   writeup, decompiled output, instrumentation, or byte prediction is used.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking or width claim.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS and fail-closed defaults
+   remain unchanged. Barrier cleartext remains bounded to host-local loopback legs and SSH
+   carries inter-host traffic. Synthetic config labels are non-personal and temporary.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; both-succeed, both-fail, incomplete, sanitizer mismatch,
+   config rejection or non-reproducible results stop the issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation preparing a sixth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. Any seventh attempt requires a new amendment and review.
+
+FINAL: **attempt 6 MAY proceed after all 15.5 checks pass.**
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
