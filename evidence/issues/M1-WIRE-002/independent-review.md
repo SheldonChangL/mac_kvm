@@ -717,6 +717,63 @@ Reviewer decision for section 16:
   stopped first. No accepted fixture, register entry, width ADR or `M1-025` unblock is
   approved.
 
+## Checkpoint 1 addendum — eighth-attempt plan review
+
+- Reviewed at: `2026-10-07T05:53:56Z`
+- Plan commit reviewed: `4268aa3ef61a`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 17
+- Verdict: **APPROVED FOR ONE EIGHTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 17 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. Attempt 7 remains stopped and is not retroactively upgraded.
+The reviewer is the same Codex executor operating under the Product Owner's temporary M1
+bootstrap waiver; this is not recorded as permanent independent Critical/High review for M1
+completion.
+
+### Five-axis section-17 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 7 remain preserved as
+   stopped evidence and are not reused as capture input. Attempt 8 must rerun. The explicit
+   protocol-error close gate treats the error as externally observable fail-closed product
+   behavior only when both peer logs and complete FIN-bounded TCP streams corroborate it.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking, accepted-name-limit or width claim.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS and fail-closed
+   defaults remain unchanged. Barrier cleartext remains bounded to host-local loopback legs and
+   SSH carries inter-host traffic. Raw capture remains on `role-capture`, and the generated
+   screen name is synthetic, non-personal, temporary, and not committed.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; both-succeed, both-fail, incomplete, sanitizer mismatch,
+   missing peer protocol-error logs, topology failure or non-reproducible results stop the
+   issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation preparing an eighth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. Any ninth attempt requires a new amendment and review.
+
+Reviewer decision for section 17:
+
+- APPROVE: attempts 1 through 7 are preserved unchanged and are not reused as capture input.
+- APPROVE: attempt 7 is not retroactively upgraded; attempt 8 must rerun.
+- APPROVE: explicit protocol-error close is an acceptable bounded black-box observation only
+  under all section-17.3 conditions.
+- APPROVE: the long-name trigger records only metadata and predicts no byte, frame, message,
+  chunking, accepted name limit or width result.
+- APPROVE: the remote-forward topology keeps the only captured cleartext leg on Linux
+  loopback, keeps inter-host traffic inside SSH, and requires loopback-only bindings on both
+  hosts.
+- APPROVE: sections 1-10 boundaries apply unchanged except for the explicit section-17 runtime
+  gate.
+- APPROVE: the 17.5 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one eighth bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 8 MAY proceed after all 17.5 checks pass.**
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
