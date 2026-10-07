@@ -613,6 +613,28 @@ change, or `M1-025` unblock.
 
 FINAL: **attempt 6 MAY proceed after all 15.5 checks pass.**
 
+### Attempt-6 runtime result — 2026-10-07T04:47Z
+
+- One bounded attempt-6 capture window was opened after the section 15 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `2561`, with SHA-256
+  `57a6299efa5b0de97ea10daf86ae3be1709a546bcf88108d31bff9a2405ffbe2`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `27 packets captured`, `54 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The synthetic config contained `3000` synthetic screens, byte length `849708`, and SHA-256
+  `a6fd0eb521adc7d188e6a76218edc3ff649868fef9d371e77abc31051ebd1746`.
+- Runtime connection succeeded, but the large config did not produce a large captured
+  application stream.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt6/sanitized.json`, byte length
+  `15085`, SHA-256 `2907fbda2b8e7d25e2cd005ce821214c1506831bae3a38b9d1fe66be25af195c`.
+- Analyzer result: `STOP-BOTH-SUCCEED`. The capture reconstructed one complete connection with
+  FIN observed in both directions and no RST. The `client-to-server` stream length was `120`
+  bytes and the `server-to-client` stream length was `187` bytes. Both `walk(S, 4)` and
+  `walk(S, 2)` succeeded on every stream.
+- This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.

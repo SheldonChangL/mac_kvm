@@ -22,8 +22,9 @@ for one bounded attempt, and stopped before analyzable stream construction becau
 drag-and-drop/file-transfer is not implemented in the tested runtime path. See
 "Attempt 5 (runtime unsupported stop)" below.
 
-A sixth attempt is proposed in `discrimination-plan.md` section 15 and has a new Checkpoint 1
-approval in `independent-review.md`. It has not opened a capture window yet.
+A sixth attempt was proposed in `discrimination-plan.md` section 15, independently approved
+for one bounded attempt, and executed. It stopped with a non-discriminating
+`STOP-BOTH-SUCCEED` result. See "Attempt 6 (non-discriminating stop)" below.
 
 ## Attempt 1 (historical)
 
@@ -74,7 +75,7 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   approval.
 - `M1-025` remains blocked until accepted discriminating evidence exists.
 
-## Attempt 6 (approved, not yet started)
+## Attempt 6 (non-discriminating stop)
 
 - Plan: `discrimination-plan.md` section 15 (repository documentation only).
 - New independent Checkpoint 1 decision: recorded in `independent-review.md` at
@@ -82,6 +83,14 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   pre-window checks pass.
 - Added trigger: disposable large synthetic Barrier server configuration with many non-personal
   screen entries, aliases and links, using normal config parsing only.
+- Runtime result: `STOP-BOTH-SUCCEED`.
+- Meaning: the synthetic config was large (`849708` bytes, `3000` screens) and the runtime
+  connection succeeded, but the captured application streams were small (`120` bytes and
+  `187` bytes). Both readings succeeded on every stream, so the attempt did not discriminate
+  the length-prefix width.
+- Sanitized stop evidence: `attempt6/sanitized.json`.
+- Consequence: STOP after sanitizer analysis. No accepted fixture, register entry, width ADR
+  or `M1-025` unblock was produced for attempt 6.
 - Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
   MacKVM production TLS or default change, no byte prediction, no capture before reviewer
   approval, and no `M1-025` unblock without accepted discriminating evidence.

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-WIRE-002",
+  "attempt": 6,
+  "roleLabelsOnly": true,
+  "windowsExecuted": false,
+  "barrierOrDeskflowSourceConsulted": false,
+  "productionCodeChanged": false,
+  "productionTLSDefaultChanged": false,
+  "trigger": {
+    "syntheticScreenCount": 3000,
+    "configByteLength": 849708,
+    "configSha256": "a6fd0eb521adc7d188e6a76218edc3ff649868fef9d371e77abc31051ebd1746",
+    "runtimeConnection": "connected"
+  },
+  "rawCapture": {
+    "stayedOnRoleCapture": true,
+    "committed": false,
+    "byteLength": 2561,
+    "sha256": "57a6299efa5b0de97ea10daf86ae3be1709a546bcf88108d31bff9a2405ffbe2",
+    "packetCounters": {
+      "captured": 27,
+      "receivedByFilter": 54,
+      "droppedByKernel": 0
+    }
+  },
+  "sanitizedOutput": {
+    "path": "evidence/issues/M1-WIRE-002/attempt6/sanitized.json",
+    "byteLength": 15085,
+    "sha256": "2907fbda2b8e7d25e2cd005ce821214c1506831bae3a38b9d1fe66be25af195c"
+  }
+}
