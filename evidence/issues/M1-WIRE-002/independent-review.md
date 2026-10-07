@@ -635,6 +635,63 @@ FINAL: **attempt 6 MAY proceed after all 15.5 checks pass.**
 - This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
   register entry, width ADR or `M1-025` unblock is approved.
 
+## Checkpoint 1 addendum — seventh-attempt plan review
+
+- Reviewed at: `2026-10-07T05:40:47Z`
+- Plan commit reviewed: `977f778919cd`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 16
+- Verdict: **APPROVED FOR ONE SEVENTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 16 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. The reviewer is the same Codex executor operating under the
+Product Owner's temporary M1 bootstrap waiver; this is not recorded as permanent independent
+Critical/High review for M1 completion.
+
+### Five-axis section-16 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 6 remain preserved as
+   stopped evidence and are not reused as capture input. The long-name path uses a
+   deterministic synthetic client identity through normal Barrier configuration or command-line
+   inputs only. No Barrier or Deskflow source, source-derived writeup, decompiled output,
+   instrumentation, packet injection, patched binary behavior, or byte prediction is used.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking, accepted-name-limit or width claim.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS and fail-closed
+   defaults remain unchanged. Barrier cleartext remains bounded to host-local loopback legs and
+   SSH carries inter-host traffic. The generated screen name is synthetic, non-personal,
+   temporary, and not committed.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; both-succeed, both-fail, incomplete, sanitizer mismatch,
+   name rejection, topology failure or non-reproducible results stop the issue and leave
+   M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation preparing a seventh attempt. It adds no fixture, ADR, register entry or raw
+   artifact. Any eighth attempt requires a new amendment and review.
+
+Reviewer decision for section 16:
+
+- APPROVE: attempts 1 through 6 are preserved unchanged and are not reused as capture input.
+- APPROVE: a deterministic long synthetic client screen name is an acceptable normal-use
+  candidate action only if both external Barrier programs accept it through normal
+  configuration or command-line inputs.
+- APPROVE: the long-name trigger records only metadata and predicts no byte, frame, message,
+  chunking, accepted name limit or width result.
+- APPROVE: the remote-forward topology keeps the only captured cleartext leg on Linux
+  loopback, keeps inter-host traffic inside SSH, and requires loopback-only bindings on both
+  hosts.
+- APPROVE: sections 1-10 boundaries apply unchanged except for the explicit role, leg and
+  trigger remapping in section 16.
+- APPROVE: the 16.5 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one seventh bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 7 MAY proceed after all 16.5 checks pass.**
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
