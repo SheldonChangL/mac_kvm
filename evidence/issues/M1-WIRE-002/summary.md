@@ -13,6 +13,10 @@ A third attempt was proposed in `discrimination-plan.md` section 12, independent
 for one bounded attempt, and executed. It stopped with a non-discriminating
 `STOP-BOTH-SUCCEED` result. See "Attempt 3 (non-discriminating stop)" below.
 
+A fourth attempt was proposed in `discrimination-plan.md` section 13, independently approved
+for one bounded attempt, and executed. It stopped with a non-discriminating
+`STOP-BOTH-SUCCEED` result. See "Attempt 4 (non-discriminating stop)" below.
+
 ## Attempt 1 (historical)
 
 The sections "Stop reason", "Evidence handling", "Restoration" and "Outcome" below record
@@ -83,3 +87,30 @@ M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains bl
   discriminating evidence.
 - Raw capture remains on `role-capture` pending independent Checkpoint 2 re-derivation and
   deletion review. Raw capture is not committed.
+- Follow-up rechecks could not find the previously recorded attempt-3 raw and sanitizer
+  working files on `role-capture`. Checkpoint 2 remains incomplete; this is recorded as an
+  evidence-handling limitation, not as a completed deletion/re-derivation result.
+
+## Attempt 4 (non-discriminating stop)
+
+- Plan: `discrimination-plan.md` section 13 (repository documentation only).
+- New independent Checkpoint 1 decision: recorded in `independent-review.md` at
+  `2026-10-07T00:41:22Z`, approving one fourth bounded attempt only after all section 13.6
+  pre-window checks pass.
+- Added trigger: deterministic synthetic macOS clipboard text must be requested from the Linux
+  client through normal Barrier clipboard sharing, and only metadata such as size, SHA-256 and
+  hash-match status may be recorded.
+- Runtime result: `STOP-BOTH-SUCCEED`.
+- Meaning: the complete sanitized attempt-4 streams were analyzed by the approved
+  `walk(S, 4)` and `walk(S, 2)` predicates, and both readings succeeded on every stream.
+  Therefore the attempt did not discriminate the length-prefix width.
+- Trigger result: the disposable evidence session generated a `200000`-byte synthetic
+  clipboard value, but Linux clipboard read-back returned `0` bytes, so the trigger hash did
+  not match. This mismatch does not approve or reject either width.
+- Sanitized stop evidence: `attempt4/sanitized.json`.
+- Consequence: STOP after sanitizer analysis. No accepted fixture, register entry, width ADR
+  or `M1-025` unblock was produced for attempt 4.
+- Unchanged boundaries: no Windows, no Barrier or Deskflow source, no production Swift, no
+  MacKVM production TLS or default change, no byte prediction, no capture before reviewer
+  approval, and no `M1-025` unblock without accepted discriminating evidence.
+- `M1-025` remains blocked until accepted discriminating evidence exists.

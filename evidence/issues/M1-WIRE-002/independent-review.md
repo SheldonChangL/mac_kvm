@@ -369,6 +369,113 @@ timestamps before the capture window opens:
 
 Status: **NOT STARTED**. No register entry, width ADR or M1-025 unblock is approved by Checkpoint 1.
 
+## Checkpoint 1 addendum — fourth-attempt plan review
+
+- Reviewed at: `2026-10-07T00:41:22Z`
+- Plan commit reviewed: `e3de34caed4e`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 13
+- Verdict: **APPROVED FOR ONE FOURTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 13 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. `M1-025` remains blocked until accepted discriminating evidence is
+registered and independently reviewed.
+
+### Five-axis section-13 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1, 2 and 3 remain preserved as
+   stopped evidence and are not reused as capture input. Attempt 3's missing raw cleanup source
+   is disclosed as an evidence-handling limitation, not treated as a completed Checkpoint 2
+   result. Section 13 uses no Barrier or Deskflow source, source-derived writeup, decompiled
+   output, instrumentation, or byte prediction.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking or width claim. The added clipboard trigger is a normal-use
+   causal check only.
+3. **Security, fail-safe and compatibility — APPROVED.** MacKVM production TLS and fail-closed
+   defaults remain unchanged. Barrier cleartext remains bounded to host-local loopback legs:
+   the captured Linux Barrier-client-to-remote-forward-listener leg and the uncaptured macOS
+   remote-forward-exit-to-Barrier-server leg. Inter-host traffic must be inside SSH. Synthetic
+   clipboard material is non-personal, temporary, cleared during cleanup and never committed;
+   only metadata may be committed.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; RST does not qualify. Both-succeed, both-fail,
+   incomplete, sanitizer mismatch, clipboard-trigger mismatch or non-reproducible results stop
+   the issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation that prepares a fourth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. A fifth attempt is explicitly disallowed without another plan amendment and
+   another independent approval.
+
+### Required attempt-4 pre-window checks
+
+Attempt 4 may proceed only if every section 13.6 check passes and is recorded with UTC
+timestamps before the capture window opens:
+
+- this approval exists and predates the check;
+- the baseline direction is verified as macOS Barrier server to Linux Barrier client;
+- all role-remapped section 6 validity checks are re-run in full, including OS versions,
+  Linux package provenance, macOS official-DMG-to-installed-binary hash chain, capture tool
+  capability, sanitizer identity, generator identity, Linux clipboard request tool identity,
+  UTC clocks, loopback-only capture filter, SSH-forward-only inter-host leg, loopback-only
+  bindings and SSH forward fail-fast;
+- Linux SSH daemon policy is checked without changing it;
+- owner configuration backup and restore procedures are re-verified on both roles;
+- the fixed maximum window duration, synthetic clipboard size ladder, graceful-only
+  stop/timeout wrappers and clipboard cleanup steps are recorded;
+- any private tooling change caused by the clipboard trigger or role mapping is reviewed
+  before execution.
+
+### Reviewer decision for section 13
+
+- APPROVE: attempts 1 through 3 are preserved unchanged and are not reused as capture input.
+- APPROVE: the attempt-3 raw cleanup limitation is disclosed and does not masquerade as a
+  completed Checkpoint 2 result.
+- APPROVE: the observed macOS-server to Linux-client direction is an acceptable normal-use
+  baseline for a new bounded experiment.
+- APPROVE: the clipboard trigger is normal product use, records only metadata, and predicts no
+  byte, frame, message, chunking or width result.
+- APPROVE: the remote-forward topology keeps the only captured cleartext leg on Linux
+  loopback, keeps inter-host traffic inside SSH, and requires loopback-only bindings on both
+  hosts.
+- APPROVE: sections 1–10 boundaries apply unchanged except for the explicit role, leg and
+  trigger remapping in 13.5.
+- APPROVE: the 13.6 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one fourth bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 4 MAY proceed after all 13.6 checks pass.**
+
+### Attempt-4 runtime result — 2026-10-07T00:48Z
+
+- One bounded attempt-4 capture window was opened after the section 13 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `225585`, with SHA-256
+  `295385b65737145edc034a51d76b125a59dbcf6a7bc75599c12a0c17c72c2c5f`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `276 packets captured`, `552 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The synthetic clipboard trigger did not hash-match inside the disposable evidence session:
+  the generated value was `200000` bytes with SHA-256
+  `3357eb5f288d9be2085180e3c97663995063b90b1599359367089d02b367c1eb`, while the Linux
+  read-back returned `0` bytes with SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- The approved stream analyzer was copied to `role-capture` and run there. Only the sanitized
+  JSON output was copied back into the repository.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt4/sanitized.json`, byte length
+  `419596`, SHA-256 `6b9b7291c06180189b05b95ff7600a696d9d33a5198a5c58a8e956df6e0b762d`.
+- Analyzer result: `STOP-BOTH-SUCCEED`. The capture reconstructed one complete connection with
+  FIN observed in both directions and no RST. The `client-to-server` stream length was `1256`
+  bytes and the `server-to-client` stream length was `201657` bytes. Both `walk(S, 4)` and
+  `walk(S, 2)` succeeded on every stream.
+- This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+- Raw deletion was not performed in this change because independent Checkpoint 2 re-derivation
+  and deletion review are not complete.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
