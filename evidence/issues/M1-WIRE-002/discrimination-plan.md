@@ -5,10 +5,11 @@ GitHub Issue #279. Current status: **attempt 1 STOPPED (`client-not-connected`,
 (`baseline-direction-mismatch`, 2026-10-06T09:02:48Z); attempt 3 STOPPED after sanitizer
 analysis (`STOP-BOTH-SUCCEED`, 2026-10-06T09:15Z); attempt 4 STOPPED after sanitizer analysis
 (`STOP-BOTH-SUCCEED`, 2026-10-07T00:48Z); attempt 5 STOPPED before analyzable stream
-construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); all five approvals are
-consumed; a sixth attempt is proposed in section 15 and is NOT approved.** No capture, SSH
-session or Barrier evidence configuration may start for attempt 6 until the independent
-reviewer records a new approval for section 15.
+construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); attempt 6 STOPPED after
+sanitizer analysis (`STOP-BOTH-SUCCEED`, 2026-10-07T04:47Z); all six approvals are consumed; a
+seventh attempt is proposed in section 16 and is NOT approved.** No capture, SSH session or
+Barrier evidence configuration may start for attempt 7 until the independent reviewer records a
+new approval for section 16.
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -1086,3 +1087,116 @@ All checks are performed fresh and recorded before the capture window opens:
 - `M1-025` stays blocked until a register entry with accepted, independently reviewed
   discriminating width evidence exists. A connection success, a large config, a long candidate
   length, or a completed attempt without exactly one surviving reading does not unblock it.
+
+## 16. Amended seventh-attempt plan (proposed, pending independent review)
+
+Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
+records no capture, fixture, register entry, ADR or width.
+
+### 16.1 Attempts 1 through 6 are preserved as stopped
+
+- Attempts 1 through 6 remain valid final results for their attempts and are not reused as
+  capture input.
+- Attempt 6 proved that a large synthetic macOS server configuration can connect but still
+  produce only small captured application streams in the tested topology. Both candidate
+  readings succeeded and no width evidence was accepted.
+
+### 16.2 Why a new reviewer approval is required
+
+- Section 15 approved exactly one sixth bounded attempt and said any further retry requires
+  another plan amendment and another independent approval. That approval was consumed by the
+  attempt-6 stop.
+- Required ordering: the reviewer records a Checkpoint 1 decision for this section in
+  `independent-review.md`, with a UTC timestamp later than this amendment's commit and earlier
+  than any attempt-7 pre-window check. Without that record, attempt 7 MUST NOT start.
+
+### 16.3 Seventh-attempt evidence strategy
+
+Attempt 7 may use a deterministic, synthetic, non-personal Barrier client screen name that is
+substantially longer than ordinary human host names. This is a normal Barrier client identity
+input supplied through documented runtime configuration or command-line options. It is not
+Barrier or Deskflow source inspection, source-derived material, decompilation,
+instrumentation, packet injection, patched binary behavior, or generated protocol bytes.
+
+The evidence hypothesis is narrow: a very long normal client identity may cause the external
+Barrier runtime to emit a larger or differently structured handshake/client-info stream than
+the previous clipboard, file-transfer and large-config attempts. This is only a causal
+hypothesis. It predicts no byte, message, frame count, chunking behavior, accepted name limit or
+prefix width.
+
+The trigger is:
+
+1. generate a deterministic long screen-name string using only safe ASCII characters from a
+   recorded recipe;
+2. configure the disposable macOS Barrier server to accept exactly that synthetic client name
+   and a minimal screen layout that lets the product connect;
+3. start the disposable macOS Barrier server with that config;
+4. start the Linux Barrier client with that same synthetic screen name through the existing
+   Linux-loopback remote-forward capture topology;
+5. record only metadata: name byte length, SHA-256, generator recipe, whether both external
+   programs accepted the name, whether runtime connection succeeded, and the normal analyzer
+   result.
+
+If either Barrier program rejects the name, truncates it before connection in a way that cannot
+be observed only as metadata, crashes, requires source inspection, requires patched binaries,
+requires binary instrumentation, or needs product behavior outside normal configuration parsing,
+STOP before analyzing for width.
+
+### 16.4 Topology and unchanged rules
+
+Roles and legs match sections 12 through 15: macOS is `role-server`, Linux is
+`role-client == role-capture`, the only captured cleartext leg is Linux loopback, inter-host
+traffic is inside SSH, and the macOS forward exit uses loopback. Sections 1 through 10 remain
+in force: no Windows, no Barrier/Deskflow source, no production Swift, no MacKVM TLS/default
+change, fixed `walk(S, 4)`/`walk(S, 2)` predicate, complete FIN-bounded streams only, raw
+stays on `role-capture`, sanitizer allowlist only.
+
+### 16.5 Fresh pre-window checks for attempt 7
+
+All checks are performed fresh and recorded before the capture window opens:
+
+1. The new reviewer approval for section 16 exists and predates the check.
+2. Baseline session check confirms macOS server to Linux client owner session.
+3. OS versions, Linux package provenance, macOS official-DMG-to-binary hash chain, capture
+   capabilities, analyzer identity, UTC clocks, SSH remote-forward loopback binding and
+   fail-fast behavior are rechecked.
+4. The long-name generator records its recipe, generated name byte length and SHA-256. The
+   generated name itself is not committed.
+5. The disposable server config and client command use only the generated synthetic name and
+   placeholders in committed evidence.
+6. Owner session backup/restore and graceful stop/timeout wrappers are reverified.
+
+### 16.6 Attempt-7 limits and outcome handling
+
+- Exactly one bounded attempt. If runtime connection fails, either external program rejects the
+  name, or the evidence topology cannot be restored safely, STOP with a fixed label and restore
+  the owner session.
+- Attempt 7 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+- `M1-025` stays blocked until a register entry with accepted, independently reviewed
+  discriminating width evidence exists. A connection success, a long synthetic name, a long
+  candidate length, or a completed attempt without exactly one surviving reading does not
+  unblock it.
+
+### 16.7 Reviewer decision for section 16
+
+Reviewer (not the capture author, except under the Product Owner's temporary M1 bootstrap
+waiver) records the decision in `independent-review.md`:
+
+- [ ] APPROVE / [ ] REJECT: attempts 1 through 6 are preserved unchanged and are not reused as
+      capture input.
+- [ ] APPROVE / [ ] REJECT: a deterministic long synthetic client screen name is an acceptable
+      normal-use candidate action only if both external Barrier programs accept it through
+      normal configuration or command-line inputs.
+- [ ] APPROVE / [ ] REJECT: the long-name trigger records only metadata and predicts no byte,
+      frame, message, chunking, accepted name limit or width result.
+- [ ] APPROVE / [ ] REJECT: the remote-forward topology keeps the only captured cleartext leg
+      on Linux loopback, keeps inter-host traffic inside SSH, and requires loopback-only
+      bindings on both hosts.
+- [ ] APPROVE / [ ] REJECT: sections 1–10 boundaries apply unchanged except for the explicit
+      role, leg and trigger remapping in section 16.
+- [ ] APPROVE / [ ] REJECT: the 16.5 fresh pre-window checks are complete and each failure
+      stops before the window opens.
+- [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
+- [ ] FINAL: attempt 7 MAY proceed after all 16.5 checks pass / attempt 7 MUST NOT proceed
+      (`M1-025` stays blocked).
