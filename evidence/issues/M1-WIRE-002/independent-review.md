@@ -449,6 +449,33 @@ timestamps before the capture window opens:
 - APPROVE: exactly one fourth bounded attempt; any further retry needs a new review.
 - FINAL: **attempt 4 MAY proceed after all 13.6 checks pass.**
 
+### Attempt-4 runtime result — 2026-10-07T00:48Z
+
+- One bounded attempt-4 capture window was opened after the section 13 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture`. The raw pcap byte length was `225585`, with SHA-256
+  `295385b65737145edc034a51d76b125a59dbcf6a7bc75599c12a0c17c72c2c5f`. Raw capture was not
+  copied into the repository.
+- The capture tool reported `276 packets captured`, `552 packets received by filter` and
+  `0 packets dropped by kernel`.
+- The synthetic clipboard trigger did not hash-match inside the disposable evidence session:
+  the generated value was `200000` bytes with SHA-256
+  `3357eb5f288d9be2085180e3c97663995063b90b1599359367089d02b367c1eb`, while the Linux
+  read-back returned `0` bytes with SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- The approved stream analyzer was copied to `role-capture` and run there. Only the sanitized
+  JSON output was copied back into the repository.
+- Sanitized output: `evidence/issues/M1-WIRE-002/attempt4/sanitized.json`, byte length
+  `419596`, SHA-256 `6b9b7291c06180189b05b95ff7600a696d9d33a5198a5c58a8e956df6e0b762d`.
+- Analyzer result: `STOP-BOTH-SUCCEED`. The capture reconstructed one complete connection with
+  FIN observed in both directions and no RST. The `client-to-server` stream length was `1256`
+  bytes and the `server-to-client` stream length was `201657` bytes. Both `walk(S, 4)` and
+  `walk(S, 2)` succeeded on every stream.
+- This is source-validity stop condition 7 (non-discriminating outcome). No accepted fixture,
+  register entry, width ADR or `M1-025` unblock is approved.
+- Raw deletion was not performed in this change because independent Checkpoint 2 re-derivation
+  and deletion review are not complete.
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
