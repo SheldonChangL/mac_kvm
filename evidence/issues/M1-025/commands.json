@@ -1,0 +1,58 @@
+{
+  "issue": "M1-025",
+  "executedAt": "2026-10-08T14:38:00+08:00",
+  "commands": [
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_025_barrier_client_wire_contract -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 7 tests in 0.001s; OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "swift test --package-path Packages/KVMContracts -Xswiftc -warnings-as-errors",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build complete; Swift Testing run passed with 56 tests"
+    },
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "All CI gates passed; report artifacts/ci/m1-008-report.json"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors"
+    },
+    {
+      "command": "claude -p \"Review the currently staged changes for M1-025 ...\"",
+      "exitCode": 0,
+      "result": "passed-with-remediation",
+      "summary": "Independent review found no Critical findings and four High findings; the High findings were remediated in the ADR/evidence package and GitHub Issue #293."
+    }
+  ],
+  "notes": [
+    "An initial sandboxed make verify run failed at Swift Package Manager sandbox setup with sandbox_apply: Operation not permitted; the same gate passed when rerun outside the managed sandbox.",
+    "No production Swift source was changed by M1-025."
+  ]
+}

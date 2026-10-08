@@ -1,0 +1,38 @@
+{
+  "issue": "M1-025",
+  "testSuite": "Tests.Contracts.test_m1_025_barrier_client_wire_contract",
+  "executedAt": "2026-10-08T14:38:00+08:00",
+  "command": "python3 -m unittest Tests.Contracts.test_m1_025_barrier_client_wire_contract -v",
+  "exitCode": 0,
+  "result": "passed",
+  "tests": [
+    {
+      "name": "test_required_sources_exist_and_are_cited",
+      "result": "passed"
+    },
+    {
+      "name": "test_frame_envelope_contract_is_frozen_narrowly",
+      "result": "passed"
+    },
+    {
+      "name": "test_marker_version_policy_is_exact_fail_closed_only",
+      "result": "passed"
+    },
+    {
+      "name": "test_independent_review_and_followup_blocker_are_recorded",
+      "result": "passed"
+    },
+    {
+      "name": "test_unknowns_remain_out_of_scope",
+      "result": "passed"
+    },
+    {
+      "name": "test_architecture_boundary_is_protocol_adapter_only",
+      "result": "passed"
+    },
+    {
+      "name": "test_m1_wire_001_fixture_stays_candidate_input_not_message_semantics",
+      "result": "passed"
+    }
+  ]
+}

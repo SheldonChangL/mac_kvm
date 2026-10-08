@@ -1,0 +1,17 @@
+{
+  "issue": "M1-025",
+  "collectedAt": "2026-10-08T14:36:47+08:00",
+  "repository": "mac_kvm",
+  "branch": "codex/m1-025-barrier-client-wire-contract",
+  "platform": {
+    "os": "macOS",
+    "osVersion": "26.6.2",
+    "architecture": "arm64"
+  },
+  "scope": {
+    "type": "adr-only",
+    "productionCodeChanged": false,
+    "parserImplemented": false,
+    "networkingChanged": false
+  }
+}
