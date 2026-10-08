@@ -1,0 +1,27 @@
+{
+  "issue": "M1-PKG-003",
+  "githubIssue": 296,
+  "result": "passed",
+  "tests": [
+    {
+      "name": "childPackageOwnsBarrierCompatibilityTests",
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "result": "passed"
+    },
+    {
+      "name": "test_actual_gate_list_includes_barriercompatibility_child_package_once",
+      "command": "python3 -m unittest Tools.cigates.tests.test_cigates -v",
+      "result": "passed"
+    },
+    {
+      "name": "test_cumulative_gate_inventory_is_the_expected_named_gates",
+      "command": "python3 -m unittest Tools.cigates.tests.test_cigates -v",
+      "result": "passed"
+    },
+    {
+      "name": "make verify",
+      "command": "make verify",
+      "result": "passed"
+    }
+  ]
+}
