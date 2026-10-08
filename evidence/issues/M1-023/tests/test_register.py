@@ -365,6 +365,25 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "wire claim"):
             validate_entry(self.register, entry)
 
+    def test_m1_025_consumer_links_are_registered(self):
+        expected_adr = "docs/adr/M1-025-barrier-client-wire-contract.md"
+        expected_test = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+        entries = {entry["evidenceId"]: entry for entry in self.register["entries"]}
+
+        for evidence_id in (
+            "BARRIER-EVID-0001",
+            "BARRIER-EVID-0002",
+            "BARRIER-EVID-0003",
+        ):
+            entry = entries[evidence_id]
+            self.assertIn(expected_adr, entry["frozenContractRefs"])
+            self.assertIn(expected_test, entry["consumingTests"])
+
+        self.assertIn(expected_adr, self.documentation)
+        self.assertIn(expected_test, self.documentation)
+        self.assertIn("it does not promote any unknown field", self.documentation)
+        self.assertIn("consumer link only", self.documentation)
+
 
 if __name__ == "__main__":
     unittest.main()

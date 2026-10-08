@@ -1,0 +1,67 @@
+{
+  "issue": "M1-025-TRACE-001",
+  "githubIssue": 293,
+  "executedAt": "2026-10-08T15:00:00+08:00",
+  "commands": [
+    {
+      "command": "python3 -m unittest evidence.issues.M1-023.tests.test_register -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 12 tests in 0.003s; OK"
+    },
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_025_barrier_client_wire_contract -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 7 tests in 0.002s; OK"
+    },
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_wire_001_contract_sequence -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 20 tests in 0.161s; OK"
+    },
+    {
+      "command": "python3 -m unittest Tests.Contracts.test_m1_wire_002_length_prefix_evidence -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 7 tests in 22.359s; OK"
+    },
+    {
+      "command": "python3 -m unittest evidence.issues.M1-EVIDENCE-001.tests.test_registration -v",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Ran 18 tests in 0.007s; OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "All CI gates passed; report artifacts/ci/m1-008-report.json"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors"
+    }
+  ]
+}
