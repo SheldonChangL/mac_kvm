@@ -369,6 +369,15 @@ def build_gate_specs(repository_root: Path) -> List[GateSpec]:
                 ),
             ),
             GateSpec(
+                "swift-package-test:BarrierCompatibility",
+                (
+                    "swift",
+                    "test",
+                    "--package-path",
+                    "Packages/BarrierCompatibility",
+                ),
+            ),
+            GateSpec(
                 "repository-contract-tests",
                 (
                     "python3",

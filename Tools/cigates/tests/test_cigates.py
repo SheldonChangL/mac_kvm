@@ -10,7 +10,7 @@ from unittest import mock
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 MODULE_PATH = REPOSITORY_ROOT / "Tools/cigates/cigates.py"
-EXPECTED_CUMULATIVE_GATE_COUNT = 23
+EXPECTED_CUMULATIVE_GATE_COUNT = 24
 
 spec = importlib.util.spec_from_file_location("cigates", MODULE_PATH)
 cigates = importlib.util.module_from_spec(spec)
@@ -297,6 +297,25 @@ class CIGateTests(unittest.TestCase):
             ),
         )
 
+    def test_actual_gate_list_includes_barriercompatibility_child_package_once(self):
+        gates = cigates.build_gate_specs(REPOSITORY_ROOT)
+        matches = [
+            gate
+            for gate in gates
+            if gate.name == "swift-package-test:BarrierCompatibility"
+        ]
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(
+            matches[0].command,
+            (
+                "swift",
+                "test",
+                "--package-path",
+                "Packages/BarrierCompatibility",
+            ),
+        )
+
     def test_cumulative_gate_inventory_is_the_expected_named_gates(self):
         gates = cigates.build_gate_specs(REPOSITORY_ROOT)
         names = [gate.name for gate in gates]
@@ -324,6 +343,7 @@ class CIGateTests(unittest.TestCase):
                 "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
                 "swift-package-test:KVMContracts",
                 "swift-package-test:MacPlatform",
+                "swift-package-test:BarrierCompatibility",
                 "repository-contract-tests",
                 "swift-test-targets",
                 "native-arm64-build",
