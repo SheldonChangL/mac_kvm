@@ -531,6 +531,145 @@
       ],
       "frozenContractRefs": [],
       "consumingTests": []
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0003",
+      "relatedIssue": "M1-024",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "M1-WIRE-002 GitHub Issue #279 attempt 8: controlled black-box observation of two lawfully installed external Barrier 2.4.0 programs over a Linux loopback capture leg inside an SSH-forwarded disposable topology. The trigger was a deterministic synthetic non-personal long client screen name supplied through normal configuration and command-line inputs. The accepted runtime observation was an explicit protocol-error close under the pre-approved section-17 gate, not successful interoperability. No Barrier or Deskflow source, source-derived writeup, decompiled output, instrumentation, packet injection, patched binary or generated protocol byte sequence was used. Peer runtime logs and raw-pcap current availability are recorded with limitations because the attempt-8 remote temporary directory was unavailable when rechecked; no raw peer-log hash or raw-pcap-to-sanitized re-derivation is claimed in the repository."
+      },
+      "capture": {
+        "capturedAt": "2026-10-07T05:55:28Z",
+        "tools": [
+          {
+            "name": "tcpdump",
+            "version": "4.99.1"
+          },
+          {
+            "name": "m1-wire-002-stream-analysis",
+            "version": "1"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported"
+        }
+      },
+      "transport": {
+        "networkScope": "The recorder observed only the Linux loopback leg between the external Barrier client and the SSH remote-forward listener. Inter-host traffic stayed inside SSH. Real addresses, ports, host names and user names are not recorded. The raw pcap stayed on role-capture and is not committed.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on hosts under that owner control. Only externally observable runtime behavior and sanitized prefix-position bytes are retained.",
+        "permittedUse": "Input to M1-025 for freezing the exact Barrier top-level length-prefix width inside the MacKVM Barrier Protocol Adapter only. It does not authorize claims about message codes, field layout beyond the prefix, version negotiation, chunking, Windows behavior or production TLS behavior.",
+        "producer": "M1-WIRE-002 attempt 8 capture producer, recorded in evidence/issues/M1-WIRE-002/attempt8/manual.md and metadata.json",
+        "reviewer": {
+          "identity": "Claude Opus 5.5 independent reviewer (Claude Code session), not the M1-WIRE-002 attempt-8 producer; second-pass review recorded in evidence/issues/M1-WIRE-002/independent-review.md Checkpoint 4",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-08T02:35:55Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "Allowlist sanitization by Tools/Evidence/m1_wire_002_stream_analysis.py version 1. It reconstructs complete FIN-bounded TCP streams, evaluates width-4 and width-2 walks on identical bytes, and retains only bytes read as length-prefix positions by either walk; every other byte is replaced by a fill byte. The committed fixture contains no raw packet headers, real addresses, ports, host names, user names, generated screen-name content or payload text.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "ip-address",
+          "hostname",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json",
+        "sha256": "6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1",
+        "byteLength": 100283
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "One complete FIN-bounded connection was retained from the Linux loopback capture leg.",
+          "The client-to-server stream is 70019 bytes and partitions as one width-4 frame with payload length 70015.",
+          "The server-to-client stream is 23 bytes and partitions under both readings; discrimination occurs on the client-to-server stream.",
+          "Width 4 succeeds on every retained complete stream; width 2 fails on the client-to-server stream at offset 57514 with overrun declared 24929 and available 12503."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0003-CLAIM-001",
+            "assertion": "The retained complete streams establish a 4-byte unsigned big-endian top-level Barrier length prefix whose value is the number of payload bytes after the prefix for this observed external Barrier 2.4.0 behavior. Width 4 partitions every retained complete stream; the narrower 2-byte big-endian reading fails on the same bytes at offset 57514 with overrun declared 24929 and available 12503.",
+            "establishedFieldIds": [
+              "barrier-length-prefix-width",
+              "barrier-length-prefix-endianness",
+              "barrier-payload-length-meaning"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json#/outcome",
+              "Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/metadata.json#/acceptedWidth",
+              "docs/adr/M1-WIRE-002-barrier-length-prefix-width.md"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "The runtime observation is an explicit protocol-error close, not successful interoperability.",
+        "Only the top-level length-prefix width, byte order and payload-length meaning are established.",
+        "No message codes, field layout beyond the prefix, maximum accepted length, chunking behavior, version negotiation, cross-version compatibility, Windows behavior or production TLS behavior is established.",
+        "The peer runtime log excerpts are summary-only because the attempt-8 remote temporary directory was unavailable when rechecked; no raw peer-log hash is claimed.",
+        "The raw pcap SHA-256 and byte length are recorded as producer runtime evidence, but current raw-pcap availability is not independently verified after the attempt-8 temporary directory became unavailable; this entry does not claim raw-pcap-to-sanitized re-derivation."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-message-code",
+          "observation": "Not interpreted by this evidence.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-026"
+          ]
+        },
+        {
+          "fieldId": "barrier-field-layout-beyond-prefix",
+          "observation": "Payload bytes other than prefix positions are sanitized fill bytes.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-026",
+            "M1-027",
+            "M1-028",
+            "M1-029"
+          ]
+        },
+        {
+          "fieldId": "barrier-maximum-frame-length-and-oversize-behavior",
+          "observation": "The protocol-error close is accepted only as a bounded observation and does not establish a maximum accepted production length.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-025"
+          ]
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer message codes, field order, optional fields, payload semantics, framing boundaries, or compatibility behavior beyond the approved top-level prefix claim.",
+        "Do not infer any other endian behavior or any field width/order beyond the registered length-prefix width, byte order and payload-length meaning.",
+        "Do not infer maximum accepted production length or successful interoperability from the protocol-error close.",
+        "Do not infer Windows behavior or production TLS behavior.",
+        "Do not copy or translate Barrier or Deskflow implementation from this evidence."
+      ],
+      "frozenContractRefs": [
+        "docs/adr/M1-WIRE-002-barrier-length-prefix-width.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py"
+      ]
     }
   ]
 }

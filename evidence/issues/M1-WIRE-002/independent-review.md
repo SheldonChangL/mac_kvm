@@ -717,6 +717,63 @@ Reviewer decision for section 16:
   stopped first. No accepted fixture, register entry, width ADR or `M1-025` unblock is
   approved.
 
+## Checkpoint 1 addendum — eighth-attempt plan review
+
+- Reviewed at: `2026-10-07T05:53:56Z`
+- Plan commit reviewed: `4268aa3ef61a`
+- Plan section: `evidence/issues/M1-WIRE-002/discrimination-plan.md` section 17
+- Verdict: **APPROVED FOR ONE EIGHTH BOUNDED CAPTURE ATTEMPT**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+This approval is narrow. It approves section 17 as a pre-capture amendment only. It does not
+approve any prefix width, register entry, ADR, fixture, source interpretation, production code
+change, or `M1-025` unblock. Attempt 7 remains stopped and is not retroactively upgraded.
+The reviewer is the same Codex executor operating under the Product Owner's temporary M1
+bootstrap waiver; this is not recorded as permanent independent Critical/High review for M1
+completion.
+
+### Five-axis section-17 review
+
+1. **Source validity / traceability — APPROVED.** Attempts 1 through 7 remain preserved as
+   stopped evidence and are not reused as capture input. Attempt 8 must rerun. The explicit
+   protocol-error close gate treats the error as externally observable fail-closed product
+   behavior only when both peer logs and complete FIN-bounded TCP streams corroborate it.
+2. **Product contract / architecture boundaries — APPROVED.** The amendment keeps #279's
+   evidence-only scope: no production Swift, parser, codec, framer or reassembler; no edit to
+   `BARRIER-EVID-0001`, `BARRIER-EVID-0002` or the accepted `M1-WIRE-001` ADR; no Windows; and
+   no message, layout, chunking, accepted-name-limit or width claim.
+3. **Security, fail-safe and compatibility — APPROVED.** Production TLS and fail-closed
+   defaults remain unchanged. Barrier cleartext remains bounded to host-local loopback legs and
+   SSH carries inter-host traffic. Raw capture remains on `role-capture`, and the generated
+   screen name is synthetic, non-personal, temporary, and not committed.
+4. **Tests, validation and acceptance criteria — APPROVED FOR CAPTURE GATE ONLY.** Both
+   readings still receive identical complete Linux-loopback direction streams. Explicit FIN in
+   both directions remains required; both-succeed, both-fail, incomplete, sanitizer mismatch,
+   missing peer protocol-error logs, topology failure or non-reproducible results stop the
+   issue and leave M1-025 blocked.
+5. **Scope control, repository hygiene and rollback — APPROVED.** The amendment is limited to
+   documentation preparing an eighth attempt. It adds no fixture, ADR, register entry or raw
+   artifact. Any ninth attempt requires a new amendment and review.
+
+Reviewer decision for section 17:
+
+- APPROVE: attempts 1 through 7 are preserved unchanged and are not reused as capture input.
+- APPROVE: attempt 7 is not retroactively upgraded; attempt 8 must rerun.
+- APPROVE: explicit protocol-error close is an acceptable bounded black-box observation only
+  under all section-17.3 conditions.
+- APPROVE: the long-name trigger records only metadata and predicts no byte, frame, message,
+  chunking, accepted name limit or width result.
+- APPROVE: the remote-forward topology keeps the only captured cleartext leg on Linux
+  loopback, keeps inter-host traffic inside SSH, and requires loopback-only bindings on both
+  hosts.
+- APPROVE: sections 1-10 boundaries apply unchanged except for the explicit section-17 runtime
+  gate.
+- APPROVE: the 17.5 fresh pre-window checks are complete and each failure stops before the
+  window opens.
+- APPROVE: exactly one eighth bounded attempt; any further retry needs a new review.
+- FINAL: **attempt 8 MAY proceed after all 17.5 checks pass.**
+
 ### Runtime attempt result — 2026-10-05T07:11:18Z
 
 - The approved one bounded capture attempt was started after pre-window gates passed.
@@ -738,3 +795,121 @@ Reviewer decision for section 16:
   `barriers running` and `server listener up`; the Linux role reported `barrierc running` and
   `connection established`.
 - M1-WIRE-002 remains stopped without accepted width evidence. `M1-025` remains blocked.
+
+## Checkpoint 2 — attempt-8 pre-registration re-derivation
+
+- Reviewed at: `2026-10-08T02:19:12Z`
+- Evidence under review:
+  `Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json`,
+  `Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/metadata.json`,
+  `evidence/issues/M1-WIRE-002/attempt8/`
+- Verdict: **APPROVED WITH RECORDED LOG-RETRIEVAL LIMITATION**
+- Critical findings: **0 open**
+- High findings: **0 open**
+
+The retained fixture is accepted as deterministic, sanitized, machine-checkable stream evidence.
+It establishes the width-4-vs-width-2 discrimination result under the fixed section-17 predicate.
+It does not rely on any Barrier or Deskflow source, and it adds no production Swift code.
+
+### Product Owner waiver for peer raw-log re-fetch
+
+- Decision recorded at: `2026-10-08T02:19:12Z`
+- Decision source: Product Owner selected option `1` in the active Codex thread after being
+  told the attempt-8 remote temporary directory was unavailable and that continuing would use
+  existing metadata, manual notes and prior runtime output as summarized log evidence.
+- Waived requirement, limited to attempt 8 only: byte-for-byte re-fetch and hashing of peer
+  runtime log excerpts for section 17.3 conditions 2 and 3.
+- Not waived: complete FIN-bounded stream evidence, deterministic width-walk reproduction,
+  privacy checks, clean-room boundary, no production code, no Windows claim, and no Barrier or
+  Deskflow source consultation.
+- Risk accepted: the protocol-error peer-log corroboration is weaker than a hashable log
+  fixture, so it is recorded as summary-only evidence and as a remaining review risk.
+
+### Re-derivation checks
+
+- Fixture byte length is `100283`; SHA-256 is
+  `6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1`.
+- The fixture records one complete connection with SYN and FIN observed in both directions and
+  no RST.
+- The `client-to-server` stream is `70019` bytes. Width 4 succeeds with one frame of payload
+  length `70015`; width 2 fails at offset `57514`, reason `overrun`, declared `24929`,
+  available `12503`.
+- The `server-to-client` stream is `23` bytes. Both width 4 and width 2 partition that stream;
+  discrimination comes only from the `client-to-server` stream.
+- The analyzer outcome is `DISCRIMINATING` and the only surviving candidate width in the
+  approved `{2, 4}` candidate set is `4`.
+- Raw pcap bytes and generated long-name content are not committed. The raw pcap is recorded as
+  role-capture-only with byte length `71230` and SHA-256
+  `5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc`.
+- Raw-pcap current availability is not independently verified after the attempt-8 temporary
+  directory became unavailable. Checkpoint 2 therefore does not claim raw-pcap-to-sanitized
+  fixture re-derivation; it accepts deterministic re-walking of the committed sanitized streams
+  and records this as a limitation.
+
+### Recorded limitation
+
+The remote attempt-8 temporary directory was unavailable when rechecked, so peer runtime log
+excerpts cannot be re-fetched and hashed in this repository state. Under the Product Owner's
+explicit direction, the runtime peer logs are retained only as summarized evidence in
+`runtime-log-excerpts.json` and `environment.json`. This limitation does not change the
+machine-checkable fixture result, but it remains a review risk and is recorded rather than
+silently treated as full log re-verification.
+
+## Checkpoint 3 — attempt-8 pre-merge review
+
+- Reviewed at: `2026-10-08T02:19:12Z`
+- Verdict: **LOCAL REMEDIATION COMPLETE; SUPERSEDED BY CHECKPOINT 4 FINAL APPROVAL**
+- Critical findings: **0 open in local remediation**
+- High findings: **0 open in local remediation**
+- Medium findings: peer raw-log re-fetch is unavailable; recorded as a limitation and review
+  risk rather than a hidden pass.
+- Low findings: none open after documentation and fixture-permission cleanup.
+
+### Five-axis review
+
+1. **Source validity / traceability — locally satisfied with limitation.** The canonical inputs
+   remain the approved M1-WIRE-001 evidence, GitHub #279, section 17 of the plan, and the
+   attempt-8 sanitized fixture. The peer raw-log source is unavailable for re-fetch and is
+   therefore not treated as a hashable source.
+2. **Product contract / architecture boundaries — satisfied.** The change is evidence,
+   documentation and tests only. It adds no parser, codec, framer, reassembler, networking
+   implementation or production TLS behavior. M1-025 remains the consumer that freezes the
+   client wire contract from registered evidence.
+3. **Security, fail-safe and compatibility — satisfied with limitation.** Raw capture and
+   generated long-name content are not committed. The fixture retains only prefix-position bytes
+   and no real address, hostname, user name, port, payload text, credential, key or certificate.
+   Windows was not executed and no Windows behavior is claimed.
+4. **Tests, validation and acceptance criteria — locally satisfied before second-pass review.**
+   The local remediation gate required the M1-WIRE-002 fixture contract test, M1-WIRE-001 guard
+   test, M1-023 register validator, package validator, privacy scan, `git diff --check`, and
+   the repository verification target available in this bootstrap phase. Checkpoint 4 records
+   the independent second-pass approval after these remediations.
+5. **Scope control, repository hygiene and rollback — satisfied.** The entry appends
+   `BARRIER-EVID-0003` without rewriting prior evidence. Rollback is a PR revert or a
+   superseding reviewed register entry; raw captures and generated content remain out of repo.
+
+FINAL: attempt 8 proceeded to the second-pass independent review recorded in Checkpoint 4.
+`M1-025` is not started until `BARRIER-EVID-0003` is validated, reviewed and merged.
+
+## Checkpoint 4 — attempt-8 second-pass independent review
+
+- Reviewed at: `2026-10-08T02:35:55Z`
+- Reviewer: Claude Opus 5.5 independent reviewer (Claude Code session), not the attempt-8
+  producer
+- Verdict: **APPROVED** — `BARRIER-EVID-0003` `provenance.reviewer.independentFromProducer`
+  set to `true`
+- Critical findings: **0 open**
+- High findings: **0 open**
+- Medium findings: peer raw-log re-fetch and raw-pcap current availability remain unverified;
+  accepted as recorded limitations under the Product Owner waiver, not as passes.
+
+Prior High findings re-checked: the only failing assertions before this checkpoint were the
+`independentFromProducer` checks; the attempt-1 historical runtime block is preserved; the
+Product Owner waiver is recorded with timestamp and scope; the raw-pcap availability limitation
+is recorded in README, environment, metadata, register limitations, register doc and
+Checkpoint 2.
+
+Independent re-derivation in this review: fixture SHA-256 and byte length match; the retained
+`client-to-server` bytes give a width-4 prefix of `70015`, exactly the remaining stream length,
+while the width-2 walk reaches offset `57514` and overruns (declared `24929`, available
+`12503`) on a FIN-bounded stream. No raw-pcap-to-sanitized re-derivation is claimed.

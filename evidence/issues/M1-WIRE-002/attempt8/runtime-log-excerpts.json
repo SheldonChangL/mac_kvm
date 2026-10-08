@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-WIRE-002",
+  "attempt": 8,
+  "status": "summary-only-peer-runtime-log-evidence",
+  "sourceLimitation": "The attempt-8 remote temporary directory was unavailable when rechecked on 2026-10-08T02:19:12Z, so these entries intentionally do not claim byte-for-byte raw log re-fetch or log hash verification.",
+  "server": {
+    "source": "producer runtime output captured during attempt 8",
+    "sanitizedSummary": [
+      "server started in the disposable evidence configuration",
+      "server accepted one client connection",
+      "server logged protocol error from client <unknown>"
+    ],
+    "containsRealAddressPortHostOrUser": false
+  },
+  "client": {
+    "source": "producer runtime output captured during attempt 8",
+    "sanitizedSummary": [
+      "client started with restart disabled",
+      "client connected through the disposable evidence topology",
+      "client logged that the server reported a protocol error"
+    ],
+    "containsRealAddressPortHostOrUser": false
+  },
+  "acceptedUse": "Supports the section-17 runtime gate only as summarized corroboration. The machine-checkable discrimination result is the sanitized stream fixture and its deterministic width-walk outcome."
+}

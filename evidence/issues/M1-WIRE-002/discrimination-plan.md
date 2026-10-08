@@ -9,7 +9,9 @@ construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); attempt 6
 sanitizer analysis (`STOP-BOTH-SUCCEED`, 2026-10-07T04:47Z); all six approvals are consumed; a
 seventh attempt STOPPED after runtime protocol error before accepted runtime connection success
 (`protocol-error-before-runtime-connection-success`, 2026-10-07T05:45Z); all seven approvals
-are consumed; no eighth attempt is proposed.**
+are consumed; attempt 8 completed under section 17 with accepted discriminating evidence
+(`DISCRIMINATING`, 2026-10-07T05:55Z), subject to the recorded peer-log re-fetch limitation and
+final Checkpoint 4 review.**
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -1202,3 +1204,141 @@ waiver) records the decision in `independent-review.md`:
 - [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
 - [ ] FINAL: attempt 7 MAY proceed after all 16.5 checks pass / attempt 7 MUST NOT proceed
       (`M1-025` stays blocked).
+
+## 17. Amended eighth-attempt plan and result
+
+Status: **COMPLETED.** This section records the reviewed attempt-8 plan and the accepted
+discriminating outcome. It does not retroactively upgrade attempt 7.
+
+### 17.1 Attempts 1 through 7 are preserved as stopped
+
+- Attempts 1 through 7 remain valid final results for their attempts and are not reused as
+  capture input.
+- Attempt 7 is preserved as stopped, not upgraded: it produced a diagnostic discriminating
+  analyzer result, but the then-approved runtime gate required accepted runtime connection
+  success and therefore stopped on protocol error.
+
+### 17.2 Why a new reviewer approval is required
+
+- Section 16 approved exactly one seventh bounded attempt and said any further retry requires
+  another plan amendment and another independent approval. That approval was consumed by the
+  attempt-7 stop.
+- This section deliberately changes the runtime gate for a future capture only. It does not
+  reinterpret or accept attempt 7.
+- Required ordering: the reviewer records a Checkpoint 1 decision for this section in
+  `independent-review.md`, with a UTC timestamp later than this amendment's commit and earlier
+  than any attempt-8 pre-window check. Without that record, attempt 8 MUST NOT start.
+
+### 17.3 Eighth-attempt evidence strategy
+
+Attempt 8 may use the same category of deterministic, synthetic, non-personal long Barrier
+client screen name as attempt 7, but it must perform a fresh capture under this section. The
+client must run with `--no-restart` so only one connection attempt is in scope.
+
+The runtime gate for this attempt is different from section 16:
+
+- A successful Barrier runtime connection still qualifies.
+- An explicit Barrier protocol-error close also qualifies **only if** all of the following hold:
+  1. both external programs start normally from documented configuration or command-line inputs;
+  2. the server logs an accepted TCP client connection followed by protocol error;
+  3. the client logs server-reported protocol error;
+  4. the TCP stream is complete under section 5, with FIN in both directions and no RST;
+  5. the analyzer receives identical complete bytes for both readings; and
+  6. no source inspection, byte synthesis, packet injection, binary patching, instrumentation,
+     or decompilation is used.
+
+This treats the protocol-error response as an externally observable fail-closed product
+behavior, not as successful interoperability. It predicts no byte, message, frame count,
+chunking behavior, accepted name limit or prefix width.
+
+### 17.4 Topology and unchanged rules
+
+Roles and legs match sections 12 through 16: macOS is `role-server`, Linux is
+`role-client == role-capture`, the only captured cleartext leg is Linux loopback, inter-host
+traffic is inside SSH, and the macOS forward exit uses loopback. Sections 1 through 10 remain
+in force except for the explicit section-17 runtime gate above: no Windows, no Barrier/Deskflow
+source, no production Swift, no MacKVM TLS/default change, fixed `walk(S, 4)`/`walk(S, 2)`
+predicate, complete FIN-bounded streams only, raw stays on `role-capture`, sanitizer allowlist
+only.
+
+### 17.5 Fresh pre-window checks for attempt 8
+
+All checks are performed fresh and recorded before the capture window opens:
+
+1. The new reviewer approval for section 17 exists and predates the check.
+2. Baseline session check confirms macOS server to Linux client owner session.
+3. OS versions, Linux package provenance, macOS official-DMG-to-binary hash chain, capture
+   capabilities, analyzer identity, UTC clocks, SSH remote-forward loopback binding and
+   fail-fast behavior are rechecked.
+4. The long-name generator records its recipe, generated name byte length and SHA-256. The
+   generated name itself is not committed.
+5. The disposable server config and client command use only the generated synthetic name and
+   placeholders in committed evidence.
+6. The Linux client command includes `--no-restart`.
+7. Owner session backup/restore and graceful stop/timeout wrappers are reverified.
+
+### 17.6 Attempt-8 limits and outcome handling
+
+- Exactly one bounded attempt. If neither successful runtime connection nor the explicit
+  protocol-error close in section 17.3 occurs, STOP with a fixed label and restore the owner
+  session.
+- If stream completeness fails, if both readings succeed, if both readings fail, or if any
+  sanitizer/privacy check fails, STOP and leave `M1-025` blocked.
+- Attempt 8 produces no fixture, register entry or ADR unless it reaches the section 9 flow
+  after a discriminating result, and then only through Checkpoints 2 and 3.
+- A protocol-error close by itself does not unblock `M1-025`; only exactly one surviving
+  reading on complete, sanitized, reviewed streams may do so.
+
+### 17.7 Reviewer decision for section 17
+
+Reviewer (not the capture author, except under the Product Owner's temporary M1 bootstrap
+waiver) records the decision in `independent-review.md`:
+
+- [ ] APPROVE / [ ] REJECT: attempts 1 through 7 are preserved unchanged and are not reused as
+      capture input.
+- [ ] APPROVE / [ ] REJECT: attempt 7 is not retroactively upgraded; attempt 8 must rerun.
+- [ ] APPROVE / [ ] REJECT: explicit protocol-error close is an acceptable bounded black-box
+      observation only under all section-17.3 conditions.
+- [ ] APPROVE / [ ] REJECT: the long-name trigger records only metadata and predicts no byte,
+      frame, message, chunking, accepted name limit or width result.
+- [ ] APPROVE / [ ] REJECT: the remote-forward topology keeps the only captured cleartext leg
+      on Linux loopback, keeps inter-host traffic inside SSH, and requires loopback-only
+      bindings on both hosts.
+- [ ] APPROVE / [ ] REJECT: sections 1–10 boundaries apply unchanged except for the explicit
+      section-17 runtime gate.
+- [ ] APPROVE / [ ] REJECT: the 17.5 fresh pre-window checks are complete and each failure
+      stops before the window opens.
+- [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
+- [ ] FINAL: attempt 8 MAY proceed after all 17.5 checks pass / attempt 8 MUST NOT proceed
+      (`M1-025` stays blocked).
+
+### 17.8 Attempt-8 runtime result — 2026-10-07T05:55Z
+
+- One bounded attempt-8 capture window was opened after the section 17 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture` and is not committed. The raw pcap byte length was
+  `71230`, with SHA-256
+  `5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc`.
+- The capture tool reported `14 packets captured`, `28 packets received by filter` and
+  `0 packets dropped by kernel`; this loopback counter asymmetry is recorded in
+  `evidence/issues/M1-WIRE-002/attempt8/environment.json`.
+- The deterministic synthetic client screen name was `70000` bytes, with SHA-256
+  `c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f96410555ae45bbcfb`. The generated name
+  itself is not committed.
+- The disposable server config was `210491` bytes, with SHA-256
+  `6e2274a4438cf6450dee105ceb2e9db696d29027634517d94903d3e8924d5a7f`.
+- Runtime observation satisfied the section-17 gate as a bounded explicit protocol-error close:
+  the server accepted one client connection and recorded a protocol error from client
+  `<unknown>`; the client ran with `--no-restart` and recorded server-reported protocol error.
+  The raw peer log directory was unavailable when rechecked on `2026-10-08T02:19:12Z`, so
+  `runtime-log-excerpts.json` records summary-only peer runtime evidence and no raw log hash.
+- Sanitized output:
+  `Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json`, byte
+  length `100283`, SHA-256
+  `6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1`.
+- Analyzer result: `DISCRIMINATING`. Width 4 succeeded on every complete stream; width 2
+  failed on `connection-1`, `client-to-server`, offset `57514`, reason `overrun`, declared
+  `24929`, available `12503`.
+- This result supports appending `BARRIER-EVID-0003` and accepting
+  `docs/adr/M1-WIRE-002-barrier-length-prefix-width.md` after Checkpoints 2 through 4 record the
+  remaining review and validation results.

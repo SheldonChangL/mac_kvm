@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-WIRE-002",
+  "attempt": 8,
+  "checkpoint1ApprovalUtc": "2026-10-07T05:53:56Z",
+  "attemptStartedUtc": "2026-10-07T05:55:28Z",
+  "attemptCompletedUtc": "2026-10-07T05:55:54Z",
+  "sourcePolicy": {
+    "cleanRoom": true,
+    "barrierOrDeskflowSourceConsulted": false,
+    "windowsExecuted": false,
+    "productionCodeChanged": false,
+    "productionTlsDefaultChanged": false
+  },
+  "roles": {
+    "roleServer": {
+      "platform": "macOS",
+      "product": "Barrier",
+      "version": "2.4.0-release",
+      "binaryProvenance": {
+        "officialDmgSha256": "af938d17dcea5701da7a990705acbd0686dfedfdbcd64721666ae0bef7644ba9",
+        "barriersSha256": "2ad6d3b9b9d6dd8cb4bb403cea91f026d896842c5ba0134891daf90f8ef846b5",
+        "barriercSha256": "53369a4579223e0f8742b897d96b6a9a6c3abc9f6ef9c4fec2779b0ef7bd5715",
+        "cliVersionLimitation": "The macOS Barrier CLI --version path is known to abort for this app bundle; the accepted provenance chain is the official DMG and installed-binary hash chain."
+      }
+    },
+    "roleClientRoleCapture": {
+      "platform": "Ubuntu",
+      "version": "22.04",
+      "product": "Barrier",
+      "versionReportedByPackage": "2.4.0+dfsg-2",
+      "captureTool": {
+        "name": "tcpdump",
+        "version": "4.99.1"
+      }
+    }
+  },
+  "topology": {
+    "capturedLeg": "Linux loopback leg only, between the external Barrier client and the SSH remote-forward listener.",
+    "interHostLeg": "SSH-forwarded only.",
+    "endpointDisclosure": "No real address, host name, user name, interface name or port value is committed.",
+    "loopbackOnly": true,
+    "sshForwardFailFast": true
+  },
+  "trigger": {
+    "kind": "deterministic-long-synthetic-client-screen-name",
+    "byteLength": 70000,
+    "sha256": "c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f96410555ae45bbcfb",
+    "generator": "ASCII literal prefix m1w8- followed by repeated lowercase a to 70000 bytes",
+    "notCommitted": true
+  },
+  "capture": {
+    "rawPcapStorage": "role-capture only; not committed",
+    "rawPcapCurrentAvailability": "not independently verified after the attempt-8 remote temporary directory became unavailable",
+    "rawPcapSha256": "5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc",
+    "rawPcapByteLength": 71230,
+    "packetCounters": {
+      "captured": 14,
+      "receivedByFilter": 28,
+      "droppedByKernel": 0,
+      "loopbackDirectionNote": "Linux loopback reports both transmit and receive observations; the retained pcap has 14 records while the filter counter observed 28 loopback directions."
+    },
+    "lifecycle": {
+      "synObservedBothDirections": true,
+      "finObservedBothDirections": true,
+      "rstObserved": false
+    }
+  },
+  "runtimeGate": {
+    "acceptedObservation": "explicit-protocol-error-close",
+    "clientRestart": "disabled with --no-restart",
+    "serverLogSummarySource": "producer runtime output recorded during attempt 8; raw peer log directory was later unavailable for re-fetch",
+    "serverLogSummary": "server started, accepted one client connection, then logged protocol error from client <unknown>",
+    "clientLogSummarySource": "producer runtime output recorded during attempt 8; raw peer log directory was later unavailable for re-fetch",
+    "clientLogSummary": "client ran with --no-restart and logged that the server reported a protocol error",
+    "rawPeerLogLimitation": "The remote temporary directory was no longer present when rechecked on 2026-10-08T02:19:12Z, so peer log excerpts are retained only as summarized runtime evidence and not as a hashable log fixture."
+  },
+  "sanitizer": {
+    "tool": "m1-wire-002-stream-analysis",
+    "version": "1",
+    "procedure": "Reconstruct complete FIN-bounded TCP streams, run width-4 and width-2 walks on identical bytes, retain only bytes read as prefixes by either walk, and replace all other bytes with fill byte 0x00.",
+    "roundTrip": "sanitized-walks-equal-raw-walks",
+    "privacyScan": "Committed artifacts contain no raw packet headers, real addresses, ports, host names, user names, generated screen-name content or payload text."
+  }
+}

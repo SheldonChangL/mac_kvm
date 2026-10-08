@@ -1,0 +1,65 @@
+{
+  "acceptedWidth": {
+    "byteOrder": "big-endian",
+    "lengthMeaning": "payload bytes after the prefix",
+    "prefixWidthBytes": 4
+  },
+  "analysis": {
+    "discriminating": true,
+    "result": "DISCRIMINATING",
+    "succeedingWidths": [
+      4
+    ],
+    "width2": {
+      "failingStreams": [
+        {
+          "connection": "connection-1",
+          "direction": "client-to-server"
+        }
+      ],
+      "succeedsOnEveryStream": false
+    },
+    "width4": {
+      "failingStreams": [],
+      "succeedsOnEveryStream": true
+    }
+  },
+  "evidenceId": "BARRIER-EVID-0003",
+  "githubIssue": "#279",
+  "issue": "M1-WIRE-002",
+  "nonClaims": [
+    "No Barrier message code, field layout beyond prefix, chunking, version negotiation, compatibility range, Windows behavior, or production TLS behavior is asserted."
+  ],
+  "rawCapture": {
+    "byteLength": 71230,
+    "currentAvailability": "not independently verified after the attempt-8 remote temporary directory became unavailable",
+    "packetCounters": {
+      "captured": 14,
+      "droppedByKernel": 0,
+      "receivedByFilter": 28
+    },
+    "sha256": "5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc",
+    "storage": "role-capture only; not committed"
+  },
+  "runtime": {
+    "acceptedObservation": "explicit-protocol-error-close",
+    "clientLogSummary": "server reported a protocol error",
+    "clientRestart": "disabled with --no-restart",
+    "peerLogReFetchLimitation": "The attempt-8 remote temporary directory was unavailable when rechecked on 2026-10-08T02:19:12Z, so peer logs are retained only as summarized runtime evidence and not as a hashable log fixture.",
+    "serverLogSummary": "accepted client connection followed by protocol error from client <unknown>"
+  },
+  "sanitizedFixture": {
+    "byteLength": 100283,
+    "path": "Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json",
+    "sha256": "6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1"
+  },
+  "schemaVersion": 1,
+  "status": "accepted-discriminating-evidence",
+  "trigger": {
+    "byteLength": 70000,
+    "generator": "ASCII literal prefix m1w8- followed by repeated lowercase a to 70000 bytes",
+    "kind": "deterministic-long-synthetic-client-screen-name",
+    "notCommitted": true,
+    "sha256": "c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f96410555ae45bbcfb"
+  }
+}
