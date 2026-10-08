@@ -41,7 +41,7 @@ The initial `status` was `initialized-no-approved-evidence` with `entries`
 empty by design. That was a safety state, not an assertion that the protocol
 has no fields: it meant every Barrier wire behavior remained unsupported and
 blocked codec work until evidence was captured and approved. The register is
-now `active` and holds the two entries described below. Every Barrier wire
+now `active` and holds the approved entries described below. Every Barrier wire
 behavior that an `approved` entry does not record remains unsupported.
 
 Only an entry whose `provenance.disposition` is exactly `approved` may support
@@ -63,7 +63,7 @@ history of an accepted observation.
 
 ## Registered evidence
 
-`BARRIER-EVID-0001` is the first entry and the only `approved` one.
+`BARRIER-EVID-0001` is the first approved entry.
 M1-EVIDENCE-001 appended it; M1-024 produced it. `BARRIER-EVID-0002`, described
 in the next section, follows it and does not change it.
 
@@ -289,3 +289,26 @@ Rolling back the M1-WIRE-001 append before it merges removes
 merge the register stays append-only, so the derived entry is marked `rejected`
 or `superseded` by a reviewed follow-up rather than deleted, and M1-025 stays
 blocked until approved evidence exists.
+
+## BARRIER-EVID-0003 — M1-WIRE-002 length-prefix discrimination
+
+`BARRIER-EVID-0003` is the accepted M1-WIRE-002 discriminating evidence item for the exact
+Barrier top-level length-prefix width within the approved `{2, 4}` candidate-reading set. It
+records a black-box attempt-8 observation using a deterministic synthetic long client screen
+name and an explicit protocol-error close accepted by the pre-approved section-17 gate.
+
+- Fixture: `Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json`
+- Fixture SHA-256: `6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1`
+- Result: width 4 succeeds on every complete stream; width 2 fails on the client-to-server
+  stream at offset `57514` with `overrun`, declared `24929`, available `12503`.
+- Accepted contract effect: using this discriminating evidence, M1-025 may freeze the exact
+  top-level length-prefix width as 4-byte unsigned big-endian payload length for the client wire
+  contract.
+- Runtime-log limitation: the peer raw-log directory was unavailable for re-fetch on
+  `2026-10-08T02:19:12Z`, so runtime peer logs are retained only as summarized evidence; the
+  machine-checkable evidence is the sanitized stream fixture and width-walk result.
+- Raw-pcap limitation: the raw pcap SHA-256 and byte length are recorded as producer runtime
+  evidence, but current raw-pcap availability is not independently verified and this entry does
+  not claim raw-pcap-to-sanitized re-derivation.
+- Non-claims: no message code, payload field layout, maximum accepted length, chunking,
+  version negotiation, Windows behavior or production TLS behavior is established.

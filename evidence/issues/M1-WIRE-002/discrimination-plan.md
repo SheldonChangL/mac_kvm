@@ -9,9 +9,9 @@ construction (`file-transfer-runtime-unsupported`, 2026-10-07T04:36Z); attempt 6
 sanitizer analysis (`STOP-BOTH-SUCCEED`, 2026-10-07T04:47Z); all six approvals are consumed; a
 seventh attempt STOPPED after runtime protocol error before accepted runtime connection success
 (`protocol-error-before-runtime-connection-success`, 2026-10-07T05:45Z); all seven approvals
-are consumed; an eighth attempt is proposed in section 17 and is NOT approved.** No capture,
-SSH session or Barrier evidence configuration may start for attempt 8 until the independent
-reviewer records a new approval for section 17.
+are consumed; attempt 8 completed under section 17 with accepted discriminating evidence
+(`DISCRIMINATING`, 2026-10-07T05:55Z), subject to the recorded peer-log re-fetch limitation and
+final Checkpoint 4 review.**
 Sections 1–10 below and the blank checklist after section 10 are kept unchanged as the
 historical attempt-1 plan.
 
@@ -1205,10 +1205,10 @@ waiver) records the decision in `independent-review.md`:
 - [ ] FINAL: attempt 7 MAY proceed after all 16.5 checks pass / attempt 7 MUST NOT proceed
       (`M1-025` stays blocked).
 
-## 17. Amended eighth-attempt plan (proposed, pending independent review)
+## 17. Amended eighth-attempt plan and result
 
-Status: **PROPOSED. NOT APPROVED. NOT STARTED.** This section is a plan amendment only. It
-records no capture, fixture, register entry, ADR or width.
+Status: **COMPLETED.** This section records the reviewed attempt-8 plan and the accepted
+discriminating outcome. It does not retroactively upgrade attempt 7.
 
 ### 17.1 Attempts 1 through 7 are preserved as stopped
 
@@ -1311,3 +1311,34 @@ waiver) records the decision in `independent-review.md`:
 - [ ] APPROVE / [ ] REJECT: exactly one bounded attempt; any further retry needs a new review.
 - [ ] FINAL: attempt 8 MAY proceed after all 17.5 checks pass / attempt 8 MUST NOT proceed
       (`M1-025` stays blocked).
+
+### 17.8 Attempt-8 runtime result — 2026-10-07T05:55Z
+
+- One bounded attempt-8 capture window was opened after the section 17 approval and fresh
+  pre-window checks.
+- Raw capture stayed on `role-capture` and is not committed. The raw pcap byte length was
+  `71230`, with SHA-256
+  `5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc`.
+- The capture tool reported `14 packets captured`, `28 packets received by filter` and
+  `0 packets dropped by kernel`; this loopback counter asymmetry is recorded in
+  `evidence/issues/M1-WIRE-002/attempt8/environment.json`.
+- The deterministic synthetic client screen name was `70000` bytes, with SHA-256
+  `c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f96410555ae45bbcfb`. The generated name
+  itself is not committed.
+- The disposable server config was `210491` bytes, with SHA-256
+  `6e2274a4438cf6450dee105ceb2e9db696d29027634517d94903d3e8924d5a7f`.
+- Runtime observation satisfied the section-17 gate as a bounded explicit protocol-error close:
+  the server accepted one client connection and recorded a protocol error from client
+  `<unknown>`; the client ran with `--no-restart` and recorded server-reported protocol error.
+  The raw peer log directory was unavailable when rechecked on `2026-10-08T02:19:12Z`, so
+  `runtime-log-excerpts.json` records summary-only peer runtime evidence and no raw log hash.
+- Sanitized output:
+  `Tests/Fixtures/Barrier/m1-wire-002-length-prefix-discrimination/sanitized.json`, byte
+  length `100283`, SHA-256
+  `6b5049bb34694130186dd147353c14c072820825c98a2ede942a49f6bab674f1`.
+- Analyzer result: `DISCRIMINATING`. Width 4 succeeded on every complete stream; width 2
+  failed on `connection-1`, `client-to-server`, offset `57514`, reason `overrun`, declared
+  `24929`, available `12503`.
+- This result supports appending `BARRIER-EVID-0003` and accepting
+  `docs/adr/M1-WIRE-002-barrier-length-prefix-width.md` after Checkpoints 2 through 4 record the
+  remaining review and validation results.
