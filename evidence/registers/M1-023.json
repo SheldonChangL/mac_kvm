@@ -341,8 +341,12 @@
         "Do not infer TLS, certificate or trust behavior. TLS was disabled for this single observation and the product TLS default is neither exercised nor validated here.",
         "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory. New approved evidence is the only way to supersede an unknown."
       ],
-      "frozenContractRefs": [],
-      "consumingTests": []
+      "frozenContractRefs": [
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+      ]
     },
     {
       "evidenceId": "BARRIER-EVID-0002",
@@ -529,8 +533,12 @@
         "Do not infer TLS, certificate or trust behavior. TLS was disabled for this single observation and the product TLS default is neither exercised nor validated here.",
         "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory."
       ],
-      "frozenContractRefs": [],
-      "consumingTests": []
+      "frozenContractRefs": [
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+      ]
     },
     {
       "evidenceId": "BARRIER-EVID-0003",
@@ -665,10 +673,12 @@
         "Do not copy or translate Barrier or Deskflow implementation from this evidence."
       ],
       "frozenContractRefs": [
-        "docs/adr/M1-WIRE-002-barrier-length-prefix-width.md"
+        "docs/adr/M1-WIRE-002-barrier-length-prefix-width.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
       ],
       "consumingTests": [
-        "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py"
+        "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py",
+        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
       ]
     }
   ]

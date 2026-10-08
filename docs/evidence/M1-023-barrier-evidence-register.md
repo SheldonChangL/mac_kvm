@@ -114,11 +114,15 @@ the next capture, no accepted source names a successor to M1-024, and
 M1-EVIDENCE-001 has no authority to invent one, so it is left untouched and
 raised as a follow-up rather than guessed.
 
-`frozenContractRefs` and `consumingTests` are both empty, which is the correct
-bounded state before M1-025 exists. Workflow step 7 is the only way they become
-non-empty: M1-025 freezes a separate wire contract and links its tests, and
-that link must leave the provenance, the fixture digest and the review history
-of this entry untouched.
+M1-025 has now frozen a separate client wire contract and linked the consumer
+test. `frozenContractRefs` points to
+`docs/adr/M1-025-barrier-client-wire-contract.md`, and `consumingTests` points
+to `Tests/Contracts/test_m1_025_barrier_client_wire_contract.py`. That link
+leaves the provenance, the fixture digest and the review history of this entry
+untouched; it does not promote any unknown field in `BARRIER-EVID-0001`.
+This is the only allowed in-place update under workflow step 7: it updates the
+consumer-link fields only and does not authorize rewriting any claim, unknown,
+provenance, fixture, limitation or prohibited-inference content.
 
 ### Derived conformance vector
 
@@ -153,6 +157,11 @@ M1-WIRE-001 (GitHub Issue #278) under
   `evidence/issues/M1-WIRE-001/independent-review.md`. It is now `approved`
   for its candidate-only claims; exact prefix width remains unknown and blocked
   on GitHub Issue #279 (M1-WIRE-002).
+- After M1-025 and GitHub Issue #293, `frozenContractRefs` points to
+  `docs/adr/M1-025-barrier-client-wire-contract.md`, and `consumingTests`
+  points to `Tests/Contracts/test_m1_025_barrier_client_wire_contract.py`.
+  This is a consumer link only; it does not turn the candidate prefix-width
+  reading into exact-width evidence.
 
 ## Traceability index
 
@@ -304,6 +313,9 @@ name and an explicit protocol-error close accepted by the pre-approved section-1
 - Accepted contract effect: using this discriminating evidence, M1-025 may freeze the exact
   top-level length-prefix width as 4-byte unsigned big-endian payload length for the client wire
   contract.
+- M1-025 consumer link: `frozenContractRefs` now includes
+  `docs/adr/M1-025-barrier-client-wire-contract.md`, and `consumingTests` now includes
+  `Tests/Contracts/test_m1_025_barrier_client_wire_contract.py`.
 - Runtime-log limitation: the peer raw-log directory was unavailable for re-fetch on
   `2026-10-08T02:19:12Z`, so runtime peer logs are retained only as summarized evidence; the
   machine-checkable evidence is the sanitized stream fixture and width-walk result.

@@ -47,6 +47,7 @@ FIXTURE_PATH = (
     "Tests/Fixtures/Barrier/m1-024-linux-client-handshake/handshake-capture.json"
 )
 M1_025_ADR_PATH = "docs/adr/M1-025-barrier-client-wire-contract.md"
+M1_025_TEST_PATH = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
 EVIDENCE_ROOT = REPOSITORY_ROOT / "evidence/issues/M1-WIRE-001"
 BARRIER_PACKAGE = REPOSITORY_ROOT / "Packages/BarrierCompatibility"
 BARRIER_BOUNDARY_SWIFT = (
@@ -708,14 +709,20 @@ def expected_claim_locations(derived):
 
 def pinned_source_violations(register_text, register):
     violations = []
-    block = textwrap.indent(PINNED_BARRIER_EVID_0001, "    ")
-    if register_text.count(block) != 1:
-        violations.append("BARRIER-EVID-0001 is not byte-for-byte unchanged")
-    elif '  "entries": [\n' + block + ",\n    {\n" not in register_text:
-        violations.append("BARRIER-EVID-0001 is not the first entry followed by an appended entry")
+    del register_text
     entries = register.get("entries") or [None]
-    if entries[0] != json.loads(PINNED_BARRIER_EVID_0001):
-        violations.append("BARRIER-EVID-0001 is not semantically unchanged")
+    current = copy.deepcopy(entries[0])
+    expected = json.loads(PINNED_BARRIER_EVID_0001)
+    expected_consumer_refs = [M1_025_ADR_PATH]
+    expected_consuming_tests = [M1_025_TEST_PATH]
+    if current.get("frozenContractRefs") != expected_consumer_refs:
+        violations.append("BARRIER-EVID-0001 does not point to the M1-025 frozen contract")
+    if current.get("consumingTests") != expected_consuming_tests:
+        violations.append("BARRIER-EVID-0001 does not name the M1-025 consuming test")
+    current["frozenContractRefs"] = []
+    current["consumingTests"] = []
+    if current != expected:
+        violations.append("BARRIER-EVID-0001 changed outside M1-025 consumer links")
     return violations
 
 
@@ -747,8 +754,10 @@ def derived_entry_violations(register, artifact, fixture_bytes, validator):
     tls = entry.get("transport", {}).get("tls", {})
     if tls != {"enabled": False, "protocolVersion": None, "certificateIdentitySanitized": True}:
         violations.append("derived entry changes the recorded TLS observation")
-    if entry.get("frozenContractRefs") != [] or entry.get("consumingTests") != []:
-        violations.append("derived entry names a consumer before M1-025 freezes a contract")
+    if entry.get("frozenContractRefs") != [M1_025_ADR_PATH]:
+        violations.append("derived entry does not point to the M1-025 frozen contract")
+    if entry.get("consumingTests") != [M1_025_TEST_PATH]:
+        violations.append("derived entry does not name the M1-025 consuming test")
     if entry.get("coverage", {}).get("direction") != source.get("coverage", {}).get("direction"):
         violations.append("derived entry changes the recorded direction coverage")
 
@@ -1153,7 +1162,7 @@ class M1Wire001ContractSequenceTests(unittest.TestCase):
             with self.subTest(mutation=name):
                 self.assertNotEqual(mutated(mutate), [])
 
-    def test_source_entry_is_unchanged_byte_for_byte(self):
+    def test_source_entry_only_adds_m1_025_consumer_links(self):
         self.assertEqual(pinned_source_violations(self.register_text, self.register), [])
         source = self.register["entries"][0]
         self.assertEqual(source["evidenceId"], SOURCE_EVIDENCE_ID)
@@ -1185,9 +1194,13 @@ class M1Wire001ContractSequenceTests(unittest.TestCase):
                 same_text,
                 lambda entry: entry["ambiguousFields"].pop(2),
             ),
-            "consumer added": (
+            "wrong consumer added": (
                 same_text,
                 lambda entry: entry["consumingTests"].append(TEST_PATH),
+            ),
+            "consumer link removed": (
+                same_text,
+                lambda entry: entry.update(consumingTests=[]),
             ),
         }
         for name, (text_change, entry_change) in cases.items():
@@ -1246,7 +1259,8 @@ class M1Wire001ContractSequenceTests(unittest.TestCase):
             "restated version": lambda r: claim(r, CLAIM_VERSION).update(
                 assertion=claim(r, CLAIM_VERSION)["assertion"].replace("00 01 00 06", "00 01 00 07")
             ),
-            "consumer added": lambda r: r["entries"][1]["consumingTests"].append(TEST_PATH),
+            "wrong consumer added": lambda r: r["entries"][1]["consumingTests"].append(TEST_PATH),
+            "consumer link removed": lambda r: r["entries"][1].update(consumingTests=[]),
             "tls enabled": lambda r: r["entries"][1]["transport"]["tls"].update(enabled=True, protocolVersion="1.3"),
             "windows claim": lambda r: r["entries"][1]["limitations"].append(
                 "Windows Barrier Server interoperability passed."

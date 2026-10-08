@@ -30,6 +30,7 @@ ATTEMPT_RUNTIME_LOGS = ATTEMPT_ROOT / "runtime-log-excerpts.json"
 REGISTER = REPOSITORY_ROOT / "evidence/registers/M1-023.json"
 REGISTER_DOC = REPOSITORY_ROOT / "docs/evidence/M1-023-barrier-evidence-register.md"
 ADR = REPOSITORY_ROOT / "docs/adr/M1-WIRE-002-barrier-length-prefix-width.md"
+M1_025_ADR = REPOSITORY_ROOT / "docs/adr/M1-025-barrier-client-wire-contract.md"
 PLAN = REPOSITORY_ROOT / "evidence/issues/M1-WIRE-002/discrimination-plan.md"
 REVIEW = REPOSITORY_ROOT / "evidence/issues/M1-WIRE-002/independent-review.md"
 
@@ -39,6 +40,7 @@ EXPECTED_FIXTURE_LENGTH = 100283
 EXPECTED_TRIGGER_SHA256 = "c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f96410555ae45bbcfb"
 EXPECTED_RAW_PCAP_SHA256 = "5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc"
 TEST_PATH = "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py"
+M1_025_TEST_PATH = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
 
 KNOWN_PUBLIC_DIGESTS = {
     EXPECTED_FIXTURE_SHA256,
@@ -225,8 +227,14 @@ class M1Wire002LengthPrefixEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(entry["fixture"]["sha256"], EXPECTED_FIXTURE_SHA256)
         self.assertEqual(entry["fixture"]["byteLength"], EXPECTED_FIXTURE_LENGTH)
-        self.assertEqual(entry["frozenContractRefs"], [str(ADR.relative_to(REPOSITORY_ROOT))])
-        self.assertEqual(entry["consumingTests"], [TEST_PATH])
+        self.assertEqual(
+            entry["frozenContractRefs"],
+            [
+                str(ADR.relative_to(REPOSITORY_ROOT)),
+                str(M1_025_ADR.relative_to(REPOSITORY_ROOT)),
+            ],
+        )
+        self.assertEqual(entry["consumingTests"], [TEST_PATH, M1_025_TEST_PATH])
         claim = entry["coverage"]["wireClaims"][0]
         self.assertEqual(claim["claimId"], EVIDENCE_ID + "-CLAIM-001")
         self.assertEqual(
