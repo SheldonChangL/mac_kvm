@@ -1,0 +1,121 @@
+{
+  "issue": "M1-027",
+  "githubIssue": 40,
+  "status": "implemented-verified-locally",
+  "baseCommit": "1425960",
+  "reviewerVerifiedAt": "2026-10-12T07:22:54Z",
+  "commit": null,
+  "commitNote": "Uncommitted working tree on branch codex/m1-027-server-hello-parser; no commit was created by the authoring session.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "red",
+      "startedAt": "2026-10-12T07:14:34Z",
+      "exitCode": 1,
+      "result": "failed-as-expected",
+      "summary": "Before BarrierServerHello.swift existed, the test target failed to compile: cannot find type 'BarrierServerHelloError' / 'BarrierServerHello' in scope."
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1027-xunit.xml",
+      "phase": "green-initial",
+      "startedAt": "2026-10-12T07:15:29Z",
+      "endedAt": "2026-10-12T07:15:30Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "94 tests passed (20 M1-027). Superseded by the final run after review fixes."
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1027-xunit.xml",
+      "phase": "green-final",
+      "startedAt": "2026-10-12T07:18:38Z",
+      "endedAt": "2026-10-12T07:18:40Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "93 tests passed (19 M1-027) after removing one vacuous test and making the metadata test check thrown errors.",
+      "report": "evidence/issues/M1-027/tests/barrier-server-hello-tests.json"
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-12T07:21:21Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Reviewer rerun: Test run with 93 tests passed."
+    },
+    {
+      "command": "swift build --build-tests --package-path Packages/BarrierCompatibility",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Rebuild after touching both M1-027 Swift files emitted 0 warnings."
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No output after final test edits (an earlier LineLength finding in the test file was fixed)."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-10-12T07:19:03Z",
+      "endedAt": "2026-10-12T07:19:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "** BUILD SUCCEEDED **. Xcode emitted the existing ambiguous-destination warning described by M1-005; no Swift compile warning was observed.",
+      "reviewerRerunAt": "2026-10-12T07:21:33Z",
+      "reviewerRerunResult": "passed: ** BUILD SUCCEEDED ** with the same existing ambiguous-destination warning"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-10-12T07:19:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-10-12T07:19:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-10-12T07:19:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-10-12T07:19:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors in tracked changes; new files checked by the grep below."
+    },
+    {
+      "command": "make verify",
+      "startedAt": "2026-10-12T07:19:05Z",
+      "endedAt": "2026-10-12T07:20:10Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "24 gates passed; report artifacts/ci/m1-008-report.json",
+      "reviewerRerunAt": "2026-10-12T07:22:00Z",
+      "reviewerRerunResult": "passed: 24 gates"
+    },
+    {
+      "command": "grep -nE '[[:space:]]$' <M1-027 files>; grep -nE 'CINN|COUT|DKDN|DMMV|/Users/' <M1-027 files>",
+      "exitCode": 1,
+      "result": "passed",
+      "summary": "grep exit 1 = no match: no trailing whitespace, no restricted Barrier tokens and no local user paths; all files end with a newline.",
+      "files": [
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierServerHello.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierServerHelloTests.swift",
+        "docs/components/M1-027-barrier-server-hello.md",
+        "evidence/issues/M1-027/*"
+      ]
+    }
+  ],
+  "authoringReviewNote": "The authoring session recorded a fresh-context self-check and addressed its notes before handoff: commands.json added; vacuous parseDoesNotMutateCallerPayload removed; metadata test now checks thrown errors. This is not treated as the formal merge review; PR review records the merge gate.",
+  "notRun": [],
+  "requiresReviewerRerun": []
+}

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-027",
+  "phase": "green",
+  "executedAt": "2026-10-12T07:18:38Z",
+  "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1027-xunit.xml",
+  "exitCode": 0,
+  "framework": "swift-testing",
+  "total": 93,
+  "passed": 93,
+  "failed": 0,
+  "skipped": 0,
+  "m1_027_total": 19,
+  "m1_027_passed": 19,
+  "rawReport": "evidence/issues/M1-027/tests/swift-testing-xunit.xml",
+  "testCases": [
+    {
+      "name": "failedParseDoesNotAffectLaterParse()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "frozenConstantsEqualGoldenBytesExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "helloCarriesOnlyAcceptedMarkerAndVersion()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "parsesGoldenPayloadReassembledFromByteByByteFragments()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "parsesGoldenPayloadWithExactBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "payloadLengthIsExactlyMarkerPlusVersion()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsEmptyPayloadAsTruncatedMarker()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsEverySingleByteMarkerMutation()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsEverySingleByteVersionMutation()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsNeighbouringVersionsWithoutNegotiation()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsOtherMarkersIncludingCaseVariants()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsTrailingBytesAfterVersion()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsTruncatedMarkerAtEveryLength()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsTruncatedVersionAtEveryLength()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "repeatedParseReturnsEqualValues()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "reportsMarkerMismatchBeforeVersionMismatchOrTrailingBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "reportsMismatchBeforeTruncation()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "reportsVersionMismatchBeforeTrailingBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "thrownErrorsCarryOnlyAllowlistedMetadata()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    }
+  ]
+}
