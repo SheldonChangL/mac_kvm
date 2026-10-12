@@ -401,6 +401,23 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         self.assertIn(expected_test, self.documentation)
         self.assertIn("M1-021 codec consumer link", self.documentation)
 
+    def test_m1_022_reassembler_consumer_links_are_registered(self):
+        expected_test = (
+            "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/"
+            "BarrierFrameReassemblerTests.swift"
+        )
+        entries = {entry["evidenceId"]: entry for entry in self.register["entries"]}
+
+        for evidence_id in ("BARRIER-EVID-0002", "BARRIER-EVID-0003"):
+            self.assertIn(expected_test, entries[evidence_id]["consumingTests"])
+
+        # BARRIER-EVID-0001 is intentionally not linked: the M1-022 reassembler
+        # tests consume the derived frame/vector and exact-width evidence, not
+        # the uninterpreted raw handshake runs.
+        self.assertNotIn(expected_test, entries["BARRIER-EVID-0001"]["consumingTests"])
+        self.assertIn(expected_test, self.documentation)
+        self.assertIn("M1-022 reassembler consumer link", self.documentation)
+
 
 if __name__ == "__main__":
     unittest.main()

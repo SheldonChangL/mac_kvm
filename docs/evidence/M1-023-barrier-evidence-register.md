@@ -163,6 +163,9 @@ M1-WIRE-001 (GitHub Issue #278) under
   After M1-021-TRACE-001 (GitHub Issue #298), `consumingTests` also points to
   `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift`
   as the M1-021 codec consumer link for the derived golden frame bytes.
+  After M1-022-TRACE-001 (GitHub Issue #301), `consumingTests` also points to
+  `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierFrameReassemblerTests.swift`
+  as the M1-022 reassembler consumer link for split/coalesced/truncated frame tests.
   This is a consumer link only; it does not turn the candidate prefix-width
   reading into exact-width evidence.
 
@@ -322,6 +325,9 @@ name and an explicit protocol-error close accepted by the pre-approved section-1
 - M1-021 codec consumer link: `consumingTests` now also includes
   `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift`
   for the bounded binary codec's exact golden-byte and top-level length-prefix tests.
+- M1-022 reassembler consumer link: `consumingTests` now also includes
+  `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierFrameReassemblerTests.swift`
+  for split, coalesced and truncated stream-frame tests over the frozen envelope.
 - Runtime-log limitation: the peer raw-log directory was unavailable for re-fetch on
   `2026-10-08T02:19:12Z`, so runtime peer logs are retained only as summarized evidence; the
   machine-checkable evidence is the sanitized stream fixture and width-walk result.

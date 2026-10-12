@@ -51,6 +51,10 @@ M1_025_TEST_PATH = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
 M1_021_CODEC_TEST_PATH = (
     "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift"
 )
+M1_022_REASSEMBLER_TEST_PATH = (
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/"
+    "BarrierFrameReassemblerTests.swift"
+)
 EVIDENCE_ROOT = REPOSITORY_ROOT / "evidence/issues/M1-WIRE-001"
 BARRIER_PACKAGE = REPOSITORY_ROOT / "Packages/BarrierCompatibility"
 BARRIER_BOUNDARY_SWIFT = (
@@ -759,8 +763,14 @@ def derived_entry_violations(register, artifact, fixture_bytes, validator):
         violations.append("derived entry changes the recorded TLS observation")
     if entry.get("frozenContractRefs") != [M1_025_ADR_PATH]:
         violations.append("derived entry does not point to the M1-025 frozen contract")
-    if entry.get("consumingTests") != [M1_025_TEST_PATH, M1_021_CODEC_TEST_PATH]:
-        violations.append("derived entry does not name the M1-025 and M1-021 consuming tests")
+    if entry.get("consumingTests") != [
+        M1_025_TEST_PATH,
+        M1_021_CODEC_TEST_PATH,
+        M1_022_REASSEMBLER_TEST_PATH,
+    ]:
+        violations.append(
+            "derived entry does not name the M1-025, M1-021 and M1-022 consuming tests"
+        )
     if entry.get("coverage", {}).get("direction") != source.get("coverage", {}).get("direction"):
         violations.append("derived entry changes the recorded direction coverage")
 

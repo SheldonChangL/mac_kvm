@@ -44,6 +44,10 @@ M1_025_TEST_PATH = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
 M1_021_CODEC_TEST_PATH = (
     "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift"
 )
+M1_022_REASSEMBLER_TEST_PATH = (
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/"
+    "BarrierFrameReassemblerTests.swift"
+)
 
 KNOWN_PUBLIC_DIGESTS = {
     EXPECTED_FIXTURE_SHA256,
@@ -239,7 +243,12 @@ class M1Wire002LengthPrefixEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(
             entry["consumingTests"],
-            [TEST_PATH, M1_025_TEST_PATH, M1_021_CODEC_TEST_PATH],
+            [
+                TEST_PATH,
+                M1_025_TEST_PATH,
+                M1_021_CODEC_TEST_PATH,
+                M1_022_REASSEMBLER_TEST_PATH,
+            ],
         )
         claim = entry["coverage"]["wireClaims"][0]
         self.assertEqual(claim["claimId"], EVIDENCE_ID + "-CLAIM-001")
