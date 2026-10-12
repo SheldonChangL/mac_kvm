@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-021",
+  "phase": "red",
+  "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+  "executedAt": "2026-10-08T07:33:58Z",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "failureType": "SwiftCompilationError",
+  "failureReason": "BarrierBinaryCodecTests referenced BarrierBinaryReader, BarrierBinaryWriter and BarrierBinaryCodecError before BarrierBinaryCodec.swift existed ('cannot find BarrierBinaryReader in scope').",
+  "remediation": "Added only BarrierBinaryCodec.swift; all package tests then passed (28 initially, 30 after review-driven test hardening)."
+}
