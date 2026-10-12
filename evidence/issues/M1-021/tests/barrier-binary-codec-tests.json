@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-021",
+  "phase": "green",
+  "executedAt": "2026-10-12T00:06:04Z",
+  "command": "swift test --package-path Packages/BarrierCompatibility",
+  "exitCode": 0,
+  "framework": "swift-testing",
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "skipped": 0,
+  "testCases": [
+    {
+      "name": "readerAcceptsEmptyPayloadFrame()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsHugeCountWithoutArithmeticOverflow()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "failedWritesLeaveBufferUnchanged()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsPayloadOneByteOverLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerOutputRoundTripsThroughReader()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerReadsCoalescedFramesInOrder()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "failedReadsDoNotAdvanceCursor()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerFillsCapacityExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerWithZeroCapacityAcceptsEmptyWrite()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerRejectsNegativeLimits()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerDecodesUnsignedIntegersBigEndian()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerAcceptsPayloadExactlyAtLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerDecodesMaximumUInt32Prefix()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsTruncatedIntegers()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "lengthPrefixRejectsValuesOutsideUInt32()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerRejectsPayloadOverLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsNegativeCountAndLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsMaximumPrefixBeforeReadingPayload()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerAcceptsZeroCountReadOnEmptyInput()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "lengthPrefixAcceptsUInt32Range()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerEncodesUnsignedIntegersBigEndian()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerReportsTruncationForMaximumPrefixWithinUnboundedLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerRejectsCapacityOverflow()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerReadsRawBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "failedPrimitiveWritesLeaveBufferUnchanged()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerProducesGoldenFrameBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsTruncatedPrefixAtEveryLength()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerReadsGoldenLengthPrefixedFrame()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "readerRejectsTruncatedPayloadAtEveryLength()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "childPackageOwnsBarrierCompatibilityTests()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    }
+  ]
+}

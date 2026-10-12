@@ -1,0 +1,64 @@
+{
+  "issue": "M1-021",
+  "githubIssue": 22,
+  "status": "implemented-verified",
+  "baseCommit": "5964788ef74f77f3ec543541e0a73169ea950203",
+  "verifiedAt": "2026-10-12T00:11:05Z",
+  "environmentNote": "Initial Claude author runs hit nested sandbox limits. Reviewer reran the exact required commands in a normal shell; final required gates passed.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "startedAt": "2026-10-12T00:06:04Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build complete; Swift Testing run passed 30 tests (29 BarrierBinaryCodecTests + 1 package-ownership test)."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-10-12T00:06:11Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "** BUILD SUCCEEDED **"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors."
+    },
+    {
+      "command": "make verify",
+      "startedAt": "2026-10-12T00:09:05Z",
+      "endedAt": "2026-10-12T00:10:35Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "All 24 gates passed, including manifest-validation, docs-check, architecture-check, code-quality, evidence tests, swift-package-test:BarrierCompatibility, repository-contract-tests, swift-test-targets and native-arm64-build. CI report: artifacts/ci/m1-008-report.json"
+    },
+    {
+      "command": "Independent fresh-context review (Claude Opus, read-only)",
+      "exitCode": 0,
+      "result": "passed-with-remediation",
+      "summary": "No Critical or High findings. One Medium doc finding and Low findings were remediated. Remaining traceability update is tracked as GitHub issue #298 because it is outside M1-021 Exact Files."
+    }
+  ],
+  "notRun": [],
+  "requiresReviewerRerun": []
+}
