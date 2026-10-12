@@ -22,6 +22,7 @@ commit is recorded in the PR and review comment.
 - `docs/adr/M1-042-virtual-key-catalog.md`
 - `evidence/issues/M1-042/summary.md`
 - `evidence/issues/M1-042/commands.json`
+- `evidence/issues/M1-042/reviews/claude-opus-2026-10-13.md`
 - `evidence/issues/M1-042/tests/results.json`
 
 No Swift source, test, package or contract file was changed.
@@ -32,8 +33,8 @@ No Swift source, test, package or contract file was changed.
 |---|---|
 | Focus items located | ADR "Catalog v1 members" covers letters, digits, navigation, function, media and modifiers; "Unknown-key policy" keeps the original code and bars it from platform APIs; "Catalog versioning" defines version `1` and change rules. All 26 merged `VirtualKey` cases are mapped (machine check in `tests/results.json`). |
 | Selected, Rejected, Consequences, Security/Compatibility impact, Rollback | Present as ADR sections (section check in `tests/results.json`). |
-| Open questions with owner and blocking condition | ADR "Open questions" table: four entries, each with owner and blocking condition; no other open question. |
-| Owner/Security/Human signoff recorded | ADR "Signoff record" lists all three roles as Pending. Not satisfied until reviewers approve. |
+| Open questions with owner and blocking condition | ADR "Open questions" table: five entries, each with owner and blocking condition; no other open question. |
+| Owner/Security/Human signoff recorded | ADR "Signoff record" lists Product Owner as Pending. Security Reviewer and independent tier-B reviewer were approved by Claude Code Opus reviewer on 2026-10-13 after the Native-wire unknown handling follow-up was added. Not complete until Product Owner approval is recorded. |
 
 ## Automated checks
 

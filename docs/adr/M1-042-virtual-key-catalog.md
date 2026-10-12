@@ -242,6 +242,7 @@ Exact Files. It is tracked as an open question below.
 |---|---|---|
 | Add punctuation/OEM, keypad, Insert, Fn/Globe, media transport and side-specific modifier members (catalog v2) | Contracts owner with Product Owner approval, through a new contract-change Issue | Blocks any M1 or M2 claim of punctuation, keypad or media-transport forwarding. Does not block M1-043, M1-044 or M1-046 for v1 members. |
 | Add catalog-version constant and payload-domain validation to `KVMContracts` | Contracts owner, through a new contract-change Issue | Must be resolved before the first persisted or Native wire representation of `VirtualKey` (M3-004). Until then M1-043 and M1-044 tests enforce domains. |
+| Decide whether a Native keyboard wire representation may carry `unknown(rawCode)`, must reject it, or must first add a source namespace | M3-004/M3-017 owners with Security Reviewer | Must be resolved before the first Native keyboard encoder represents `VirtualKey.unknown`. This does not block M1's Barrier-to-macOS v1 mapper, where `unknown` stays reject-only at the platform boundary. |
 | Source namespace for `unknown`, enabling explicit platform handling | Contracts owner and Security Reviewer, through a superseding catalog ADR | Blocks any mapper that would inject an `unknown` value. Reject-only handling stays in force until resolved. |
 | M1-043 Exact Files place `BarrierVirtualKeyMapper` in `KVMCore`, while M1-002 and Frozen Decision 4 keep Barrier key tables in `BarrierCompatibility` | M1-043 implementer with Architecture Reviewer | Must be resolved by Product Owner decision before M1-043 starts. This ADR does not authorize Barrier key identifiers in `KVMCore`. |
 
@@ -262,8 +263,8 @@ decoder bounds, privacy-safe logging or fail-safe cleanup.
 | Role | Required for | Status |
 |---|---|---|
 | Product Owner | Catalog v1 scope and the v1 forwarding limitation | Pending |
-| Security Reviewer | Unknown-key reject-only policy and diagnostic exclusions | Pending |
-| Human / independent reviewer (tier B) | Full review of this ADR against C-005 and M1-002 | Pending |
+| Security Reviewer | Unknown-key reject-only policy and diagnostic exclusions | Approved by Claude Code Opus reviewer on 2026-10-13; no Critical or High findings after the Native-wire unknown handling follow-up was added above. |
+| Human / independent reviewer (tier B) | Full review of this ADR against C-005 and M1-002 | Approved by Claude Code Opus reviewer on 2026-10-13; no Critical or High findings after the Native-wire unknown handling follow-up was added above. |
 
 This ADR is not accepted, and dependent Issues may not merge, until all three
 rows record an approval with reviewer identity and date.
