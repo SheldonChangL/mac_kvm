@@ -1,0 +1,111 @@
+{
+  "issue": "M1-026",
+  "githubIssue": 39,
+  "status": "implemented-verified-locally",
+  "baseCommit": "aef3b2b0f81cf7d382644105163841d83cf86838",
+  "reviewerVerifiedAt": "2026-10-12T06:59:09Z",
+  "commit": null,
+  "commitNote": "Uncommitted working tree on branch codex/m1-026-message-registry; no commit was created by the authoring session.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "red",
+      "startedAt": "2026-10-12T06:53:20Z",
+      "exitCode": 1,
+      "result": "failed-as-expected",
+      "summary": "With BarrierMessageRegistry.swift temporarily moved out, the test target failed to compile: cannot find type 'BarrierMessageRegistryError' / 'BarrierMessageRegistry' in scope. The file was restored before the green run."
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1026-xunit.xml",
+      "phase": "green",
+      "startedAt": "2026-10-12T06:53:29Z",
+      "endedAt": "2026-10-12T06:53:31Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Test run with 74 tests passed (19 M1-026 registry tests plus existing BarrierCompatibility tests). Report: evidence/issues/M1-026/tests/",
+      "report": "evidence/issues/M1-026/tests/barrier-message-registry-tests.json"
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "reviewer-rerun-after-format-fix",
+      "startedAt": "2026-10-12T06:57:36Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Reviewer rerun after Swift format fix: Test run with 74 tests passed."
+    },
+    {
+      "command": "swift build --build-tests --package-path Packages/BarrierCompatibility",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Rebuild after touching both M1-026 Swift files emitted 0 warnings."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-10-12T06:53:49Z",
+      "endedAt": "2026-10-12T06:53:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "** BUILD SUCCEEDED **. Xcode emitted the existing ambiguous-destination warning described by M1-005; no Swift compile warning was observed.",
+      "reviewerRerunAt": "2026-10-12T06:56:24Z",
+      "reviewerRerunResult": "passed: ** BUILD SUCCEEDED ** with the same existing ambiguous-destination warning"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-10-12T06:53:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "rerunAt": "2026-10-12T06:55:03Z",
+      "rerunNote": "Rerun after the component doc and evidence files were written; same exit code 0 and output."
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-10-12T06:53:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK",
+      "rerunAt": "2026-10-12T06:55:03Z",
+      "rerunNote": "Rerun after the component doc and evidence files were written; same exit code 0 and output."
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-10-12T06:53:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK",
+      "rerunAt": "2026-10-12T06:55:03Z",
+      "rerunNote": "Rerun after the component doc and evidence files were written; same exit code 0 and output."
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors.",
+      "rerunAt": "2026-10-12T06:55:03Z",
+      "rerunNote": "Rerun after the component doc and evidence files were written; same exit code 0 and output."
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-10-12T06:57:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Reviewer found Swift format lint failures in BarrierMessageRegistryTests.swift; Claude fixed only formatting, then lint passed with no output."
+    },
+    {
+      "command": "make verify",
+      "startedAt": "2026-10-12T06:57:52Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "24 gates passed; report artifacts/ci/m1-008-report.json"
+    },
+    {
+      "command": "grep -nE '[[:space:]]$' <7 M1-026 files>; grep -nE 'CINN|COUT|DKDN|DMMV|/Users/' <7 M1-026 files>",
+      "startedAt": "2026-10-12T06:55:03Z",
+      "exitCode": 1,
+      "result": "passed",
+      "summary": "grep exit 1 = no match: no trailing whitespace, no architecture-restricted Barrier tokens and no local user paths in M1-026 source, test, doc or evidence files; all 7 files end with a newline."
+    }
+  ],
+  "notRun": [],
+  "requiresReviewerRerun": []
+}

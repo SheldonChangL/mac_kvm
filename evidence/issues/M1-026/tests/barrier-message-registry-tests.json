@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-026",
+  "phase": "green",
+  "executedAt": "2026-10-12T06:53:29Z",
+  "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1026-xunit.xml",
+  "exitCode": 0,
+  "framework": "swift-testing",
+  "total": 74,
+  "passed": 74,
+  "failed": 0,
+  "skipped": 0,
+  "m1_026_total": 19,
+  "m1_026_passed": 19,
+  "rawReport": "evidence/issues/M1-026/tests/swift-testing-xunit.xml",
+  "testCases": [
+    {
+      "name": "codesDifferingOnlyInLastByteAreBothRegistrable()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "decoderFailureDoesNotAffectLaterDispatch()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "decoderFailurePropagatesTyped()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "dispatchDoesNotDependOnRegistrationOrder()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "dispatchesEachCodeWidthToItsOwnDecoder()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "dispatchesGoldenPayloadToRegisteredDecoderWithExactBody()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "emptyPayloadIsUnknown()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "emptyRegistryReportsEveryPayloadAsUnknown()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "failedRegistrationLeavesRegistryUnchanged()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "payloadEqualToCodeDecodesEmptyBody()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "payloadShorterThanCodeIsUnknown()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "registeringOnCopyDoesNotChangeOriginal()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsCodeThatExtendsRegisteredCode()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsCodeThatIsPrefixOfRegisteredCode()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsDuplicateCode()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsEmptyCode()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "repeatedDecodeReturnsSameOutcome()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "unknownDiagnosticCarriesOnlyAllowlistedMetadata()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "unknownPayloadsNeverReachDecodersAndDoNotCrash()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    }
+  ]
+}
