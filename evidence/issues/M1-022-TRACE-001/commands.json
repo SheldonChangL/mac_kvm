@@ -1,0 +1,50 @@
+{
+  "issue": "M1-022-TRACE-001",
+  "githubIssue": 301,
+  "status": "implemented-and-locally-verified",
+  "baseCommit": "c7182fe9634d1c086bbdfec6ec942a3f9fbcd730",
+  "verifiedAt": "2026-10-12T01:17:08Z",
+  "commands": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "exitCode": 0,
+      "result": "Ran 14 tests in 0.002s; OK"
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_001_contract_sequence.py",
+      "exitCode": 0,
+      "result": "Ran 20 tests in 0.225s; OK"
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py",
+      "exitCode": 0,
+      "result": "Ran 7 tests in 22.363s; OK"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed with no output"
+    },
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "result": "24 gates passed; report artifacts/ci/m1-008-report.json"
+    }
+  ],
+  "notRun": []
+}
