@@ -537,7 +537,8 @@
         "docs/adr/M1-025-barrier-client-wire-contract.md"
       ],
       "consumingTests": [
-        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift"
       ]
     },
     {
@@ -678,7 +679,8 @@
       ],
       "consumingTests": [
         "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py",
-        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+        "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift"
       ]
     }
   ]

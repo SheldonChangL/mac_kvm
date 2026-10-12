@@ -160,6 +160,9 @@ M1-WIRE-001 (GitHub Issue #278) under
 - After M1-025 and GitHub Issue #293, `frozenContractRefs` points to
   `docs/adr/M1-025-barrier-client-wire-contract.md`, and `consumingTests`
   points to `Tests/Contracts/test_m1_025_barrier_client_wire_contract.py`.
+  After M1-021-TRACE-001 (GitHub Issue #298), `consumingTests` also points to
+  `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift`
+  as the M1-021 codec consumer link for the derived golden frame bytes.
   This is a consumer link only; it does not turn the candidate prefix-width
   reading into exact-width evidence.
 
@@ -316,6 +319,9 @@ name and an explicit protocol-error close accepted by the pre-approved section-1
 - M1-025 consumer link: `frozenContractRefs` now includes
   `docs/adr/M1-025-barrier-client-wire-contract.md`, and `consumingTests` now includes
   `Tests/Contracts/test_m1_025_barrier_client_wire_contract.py`.
+- M1-021 codec consumer link: `consumingTests` now also includes
+  `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift`
+  for the bounded binary codec's exact golden-byte and top-level length-prefix tests.
 - Runtime-log limitation: the peer raw-log directory was unavailable for re-fetch on
   `2026-10-08T02:19:12Z`, so runtime peer logs are retained only as summarized evidence; the
   machine-checkable evidence is the sanitized stream fixture and width-walk result.

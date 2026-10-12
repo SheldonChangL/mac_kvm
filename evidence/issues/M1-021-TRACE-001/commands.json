@@ -1,0 +1,78 @@
+{
+  "issue": "M1-021-TRACE-001",
+  "githubIssue": 298,
+  "status": "implemented-verified",
+  "baseCommit": "840dc9c4d1646d756bc9b8c9b6959de5312de14e",
+  "verifiedAt": "2026-10-12T00:20:56Z",
+  "commands": [
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "exitCode": 1,
+      "result": "red-phase-expected-failure",
+      "summary": "Test added before correcting register links; failed because BARRIER-EVID-0002 lacked the M1-021 codec consuming test and BARRIER-EVID-0001 had been accidentally linked."
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_001_contract_sequence.py",
+      "exitCode": 1,
+      "result": "red-phase-expected-failure",
+      "summary": "Pin test failed until BARRIER-EVID-0002 consumingTests was updated and BARRIER-EVID-0001 reverted to M1-025-only consumingTests."
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "7 tests passed after BARRIER-EVID-0003 consumer-link update."
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "13 tests passed after final register-link correction."
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_001_contract_sequence.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "20 tests passed after final register-link correction."
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "7 tests passed after final register-link correction."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors."
+    },
+    {
+      "command": "make verify",
+      "startedAt": "2026-10-12T00:19:10Z",
+      "endedAt": "2026-10-12T00:20:40Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "All 24 gates passed, including evidence-test:M1-023/tests/test_register.py, repository-contract-tests and swift-package-test:BarrierCompatibility. CI report: artifacts/ci/m1-008-report.json"
+    }
+  ],
+  "notRun": []
+}

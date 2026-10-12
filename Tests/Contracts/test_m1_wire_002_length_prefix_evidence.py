@@ -41,6 +41,9 @@ EXPECTED_TRIGGER_SHA256 = "c886c23ce4f108f6198b9a2f5a7fb703806256d14157c5f964105
 EXPECTED_RAW_PCAP_SHA256 = "5ed5322b6edc0e3c8fd0a63776a25335de4a15d824769d1162361dfd05c6fabc"
 TEST_PATH = "Tests/Contracts/test_m1_wire_002_length_prefix_evidence.py"
 M1_025_TEST_PATH = "Tests/Contracts/test_m1_025_barrier_client_wire_contract.py"
+M1_021_CODEC_TEST_PATH = (
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift"
+)
 
 KNOWN_PUBLIC_DIGESTS = {
     EXPECTED_FIXTURE_SHA256,
@@ -234,7 +237,10 @@ class M1Wire002LengthPrefixEvidenceTests(unittest.TestCase):
                 str(M1_025_ADR.relative_to(REPOSITORY_ROOT)),
             ],
         )
-        self.assertEqual(entry["consumingTests"], [TEST_PATH, M1_025_TEST_PATH])
+        self.assertEqual(
+            entry["consumingTests"],
+            [TEST_PATH, M1_025_TEST_PATH, M1_021_CODEC_TEST_PATH],
+        )
         claim = entry["coverage"]["wireClaims"][0]
         self.assertEqual(claim["claimId"], EVIDENCE_ID + "-CLAIM-001")
         self.assertEqual(
