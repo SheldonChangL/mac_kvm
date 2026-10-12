@@ -1,0 +1,58 @@
+{
+  "issue": "M1-022",
+  "githubIssue": 36,
+  "status": "implemented-verified",
+  "baseCommit": "64d94c7e37941b5b3c4470a58113153765d36b4e",
+  "verifiedAt": "2026-10-12T01:08:21Z",
+  "environmentNote": "Initial Claude authoring session could not run build/test commands. Reviewer reran the exact required commands in a normal shell; final required gates passed.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "startedAt": "2026-10-12T01:03:31Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build complete; Swift Testing run passed 55 tests (25 M1-022 reassembler tests plus existing BarrierCompatibility tests)."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-10-12T01:03:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "** BUILD SUCCEEDED **"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors."
+    },
+    {
+      "command": "make verify",
+      "startedAt": "2026-10-12T01:06:58Z",
+      "endedAt": "2026-10-12T01:08:00Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "All 24 gates passed, including manifest-validation, docs-check, architecture-check, code-quality, evidence tests, swift-package-test:BarrierCompatibility, repository-contract-tests, swift-test-targets and native-arm64-build. CI report: artifacts/ci/m1-008-report.json"
+    }
+  ],
+  "notRun": [],
+  "requiresReviewerRerun": []
+}
