@@ -1,0 +1,63 @@
+{
+  "issue": "M1-042",
+  "generatedAt": "2026-10-12T07:38:23+00:00",
+  "baseCommit": "a25e591b1e86359909e3837b0cf7eb0b4efb6965",
+  "checks": [
+    {
+      "name": "docs-check-rules-on-new-files",
+      "files": [
+        "docs/adr/M1-042-virtual-key-catalog.md",
+        "evidence/issues/M1-042/summary.md",
+        "evidence/issues/M1-042/commands.json"
+      ],
+      "violations": [],
+      "status": "passed"
+    },
+    {
+      "name": "adr-required-sections",
+      "missing": [],
+      "status": "passed"
+    },
+    {
+      "name": "adr-no-unresolved-placeholders",
+      "matches": [],
+      "status": "passed"
+    },
+    {
+      "name": "referenced-paths-exist",
+      "missing": [],
+      "checked": 16,
+      "status": "passed"
+    },
+    {
+      "name": "relative-links-resolve",
+      "missing": [],
+      "status": "passed"
+    },
+    {
+      "name": "catalog-covers-every-virtualkey-case",
+      "enumCases": 26,
+      "uncovered": [],
+      "status": "passed"
+    },
+    {
+      "name": "open-questions-have-owner-and-blocking-condition",
+      "rows": 4,
+      "incomplete": [],
+      "status": "passed"
+    }
+  ],
+  "requiredCommands": {
+    "make docs-check": "passed",
+    "python3 Tools/Backlog/validate_package.py": "passed",
+    "make architecture-check": "passed"
+  },
+  "productionSourceChanged": false,
+  "manualHardwareRequired": false,
+  "signoff": {
+    "productOwner": "pending",
+    "securityReviewer": "pending",
+    "humanIndependentReviewer": "pending"
+  },
+  "status": "passed"
+}
