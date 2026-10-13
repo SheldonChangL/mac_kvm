@@ -45,6 +45,14 @@
       "startedAt": "2026-10-13T01:47:57Z",
       "endedAt": "2026-10-13T01:47:57Z",
       "output": ""
+    },
+    {
+      "command": "make verify REPORT=/tmp/m1_044_verify_after_format_external.json",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T05:37:14.861+00:00",
+      "endedAt": "2026-10-13T05:38:31.669+00:00",
+      "output": "all CI gates passed; report=/tmp/m1_044_verify_after_format_external.json",
+      "note": "rerun after swift-format fixed MacKeyCodeMapperTests.swift; includes manifest, docs, architecture, code-quality, tool tests, evidence tests, Swift package tests, repository contract tests, swift test targets and native arm64 build"
     }
   ],
   "notes": [

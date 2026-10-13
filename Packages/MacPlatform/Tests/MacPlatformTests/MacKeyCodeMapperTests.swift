@@ -216,10 +216,12 @@ func unknownKeysAreRejectedWhateverTheirRawValue(rawCode: UInt32) {
 }
 
 @Test func failureReasonsAreClosedAndCarryNoPayload() {
-  #expect(MacKeyCodeMappingFailure.allCases == [.unknownKey, .payloadOutOfDomain, .noMacOSBaseline])
-  #expect(MacKeyCodeMappingFailure.allCases.map(\.rawValue) == [
-    "unknownKey", "payloadOutOfDomain", "noMacOSBaseline",
-  ])
+  #expect(
+    MacKeyCodeMappingFailure.allCases == [.unknownKey, .payloadOutOfDomain, .noMacOSBaseline])
+  #expect(
+    MacKeyCodeMappingFailure.allCases.map(\.rawValue) == [
+      "unknownKey", "payloadOutOfDomain", "noMacOSBaseline",
+    ])
 }
 
 // MARK: - Privacy
@@ -259,7 +261,8 @@ func unknownKeysAreRejectedWhateverTheirRawValue(rawCode: UInt32) {
 
 @Test func concurrentCallersOffTheMainThreadAgree() async {
   let expected = catalogV1Members.map { MacKeyCodeMapper.keyCode(for: $0) }
-  let results = await withTaskGroup(of: [Result<CGKeyCode, MacKeyCodeMappingFailure>].self) { group in
+  let results = await withTaskGroup(of: [Result<CGKeyCode, MacKeyCodeMappingFailure>].self) {
+    group in
     for _ in 0..<8 {
       group.addTask {
         catalogV1Members.map { MacKeyCodeMapper.keyCode(for: $0) }
