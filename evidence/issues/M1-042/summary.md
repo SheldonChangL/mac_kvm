@@ -2,9 +2,9 @@
 
 ## Status
 
-Decision document authored; signoff pending. M1-042 is not complete until the
-Product Owner, Security Reviewer and an independent tier-B reviewer record
-approval in the ADR signoff table.
+Decision document authored and all required signoffs recorded. Product Owner,
+Security Reviewer and independent tier-B reviewer approvals are present in the
+ADR signoff table.
 
 Base commit: `a25e591b1e86359909e3837b0cf7eb0b4efb6965`; final implementation
 commit is recorded in the PR and review comment.
@@ -34,7 +34,7 @@ No Swift source, test, package or contract file was changed.
 | Focus items located | ADR "Catalog v1 members" covers letters, digits, navigation, function, media and modifiers; "Unknown-key policy" keeps the original code and bars it from platform APIs; "Catalog versioning" defines version `1` and change rules. All 26 merged `VirtualKey` cases are mapped (machine check in `tests/results.json`). |
 | Selected, Rejected, Consequences, Security/Compatibility impact, Rollback | Present as ADR sections (section check in `tests/results.json`). |
 | Open questions with owner and blocking condition | ADR "Open questions" table: five entries, each with owner and blocking condition; no other open question. |
-| Owner/Security/Human signoff recorded | ADR "Signoff record" lists Product Owner as Pending. Security Reviewer and independent tier-B reviewer were approved by Claude Code Opus reviewer on 2026-10-13 after the Native-wire unknown handling follow-up was added. Not complete until Product Owner approval is recorded. |
+| Owner/Security/Human signoff recorded | ADR "Signoff record" lists Product Owner approval by Sheldon Chang on 2026-10-13. Security Reviewer and independent tier-B reviewer were approved by Claude Code Opus reviewer on 2026-10-13 after the Native-wire unknown handling follow-up was added. |
 
 ## Automated checks
 

@@ -262,9 +262,9 @@ decoder bounds, privacy-safe logging or fail-safe cleanup.
 
 | Role | Required for | Status |
 |---|---|---|
-| Product Owner | Catalog v1 scope and the v1 forwarding limitation | Pending |
+| Product Owner | Catalog v1 scope and the v1 forwarding limitation | Approved by Product Owner Sheldon Chang on 2026-10-13. |
 | Security Reviewer | Unknown-key reject-only policy and diagnostic exclusions | Approved by Claude Code Opus reviewer on 2026-10-13; no Critical or High findings after the Native-wire unknown handling follow-up was added above. |
 | Human / independent reviewer (tier B) | Full review of this ADR against C-005 and M1-002 | Approved by Claude Code Opus reviewer on 2026-10-13; no Critical or High findings after the Native-wire unknown handling follow-up was added above. |
 
-This ADR is not accepted, and dependent Issues may not merge, until all three
-rows record an approval with reviewer identity and date.
+This ADR is accepted for M1-042 because all three required rows record an
+approval with reviewer identity and date.
