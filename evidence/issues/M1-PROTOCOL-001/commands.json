@@ -1,0 +1,72 @@
+{
+  "capture": {
+    "attempts": [
+      "m1-client",
+      "m1x"
+    ],
+    "existingBarrierSessionTouched": false,
+    "rawPcapCommitted": false,
+    "root": "<private-tmp-capture-root>"
+  },
+  "commands": [
+    {
+      "command": "python3 Tests/Contracts/test_m1_protocol_001_message_contracts.py",
+      "endedAt": "2026-10-13T06:13:08Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:08Z",
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n",
+      "stdout": ""
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "endedAt": "2026-10-13T06:13:08Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:08Z",
+      "stderr": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.003s\n\nOK\n",
+      "stdout": ""
+    },
+    {
+      "command": "make docs-check",
+      "endedAt": "2026-10-13T06:13:08Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:08Z",
+      "stderr": "",
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "endedAt": "2026-10-13T06:13:08Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:08Z",
+      "stderr": "",
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
+    },
+    {
+      "command": "make architecture-check",
+      "endedAt": "2026-10-13T06:13:09Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:08Z",
+      "stderr": "",
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n"
+    },
+    {
+      "command": "git diff --check",
+      "endedAt": "2026-10-13T06:13:09Z",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:13:09Z",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": "make verify REPORT=/private/tmp/m1_protocol_001_verify_final.json",
+      "endedAt": "2026-10-13T06:19:39.393+00:00",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T06:18:29.862+00:00",
+      "stderr": "",
+      "stdout": "All gates passed; report stored outside repository at /private/tmp/m1_protocol_001_verify_final.json"
+    }
+  ],
+  "commit": "50c5c48ac3d073cc955deb24137696fbfb9a4f82",
+  "issue": "M1-PROTOCOL-001",
+  "schemaVersion": 1
+}

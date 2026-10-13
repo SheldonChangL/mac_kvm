@@ -336,3 +336,27 @@ name and an explicit protocol-error close accepted by the pre-approved section-1
   not claim raw-pcap-to-sanitized re-derivation.
 - Non-claims: no message code, payload field layout, maximum accepted length, chunking,
   version negotiation, Windows behavior or production TLS behavior is established.
+
+## BARRIER-EVID-0004 — M1-PROTOCOL-001 HelloBack screen-name contract
+
+`BARRIER-EVID-0004` is the accepted M1-PROTOCOL-001 evidence item for the narrow
+Barrier client HelloBack screen-name encoding contract consumed by M1-028. It
+records two bounded black-box observations over temporary loopback/SSH-forwarded
+ports. The only varied input was a deterministic synthetic client screen name.
+
+- Fixture: `Tests/Fixtures/Barrier/m1-protocol-001-message-contracts/sanitized.json`
+- Fixture SHA-256: recorded in `evidence/registers/M1-023.json`
+- Accepted contract effect: M1-028 may encode HelloBack as a 4-byte unsigned
+  big-endian payload length, the `Barrier` marker, opaque version bytes
+  `00 01 00 06`, a 4-byte unsigned big-endian UTF-8 screen-name byte count, and
+  exactly that many screen-name bytes.
+- M1-028 consumer link: `frozenContractRefs` includes
+  `docs/adr/M1-PROTOCOL-001-barrier-message-contracts.md`, and
+  `consumingTests` includes
+  `Tests/Contracts/test_m1_protocol_001_message_contracts.py`.
+- Observation-only bytes: early server-to-client control tokens were observed,
+  but this entry does not establish the full control-message semantics required
+  by M1-031.
+- Non-claims: no mouse, button, wheel, keyboard, enter, leave, clipboard,
+  keepalive, Windows behavior, production TLS behavior, successful linked-screen
+  switching, or general Barrier screen-name maximum is established.
