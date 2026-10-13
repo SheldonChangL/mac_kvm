@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-029",
+  "phase": "green",
+  "framework": "swift-testing",
+  "reportKind": "raw-xunit-regenerated-by-reviewer",
+  "reportNote": "Codex reviewer regenerated a raw Swift Testing xUnit report with `swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-029/tests/swift-testing-xunit.xml`. Swift Testing wrote `swift-testing-xunit-swift-testing.xml`; it records 140 total tests, 0 failures, 0 skipped. The M1-029 test case names below are enumerated from BarrierClientHandshakeTests.swift and are covered by that passing raw report.",
+  "runs": [
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+      "phase": "claude-authoring",
+      "exitCode": 0,
+      "total": 140,
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "codex-reviewer-rerun",
+      "exitCode": 0,
+      "total": 140,
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "total": 140,
+  "passed": 140,
+  "failed": 0,
+  "skipped": 0,
+  "m1_029_total": 26,
+  "m1_029_passed": 26,
+  "m1_029_source": "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHandshakeTests.swift",
+  "rawReport": "evidence/issues/M1-029/tests/swift-testing-xunit-swift-testing.xml",
+  "testCases": [
+    {
+      "name": "handshakeAcceptsHelloReassembledFromByteByByteFragments()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeAcceptsScreenNameAtExactlyTheConfiguredLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeAcceptsSingleByteScreenNameAtMinimumLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeCancelAndTimeoutAreIdempotentAndKeepTheFirstTerminalReason()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeCancelsFromEveryPendingState()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeConsumesOnlyTheHelloFromCoalescedFrames()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeEmitsGoldenHelloBackFrameForM1xExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeEmitsSameBytesAsTheHelloBackWriter()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeErrorsCarryOnlyAllowlistedMetadata()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsClosedOnHelloWithTrailingBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsClosedOnInvalidScreenNames()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsClosedOnTruncatedHelloPayload()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsClosedOnUnsupportedMarker()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsClosedOnUnsupportedVersion()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailsForScreenNameOneByteOverTheConfiguredLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeFailureIsStickyForEveryLaterEvent()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeLateCancelAndTimeoutDoNotTearDownProtocolConnected()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeProgressesThroughEveryStateToProtocolConnected()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeRejectsEventsAfterProtocolConnectedWithoutChangingState()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeRejectsHelloBeforeStart()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeRejectsOutOfOrderEvents()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeReleasesScreenNameOnEveryTerminalState()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeRunsAreDeterministic()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeTimesOutFromEveryPendingState()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "handshakeValidatesServerHelloBeforeScreenName()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    },
+    {
+      "name": "truncatedHelloFrameNeverReachesTheHandshakeAndTimeoutTerminates()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed",
+      "statusSource": "aggregate"
+    }
+  ]
+}
