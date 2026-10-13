@@ -221,10 +221,10 @@ class M1Wire002LengthPrefixEvidenceTests(unittest.TestCase):
         )
 
     def test_register_appends_consumable_independently_reviewed_evidence(self):
-        self.assertEqual(
-            [entry["evidenceId"] for entry in self.register["entries"]],
-            ["BARRIER-EVID-0001", "BARRIER-EVID-0002", EVIDENCE_ID],
-        )
+        evidence_ids = [entry["evidenceId"] for entry in self.register["entries"]]
+        self.assertEqual(evidence_ids[:3], ["BARRIER-EVID-0001", "BARRIER-EVID-0002", EVIDENCE_ID])
+        self.assertEqual(len(evidence_ids), len(set(evidence_ids)))
+        self.assertIn(EVIDENCE_ID, evidence_ids)
         entry = self.register_entry
         self.assertEqual(entry["provenance"]["disposition"], "approved")
         self.assertTrue(entry["provenance"]["reviewer"]["independentFromProducer"])

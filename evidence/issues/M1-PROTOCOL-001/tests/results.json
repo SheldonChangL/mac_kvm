@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "name": "two synthetic screen-name attempts retained",
+      "result": "pass"
+    },
+    {
+      "name": "HelloBack payload length changes with screen-name byte length",
+      "result": "pass"
+    },
+    {
+      "name": "downstream non-HelloBack messages remain non-claims",
+      "result": "pass"
+    },
+    {
+      "name": "DINF screen-info payloads removed from committed fixture",
+      "result": "pass"
+    }
+  ],
+  "fixture": {
+    "metadataSha256": "c22dac648c88dae442afeaf3a9ae9d3ce6c60ff4c518c2b941ac4bc6935026d6",
+    "sanitizedSha256": "88e70eef9d065f293dfce40fa427d7ac61f7c9121aa2a3a12482b10ff8f9e7c9"
+  },
+  "issue": "M1-PROTOCOL-001",
+  "schemaVersion": 1
+}

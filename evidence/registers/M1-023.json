@@ -684,6 +684,156 @@
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierBinaryCodecTests.swift",
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierFrameReassemblerTests.swift"
       ]
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0004",
+      "relatedIssue": "M1-024",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "M1-PROTOCOL-001 GitHub Issue #306 controlled black-box observations of two lawfully installed external Barrier 2.4.0 programs over isolated temporary ports. The Linux peer ran barriers on loopback-only temporary ports and the macOS peer ran the Barrier.app barrierc binary through temporary SSH local forwards. The trigger varied only deterministic synthetic non-personal ASCII client screen names. Existing user Barrier sessions on port 24800 were not touched. No Barrier or Deskflow source, header, constant table, generated implementation artifact, decompiled material, packet injection, binary patching or instrumentation was read, copied, linked or bundled."
+      },
+      "capture": {
+        "capturedAt": "2026-10-13T06:00:48Z",
+        "tools": [
+          {
+            "name": "tcpdump",
+            "version": "4.99.1"
+          },
+          {
+            "name": "Barrier barriers",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "Barrier.app barrierc",
+            "version": "2.4.0-release"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client-and-server",
+        "os": {
+          "name": "macOS-and-Ubuntu",
+          "version": "macOS local plus Ubuntu 22.04 peer",
+          "build": "sanitized"
+        }
+      },
+      "transport": {
+        "networkScope": "The recorder observed only Linux loopback traffic on temporary ports between the SSH remote-forward listener and the external Barrier server. Inter-host traffic stayed inside SSH. Real addresses, ports, host names and user names are not recorded. Raw pcaps stayed under /private/tmp and remote mktemp directories and are not committed.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on hosts under that owner control. Only externally observable runtime behavior and sanitized application payload bytes for deterministic non-personal screen names are retained.",
+        "permittedUse": "Input to M1-PROTOCOL-001 for freezing the narrow Barrier client HelloBack screen-name encoding contract inside the MacKVM Barrier Protocol Adapter only. It does not authorize claims about pointer, button, wheel, keyboard, enter/leave, clipboard, production TLS, Windows, or successful linked-screen switching behavior.",
+        "producer": "Codex M1-PROTOCOL-001 capture orchestrator in the active Product Owner-authorized M1 continuation thread",
+        "reviewer": {
+          "identity": "Claude Opus independent reviewer (Claude Code session), not the M1-PROTOCOL-001 producer; review recorded in evidence/issues/M1-PROTOCOL-001/independent-review.md",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-13T06:12:30Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "Allowlist sanitizer reconstructed TCP application payload runs from classic pcap. The committed fixture retains only the HelloBack client-to-server application payloads needed by M1-028, direction labels, byte lengths, base64 payloads, synthetic screen-name metadata, and raw pcap digests. DINF screen-info runs were removed before commit because they carry real display/cursor metadata and are not consumed by M1-028. Packet headers, real addresses, ports, host names, user names and raw pcap bytes are not committed.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "ip-address",
+          "hostname",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m1-protocol-001-message-contracts/sanitized.json",
+        "sha256": "88e70eef9d065f293dfce40fa427d7ac61f7c9121aa2a3a12482b10ff8f9e7c9",
+        "byteLength": 4371
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "Two bounded captures varied only the deterministic synthetic client screen name: m1-client (9 UTF-8 bytes) and m1x (3 UTF-8 bytes).",
+          "Both captures observed the same server hello bytes followed by a client-to-server HelloBack frame whose payload length changed by exactly the screen-name byte-count delta.",
+          "The m1-client HelloBack frame is 28 bytes: 4-byte prefix 00000018, payload marker Barrier, version 00010006, 4-byte screen-name length 00000009, and UTF-8 bytes 6d312d636c69656e74.",
+          "The m1x HelloBack frame is 22 bytes: 4-byte prefix 00000012, payload marker Barrier, version 00010006, 4-byte screen-name length 00000003, and UTF-8 bytes 6d3178.",
+          "Both captures also observed server-to-client QINF, CIAK, CROP and DSOP payload tokens, but this entry freezes no enter, leave, keyboard, mouse, clipboard, or keepalive semantics."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0004-CLAIM-001",
+            "assertion": "For the observed external Barrier 2.4.0 client HelloBack, the top-level frame is a 4-byte unsigned big-endian payload length followed by a payload made of ASCII marker Barrier, opaque version bytes 00010006, a 4-byte unsigned big-endian client screen-name byte length, then exactly that many UTF-8 screen-name bytes. The claim is established by two captures where the only varied input is the deterministic synthetic screen name and the encoded length plus payload length vary accordingly.",
+            "establishedFieldIds": [
+              "barrier-client-helloback-marker",
+              "barrier-client-helloback-version",
+              "barrier-client-helloback-screen-name-length",
+              "barrier-client-helloback-screen-name-bytes"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-protocol-001-message-contracts/sanitized.json#/attempts/0/connections/0/streams/1/runs/0",
+              "Tests/Fixtures/Barrier/m1-protocol-001-message-contracts/sanitized.json#/attempts/1/connections/0/streams/1/runs/0",
+              "docs/adr/M1-PROTOCOL-001-barrier-message-contracts.md"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "Only the client HelloBack screen-name encoding contract is consumable by M1-028.",
+        "The capture used TLS disabled for observation only; production TLS defaults are unchanged and unvalidated by this entry.",
+        "The captures reached early handshake/control traffic only; they do not establish successful linked-screen switching.",
+        "QINF, CIAK, CROP and DSOP bytes are retained as observations but not sufficient to complete M1-031 enter/leave/keepalive semantics.",
+        "No Windows behavior is claimed.",
+        "Raw pcaps are not committed and this entry does not claim raw-pcap-to-sanitized re-derivation from the repository alone."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-control-enter-leave-keepalive-fields",
+          "observation": "No successful enter, leave, keepalive or linked-screen transition contract is established by this entry.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-031"
+          ]
+        },
+        {
+          "fieldId": "barrier-mouse-message-fields",
+          "observation": "No pointer, button or wheel messages were generated in these captures.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-032",
+            "M1-033",
+            "M1-034"
+          ]
+        },
+        {
+          "fieldId": "barrier-keyboard-message-fields",
+          "observation": "No keyboard event semantics are established by this entry.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-041"
+          ]
+        },
+        {
+          "fieldId": "barrier-client-screen-name-maximum-peer-accepted-length",
+          "observation": "Only 3-byte and 9-byte synthetic names were observed; any M1 writer maximum is a MacKVM fail-closed support bound, not a Barrier peer maximum.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer mouse, button, wheel, keyboard, enter, leave, clipboard, keepalive, message code semantics beyond HelloBack, field semantics beyond HelloBack, endian behavior beyond the named HelloBack fields, framing behavior beyond the top-level prefix, message boundaries beyond retained complete frames, compatibility, Windows, production TLS, or successful linked-screen switching behavior.",
+        "Do not infer a general peer-accepted maximum screen-name length from this evidence.",
+        "Do not copy or translate Barrier or Deskflow implementation from this evidence."
+      ],
+      "frozenContractRefs": [
+        "docs/adr/M1-PROTOCOL-001-barrier-message-contracts.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_protocol_001_message_contracts.py"
+      ]
     }
   ]
 }

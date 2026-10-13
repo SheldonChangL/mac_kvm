@@ -1,0 +1,144 @@
+{
+  "attempts": [
+    {
+      "barrier": {
+        "client": "Barrier barrierc 2.4.0-release protocol 1.6",
+        "crypto": "disabled-for-capture-only",
+        "server": "Barrier barriers 2.4.0-release protocol 1.6"
+      },
+      "captureId": "m1-protocol-001-message-contracts",
+      "connections": [
+        {
+          "peerPort": "peer-1",
+          "streams": [
+            {
+              "direction": "server-to-client",
+              "runs": [
+                {
+                  "base64": "AAAAC0JhcnJpZXIAAQAG",
+                  "byteLength": 15,
+                  "sequence": 1
+                },
+                {
+                  "base64": "AAAABFFJTkY=",
+                  "byteLength": 8,
+                  "sequence": 2
+                },
+                {
+                  "base64": "AAAABENJQUs=",
+                  "byteLength": 8,
+                  "sequence": 3
+                },
+                {
+                  "base64": "AAAABENST1AAAAAIRFNPUAAAAAA=",
+                  "byteLength": 20,
+                  "sequence": 4
+                }
+              ]
+            },
+            {
+              "direction": "client-to-server",
+              "runs": [
+                {
+                  "base64": "AAAAGEJhcnJpZXIAAQAGAAAACW0xLWNsaWVudA==",
+                  "byteLength": 28,
+                  "sequence": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pcap": {
+        "byteLength": 1453,
+        "recordCount": 16,
+        "sha256": "de24dbcfdfbc91630b65f92c47841122ab45f6f37f75d93228648b2f7b1d0632"
+      },
+      "schemaVersion": 1,
+      "screenName": {
+        "kind": "synthetic-non-personal-ascii",
+        "utf8ByteLength": 9,
+        "value": "m1-client"
+      },
+      "topology": {
+        "existingSessionTouched": false,
+        "macClientTarget": "mac-loopback-ssh-forward-temporary-port",
+        "serverListen": "linux-loopback-temporary-port"
+      }
+    },
+    {
+      "barrier": {
+        "client": "Barrier barrierc 2.4.0-release protocol 1.6",
+        "crypto": "disabled-for-capture-only",
+        "server": "Barrier barriers 2.4.0-release protocol 1.6"
+      },
+      "captureId": "m1-protocol-001-message-contracts",
+      "connections": [
+        {
+          "peerPort": "peer-1",
+          "streams": [
+            {
+              "direction": "server-to-client",
+              "runs": [
+                {
+                  "base64": "AAAAC0JhcnJpZXIAAQAG",
+                  "byteLength": 15,
+                  "sequence": 1
+                },
+                {
+                  "base64": "AAAABFFJTkY=",
+                  "byteLength": 8,
+                  "sequence": 2
+                },
+                {
+                  "base64": "AAAABENJQUs=",
+                  "byteLength": 8,
+                  "sequence": 3
+                },
+                {
+                  "base64": "AAAABENST1AAAAAIRFNPUAAAAAA=",
+                  "byteLength": 20,
+                  "sequence": 4
+                }
+              ]
+            },
+            {
+              "direction": "client-to-server",
+              "runs": [
+                {
+                  "base64": "AAAAEkJhcnJpZXIAAQAGAAAAA20xeA==",
+                  "byteLength": 22,
+                  "sequence": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pcap": {
+        "byteLength": 1365,
+        "recordCount": 15,
+        "sha256": "c4957c838d8ece7f7a88056f83f887e07400884a5ac5cb713c5a484fa600112a"
+      },
+      "schemaVersion": 1,
+      "screenName": {
+        "kind": "synthetic-non-personal-ascii",
+        "utf8ByteLength": 3,
+        "value": "m1x"
+      },
+      "topology": {
+        "existingSessionTouched": false,
+        "macClientTarget": "mac-loopback-ssh-forward-temporary-port",
+        "serverListen": "linux-loopback-temporary-port"
+      }
+    }
+  ],
+  "encoding": "base64",
+  "fixtureId": "m1-protocol-001-message-contracts",
+  "nonClaims": [
+    "does not establish mouse, keyboard, enter/leave, clipboard, TLS, Windows, or successful linked-screen switching behavior",
+    "does not derive from Barrier or Deskflow source, headers, constants, or decompiled material"
+  ],
+  "schemaVersion": 1,
+  "source": "controlled black-box captures of external Barrier 2.4.0 client/server over isolated temporary loopback/SSH-forwarded ports"
+}

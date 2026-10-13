@@ -1,0 +1,40 @@
+{
+  "fixtureId": "m1-protocol-001-message-contracts",
+  "payload": {
+    "byteLength": 4371,
+    "path": "sanitized.json",
+    "sha256": "88e70eef9d065f293dfce40fa427d7ac61f7c9121aa2a3a12482b10ff8f9e7c9"
+  },
+  "protocol": "barrier",
+  "provenance": {
+    "capturedAt": "2026-10-13T06:00:48Z",
+    "reference": "M1-PROTOCOL-001 controlled capture: Linux Barrier server barriers 2.4.0-release protocol 1.6 on temporary loopback ports; macOS Barrier client barrierc app bundle 2.4.0-release over temporary SSH local forwards. Existing user Barrier session on port 24800 was not touched. TLS disabled for this observation only; production TLS default remains enabled and unvalidated.",
+    "sourceKind": "black-box-capture"
+  },
+  "rawCaptures": [
+    {
+      "byteLength": 1453,
+      "recordCount": 16,
+      "screenName": "m1-client",
+      "sha256": "de24dbcfdfbc91630b65f92c47841122ab45f6f37f75d93228648b2f7b1d0632"
+    },
+    {
+      "byteLength": 1365,
+      "recordCount": 15,
+      "screenName": "m1x",
+      "sha256": "c4957c838d8ece7f7a88056f83f887e07400884a5ac5cb713c5a484fa600112a"
+    }
+  ],
+  "sanitization": {
+    "containsSensitiveData": false,
+    "note": "DINF screen-info runs were removed before commit because M1-028 consumes only HelloBack and DINF carries real display/cursor metadata.",
+    "rawRetainedInRepository": false,
+    "removedCategories": [
+      "ip-address",
+      "hostname",
+      "other-private-data"
+    ],
+    "status": "sanitized"
+  },
+  "schemaVersion": 1
+}

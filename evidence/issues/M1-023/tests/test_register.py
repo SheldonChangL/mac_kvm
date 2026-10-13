@@ -418,6 +418,23 @@ class BarrierEvidenceRegisterTests(unittest.TestCase):
         self.assertIn(expected_test, self.documentation)
         self.assertIn("M1-022 reassembler consumer link", self.documentation)
 
+    def test_m1_028_helloback_consumer_link_is_registered(self):
+        expected_adr = "docs/adr/M1-PROTOCOL-001-barrier-message-contracts.md"
+        expected_test = "Tests/Contracts/test_m1_protocol_001_message_contracts.py"
+        entries = {entry["evidenceId"]: entry for entry in self.register["entries"]}
+        entry = entries["BARRIER-EVID-0004"]
+
+        self.assertIn(expected_adr, entry["frozenContractRefs"])
+        self.assertIn(expected_test, entry["consumingTests"])
+        self.assertIn("barrier-client-helloback-screen-name-length", {
+            field
+            for claim in entry["coverage"]["wireClaims"]
+            for field in claim["establishedFieldIds"]
+        })
+        self.assertIn(expected_adr, self.documentation)
+        self.assertIn(expected_test, self.documentation)
+        self.assertIn("M1-PROTOCOL-001 HelloBack screen-name contract", self.documentation)
+
 
 if __name__ == "__main__":
     unittest.main()
