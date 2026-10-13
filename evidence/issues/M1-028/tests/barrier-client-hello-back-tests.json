@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-028",
+  "phase": "green",
+  "executedAt": "2026-10-13T23:26:50Z",
+  "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1028-xunit.xml",
+  "exitCode": 0,
+  "framework": "swift-testing",
+  "total": 114,
+  "passed": 114,
+  "failed": 0,
+  "skipped": 0,
+  "m1_028_total": 21,
+  "m1_028_passed": 21,
+  "rawReport": "evidence/issues/M1-028/tests/swift-testing-xunit.xml",
+  "testCases": [
+    {
+      "name": "acceptsEveryAllowedCharacterClass()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "acceptsLargestLimitThatFitsTheLengthPrefix()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "acceptsScreenNameAtExactlyTheConfiguredLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "acceptsSingleByteScreenNameAtMinimumLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "checksLengthBeforeCharacters()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "failedWriteDoesNotAffectLaterWrite()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "goldenFramesDifferOnlyByScreenNameDelta()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "helloBackConstantsEqualGoldenBytesExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "helloBackErrorsCarryOnlyAllowlistedMetadata()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "lengthFieldsAreBigEndianAcrossByteBoundary()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "reassemblerYieldsGoldenPayloadsFromFragmentedAndCoalescedFrames()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsASCIIOutsideTheIdentifierSet()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsEmptyScreenName()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsInvalidConfiguredLimits()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsNonASCIIScreenNames()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "rejectsScreenNameOneByteOverTheConfiguredLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "repeatedWritesReturnIdenticalBytes()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "truncatedWrittenFrameIsReportedByReassembler()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writerCarriesOnlyTheConfiguredLimit()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writesGoldenFrameForM1ClientExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    },
+    {
+      "name": "writesGoldenFrameForM1xExactly()",
+      "classname": "BarrierCompatibilityTests",
+      "status": "passed"
+    }
+  ]
+}
