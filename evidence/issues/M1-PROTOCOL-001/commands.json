@@ -66,7 +66,7 @@
       "stdout": "All gates passed; report stored outside repository at /private/tmp/m1_protocol_001_verify_final.json"
     }
   ],
-  "commit": "a8e3edcc9b6f2bdec37c3cb84f69df570b4d9fce",
+  "commit": "50c5c48ac3d073cc955deb24137696fbfb9a4f82",
   "issue": "M1-PROTOCOL-001",
   "schemaVersion": 1
 }
