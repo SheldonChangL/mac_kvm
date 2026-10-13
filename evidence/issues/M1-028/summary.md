@@ -4,8 +4,9 @@ Base commit: `ce20492` (M1-PROTOCOL-001 HelloBack contract frozen)
 
 Branch: `codex/m1-028-barrier-client-hello-back`
 
-Status: **implemented; reviewer SwiftPM tests and `xcodebuild` pass;
-uncommitted.**
+Status: **implemented; reviewer SwiftPM tests and `xcodebuild` pass.**
+
+Implementation commit: `4e31d3e1c1396cdbdef2e4e0b36c68be487524e9`
 
 ## Preconditions
 
