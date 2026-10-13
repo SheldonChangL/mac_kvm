@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-044",
+  "catalogVersion": 1,
+  "framework": "swift-testing",
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-10-13T01:47:28Z",
+  "endedAt": "2026-10-13T01:47:30Z",
+  "exitCode": 0,
+  "packageSummary": "✔ Test run with 83 tests in 0 suites passed after 0.008 seconds.",
+  "packageSkipped": [
+    "manualRealAPIProbeRunsOneReviewerSelectedAction",
+    "manualUniquePasteboardProbeRunsTheRealAdapterPath",
+    "manualRealInjectionProbeRunsOneReviewerSelectedAction"
+  ],
+  "m1044": {
+    "declared": 20,
+    "passed": 20,
+    "failed": 0,
+    "missing": 0,
+    "tests": [
+      {
+        "name": "coversCatalogVersionOne",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "mapsRepresentativeKeysToTheirUSANSIBaseline",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "everyLetterMatchesTheSDKANSIConstant",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "everyDigitMatchesTheSDKANSIConstant",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "functionKeysOneThroughTwentyMatchTheSDKConstants",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "everyPayloadFreeMemberMatchesTheSDKConstant",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "sideAgnosticModifiersMapToTheLeftSideKey",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "payloadDomainEdgesAreAcceptedAndTheirNeighboursRejected",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "functionKeysTwentyOneThroughTwentyFourAreCatalogGapsOnMacOS",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "everyPayloadValueOutsideItsDomainIsRejected",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "unknownKeysAreRejectedWhateverTheirRawValue",
+        "status": "passed",
+        "cases": 6
+      },
+      {
+        "name": "everyCatalogMemberIsMappedOrRejectedAsAGap",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "mappedCodesAreDistinctAndInsideTheSDKKeyCodeRange",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "catalogMembersNeverMapToKeysOutsideCatalogVersionOne",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "failureReasonsAreClosedAndCarryNoPayload",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "rejectionDescriptionsNeverContainTheRawCode",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "mapperHoldsNoStateAndCannotBeInstantiated",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "repeatedAndInterleavedCallsAreDeterministic",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "concurrentCallersOffTheMainThreadAgree",
+        "status": "passed",
+        "cases": 1
+      },
+      {
+        "name": "cancelledCallersStillGetTheSameAnswer",
+        "status": "passed",
+        "cases": 1
+      }
+    ]
+  },
+  "redPhase": {
+    "command": "swift test --package-path Packages/MacPlatform",
+    "state": "tests written before MacKeyCodeMapper.swift existed",
+    "startedAt": "2026-10-13T01:43:10Z",
+    "endedAt": "2026-10-13T01:43:15Z",
+    "exitCode": 1,
+    "compileErrorLines": 76,
+    "representativeError": "cannot find type 'MacKeyCodeMappingFailure' in scope"
+  },
+  "mutationCheck": {
+    "mutation": "letters[1] (B) changed from 0x0B to 0x0A in MacKeyCodeMapper.swift, then restored byte-identical",
+    "exitCode": 1,
+    "failedTests": [
+      "catalogMembersNeverMapToKeysOutsideCatalogVersionOne",
+      "everyLetterMatchesTheSDKANSIConstant"
+    ]
+  }
+}
