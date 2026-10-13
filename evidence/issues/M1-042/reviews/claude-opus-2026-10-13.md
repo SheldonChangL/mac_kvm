@@ -43,8 +43,8 @@ None.
   compatibility impact and rollback are present.
 - Open questions have owners and blocking conditions after the Native wire
   follow-up was added.
-- Security Reviewer and independent tier-B review approve with no Critical or
-  High findings. Product Owner approval remains pending.
+- Product Owner, Security Reviewer and independent tier-B review approve with
+  no Critical or High findings.
 
 ## Commands
 
