@@ -1,0 +1,141 @@
+{
+  "issue": "M1-029",
+  "status": "implemented-reviewer-verified",
+  "baseCommit": "6d99333",
+  "branch": "codex/m1-029-barrier-client-handshake",
+  "commit": "2a2502388438ab39847eca86aca2f8af7b26e058",
+  "commitNote": "Implementation commit. A follow-up evidence-only commit records this hash to avoid amending the implementation commit.",
+  "environmentNote": "The Claude authoring session runs inside an outer macOS sandbox where SwiftPM cannot nest its own sandbox, so SwiftPM commands there were run with `--disable-sandbox`. That flag only disables SwiftPM's manifest/plugin sandbox and does not change compilation or test selection.",
+  "timestampNote": "Start/end times of the authoring and Codex reviewer SwiftPM runs were not captured in the evidence pass and are recorded as null.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "claude-authoring-environment-probe",
+      "startedAt": null,
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "Failed only because SwiftPM's nested sandbox cannot be applied inside the authoring session's sandbox. Not a code failure; rerun with --disable-sandbox."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+      "phase": "claude-authoring",
+      "startedAt": null,
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "140 Swift Testing tests passed (114 existing + 26 M1-029).",
+      "report": "evidence/issues/M1-029/tests/barrier-client-handshake-tests.json"
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "codex-reviewer-rerun",
+      "startedAt": null,
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Codex reviewer rerun outside the nested SwiftPM sandbox: 140 Swift Testing tests passed.",
+      "report": "evidence/issues/M1-029/tests/barrier-client-handshake-tests.json"
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-029/tests/swift-testing-xunit.xml",
+      "phase": "codex-reviewer-xunit-rerun",
+      "startedAt": "2026-10-13T23:47:36Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "140 Swift Testing tests passed; raw report written by Swift Testing as evidence/issues/M1-029/tests/swift-testing-xunit-swift-testing.xml.",
+      "report": "evidence/issues/M1-029/tests/swift-testing-xunit-swift-testing.xml"
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHandshake.swift Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHandshakeTests.swift",
+      "phase": "codex-reviewer-rerun",
+      "startedAt": "2026-10-13T23:47:36Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No output."
+    },
+    {
+      "command": "swift build --build-tests --package-path Packages/BarrierCompatibility",
+      "phase": "codex-reviewer-rerun",
+      "startedAt": "2026-10-13T23:47:36Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build complete."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-13T23:45:39Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-13T23:45:39Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-13T23:45:40Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK. docs-check scans tracked files only, so it did NOT check the untracked M1-029 files; see the evidence-pass-final entry.",
+      "scope": "tracked-files-only"
+    },
+    {
+      "command": "git diff --no-index --check /dev/null <file> (once per M1-029 file); docs-check rules (check_tracked_file) applied directly to the untracked M1-029 Markdown/JSON files; git diff --check; make docs-check",
+      "phase": "evidence-pass-final",
+      "startedAt": "2026-10-13T23:46:37Z",
+      "endedAt": "2026-10-13T23:46:38Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Whitespace check printed nothing for every file (each exit 1 = file differs from /dev/null; a whitespace error would print the line and exit 3). docs-check rules returned no violations for the four untracked Markdown/JSON files. `git diff --check` exit 0 (no tracked changes). `make docs-check` printed 'docs check OK', exit 0. commands.json was edited after this run only to append this entry.",
+      "files": [
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHandshake.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHandshakeTests.swift",
+        "docs/components/M1-029-barrier-client-handshake.md",
+        "evidence/issues/M1-029/summary.md",
+        "evidence/issues/M1-029/commands.json",
+        "evidence/issues/M1-029/tests/barrier-client-handshake-tests.json"
+      ]
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "phase": "codex-reviewer-rerun",
+      "startedAt": "2026-10-13T23:47:45Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build succeeded. Output ended with `** BUILD SUCCEEDED **`."
+    },
+    {
+      "command": "git diff --cached --check",
+      "phase": "codex-reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:49:16Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors in staged M1-029 files."
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "codex-reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:49:16Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "After staging, build complete and 140 Swift Testing tests passed."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py && make architecture-check && make docs-check",
+      "phase": "codex-reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:49:16Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics; architecture check OK; docs check OK."
+    }
+  ],
+  "notRun": [
+    "make verify (not a Required Command for M1-029; PR CI will run repository gates)"
+  ],
+  "requiresReviewerRerun": []
+}
