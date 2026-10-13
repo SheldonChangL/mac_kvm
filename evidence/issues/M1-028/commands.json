@@ -1,0 +1,216 @@
+{
+  "issue": "M1-028",
+  "status": "implemented-reviewer-verified",
+  "baseCommit": "ce20492",
+  "branch": "codex/m1-028-barrier-client-hello-back",
+  "commit": null,
+  "commitNote": "Uncommitted working tree; per instruction no commit or PR was created by the authoring session.",
+  "environmentNote": "The authoring session runs inside an outer macOS sandbox. Plain `swift test --package-path Packages/BarrierCompatibility` failed before compiling with `sandbox-exec: sandbox_apply: Operation not permitted` / `Invalid manifest` (SwiftPM cannot nest its own sandbox), so SwiftPM commands were run with `--disable-sandbox`. That flag only disables SwiftPM's manifest/plugin sandbox and does not change compilation or test selection.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "environment-probe",
+      "startedAt": "2026-10-13T23:25:05Z",
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "Manifest evaluation failed: sandbox-exec: sandbox_apply: Operation not permitted. Not a code failure; reran with --disable-sandbox."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+      "phase": "red",
+      "exitCode": 1,
+      "result": "failed-as-expected",
+      "summary": "Before BarrierClientHelloBack.swift existed, the test target failed to compile: cannot find type 'BarrierClientHelloBackWriter' / 'BarrierClientHelloBackError' in scope. The same run exposed two test names colliding with BarrierServerHelloTests (module-level @Test functions), which were renamed with a helloBack prefix."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+      "phase": "green-initial",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "114 tests passed (21 M1-028) after the implementation and splitting two #expect expressions the type checker could not solve in time. Superseded by the final run."
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics <M1-028 Swift files>",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No output.",
+      "files": [
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHelloBack.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHelloBackTests.swift"
+      ]
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output /tmp/m1028-xunit.xml",
+      "phase": "green-final",
+      "startedAt": "2026-10-13T23:26:50Z",
+      "endedAt": "2026-10-13T23:26:53Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Test run with 114 tests passed (21 M1-028).",
+      "report": "evidence/issues/M1-028/tests/barrier-client-hello-back-tests.json"
+    },
+    {
+      "command": "swift build --disable-sandbox --build-tests --package-path Packages/BarrierCompatibility",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "After touching both M1-028 Swift files, both were recompiled with 0 warnings and 0 errors; Build complete."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "startedAt": "2026-10-13T23:27:02Z",
+      "exitCode": 66,
+      "result": "not-verified-environment-failure",
+      "summary": "xcodebuild: error: 'MacKVM.xcworkspace' is not a workspace file. Also logged 'Logging connecton invalid' XPC errors and CoreSimulatorService 'Connection refused', and `xcodebuild -list -workspace MacKVM.xcworkspace` failed the same way. MacKVM.xcworkspace is unchanged (git status clean for it), so this is attributed to the session's sandboxed access to Xcode system services, not to M1-028. Reviewer must rerun."
+    },
+    {
+      "command": "swift build --disable-sandbox",
+      "phase": "partial-substitute-for-xcodebuild",
+      "startedAt": "2026-10-13T23:27:26Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Root SwiftPM build: Build complete. Emitted 'mac_kvm': found 4 file(s) which are unhandled on manifest evaluation; that is a root-package warning and M1-028 only adds .swift files inside the separate Packages/BarrierCompatibility package. Not a substitute for the Required xcodebuild command."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-10-13T23:27:03Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-10-13T23:27:03Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-10-13T23:27:04Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "startedAt": "2026-10-13T23:27:05Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No output. Only checks tracked changes, and there are none: every M1-028 file is untracked, so this command did NOT check any M1-028 file. The untracked files were checked separately by the `git diff --no-index --check` entries below.",
+      "scope": "tracked-changes-only"
+    },
+    {
+      "command": "git diff --no-index --check /dev/null <file> (run once per M1-028 file)",
+      "phase": "evidence-completion",
+      "startedAt": "2026-10-13T23:29:30Z",
+      "exitCode": 1,
+      "result": "passed",
+      "summary": "No output for any file. With --no-index, exit 1 only means the file differs from /dev/null; a whitespace error prints the offending line and exits 3, which was confirmed with a throwaway /tmp probe file containing trailing spaces (printed 'trailing whitespace.', exit 3).",
+      "files": [
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHelloBack.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHelloBackTests.swift",
+        "docs/components/M1-028-barrier-client-hello-back.md",
+        "evidence/issues/M1-028/commands.json",
+        "evidence/issues/M1-028/tests/barrier-client-hello-back-tests.json"
+      ],
+      "note": "Run before docs/summary edits; the final run over all M1-028 files is the next entry."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility",
+      "phase": "evidence-completion-rerun",
+      "startedAt": "2026-10-13T23:29:31Z",
+      "endedAt": "2026-10-13T23:29:33Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Test run with 114 tests in 0 suites passed. No Swift file changed in this pass; rerun only to confirm the recorded green state. No new xUnit report was written."
+    },
+    {
+      "command": "git diff --no-index --check /dev/null <file> (final, run once per M1-028 file) && make docs-check",
+      "phase": "evidence-completion-final",
+      "startedAt": "2026-10-13T23:30:43Z",
+      "endedAt": "2026-10-13T23:30:43Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Whitespace check printed nothing for every file (each exit 1 = differs from /dev/null, no errors); `git diff --check` on tracked changes exit 0; `make docs-check` printed 'docs check OK', exit 0. commands.json was edited after this run only to append this entry.",
+      "files": [
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHelloBack.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientHelloBackTests.swift",
+        "docs/components/M1-028-barrier-client-hello-back.md",
+        "evidence/issues/M1-028/summary.md",
+        "evidence/issues/M1-028/commands.json",
+        "evidence/issues/M1-028/tests/barrier-client-hello-back-tests.json",
+        "evidence/issues/M1-028/tests/swift-testing-xunit.xml"
+      ]
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-13T23:31:29Z",
+      "endedAt": "2026-10-13T23:31:32Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Reviewer rerun outside the nested SwiftPM sandbox: build complete, 114 Swift Testing tests passed."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-13T23:31:29Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-13T23:31:29Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-13T23:31:29Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "phase": "reviewer-rerun",
+      "startedAt": "2026-10-13T23:31:41Z",
+      "endedAt": "2026-10-13T23:31:47Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Build succeeded. Output ended with `** BUILD SUCCEEDED **`."
+    },
+    {
+      "command": "git diff --cached --check",
+      "phase": "reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:32:55Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors in staged M1-028 files."
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "phase": "reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:32:55Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "After staging, build complete and 114 Swift Testing tests passed."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py && make architecture-check && make docs-check",
+      "phase": "reviewer-final-staged-rerun",
+      "startedAt": "2026-10-13T23:32:55Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics; architecture check OK; docs check OK."
+    }
+  ],
+  "notRun": [
+    "make verify (not a Required Command for M1-028; PR CI will run repository gates)"
+  ],
+  "requiresReviewerRerun": []
+}
