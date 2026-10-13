@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-044",
+  "branch": "codex/m1-044-mac-key-code-mapper",
+  "status": "passed",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/MacPlatform",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:28Z",
+      "endedAt": "2026-10-13T01:47:30Z",
+      "output": "Test run with 83 tests in 0 suites passed after 0.020 seconds."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:42Z",
+      "endedAt": "2026-10-13T01:47:45Z",
+      "output": "** BUILD SUCCEEDED **"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:56Z",
+      "endedAt": "2026-10-13T01:47:56Z",
+      "output": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:56Z",
+      "endedAt": "2026-10-13T01:47:57Z",
+      "output": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:57Z",
+      "endedAt": "2026-10-13T01:47:57Z",
+      "output": "docs check OK"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:47:57Z",
+      "endedAt": "2026-10-13T01:47:57Z",
+      "output": ""
+    },
+    {
+      "command": "make verify REPORT=/tmp/m1_044_verify_after_format_external.json",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T05:37:14.861+00:00",
+      "endedAt": "2026-10-13T05:38:31.669+00:00",
+      "output": "all CI gates passed; report=/tmp/m1_044_verify_after_format_external.json",
+      "note": "rerun after swift-format fixed MacKeyCodeMapperTests.swift; includes manifest, docs, architecture, code-quality, tool tests, evidence tests, Swift package tests, repository contract tests, swift test targets and native arm64 build"
+    }
+  ],
+  "notes": [
+    "The first in-sandbox SwiftPM attempt failed with sandbox_apply permission errors; the same required command passed when rerun with the approved external execution path.",
+    "xcodebuild completed with exit code 0 and BUILD SUCCEEDED."
+  ]
+}
