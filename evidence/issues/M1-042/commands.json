@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-042",
+  "commit": "a25e591b1e86359909e3837b0cf7eb0b4efb6965",
+  "workingTree": "M1-042 additions only: docs/adr/M1-042-virtual-key-catalog.md and evidence/issues/M1-042/; unrelated untracked local unblock artifacts excluded",
+  "status": "passed",
+  "toolchain": {
+    "machine": "arm64",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T07:37:30.060+00:00",
+      "endedAt": "2026-10-12T07:37:30.231+00:00",
+      "output": "docs check OK",
+      "note": "rerun by reviewer after staging M1-042 additions; docs check passed with new files included in the index"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T07:37:30.258+00:00",
+      "endedAt": "2026-10-12T07:37:30.318+00:00",
+      "output": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T07:37:30.344+00:00",
+      "endedAt": "2026-10-12T07:37:30.662+00:00",
+      "output": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T23:52:27Z",
+      "endedAt": "2026-10-12T23:52:27Z",
+      "output": "docs check OK",
+      "note": "rerun after Claude review evidence and Native-wire unknown open-question update"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T23:52:27Z",
+      "endedAt": "2026-10-12T23:52:27Z",
+      "output": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "note": "rerun after Claude review evidence and Native-wire unknown open-question update"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T23:52:27Z",
+      "endedAt": "2026-10-12T23:52:28Z",
+      "output": "architecture check OK",
+      "note": "rerun after Claude review evidence and Native-wire unknown open-question update"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "startedAt": "2026-10-12T23:52:28Z",
+      "endedAt": "2026-10-12T23:52:28Z",
+      "output": "",
+      "note": "no whitespace errors"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:15:46Z",
+      "endedAt": "2026-10-13T01:15:46Z",
+      "output": "docs check OK",
+      "note": "rerun after Product Owner signoff was recorded"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:15:46Z",
+      "endedAt": "2026-10-13T01:15:46Z",
+      "output": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "note": "rerun after Product Owner signoff was recorded"
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:15:46Z",
+      "endedAt": "2026-10-13T01:15:47Z",
+      "output": "architecture check OK",
+      "note": "rerun after Product Owner signoff was recorded"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "startedAt": "2026-10-13T01:15:47Z",
+      "endedAt": "2026-10-13T01:15:47Z",
+      "output": "",
+      "note": "no whitespace errors after Product Owner signoff update"
+    }
+  ]
+}
