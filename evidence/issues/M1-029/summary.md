@@ -5,7 +5,9 @@ Base commit: `6d99333` (M1-028 HelloBack writer merged)
 Branch: `codex/m1-029-barrier-client-handshake`
 
 Status: **implemented; reviewer SwiftPM tests, `xcodebuild`, package, docs and
-architecture gates pass; not committed.**
+architecture gates pass.**
+
+Implementation commit: `2a2502388438ab39847eca86aca2f8af7b26e058`
 
 ## Preconditions
 

@@ -3,8 +3,8 @@
   "status": "implemented-reviewer-verified",
   "baseCommit": "6d99333",
   "branch": "codex/m1-029-barrier-client-handshake",
-  "commit": null,
-  "commitNote": "Not committed yet. The implementation commit hash must be recorded here after the reviewer commits.",
+  "commit": "2a2502388438ab39847eca86aca2f8af7b26e058",
+  "commitNote": "Implementation commit. A follow-up evidence-only commit records this hash to avoid amending the implementation commit.",
   "environmentNote": "The Claude authoring session runs inside an outer macOS sandbox where SwiftPM cannot nest its own sandbox, so SwiftPM commands there were run with `--disable-sandbox`. That flag only disables SwiftPM's manifest/plugin sandbox and does not change compilation or test selection.",
   "timestampNote": "Start/end times of the authoring and Codex reviewer SwiftPM runs were not captured in the evidence pass and are recorded as null.",
   "commands": [
