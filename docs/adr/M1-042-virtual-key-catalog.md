@@ -2,10 +2,9 @@
 
 ## Status
 
-Proposed. This ADR freezes the C-005 `VirtualKey` catalog version 1 and the
-unknown-key policy once the signoffs listed under "Signoff record" are
-recorded. Until then, dependent Issues M1-043, M1-044 and M1-046 must not
-merge.
+Accepted. This ADR freezes the C-005 `VirtualKey` catalog version 1 and the
+unknown-key policy because all signoffs listed under "Signoff record" are
+recorded.
 
 ## Binding sources
 
