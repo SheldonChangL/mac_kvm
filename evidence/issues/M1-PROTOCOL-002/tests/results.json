@@ -56,7 +56,7 @@
     "make architecture-check": "passed",
     "git diff --check": "passed",
     "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v": "passed; Ran 147 tests in 47.309s; OK",
-    "make verify REPORT=/private/tmp/m1_protocol_002_verify_remediated.json": "passed; all 24 gates passed"
+    "make verify REPORT=/private/tmp/m1_protocol_002_verify_approved.json": "passed; all 24 gates passed on commit 8fe7d011f7a098ba822ffda173543443f1972c75"
   },
   "status": "passed"
 }
