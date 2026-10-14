@@ -883,23 +883,24 @@
       },
       "provenance": {
         "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on hosts under that owner control. Only externally observable runtime behavior and sanitized application payload bytes for deterministic non-personal screen names are retained.",
-        "permittedUse": "Input to M1-PROTOCOL-002 for freezing the narrow Barrier control-message contract inside the MacKVM Barrier Protocol Adapter for M1-031 only. It does not authorize claims about pointer, button, wheel, keyboard, clipboard, production TLS, Windows, or full linked-screen compatibility behavior.",
+        "permittedUse": "Input to M1-PROTOCOL-002 for freezing the narrow Barrier control-message contract inside the MacKVM Barrier Protocol Adapter for M1-031 only after independent approval. It does not authorize claims about pointer, button, wheel, keyboard, clipboard, production TLS, Windows, or full linked-screen compatibility behavior.",
         "producer": "Codex M1-PROTOCOL-002 capture orchestrator in the active Product Owner-authorized M1 continuation thread",
         "reviewer": {
-          "identity": "Pending independent reviewer; review record placeholder is evidence/issues/M1-PROTOCOL-002/independent-review.md",
-          "independentFromProducer": false,
-          "reviewedAt": "2026-10-14T04:30:00Z"
+          "identity": "Claude Code independent reviewer final approval review recorded in evidence/issues/M1-PROTOCOL-002/independent-review.md",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-14T09:24:25Z"
         },
-        "disposition": "pending-review"
+        "disposition": "approved"
       },
       "sanitization": {
-        "procedure": "Allowlist sanitizer reconstructed TCP application payload frames from classic pcap. The committed fixture retains only the setup context and M1-031 control-message frames needed to freeze QINF, DINF, CIAK, CROP, DSOP, CALV, CNOP, CINN and COUT. DCLP clipboard and DKDN/DKUP hotkey side-effect frames are excluded and retained only as counts. Packet headers, real addresses, ports, host names, user names and raw pcap bytes are not committed.",
+        "procedure": "Allowlist sanitizer reconstructed TCP application payload frames from classic pcap. The committed fixture retains only the setup context and M1-031 control-message frames needed to freeze QINF, DINF, CIAK, CROP, DSOP, CALV, CNOP, CINN and COUT after approval. DCLP, DKDN and DKUP side-effect frame bodies are excluded and retained only as counts; after review, M1-031 may only skip their complete top-level frames by length without decoding or forwarding them. Packet headers, real addresses, ports, host names, user names and raw pcap bytes are not committed.",
         "status": "sanitized",
         "containsSensitiveData": false,
         "removedCategories": [
           "clipboard-payload",
           "hostname",
           "ip-address",
+          "typed-text",
           "other-private-data"
         ]
       },
@@ -911,7 +912,7 @@
       "coverage": {
         "direction": "bidirectional",
         "behaviors": [
-          "The capture observed the Barrier server request screen info with QINF and the client answer with DINF carrying origin -1920,0, size 3648x1117, reserved 0 and cursor 772,594.",
+          "The capture observed the Barrier server request screen info with QINF and the client answer with DINF carrying origin -1920,0, size 3648x1117, reserved 0 and cursor 772,594; this real display/cursor geometry is retained as low-sensitivity protocol evidence required by M1-031, not as host identity.",
           "The capture observed setup control frames CIAK, CROP and DSOP with a zero DSOP value.",
           "The capture observed bidirectional CALV keepalive and CNOP no-op frames.",
           "The hotkey trigger produced a server-to-client CINN enter frame with x=772, y=594, sequence=1 and opaque modifier mask 0x2000, correlated with peer logs showing switch to the synthetic client screen.",
@@ -932,7 +933,7 @@
           },
           {
             "claimId": "BARRIER-EVID-0005-CLAIM-002",
-            "assertion": "The observed DINF frame body contains seven 16-bit big-endian fields: signed origin x, signed origin y, unsigned width, unsigned height, reserved zero, unsigned cursor x and unsigned cursor y.",
+            "assertion": "The observed DINF frame body contains seven 16-bit big-endian fields: signed origin x, signed origin y, positive non-zero width, positive non-zero height, reserved zero, cursor x and cursor y. Cursor coordinate signedness is not established; M1-031 may accept only raw cursor values in 0x0000...0x7fff that also fall inside the current DINF rectangle and must fail closed otherwise.",
             "establishedFieldIds": [
               "barrier-control-dinf-screen-info-layout"
             ],
@@ -943,7 +944,7 @@
           },
           {
             "claimId": "BARRIER-EVID-0005-CLAIM-003",
-            "assertion": "The observed CINN frame body contains unsigned big-endian x and y coordinates, an unsigned big-endian sequence, and an opaque unsigned big-endian modifier mask; COUT has no body.",
+            "assertion": "The observed CINN frame body contains 16-bit big-endian x and y coordinate fields, a 4-byte big-endian observed sequence field, and an opaque 16-bit big-endian modifier mask; COUT has no body. Coordinate signedness and sequence increment semantics are not established; M1-031 may accept only raw enter coordinate values in 0x0000...0x7fff that also fall inside the current DINF rectangle and must fail closed otherwise.",
             "establishedFieldIds": [
               "barrier-control-cinn-enter-layout",
               "barrier-control-cout-leave-layout"
@@ -956,7 +957,7 @@
           },
           {
             "claimId": "BARRIER-EVID-0005-CLAIM-004",
-            "assertion": "The observed DSOP setup frame carries one unsigned big-endian 4-byte value observed as zero; no non-zero option semantics are established.",
+            "assertion": "The observed DSOP setup frame carries one 4-byte big-endian value observed as zero; no non-zero option semantics are established, and M1-031 must fail closed for non-zero values or any other DSOP payload length.",
             "establishedFieldIds": [
               "barrier-control-dsop-zero-layout"
             ],
@@ -968,10 +969,14 @@
         ]
       },
       "limitations": [
-        "This entry is not consumable until independent review changes disposition to approved.",
-        "Only the M1-031 control-message contract may become consumable by this entry after approval.",
+        "Only the M1-031 control-message contract is consumable by this entry after approval.",
         "The capture used TLS disabled for observation only; production TLS defaults are unchanged and unvalidated by this entry.",
         "DCLP clipboard and DKDN/DKUP hotkey side-effect frames were observed but removed from the committed fixture and are not consumable claims.",
+        "M1-031 may only skip the known excluded DCLP, DKDN and DKUP frames by top-level length without decoding their bodies or forwarding them to the KVM input pipeline; malformed excluded frames or unknown tokens remain fail-closed.",
+        "Diagnostics for skipped excluded frames may include only token, direction, count or length and non-sensitive reason metadata; they must not include frame body bytes, clipboard content or key data.",
+        "BARRIER-EVID-0004 remains append-only and still records that it did not establish enter, leave or keepalive semantics. This later pending entry is intended to resolve that specific M1-031 blocker after approval without rewriting BARRIER-EVID-0004.",
+        "The trigger attempted ctrl+F2, ctrl+F1, ctrl+F2, but the accepted capture contains only one CINN and one COUT transition. No repeated-enter or sequence increment behavior is claimed, and the DKDN/DKUP count asymmetry is treated as an excluded side effect.",
+        "A public PR history revision previously exposed one peer address in commands.json. The current committed command record is redacted; the historical exposure remains a review risk and is not consumable protocol evidence.",
         "No Windows behavior is claimed.",
         "Raw pcaps are not committed and this entry does not claim raw-pcap-to-sanitized re-derivation from the repository alone."
       ],
@@ -989,6 +994,54 @@
           "blockedClaimIds": [
             "M1-041"
           ]
+        },
+        {
+          "fieldId": "barrier-control-dinf-reserved-field",
+          "observation": "The DINF reserved field was observed as zero; its meaning is not established and writers emit zero only.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-dinf-cursor-signedness",
+          "observation": "DINF cursor coordinate signedness is not distinguished by the single observed values 772,594; M1-031 may accept only raw values in 0x0000...0x7fff that also fall inside the current DINF rectangle.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-dinf-size-signedness-and-zero-bounds",
+          "observation": "DINF width and height signedness beyond the observed positive values is not established; zero-size or out-of-bounds values remain unsupported.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-cinn-coordinate-signedness",
+          "observation": "CINN coordinate signedness is not distinguished by the single observed values 772,594; M1-031 may accept only raw values in 0x0000...0x7fff that also fall inside the current DINF rectangle.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-cinn-sequence-semantics",
+          "observation": "Only one CINN sequence value was observed, so sequence increment or rollover semantics are not established.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-keepalive-timing",
+          "observation": "CALV and CNOP frame layouts were observed, but keepalive interval and timeout behavior are not established.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-ordering-state-machine",
+          "observation": "The retained capture records one observed setup/enter/leave order, but complete ordering and state-machine behavior are not established.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-excluded-frame-body-and-length-semantics",
+          "observation": "DCLP, DKDN and DKUP bodies are excluded and their body semantics are not established; M1-031 owns any bounded-frame limit for skipping these known excluded tokens.",
+          "status": "unknown",
+          "blockedClaimIds": []
         },
         {
           "fieldId": "barrier-mouse-message-fields",
@@ -1016,7 +1069,7 @@
         }
       ],
       "prohibitedInferences": [
-        "Do not infer DCLP, DKDN, DKUP, mouse, button, wheel, keyboard, clipboard, production TLS, Windows, full linked-screen compatibility, unobserved message code semantics, unobserved field semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, DSOP non-zero option semantics, CINN modifier-mask bit meanings, keepalive interval or timeout behavior from this evidence.",
+        "Do not infer DCLP, DKDN, DKUP, mouse, button, wheel, keyboard, clipboard, production TLS, Windows, full linked-screen compatibility, unobserved message code semantics, unobserved field semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, DSOP non-zero option semantics, DINF cursor signedness, DINF width/height signedness beyond positive non-zero bounded size handling, CINN coordinate signedness, CINN sequence semantics, complete control-message ordering/state-machine behavior, excluded-token body semantics, CINN modifier-mask bit meanings, keepalive interval or timeout behavior from this evidence.",
         "Do not copy or translate Barrier or Deskflow implementation from this evidence."
       ],
       "frozenContractRefs": [

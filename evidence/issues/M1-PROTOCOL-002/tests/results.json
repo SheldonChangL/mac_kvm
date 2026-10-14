@@ -16,11 +16,11 @@
       "status": "passed"
     },
     {
-      "name": "DINF fields decode as big-endian screen info",
+      "name": "DINF fields decode as big-endian screen info and coordinate signedness remains bounded",
       "status": "passed"
     },
     {
-      "name": "CINN fields decode as big-endian enter control",
+      "name": "CINN fields decode as big-endian enter control and sequence semantics remain opaque",
       "status": "passed"
     },
     {
@@ -28,7 +28,7 @@
       "status": "passed"
     },
     {
-      "name": "DSOP observed value is zero and non-zero values are unsupported",
+      "name": "DSOP observed value is exactly zero",
       "status": "passed"
     },
     {
@@ -36,7 +36,15 @@
       "status": "passed"
     },
     {
-      "name": "BARRIER-EVID-0005 register entry is pending-review and scoped to M1-031",
+      "name": "ADR records excluded-token skip policy, fail-closed bounds, and public-history redaction risk",
+      "status": "passed"
+    },
+    {
+      "name": "ADR and register non-claims cover TLS, Windows, keyboard, mouse, clipboard, coordinate signedness, sequence semantics and keepalive timing",
+      "status": "passed"
+    },
+    {
+      "name": "BARRIER-EVID-0005 register entry is approved and scoped to M1-031",
       "status": "passed"
     }
   ],
@@ -47,7 +55,8 @@
     "python3 Tools/Backlog/validate_package.py": "passed",
     "make architecture-check": "passed",
     "git diff --check": "passed",
-    "make verify REPORT=/private/tmp/m1_protocol_002_verify_pending.json": "passed"
+    "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v": "passed; Ran 147 tests in 47.309s; OK",
+    "make verify REPORT=/private/tmp/m1_protocol_002_verify_remediated.json": "passed; all 24 gates passed"
   },
   "status": "passed"
 }

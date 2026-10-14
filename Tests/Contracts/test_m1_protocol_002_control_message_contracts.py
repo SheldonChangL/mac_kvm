@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import re
 import struct
 import unittest
 from pathlib import Path
@@ -14,6 +15,7 @@ FIXTURE = FIXTURE_DIRECTORY / "sanitized.json"
 METADATA = FIXTURE_DIRECTORY / "metadata.json"
 ADR = REPOSITORY_ROOT / "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md"
 REGISTER = REPOSITORY_ROOT / "evidence/registers/M1-023.json"
+COMMANDS = REPOSITORY_ROOT / "evidence/issues/M1-PROTOCOL-002/commands.json"
 
 THIS_TEST = "Tests/Contracts/test_m1_protocol_002_control_message_contracts.py"
 
@@ -47,6 +49,7 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
         cls.metadata = json.loads(METADATA.read_text(encoding="utf-8"))
         cls.adr = ADR.read_text(encoding="utf-8")
         cls.register = json.loads(REGISTER.read_text(encoding="utf-8"))
+        cls.commands = COMMANDS.read_text(encoding="utf-8")
         cls.frames = {}
         for stream in cls.fixture["streams"]:
             for frame in stream["retainedFrames"]:
@@ -95,11 +98,14 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
             struct.unpack(">hhHHHHH", body), (-1920, 0, 3648, 1117, 0, 772, 594)
         )
         self.assertEqual(body[0:2], bytes.fromhex("f880"))
+        self.assertIn("signedness not frozen", self.adr)
+        self.assertIn("use the DINF rectangle for validation", self.adr)
 
     def test_cinn_fields_are_big_endian(self):
         body = self.frame_body("server-to-client", "CINN")
         self.assertEqual(len(body), 10)
         self.assertEqual(struct.unpack(">HHIH", body), (772, 594, 1, 0x2000))
+        self.assertIn("not sequence increment semantics", self.adr)
 
     def test_token_only_frames_have_payload_length_four(self):
         seen = set()
@@ -115,6 +121,7 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
         body = self.frame_body("server-to-client", "DSOP")
         self.assertEqual(body, bytes(4))
         self.assertEqual(int.from_bytes(body, "big"), 0)
+        self.assertIn("Any other `DSOP` payload length or", self.adr)
 
     def test_excluded_side_effect_tokens_are_not_retained_as_bytes(self):
         omitted = {}
@@ -134,19 +141,41 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
             omitted_count = sum(item["count"] for item in stream["omittedFrames"])
             self.assertEqual(retained_count + omitted_count, stream["observedFrameCount"])
         self.assertEqual(omitted, {"DCLP": 6, "DKDN": 1, "DKUP": 2})
+        self.assertIn("skip exactly one complete frame", self.adr)
+        self.assertIn("must not synthesize a KVM event", " ".join(self.adr.split()))
 
     def test_non_claims_cover_tls_windows_keyboard_mouse_clipboard(self):
         non_claims = " ".join(self.fixture["nonClaims"])
         adr_non_claims = self.adr.split("## Non-claims", 1)[1].split("\n## ", 1)[0]
+        normalized_adr_non_claims = " ".join(adr_non_claims.split())
         for term in ("TLS", "Windows", "keyboard", "mouse", "clipboard"):
             self.assertIn(term, non_claims)
             self.assertIn(term, adr_non_claims)
+        for term in ("DINF cursor signedness", "CINN coordinate signedness", "CINN sequence semantics"):
+            self.assertIn(term, normalized_adr_non_claims)
 
-    def test_register_records_pending_evidence_0005_for_m1_031(self):
+    def test_command_record_redacts_peer_address_and_notes_history_risk(self):
+        command_strings = " ".join(
+            item["command"] for item in json.loads(self.commands)["commands"]
+        )
+        self.assertIsNone(
+            re.search(r"\bssh\b[^\n]*\b(?:\d{1,3}\.){3}\d{1,3}\b", command_strings),
+            "commands.json command records must not name concrete peer IPv4 addresses",
+        )
+        self.assertIsNone(
+            re.search(r"\bssh\b[^\n]*\b[A-Za-z0-9._%+-]+@", command_strings),
+            "commands.json command records must not name concrete SSH user or host principals",
+        )
+        self.assertIn("<linux-peer>", self.commands)
+        self.assertIn("public-history exposure remains a recorded review risk", self.adr)
+
+    def test_register_records_approved_evidence_0005_for_m1_031(self):
         entry = next(
             item for item in self.register["entries"] if item["evidenceId"] == "BARRIER-EVID-0005"
         )
-        self.assertEqual(entry["provenance"]["disposition"], "pending-review")
+        self.assertEqual(entry["provenance"]["disposition"], "approved")
+        self.assertTrue(entry["provenance"]["reviewer"]["independentFromProducer"])
+        self.assertIn("final approval review", entry["provenance"]["reviewer"]["identity"])
         self.assertEqual(entry["source"]["category"], "black-box-capture")
         self.assertEqual(
             entry["fixture"],
@@ -161,6 +190,9 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
             "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md",
             entry["frozenContractRefs"],
         )
+        limitations = " ".join(entry["limitations"])
+        self.assertIn("public PR history revision previously exposed one peer address", limitations)
+        self.assertIn("skip the known excluded DCLP, DKDN and DKUP frames", limitations)
         blocked = {
             blocked
             for field in entry["ambiguousFields"]
@@ -168,6 +200,17 @@ class M1Protocol002ControlMessageContractTests(unittest.TestCase):
         }
         self.assertNotIn("M1-031", blocked)
         self.assertTrue({"M1-032", "M1-033", "M1-034", "M1-041"} <= blocked)
+        ambiguous = {field["fieldId"] for field in entry["ambiguousFields"]}
+        self.assertTrue(
+            {
+                "barrier-control-dinf-reserved-field",
+                "barrier-control-dinf-cursor-signedness",
+                "barrier-control-cinn-coordinate-signedness",
+                "barrier-control-cinn-sequence-semantics",
+                "barrier-control-keepalive-timing",
+            }
+            <= ambiguous
+        )
 
 
 if __name__ == "__main__":

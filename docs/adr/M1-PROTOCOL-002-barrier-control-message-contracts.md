@@ -2,10 +2,9 @@
 
 ## Status
 
-Proposed for M1-031 consumption; pending independent review. M1-031, M1-032,
-M1-033, M1-034 and M1-041 remain blocked until `BARRIER-EVID-0005` records an
-approved independent review. Nothing here freezes pointer, button, wheel or
-keyboard semantics.
+Accepted for M1-031 consumption only after independent review approved
+`BARRIER-EVID-0005`. M1-032, M1-033, M1-034 and M1-041 remain blocked. Nothing
+here freezes pointer, button, wheel or keyboard semantics.
 
 ## Context
 
@@ -53,9 +52,10 @@ input pipeline.
 |---|---|
 | server-to-client | `00 00 00 08 44 53 4f 50 00 00 00 00` |
 
-Body: one 4-byte unsigned big-endian value, observed as `0`. M1-031 may accept
-and ignore exactly this observed no-option value during setup. No general
-option semantics are frozen; a non-zero value is unsupported.
+Body: one 4-byte big-endian value, observed as `0`. M1-031 may accept and ignore
+only a 4-byte zero body during setup. Any other `DSOP` payload length or
+non-zero value is unsupported and must fail closed. No general option semantics
+are frozen.
 
 ### DINF (client-to-server response to QINF)
 
@@ -67,17 +67,29 @@ option semantics are frozen; a non-zero value is unsupported.
 |---:|---|---:|---|---:|
 | 0 | Screen origin x | 2 bytes | signed big-endian | -1920 (`f8 80`) |
 | 2 | Screen origin y | 2 bytes | signed big-endian | 0 (`00 00`) |
-| 4 | Width | 2 bytes | unsigned big-endian | 3648 (`0e 40`) |
-| 6 | Height | 2 bytes | unsigned big-endian | 1117 (`04 5d`) |
+| 4 | Width | 2 bytes | big-endian positive size value | 3648 (`0e 40`) |
+| 6 | Height | 2 bytes | big-endian positive size value | 1117 (`04 5d`) |
 | 8 | Reserved/unknown | 2 bytes | big-endian, meaning unknown | 0 (`00 00`) |
-| 10 | Cursor x | 2 bytes | unsigned big-endian | 772 (`03 04`) |
-| 12 | Cursor y | 2 bytes | unsigned big-endian | 594 (`02 52`) |
+| 10 | Cursor x | 2 bytes | big-endian coordinate value, signedness not frozen | 772 (`03 04`) |
+| 12 | Cursor y | 2 bytes | big-endian coordinate value, signedness not frozen | 594 (`02 52`) |
 
 The body is exactly 14 bytes. The values match the server log line
 `received client "m1-control" info shape=-1920,0 3648x1117 at 772,594`.
 M1-031 may consume only this field layout and bounds. The observed display
 values are capture facts, not defaults, and must not be treated as display
-identity. The reserved field stays unknown; writers emit `0`.
+identity. They are real display/cursor geometry from the controlled external
+peer, retained as low-sensitivity evidence because M1-031 needs a screen-info
+contract; they are not host identity, addresses, credentials, typed content or
+clipboard payload. This differs from `BARRIER-EVID-0004`, which removed DINF
+because M1-028 did not consume screen-info fields. The reserved field stays
+unknown; writers emit `0`.
+
+M1-031 must use the DINF rectangle for validation. Cursor coordinates are
+accepted only when the raw 16-bit value is in `0x0000...0x7fff` (where signed
+and unsigned interpretations agree) and the resulting non-negative coordinate
+falls within the current session's DINF rectangle. All other coordinate values
+fail closed instead of being forwarded to the KVM input pipeline. This evidence
+does not freeze a general signedness rule for cursor coordinates.
 
 ### CINN (server-to-client enter)
 
@@ -87,15 +99,22 @@ identity. The reserved field stays unknown; writers emit `0`.
 
 | Body offset | Field | Width | Encoding | Observed |
 |---:|---|---:|---|---:|
-| 0 | Enter x | 2 bytes | unsigned big-endian | 772 |
-| 2 | Enter y | 2 bytes | unsigned big-endian | 594 |
-| 4 | Sequence | 4 bytes | unsigned big-endian | 1 |
-| 8 | Modifier mask | 2 bytes | unsigned big-endian | `0x2000` |
+| 0 | Enter x | 2 bytes | big-endian coordinate value, signedness not frozen | 772 |
+| 2 | Enter y | 2 bytes | big-endian coordinate value, signedness not frozen | 594 |
+| 4 | Sequence | 4 bytes | big-endian observed sequence value | 1 |
+| 8 | Modifier mask | 2 bytes | big-endian opaque mask | `0x2000` |
 
 The body is exactly 10 bytes. It correlates with the server log line
 `switch from "linux-protocol" to "m1-control" at 772,594` and the client log
 line `entering screen`. The modifier mask is carried as an opaque 16-bit value;
-no bit meaning, including `0x2000`, is frozen.
+no bit meaning, including `0x2000`, is frozen. The sequence value was observed
+only once, so this evidence freezes only the 4-byte field position for M1-031,
+not sequence increment semantics.
+
+M1-031 applies the same deterministic coordinate rule used for DINF cursor
+coordinates: enter coordinates must be in `0x0000...0x7fff` and must fall within
+the current session's DINF rectangle before any enter state is exposed to KVM
+Core. Otherwise M1-031 fails closed.
 
 ### COUT (server-to-client leave)
 
@@ -120,6 +139,20 @@ excluded side-effect frames interleaved with `CALV`, then `COUT` and further
 `CALV`.
 Client-to-server: HelloBack, `DINF`, then repeated `CALV`/`CNOP`.
 
+### Excluded side-effect frames
+
+`DCLP`, `DKDN` and `DKUP` were observed as hotkey-trigger side effects, but this
+evidence does not freeze their bodies or semantics. M1-031 may recognize only
+the top-level frame token and length prefix for these known excluded tokens in
+order to skip exactly one complete frame, emit a diagnostic, and continue the
+control-message session. The diagnostic must include only token, direction,
+count/length and non-sensitive reason metadata; it must not include frame body
+bytes, clipboard content or key data. M1-031 must not decode their body, must
+not synthesize a KVM event from them, and must fail closed if the top-level
+length is malformed or exceeds the M1-031 decoder's documented bounded-frame
+limit. Unknown tokens outside the known excluded set remain unsupported and fail
+closed.
+
 ## Non-claims
 
 This ADR does not freeze `DCLP`, `DKDN`, `DKUP`, mouse, button, wheel,
@@ -127,8 +160,11 @@ keyboard, clipboard, TLS, Windows, or full interoperability behavior. The hotkey
 trigger produced `DCLP`, `DKDN` and `DKUP` side-effect frames; their bytes are
 not committed and they are not consumable by M1-031. It also does not freeze
 general `DSOP` option semantics, complete `CINN` modifier-mask semantics, the
-DINF reserved field, keepalive timing or timeout behavior, or a successful full
-linked-screen session.
+DINF reserved field, DINF cursor signedness, DINF width/height signedness beyond
+positive non-zero bounded size handling, CINN coordinate signedness, CINN
+sequence semantics, complete control-message ordering/state-machine behavior,
+known excluded-token body semantics, keepalive timing or timeout behavior, or a
+successful full linked-screen session.
 
 ## Evidence
 
@@ -160,8 +196,13 @@ existing user Barrier session on port 24800 was not touched.
   frames, token counts for omitted frames, synthetic names and raw digests.
 - `DCLP`, `DKDN` and `DKUP` bytes are removed; only their per-direction counts
   remain as non-consumed observation metadata.
-- No typed text, clipboard payload, credential, private key, token, hostname,
-  IP address or real port is committed.
+- `DCLP`, `DKDN` and `DKUP` are named only as observed token strings. No
+  clipboard or keyboard semantics are frozen from their names or bodies.
+- No typed text, clipboard payload, credential, private key, token, hostname, IP
+  address or real port is intentionally committed. The PR history previously
+  contained one peer address in `commands.json`; the committed command record is
+  redacted and this public-history exposure remains a recorded review risk, not
+  part of the consumable protocol evidence.
 - No Barrier or Deskflow source, header, generated code, constant table,
   decompiled output, packet injection, binary patching or instrumentation was
   used.
@@ -169,7 +210,11 @@ existing user Barrier session on port 24800 was not touched.
 ## Compatibility impact
 
 M1-031 can decode the control frames above for observed Barrier 2.4.0 protocol
-1.6 behavior. This does not unblock M1-032, M1-033, M1-034 or M1-041.
+1.6 behavior. `BARRIER-EVID-0004` remains unchanged and correctly states that it
+did not establish enter/leave/keepalive semantics; this entry is the later,
+narrower evidence that resolves that specific M1-031 blocker without rewriting
+the append-only register. This does not unblock M1-032, M1-033, M1-034 or
+M1-041.
 
 ## Rejected alternatives
 
@@ -190,9 +235,26 @@ translating GPL implementation material into the first-party adapter.
 | General `DSOP` option semantics | Protocol compatibility owner | Does not block M1-031; non-zero values stay unsupported |
 | `CINN` modifier-mask bit meanings | M1-041 / keyboard owner | Does not block M1-031; mask stays opaque |
 | DINF reserved field meaning | Protocol compatibility owner | Does not block M1-031; field stays unknown |
+| DINF cursor coordinate signedness | Protocol compatibility owner | Does not block M1-031; M1-031 must validate against DINF bounds |
+| DINF width/height signedness and zero-size behavior | Protocol compatibility owner | Does not block M1-031; M1-031 accepts only positive non-zero bounded sizes |
+| CINN coordinate signedness | Protocol compatibility owner | Does not block M1-031; M1-031 must validate against DINF bounds |
+| CINN sequence increment semantics | Protocol compatibility owner | Does not block M1-031; sequence stays opaque beyond field position |
+| Complete control-message ordering/state machine | M1-031 implementer with reviewer | Not frozen by this evidence; M1-031 fail-closes inconsistent session state |
+| Excluded-token body semantics and length limit | M1-031 implementer with reviewer | Body stays unknown; bounded-frame limit belongs to M1-031 decoder |
 | Keepalive interval and timeout | M1-031 implementer with reviewer | Not frozen by this evidence |
+
+## Capture limitations
+
+The trigger attempted `ctrl+F2`, `ctrl+F1`, `ctrl+F2`, but the accepted capture
+contains one `CINN` and one `COUT` transition. The third hotkey did not produce a
+second consumable enter transition in the retained evidence, so no sequence
+increment or repeated-enter behavior is claimed. The observed `DKDN`/`DKUP`
+count asymmetry is treated as an excluded side effect and is not consumed.
 
 ## Rollback
 
-Revert this ADR, the M1-PROTOCOL-002 fixture, the contract test and the
-`BARRIER-EVID-0005` register entry. M1-031 then returns to blocked state.
+Before merge, revert this ADR, the M1-PROTOCOL-002 fixture, the contract test
+and the `BARRIER-EVID-0005` register entry. After merge, preserve the register's
+append-only policy by marking `BARRIER-EVID-0005` rejected or superseded in a
+follow-up entry/change, then block M1-031 until replacement approved evidence
+exists.

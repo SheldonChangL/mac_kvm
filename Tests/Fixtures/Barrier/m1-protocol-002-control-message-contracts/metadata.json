@@ -17,6 +17,7 @@
       "clipboard-payload",
       "hostname",
       "ip-address",
+      "typed-text",
       "other-private-data"
     ],
     "status": "sanitized"
