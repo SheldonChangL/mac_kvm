@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PROTOCOL-002",
+  "fixture": {
+    "path": "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json",
+    "sha256": "18d601dc128320b91a06e5bb2dee505300dd7457e30cd982c401a4babf788bff",
+    "byteLength": 5944
+  },
+  "checks": [
+    {
+      "name": "metadata pins sanitized fixture digest and size",
+      "status": "passed"
+    },
+    {
+      "name": "retained golden frames match exact observed bytes",
+      "status": "passed"
+    },
+    {
+      "name": "DINF fields decode as big-endian screen info",
+      "status": "passed"
+    },
+    {
+      "name": "CINN fields decode as big-endian enter control",
+      "status": "passed"
+    },
+    {
+      "name": "token-only frames have length four and no body",
+      "status": "passed"
+    },
+    {
+      "name": "DSOP observed value is zero and non-zero values are unsupported",
+      "status": "passed"
+    },
+    {
+      "name": "DCLP/DKDN/DKUP side-effect frame bytes are not retained",
+      "status": "passed"
+    },
+    {
+      "name": "BARRIER-EVID-0005 register entry is pending-review and scoped to M1-031",
+      "status": "passed"
+    }
+  ],
+  "commands": {
+    "python3 Tests/Contracts/test_m1_protocol_002_control_message_contracts.py": "passed",
+    "python3 evidence/issues/M1-023/tests/test_register.py": "passed",
+    "make docs-check": "passed",
+    "python3 Tools/Backlog/validate_package.py": "passed",
+    "make architecture-check": "passed",
+    "git diff --check": "passed",
+    "make verify REPORT=/private/tmp/m1_protocol_002_verify_pending.json": "passed"
+  },
+  "status": "passed"
+}

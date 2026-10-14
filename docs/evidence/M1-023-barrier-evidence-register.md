@@ -360,3 +360,32 @@ ports. The only varied input was a deterministic synthetic client screen name.
 - Non-claims: no mouse, button, wheel, keyboard, enter, leave, clipboard,
   keepalive, Windows behavior, production TLS behavior, successful linked-screen
   switching, or general Barrier screen-name maximum is established.
+
+## BARRIER-EVID-0005 — M1-PROTOCOL-002 control-message contract
+
+`BARRIER-EVID-0005` is the pending-review M1-PROTOCOL-002 evidence item for the
+narrow Barrier control-message contract intended for M1-031. It records one
+bounded black-box observation over a temporary loopback/SSH-forwarded port. The
+trigger used deterministic Barrier config hotkeys to switch between synthetic
+screen names `linux-protocol` and `m1-control`. M1-031 remains blocked until
+this entry is independently reviewed and marked `approved`.
+
+- Fixture: `Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json`
+- Fixture SHA-256: recorded in `evidence/registers/M1-023.json`
+- Proposed contract effect after approval: M1-031 may decode the observed
+  screen-info, setup, enter, leave, keepalive and no-op control frames using
+  the field layout frozen in
+  `docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md`.
+- M1-031 consumer link: `frozenContractRefs` includes
+  `docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md`, and
+  `consumingTests` includes
+  `Tests/Contracts/test_m1_protocol_002_control_message_contracts.py`. M1-031
+  will add its Swift control-message tests as a consumer when that Issue
+  implements the decoder.
+- Sanitization: raw pcap bytes are not committed; `DCLP` clipboard and
+  `DKDN`/`DKUP` hotkey side-effect frame bytes are excluded and retained only as
+  counts.
+- Non-claims: no mouse, button, wheel, keyboard, clipboard, Windows behavior,
+  production TLS behavior, full linked-screen compatibility, non-zero setup
+  option semantics, enter modifier-mask bit meanings, keepalive interval or
+  timeout behavior is established.

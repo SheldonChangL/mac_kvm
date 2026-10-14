@@ -834,6 +834,198 @@
       "consumingTests": [
         "Tests/Contracts/test_m1_protocol_001_message_contracts.py"
       ]
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0005",
+      "relatedIssue": "M1-031",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "M1-PROTOCOL-002 GitHub Issue #315 controlled black-box observation of two lawfully installed external Barrier 2.4.0 programs over isolated temporary ports. The Linux peer ran barriers on a loopback-only temporary port and the macOS peer ran the Barrier.app barrierc binary through a temporary SSH local forward. The trigger used deterministic Barrier config hotkeys and xdotool on the Linux X display to switch to and from the synthetic macOS client screen. Existing user Barrier sessions on port 24800 were not touched. No Barrier or Deskflow source, header, constant table, generated implementation artifact, decompiled material, packet injection, binary patching or instrumentation was read, copied, linked or bundled."
+      },
+      "capture": {
+        "capturedAt": "2026-10-14T04:18:19Z",
+        "tools": [
+          {
+            "name": "tcpdump",
+            "version": "4.99.1"
+          },
+          {
+            "name": "Barrier barriers",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "Barrier.app barrierc",
+            "version": "2.4.0-release"
+          },
+          {
+            "name": "xdotool",
+            "version": "available on Ubuntu peer"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client-and-server",
+        "os": {
+          "name": "macOS-and-Ubuntu",
+          "version": "macOS local plus Ubuntu 22.04 peer",
+          "build": "sanitized"
+        }
+      },
+      "transport": {
+        "networkScope": "The recorder observed only Linux loopback traffic on a temporary port between the SSH local-forward listener and the external Barrier server. Inter-host traffic stayed inside SSH. Real addresses, ports, host names and user names are not recorded. Raw pcaps stayed under /private/tmp and remote mktemp directories and are not committed.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on hosts under that owner control. Only externally observable runtime behavior and sanitized application payload bytes for deterministic non-personal screen names are retained.",
+        "permittedUse": "Input to M1-PROTOCOL-002 for freezing the narrow Barrier control-message contract inside the MacKVM Barrier Protocol Adapter for M1-031 only. It does not authorize claims about pointer, button, wheel, keyboard, clipboard, production TLS, Windows, or full linked-screen compatibility behavior.",
+        "producer": "Codex M1-PROTOCOL-002 capture orchestrator in the active Product Owner-authorized M1 continuation thread",
+        "reviewer": {
+          "identity": "Pending independent reviewer; review record placeholder is evidence/issues/M1-PROTOCOL-002/independent-review.md",
+          "independentFromProducer": false,
+          "reviewedAt": "2026-10-14T04:30:00Z"
+        },
+        "disposition": "pending-review"
+      },
+      "sanitization": {
+        "procedure": "Allowlist sanitizer reconstructed TCP application payload frames from classic pcap. The committed fixture retains only the setup context and M1-031 control-message frames needed to freeze QINF, DINF, CIAK, CROP, DSOP, CALV, CNOP, CINN and COUT. DCLP clipboard and DKDN/DKUP hotkey side-effect frames are excluded and retained only as counts. Packet headers, real addresses, ports, host names, user names and raw pcap bytes are not committed.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "clipboard-payload",
+          "hostname",
+          "ip-address",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json",
+        "sha256": "18d601dc128320b91a06e5bb2dee505300dd7457e30cd982c401a4babf788bff",
+        "byteLength": 5944
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "The capture observed the Barrier server request screen info with QINF and the client answer with DINF carrying origin -1920,0, size 3648x1117, reserved 0 and cursor 772,594.",
+          "The capture observed setup control frames CIAK, CROP and DSOP with a zero DSOP value.",
+          "The capture observed bidirectional CALV keepalive and CNOP no-op frames.",
+          "The hotkey trigger produced a server-to-client CINN enter frame with x=772, y=594, sequence=1 and opaque modifier mask 0x2000, correlated with peer logs showing switch to the synthetic client screen.",
+          "The hotkey trigger produced a server-to-client COUT leave frame correlated with peer logs showing switch back to the Linux server screen."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0005-CLAIM-001",
+            "assertion": "For the observed external Barrier 2.4.0 control messages, QINF, CIAK, CROP, CALV, CNOP and COUT are 4-byte-token payloads with no body under the frozen 4-byte unsigned big-endian top-level length prefix.",
+            "establishedFieldIds": [
+              "barrier-control-token-only-frame-layout"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/0/retainedFrames",
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/1/retainedFrames",
+              "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0005-CLAIM-002",
+            "assertion": "The observed DINF frame body contains seven 16-bit big-endian fields: signed origin x, signed origin y, unsigned width, unsigned height, reserved zero, unsigned cursor x and unsigned cursor y.",
+            "establishedFieldIds": [
+              "barrier-control-dinf-screen-info-layout"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/1/retainedFrames/1",
+              "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0005-CLAIM-003",
+            "assertion": "The observed CINN frame body contains unsigned big-endian x and y coordinates, an unsigned big-endian sequence, and an opaque unsigned big-endian modifier mask; COUT has no body.",
+            "establishedFieldIds": [
+              "barrier-control-cinn-enter-layout",
+              "barrier-control-cout-leave-layout"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/0/retainedFrames/6",
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/0/retainedFrames/7",
+              "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0005-CLAIM-004",
+            "assertion": "The observed DSOP setup frame carries one unsigned big-endian 4-byte value observed as zero; no non-zero option semantics are established.",
+            "establishedFieldIds": [
+              "barrier-control-dsop-zero-layout"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json#/streams/0/retainedFrames/4",
+              "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "This entry is not consumable until independent review changes disposition to approved.",
+        "Only the M1-031 control-message contract may become consumable by this entry after approval.",
+        "The capture used TLS disabled for observation only; production TLS defaults are unchanged and unvalidated by this entry.",
+        "DCLP clipboard and DKDN/DKUP hotkey side-effect frames were observed but removed from the committed fixture and are not consumable claims.",
+        "No Windows behavior is claimed.",
+        "Raw pcaps are not committed and this entry does not claim raw-pcap-to-sanitized re-derivation from the repository alone."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-control-dsop-nonzero-option-semantics",
+          "observation": "Only a zero DSOP value was observed; non-zero values remain unsupported.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-cinn-modifier-mask-bits",
+          "observation": "The CINN modifier mask was observed as opaque 0x2000; bit meanings are not established.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-041"
+          ]
+        },
+        {
+          "fieldId": "barrier-mouse-message-fields",
+          "observation": "No pointer, button or wheel message semantics are established by this entry.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-032",
+            "M1-033",
+            "M1-034"
+          ]
+        },
+        {
+          "fieldId": "barrier-keyboard-message-fields",
+          "observation": "Hotkey side-effect keyboard frames were excluded and no keyboard event semantics are established by this entry.",
+          "status": "unknown",
+          "blockedClaimIds": [
+            "M1-041"
+          ]
+        },
+        {
+          "fieldId": "barrier-clipboard-message-fields",
+          "observation": "Clipboard side-effect frames were excluded and no clipboard message semantics are established by this entry.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer DCLP, DKDN, DKUP, mouse, button, wheel, keyboard, clipboard, production TLS, Windows, full linked-screen compatibility, unobserved message code semantics, unobserved field semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, DSOP non-zero option semantics, CINN modifier-mask bit meanings, keepalive interval or timeout behavior from this evidence.",
+        "Do not copy or translate Barrier or Deskflow implementation from this evidence."
+      ],
+      "frozenContractRefs": [
+        "docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_protocol_002_control_message_contracts.py"
+      ]
     }
   ]
 }
