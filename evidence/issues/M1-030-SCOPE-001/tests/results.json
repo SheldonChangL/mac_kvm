@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-030-SCOPE-001",
+  "githubIssue": 317,
+  "phase": "green",
+  "baseCommit": "1964732e18ceebafb1fca67f953cb94adbb18bd5",
+  "command": "python3 -m unittest Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py -v",
+  "startedAt": "2026-10-15T02:19:33Z",
+  "endedAt": "2026-10-15T02:19:33Z",
+  "exitCode": 0,
+  "status": "passed",
+  "testsRun": 8,
+  "failures": 0,
+  "errors": 0,
+  "tests": [
+    "test_architecture_sources_still_prohibit_barrier_in_kvmcore",
+    "test_dependency_order_is_preserved",
+    "test_exact_files_add_no_production_source",
+    "test_index_row_still_agrees_with_manifest",
+    "test_issue_and_manifest_declare_corrected_scope",
+    "test_old_kvmcore_paths_do_not_exist",
+    "test_scope_check_rejects_old_kvmcore_scope",
+    "test_traceability_links_correction_to_m1_030"
+  ],
+  "notes": [
+    "The suite proves the M1-030 Issue and manifest agree on the corrected BarrierCompatibility exact files and Required Commands, rejects the old Packages/KVMCore paths and command, preserves depends_on M1-020 and M1-029 and the topological order, adds no production source, and links the correction in SOURCE_TRACEABILITY.md.",
+    "It runs inside the cumulative repository-contract-tests gate; it adds no evidence test file, so the named gate inventory is unchanged."
+  ]
+}

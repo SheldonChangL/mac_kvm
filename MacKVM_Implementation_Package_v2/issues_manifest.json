@@ -2278,12 +2278,11 @@
       "epic_name": "Barrier Compatibility Evidence 與 Codec",
       "size": "S",
       "exact_files": [
-        "Packages/KVMCore/Sources/KVMCore/BarrierHandshakeTests.swift",
-        "Packages/KVMCore/Tests/KVMCoreTests/BarrierHandshakeTestsTests.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift",
         "docs/components/M1-030-barrier-handshake-tests.md"
       ],
       "commands": [
-        "swift test --package-path Packages/KVMCore",
+        "swift test --package-path Packages/BarrierCompatibility",
         "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
         "python3 Tools/Backlog/validate_package.py",
         "make architecture-check"

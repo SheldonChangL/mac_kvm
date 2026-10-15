@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-030-SCOPE-001",
+  "githubIssue": 317,
+  "blocksGithubIssue": 53,
+  "baseCommit": "1964732e18ceebafb1fca67f953cb94adbb18bd5",
+  "implementationCommit": null,
+  "implementationCommitNote": "This package is part of the single atomic correction commit, which cannot contain its own hash. Discover it with git log --oneline -- evidence/issues/M1-030-SCOPE-001/.",
+  "status": "author_verified",
+  "authorship": {
+    "implementationAuthor": "Claude Code (--model opus)",
+    "independentReviewer": "separate Codex executor; review not recorded in this package"
+  },
+  "toolchain": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "pythonVersion": "3.9.6",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)"
+  },
+  "commands": [
+    {
+      "command": "python3 -m unittest Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py -v",
+      "phase": "red",
+      "startedAt": "2026-10-15T02:19:10Z",
+      "endedAt": "2026-10-15T02:19:10Z",
+      "exitCode": 1,
+      "result": "Expected failure before the correction: Ran 8 tests; 3 methods failed (8 subTest failures). See tests/red-phase.json."
+    },
+    {
+      "command": "python3 -m unittest Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py -v",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:19:33Z",
+      "endedAt": "2026-10-15T02:19:33Z",
+      "exitCode": 0,
+      "result": "Ran 8 tests; OK. See tests/results.json."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:19:39Z",
+      "endedAt": "2026-10-15T02:19:39Z",
+      "exitCode": 0,
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:19:39Z",
+      "endedAt": "2026-10-15T02:19:41Z",
+      "exitCode": 0,
+      "result": "architecture check OK"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:20:15Z",
+      "endedAt": "2026-10-15T02:21:08Z",
+      "exitCode": 1,
+      "result": "Ran 155 tests; 146 passed, 9 failed. All 8 M1-030-SCOPE-001 tests passed. The 9 failures are M1-004, M1-005, M1-006 and M1-007 tests that invoke SwiftPM, which fails with sandbox-exec: sandbox_apply: Operation not permitted in the author environment.",
+      "environmentNote": "swift package --package-path Packages/BarrierCompatibility describe --type json on the unmodified package fails with the same sandbox error, so the failure is environmental. No failing test reads a file changed by this correction. Reviewer must rerun outside the sandbox."
+    },
+    {
+      "command": "git add <changed and new files>",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:22:22Z",
+      "endedAt": "2026-10-15T02:22:26Z",
+      "exitCode": 128,
+      "result": "fatal: Unable to create .git/index.lock: Operation not permitted. The author environment denies writes to .git, as recorded in M1-PKG-002, so nothing was staged or committed by the author."
+    },
+    {
+      "command": "make docs-check",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:22:34Z",
+      "endedAt": "2026-10-15T02:22:35Z",
+      "exitCode": 0,
+      "result": "docs check OK. docs-check reads git-tracked files only, so this run covers the modified tracked files but not the unstaged new evidence files."
+    },
+    {
+      "command": "git diff --check",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:22:34Z",
+      "endedAt": "2026-10-15T02:22:35Z",
+      "exitCode": 0,
+      "result": "No output."
+    },
+    {
+      "command": "python3 -I -c '<load Tools/docs-check/docs-check.py and apply check_tracked_file to the four new evidence files>'",
+      "phase": "green",
+      "startedAt": "2026-10-15T02:22:41Z",
+      "endedAt": "2026-10-15T02:22:41Z",
+      "exitCode": 0,
+      "result": "violations []. Applies the docs-check Markdown and JSON rules to the untracked evidence files; a grep for trailing whitespace and missing final newlines over all new files also found nothing."
+    }
+  ]
+}

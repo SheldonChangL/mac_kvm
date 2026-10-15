@@ -84,6 +84,19 @@ Boundary:
 - 版本：只記錄觀測到的 version bytes，以及交由 M1-025 採納或拒絕的 `exact-supported-version-fail-closed` 提案；不主張一般版本協商或跨版本相容。
 - M1 未執行 Windows（`docs/adr/M1-SCOPE-001-linux-only-validation.md`），本鏈路不記錄 Windows 結果。production TLS 預設維持 enabled、fail-closed，未被改變。
 
+## M1-030-SCOPE-001 Barrier Handshake Test Scope Correction
+
+本節只記錄 M1-030 Exact Files 的 source-validity 修正；不是 M1-030 完成證據，也不新增 handshake test 或 production behavior。
+
+| Stage | Issue | Recorded artifact | Verification |
+|---|---|---|---|
+| Scope correction | M1-030-SCOPE-001（GitHub Issue #317） | M1-030 Issue 檔與 `issues_manifest.json` 的 Exact Files／Required Commands；[`evidence/issues/M1-030-SCOPE-001/`](../evidence/issues/M1-030-SCOPE-001/summary.md) | `Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py` |
+| Future test owner | M1-030（GitHub Issue #53） | `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift`、`docs/components/M1-030-barrier-handshake-tests.md` | M1-030 Required Commands（`swift test --package-path Packages/BarrierCompatibility`） |
+
+- 依據：Frozen Decision 4（Barrier-specific tokens/types 不可進 KVMCore）與 Architecture Guardrails（`KVMCore` 不可 import `BarrierCompatibility`）。原 Exact Files 將 Barrier handshake tests 與 helper 置於 `Packages/KVMCore`，與上述凍結決策衝突；已移除兩個 KVMCore 路徑，不新增 production helper，M1-030 直接測試 M1-029 的 `BarrierClientHandshake`。
+- `depends_on` 維持 M1-020、M1-029，`topological_order` 不變；M1-030-SCOPE-001 不在 canonical manifest 中，不列入任何 `depends_on`。
+- 不改變 wire bytes、product scope、architecture boundary 或其他 Issue。
+
 ## M1-001 Direct Traceability
 
 | Requirement | Canonical source | Frozen refinement | Decision record | Verification |
