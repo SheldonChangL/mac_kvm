@@ -1,0 +1,255 @@
+{
+  "issue": "M1-031",
+  "status": "implemented-author-verified-reviewer-rerun-required",
+  "author": "Claude Code (--model opus)",
+  "baseCommit": "5277134a75b1fcea9370203b08d65d1d213bdaf4",
+  "branch": "codex/m1-031-barrier-control-messages",
+  "commit": null,
+  "commitNote": "No implementation commit hash is recorded in this file; the commit (if any) is reported in the author handoff. A reviewer or follow-up evidence-only commit may record it.",
+  "toolchain": {
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6"
+  },
+  "environmentNote": "The Claude authoring session runs inside an outer macOS sandbox where SwiftPM cannot nest its own sandbox (sandbox_apply: Operation not permitted), so SwiftPM commands were run with `--disable-sandbox`. That flag only disables SwiftPM's manifest/plugin sandbox and does not change compilation or test selection. xcodebuild could not open the workspace in this session, and tools that spawn plain `swift` subprocesses hit the same nested-sandbox failure.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierControlMessagesTests",
+      "phase": "red-environment-probe",
+      "startedAt": "2026-10-15T03:01:28Z",
+      "endedAt": "2026-10-15T03:01:29Z",
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "SwiftPM nested-sandbox failure before compilation (sandbox_apply: Operation not permitted). Not a test result."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierControlMessagesTests",
+      "phase": "red",
+      "startedAt": "2026-10-15T03:01:33Z",
+      "endedAt": "2026-10-15T03:01:38Z",
+      "exitCode": 1,
+      "result": "failed-as-expected",
+      "summary": "Tests written before production code: compilation failed with 468 compiler error lines because BarrierControlDecoder and the other types under test did not exist.",
+      "report": "evidence/issues/M1-031/tests/barrier-control-messages-tests.json"
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierControlMessagesTests",
+      "phase": "green-first-attempt",
+      "startedAt": "2026-10-15T03:02:53Z",
+      "endedAt": "2026-10-15T03:02:58Z",
+      "exitCode": 1,
+      "result": "failed",
+      "summary": "31/34 passed. The 3 failures were test-construction defects (doubled oversize body; source scan matching a comment), fixed without relaxing expectations."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierControlMessagesTests",
+      "phase": "green-focused",
+      "startedAt": "2026-10-15T03:03:09Z",
+      "endedAt": "2026-10-15T03:03:11Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "34/34 M1-031 tests passed."
+    },
+    {
+      "command": "swift format format -i <both M1-031 Swift files> && swift format lint --strict --no-color-diagnostics Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierControlMessages.swift Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierControlMessagesTests.swift",
+      "phase": "format-lint",
+      "startedAt": null,
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "First lint reported 4 LineLength and 1 TrailingComma findings; swift format was applied to the two M1-031 files only and the strict lint then printed nothing, exit 0. Start time not captured."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-031/tests/swift-testing-xunit.xml",
+      "phase": "full-package",
+      "startedAt": "2026-10-15T03:03:23Z",
+      "endedAt": "2026-10-15T03:03:26Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "185 Swift Testing tests passed (151 existing + 34 M1-031).",
+      "report": "evidence/issues/M1-031/tests/swift-testing-xunit-swift-testing.xml"
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility -Xswiftc -warnings-as-errors",
+      "phase": "full-package-warnings-as-errors",
+      "startedAt": "2026-10-15T03:03:26Z",
+      "endedAt": "2026-10-15T03:03:30Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "185 tests passed with warnings as errors."
+    },
+    {
+      "command": "python3 -I /tmp/m1031/scripts/mutate.py <repo> (11 one-line mutants in /tmp copies)",
+      "phase": "mutation",
+      "startedAt": "2026-10-15T03:03:52Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "11/11 mutants killed by BarrierControlMessagesTests (each mutant run exited 1) against the pre-review tests (first 03:03:52Z, last 03:05:10Z) and again against the final tests (see post-review-mutation). Repository source not edited.",
+      "report": "evidence/issues/M1-031/tests/barrier-control-messages-tests.json"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "phase": "author-environment",
+      "startedAt": "2026-10-15T03:05:23Z",
+      "endedAt": "2026-10-15T03:05:24Z",
+      "exitCode": 66,
+      "result": "environment-failure",
+      "summary": "xcodebuild: error: 'MacKVM.xcworkspace' is not a workspace file, with CoreSimulatorService/launchd connection failures and log-file permission errors. Retried once outside the harness sandbox at 2026-10-15T03:05:34Z with the same exit 66. The workspace files are unchanged by M1-031. Reviewer rerun required."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "author",
+      "startedAt": "2026-10-15T03:05:24Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "author",
+      "startedAt": "2026-10-15T03:05:24Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make verify REPORT=/tmp/m1031/verify-report.json",
+      "phase": "author-environment",
+      "startedAt": "2026-10-15T03:05:39Z",
+      "endedAt": "2026-10-15T03:05:41Z",
+      "exitCode": 2,
+      "result": "environment-failure",
+      "summary": "manifest-validation, docs-check and architecture-check passed. code-quality failed: its repository-wide swift format lint passed (exit 0) but its plain `swift test -Xswiftc -warnings-as-errors` hit the SwiftPM nested-sandbox failure. Later gates were not run (fail-fast). Report written outside the repository."
+    },
+    {
+      "command": "swift test -Xswiftc -warnings-as-errors (repository root)",
+      "phase": "author-environment-diagnosis",
+      "startedAt": "2026-10-15T03:05:52Z",
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "sandbox-exec: sandbox_apply: Operation not permitted. Reproduces the code-quality failure."
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors (repository root)",
+      "phase": "author-make-verify-substitute",
+      "startedAt": "2026-10-15T03:05:52Z",
+      "endedAt": "2026-10-15T03:05:56Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "47 tests passed."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/KVMContracts -Xswiftc -warnings-as-errors",
+      "phase": "author-make-verify-substitute",
+      "startedAt": "2026-10-15T03:06:04Z",
+      "endedAt": "2026-10-15T03:06:06Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "56 tests passed."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/MacPlatform",
+      "phase": "author-make-verify-substitute",
+      "startedAt": "2026-10-15T03:06:06Z",
+      "endedAt": "2026-10-15T03:06:11Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "83 tests passed."
+    },
+    {
+      "command": "python3 Tools/cigates/cigates.py --repository-root . --check-tool-tests --expected-tool-test-count 9 ; python3 Tools/cigates/cigates.py --repository-root . --check-evidence-tests --expected-evidence-test-count 3",
+      "phase": "author-make-verify-substitute",
+      "startedAt": "2026-10-15T03:06:11Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "tool test discovery OK: 9 files; evidence test discovery OK: 3 files"
+    },
+    {
+      "command": "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py'",
+      "phase": "author-make-verify-substitute",
+      "startedAt": "2026-10-15T03:06:14Z",
+      "endedAt": "2026-10-15T03:06:59Z",
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "Ran 155 tests, 146 passed, 9 failed. All 9 failures (M1-004 skeleton x2, M1-005 arm64 build, M1-006 package boundaries x3, M1-007 test targets x3) are verifier scripts spawning plain `swift`, which failed with sandbox_apply: Operation not permitted; checked per failure. The M1-PROTOCOL-002 contract tests are among the passing tests. Reviewer rerun required."
+    },
+    {
+      "command": "git diff --no-index --check /dev/null <file> (each M1-031 file); targeted privacy grep (IPv4, /Users/, email, password, secret, private key, key headers, ghp_, token=, api key, 24800, hostname); json.load on both JSON files",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-15T03:08:30Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors in any of the 7 files. Privacy grep matched only the Swift toolchain version string in commands.json; the xUnit file contains no hostname or home path. Both JSON files parse. Start time approximate (not captured by the command)."
+    },
+    {
+      "command": "git add <M1-031 files>",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-15T03:09:30Z",
+      "exitCode": 128,
+      "result": "environment-failure",
+      "summary": "fatal: Unable to create '.git/index.lock': Operation not permitted. The authoring session cannot write .git, so the files stay untracked and no commit was made. Start time approximate."
+    },
+    {
+      "command": "docs-check rules (check_tracked_file) applied directly to the 4 untracked M1-031 Markdown/JSON files; make docs-check; make architecture-check",
+      "phase": "evidence-pass",
+      "startedAt": "2026-10-15T03:09:57Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "0 violations for the untracked files; `docs check OK` (tracked files only); `architecture check OK` (architecture-check walks the filesystem, so it covered the new Swift files)."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierControlMessagesTests",
+      "phase": "post-review-focused",
+      "startedAt": "2026-10-15T03:12:34Z",
+      "endedAt": "2026-10-15T03:12:36Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "34/34 after strengthening three tests for Low findings from a fresh-context Claude review (all-bit flips, fixed-width integer leak detection, exhaustive error list). Production code unchanged. swift format format -i and swift format lint --strict on both Swift files ran first: lint exit 0, no output."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-031/tests/swift-testing-xunit.xml",
+      "phase": "post-review-full-package",
+      "startedAt": "2026-10-15T03:12:45Z",
+      "endedAt": "2026-10-15T03:12:46Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "185 tests passed; raw report regenerated.",
+      "report": "evidence/issues/M1-031/tests/swift-testing-xunit-swift-testing.xml"
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility -Xswiftc -warnings-as-errors",
+      "phase": "post-review-warnings-as-errors",
+      "startedAt": "2026-10-15T03:12:46Z",
+      "endedAt": "2026-10-15T03:12:49Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "185 tests passed with warnings as errors."
+    },
+    {
+      "command": "python3 -I /tmp/m1031/scripts/mutate.py <repo> (11 one-line mutants in /tmp copies)",
+      "phase": "post-review-mutation",
+      "startedAt": "2026-10-15T03:12:49Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "11/11 mutants killed against the final tests; last mutant started 2026-10-15T03:14:06Z.",
+      "report": "evidence/issues/M1-031/tests/barrier-control-messages-tests.json"
+    },
+    {
+      "command": "final pass: git diff --no-index --check (7 files); privacy grep; docs-check rules on the 4 untracked Markdown/JSON files; make architecture-check; make docs-check; python3 Tools/Backlog/validate_package.py; git status --short; git diff --stat",
+      "phase": "evidence-pass-final",
+      "startedAt": "2026-10-15T03:14:50Z",
+      "endedAt": "2026-10-15T03:14:51Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No whitespace errors; privacy grep matched only this file's own description of the scan and the toolchain version string; 0 docs-check violations; architecture check OK; docs check OK; PACKAGE OK: 217 issues, 5 milestones, 17 epics. git diff --stat is empty (no tracked file modified); only the M1-031 files and the pre-existing unrelated untracked zip/directory are untracked. commands.json was edited after this run only to append this entry."
+    }
+  ],
+  "notRun": [
+    "Remaining make verify gates after code-quality (tool tests, evidence tests, per-package swift tests, M1-007/M1-005 verifier scripts) were not run by cigates because of fail-fast; equivalents above were run manually where the environment allowed."
+  ],
+  "requiresReviewerRerun": [
+    "swift test --package-path Packages/BarrierCompatibility (without --disable-sandbox)",
+    "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+    "make verify",
+    "make docs-check after the M1-031 files are tracked"
+  ]
+}
