@@ -42,8 +42,7 @@ labels:
 
 ## Exact Files
 
-- `Packages/KVMCore/Sources/KVMCore/BarrierHandshakeTests.swift`
-- `Packages/KVMCore/Tests/KVMCoreTests/BarrierHandshakeTestsTests.swift`
+- `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift`
 - `docs/components/M1-030-barrier-handshake-tests.md`
 
 Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴大 PR。
@@ -94,7 +93,7 @@ Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴�
 ## Required Commands
 
 ```bash
-swift test --package-path Packages/KVMCore
+swift test --package-path Packages/BarrierCompatibility
 xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build
 python3 Tools/Backlog/validate_package.py
 make architecture-check

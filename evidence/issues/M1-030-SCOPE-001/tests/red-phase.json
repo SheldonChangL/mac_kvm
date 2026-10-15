@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-030-SCOPE-001",
+  "githubIssue": 317,
+  "phase": "red",
+  "treeState": "1964732e18ceebafb1fca67f953cb94adbb18bd5 plus only the new Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py",
+  "command": "python3 -m unittest Tests/Contracts/test_m1_030_barrier_handshake_test_scope.py -v",
+  "startedAt": "2026-10-15T02:19:10Z",
+  "endedAt": "2026-10-15T02:19:10Z",
+  "exitCode": 1,
+  "status": "expected_failure",
+  "testsRun": 8,
+  "failures": 8,
+  "errors": 0,
+  "failuresNote": "unittest counts each failing subTest separately: 3 test methods failed, producing 8 failures.",
+  "failingTests": [
+    "test_issue_and_manifest_declare_corrected_scope",
+    "test_exact_files_add_no_production_source",
+    "test_traceability_links_correction_to_m1_030"
+  ],
+  "passingTests": [
+    "test_architecture_sources_still_prohibit_barrier_in_kvmcore",
+    "test_dependency_order_is_preserved",
+    "test_index_row_still_agrees_with_manifest",
+    "test_old_kvmcore_paths_do_not_exist",
+    "test_scope_check_rejects_old_kvmcore_scope"
+  ],
+  "scopeViolationsAtBase": [
+    "manifest: exact files must be the corrected BarrierCompatibility test and doc",
+    "manifest: KVMCore exact file Packages/KVMCore/Sources/KVMCore/BarrierHandshakeTests.swift",
+    "manifest: KVMCore exact file Packages/KVMCore/Tests/KVMCoreTests/BarrierHandshakeTestsTests.swift",
+    "issue: exact files must be the corrected BarrierCompatibility test and doc",
+    "issue: KVMCore exact file Packages/KVMCore/Sources/KVMCore/BarrierHandshakeTests.swift",
+    "issue: KVMCore exact file Packages/KVMCore/Tests/KVMCoreTests/BarrierHandshakeTestsTests.swift",
+    "manifest: required commands must target BarrierCompatibility",
+    "manifest: KVMCore required command",
+    "issue: required commands must target BarrierCompatibility",
+    "issue: KVMCore required command"
+  ],
+  "failureReason": "The M1-030 Issue and manifest declared two Packages/KVMCore exact files (a Barrier helper source and a KVMCoreTests test) and required swift test --package-path Packages/KVMCore, contradicting Frozen Decision 4; the source traceability index had no M1-030-SCOPE-001 entry.",
+  "remediation": "Replaced the two KVMCore exact files with the single BarrierCompatibilityTests path, retargeted the Swift Required Command to Packages/BarrierCompatibility in both canonical sources, and added the M1-030-SCOPE-001 traceability section."
+}
