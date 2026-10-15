@@ -1,0 +1,26 @@
+{
+  "fixtureId": "m1-protocol-002-control-message-contracts",
+  "payload": {
+    "byteLength": 5944,
+    "path": "sanitized.json",
+    "sha256": "18d601dc128320b91a06e5bb2dee505300dd7457e30cd982c401a4babf788bff"
+  },
+  "protocol": "barrier",
+  "provenance": {
+    "capturedAt": "2026-10-14T04:18:19Z",
+    "reference": "M1-PROTOCOL-002 (GitHub Issue #315) controlled capture: Linux barriers 2.4.0-release protocol 1.6 on a temporary loopback port; macOS Barrier.app barrierc 2.4.0-release via temporary SSH local forward. Port 24800 session untouched. TLS disabled for capture only. Raw pcap sha256 454eb259d8b89f1bceb72f923f26815bb7c88b875947ea93d4b7ba821bbe1d7f, 5234 bytes, not committed.",
+    "sourceKind": "black-box-capture"
+  },
+  "sanitization": {
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "clipboard-payload",
+      "hostname",
+      "ip-address",
+      "typed-text",
+      "other-private-data"
+    ],
+    "status": "sanitized"
+  },
+  "schemaVersion": 1
+}

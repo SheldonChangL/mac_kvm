@@ -1,0 +1,191 @@
+{
+  "capture": {
+    "barrier": {
+      "client": "Barrier barrierc 2.4.0-release protocol 1.6",
+      "crypto": "disabled-for-capture-only",
+      "server": "Barrier barriers 2.4.0-release protocol 1.6"
+    },
+    "captureId": "m1-protocol-002-control-message-contracts",
+    "pcap": {
+      "byteLength": 5234,
+      "committed": false,
+      "recordCount": 57,
+      "sha256": "454eb259d8b89f1bceb72f923f26815bb7c88b875947ea93d4b7ba821bbe1d7f"
+    },
+    "screenNames": {
+      "client": "m1-control",
+      "kind": "synthetic-non-personal-ascii",
+      "server": "linux-protocol"
+    },
+    "topology": {
+      "existingSessionTouched": false,
+      "macClientTarget": "mac-loopback-ssh-forward-temporary-port",
+      "serverListen": "linux-loopback-temporary-port"
+    },
+    "trigger": "Barrier config hotkeys control+F2 switchToScreen(m1-control) and control+F1 switchToScreen(linux-protocol); xdotool pressed ctrl+F2, ctrl+F1, ctrl+F2 on the Linux X display"
+  },
+  "encoding": "base64",
+  "fixtureId": "m1-protocol-002-control-message-contracts",
+  "frameConvention": "each retained item is one complete top-level frame including its 4-byte unsigned big-endian length prefix; streamFrameIndex is the 1-based position among all complete frames observed in that direction",
+  "logCorrelation": {
+    "client": [
+      "connected to server",
+      "entering screen",
+      "leaving screen"
+    ],
+    "server": [
+      "accepted client",
+      "received client \"m1-control\" info shape=-1920,0 3648x1117 at 772,594",
+      "switch from \"linux-protocol\" to \"m1-control\" at 772,594",
+      "leaving screen",
+      "switch from \"m1-control\" to \"linux-protocol\" at 1919,540",
+      "entering screen"
+    ]
+  },
+  "nonClaims": [
+    "does not establish DCLP, DKDN, DKUP, mouse, button, wheel, keyboard, clipboard, TLS, Windows, or full interoperability behavior",
+    "does not establish general DSOP option semantics beyond the observed zero value",
+    "does not establish complete CINN modifier-mask semantics from the observed 0x2000 value",
+    "does not derive from Barrier or Deskflow source, headers, constants, or decompiled material"
+  ],
+  "schemaVersion": 1,
+  "source": "controlled black-box capture of external Barrier 2.4.0 client/server over an isolated temporary loopback/SSH-forwarded port",
+  "streams": [
+    {
+      "direction": "server-to-client",
+      "observedFrameCount": 22,
+      "omittedFrames": [
+        {
+          "bytesRetained": false,
+          "count": 5,
+          "reason": "repeated-keepalive-representative-retained",
+          "token": "CALV"
+        },
+        {
+          "bytesRetained": false,
+          "count": 6,
+          "reason": "excluded-side-effect-not-consumable",
+          "token": "DCLP"
+        },
+        {
+          "bytesRetained": false,
+          "count": 1,
+          "reason": "excluded-side-effect-not-consumable",
+          "token": "DKDN"
+        },
+        {
+          "bytesRetained": false,
+          "count": 2,
+          "reason": "excluded-side-effect-not-consumable",
+          "token": "DKUP"
+        }
+      ],
+      "retainedFrames": [
+        {
+          "base64": "AAAAC0JhcnJpZXIAAQAG",
+          "byteLength": 15,
+          "classification": "setup-context",
+          "streamFrameIndex": 1,
+          "token": "Barrier"
+        },
+        {
+          "base64": "AAAABFFJTkY=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 2,
+          "token": "QINF"
+        },
+        {
+          "base64": "AAAABENJQUs=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 3,
+          "token": "CIAK"
+        },
+        {
+          "base64": "AAAABENST1A=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 4,
+          "token": "CROP"
+        },
+        {
+          "base64": "AAAACERTT1AAAAAA",
+          "byteLength": 12,
+          "classification": "consumable",
+          "streamFrameIndex": 5,
+          "token": "DSOP"
+        },
+        {
+          "base64": "AAAABENBTFY=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 6,
+          "token": "CALV"
+        },
+        {
+          "base64": "AAAADkNJTk4DBAJSAAAAASAA",
+          "byteLength": 18,
+          "classification": "consumable",
+          "streamFrameIndex": 7,
+          "token": "CINN"
+        },
+        {
+          "base64": "AAAABENPVVQ=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 19,
+          "token": "COUT"
+        }
+      ]
+    },
+    {
+      "direction": "client-to-server",
+      "observedFrameCount": 25,
+      "omittedFrames": [
+        {
+          "bytesRetained": false,
+          "count": 5,
+          "reason": "repeated-keepalive-representative-retained",
+          "token": "CALV"
+        },
+        {
+          "bytesRetained": false,
+          "count": 16,
+          "reason": "repeated-keepalive-representative-retained",
+          "token": "CNOP"
+        }
+      ],
+      "retainedFrames": [
+        {
+          "base64": "AAAAGUJhcnJpZXIAAQAGAAAACm0xLWNvbnRyb2w=",
+          "byteLength": 29,
+          "classification": "setup-context",
+          "streamFrameIndex": 1,
+          "token": "Barrier"
+        },
+        {
+          "base64": "AAAAEkRJTkb4gAAADkAEXQAAAwQCUg==",
+          "byteLength": 22,
+          "classification": "consumable",
+          "streamFrameIndex": 2,
+          "token": "DINF"
+        },
+        {
+          "base64": "AAAABENBTFY=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 3,
+          "token": "CALV"
+        },
+        {
+          "base64": "AAAABENOT1A=",
+          "byteLength": 8,
+          "classification": "consumable",
+          "streamFrameIndex": 4,
+          "token": "CNOP"
+        }
+      ]
+    }
+  ]
+}

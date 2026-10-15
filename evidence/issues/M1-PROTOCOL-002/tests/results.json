@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PROTOCOL-002",
+  "fixture": {
+    "path": "Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json",
+    "sha256": "18d601dc128320b91a06e5bb2dee505300dd7457e30cd982c401a4babf788bff",
+    "byteLength": 5944
+  },
+  "checks": [
+    {
+      "name": "metadata pins sanitized fixture digest and size",
+      "status": "passed"
+    },
+    {
+      "name": "retained golden frames match exact observed bytes",
+      "status": "passed"
+    },
+    {
+      "name": "DINF fields decode as big-endian screen info and coordinate signedness remains bounded",
+      "status": "passed"
+    },
+    {
+      "name": "CINN fields decode as big-endian enter control and sequence semantics remain opaque",
+      "status": "passed"
+    },
+    {
+      "name": "token-only frames have length four and no body",
+      "status": "passed"
+    },
+    {
+      "name": "DSOP observed value is exactly zero",
+      "status": "passed"
+    },
+    {
+      "name": "DCLP/DKDN/DKUP side-effect frame bytes are not retained",
+      "status": "passed"
+    },
+    {
+      "name": "ADR records excluded-token skip policy, fail-closed bounds, and public-history redaction risk",
+      "status": "passed"
+    },
+    {
+      "name": "ADR and register non-claims cover TLS, Windows, keyboard, mouse, clipboard, coordinate signedness, sequence semantics and keepalive timing",
+      "status": "passed"
+    },
+    {
+      "name": "BARRIER-EVID-0005 register entry is approved and scoped to M1-031",
+      "status": "passed"
+    }
+  ],
+  "commands": {
+    "python3 Tests/Contracts/test_m1_protocol_002_control_message_contracts.py": "passed",
+    "python3 evidence/issues/M1-023/tests/test_register.py": "passed",
+    "make docs-check": "passed",
+    "python3 Tools/Backlog/validate_package.py": "passed",
+    "make architecture-check": "passed",
+    "git diff --check": "passed",
+    "python3 -m unittest discover -s Tests/Contracts -p 'test_*.py' -v": "passed; Ran 147 tests in 47.309s; OK",
+    "make verify REPORT=/private/tmp/m1_protocol_002_verify_approved.json": "passed; all 24 gates passed on commit 8fe7d011f7a098ba822ffda173543443f1972c75"
+  },
+  "status": "passed"
+}

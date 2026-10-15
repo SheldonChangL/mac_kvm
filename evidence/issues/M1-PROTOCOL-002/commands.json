@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PROTOCOL-002",
+  "baseCommit": "dc512140d547a5da4594a3b7da62b9736aece1fe",
+  "capture": {
+    "rawPcapCommitted": false,
+    "rawPcapSha256": "454eb259d8b89f1bceb72f923f26815bb7c88b875947ea93d4b7ba821bbe1d7f",
+    "rawPcapByteLength": 5234,
+    "existingBarrierSessionTouched": false,
+    "serverPort": "temporary-linux-loopback-port",
+    "clientPort": "temporary-macos-ssh-forward-port"
+  },
+  "commands": [
+    {
+      "command": "ssh -o BatchMode=yes <linux-peer> 'uname -a; command -v barriers; barriers --version 2>&1 | head -20; command -v tcpdump; tcpdump --version 2>&1 | head -5'",
+      "exitCode": 0,
+      "result": "Linux peer, barriers 2.4.0-release protocol 1.6 and tcpdump 4.99.1 available."
+    },
+    {
+      "command": "M1-PROTOCOL-002 controlled capture using Linux barriers on loopback temporary port, macOS barrierc through SSH local forward, tcpdump on Linux lo, and xdotool hotkeys ctrl+F2/ctrl+F1/ctrl+F2",
+      "exitCode": 0,
+      "result": "Captured 57 packets; raw pcap SHA-256 454eb259d8b89f1bceb72f923f26815bb7c88b875947ea93d4b7ba821bbe1d7f; raw pcap not committed."
+    },
+    {
+      "command": "python3 Tests/Contracts/test_m1_protocol_002_control_message_contracts.py",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "..........\\n----------------------------------------------------------------------\\nRan 10 tests in 0.001s\\n\\nOK\\n"
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "...............\\n----------------------------------------------------------------------\\nRan 15 tests in 0.004s\\n\\nOK\\n"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\\ndocs check OK\\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\\n",
+      "stderr": ""
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\\narchitecture check OK\\n",
+      "stderr": ""
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "make verify REPORT=/private/tmp/m1_protocol_002_verify_approved.json",
+      "exitCode": 0,
+      "stdout": "CI context: commit=8fe7d011f7a098ba822ffda173543443f1972c75 machine=arm64 python=3.9.6 swift=Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)\\n[PASSED] manifest-validation exit=0 durationMs=47\\n[PASSED] docs-check exit=0 durationMs=139\\n[PASSED] architecture-check exit=0 durationMs=399\\n[PASSED] code-quality exit=0 durationMs=3914\\n[PASSED] tool-test-discovery exit=0 durationMs=43\\n[PASSED] evidence-test-discovery exit=0 durationMs=44\\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=134\\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4399\\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=202\\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=599\\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=279\\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=271\\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=55\\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=193\\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=111\\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=38\\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=41\\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=34\\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=913\\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=935\\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=933\\n[PASSED] repository-contract-tests exit=0 durationMs=50501\\n[PASSED] swift-test-targets exit=0 durationMs=1634\\n[PASSED] native-arm64-build exit=0 durationMs=845\\nCI report: /private/tmp/m1_protocol_002_verify_approved.json\\n",
+      "stderr": ""
+    }
+  ]
+}

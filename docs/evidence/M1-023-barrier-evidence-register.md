@@ -360,3 +360,46 @@ ports. The only varied input was a deterministic synthetic client screen name.
 - Non-claims: no mouse, button, wheel, keyboard, enter, leave, clipboard,
   keepalive, Windows behavior, production TLS behavior, successful linked-screen
   switching, or general Barrier screen-name maximum is established.
+
+## BARRIER-EVID-0005 — M1-PROTOCOL-002 control-message contract
+
+`BARRIER-EVID-0005` is the approved M1-PROTOCOL-002 evidence item for the narrow
+Barrier control-message contract intended for M1-031 only. It records one
+bounded black-box observation over a temporary loopback/SSH-forwarded port. The
+trigger used deterministic Barrier config hotkeys to switch between synthetic
+screen names `linux-protocol` and `m1-control`.
+`BARRIER-EVID-0004` remains unchanged and still records that it did not
+establish enter, leave or keepalive semantics; `BARRIER-EVID-0005` is a later
+entry that resolves that M1-031-specific blocker without rewriting the
+append-only register.
+
+- Fixture: `Tests/Fixtures/Barrier/m1-protocol-002-control-message-contracts/sanitized.json`
+- Fixture SHA-256: recorded in `evidence/registers/M1-023.json`
+- Approved contract effect: M1-031 may decode the observed screen-info, setup,
+  enter, leave, keepalive and no-op control frames using the field layout frozen in
+  `docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md`.
+  It may skip only the known excluded `DCLP`, `DKDN` and `DKUP` side-effect
+  frames by top-level length, without decoding their bodies or forwarding them
+  into the KVM input pipeline. Malformed excluded frames and unknown tokens
+  remain fail-closed.
+- M1-031 consumer link: `frozenContractRefs` includes
+  `docs/adr/M1-PROTOCOL-002-barrier-control-message-contracts.md`, and
+  `consumingTests` includes
+  `Tests/Contracts/test_m1_protocol_002_control_message_contracts.py`. M1-031
+  will add its Swift control-message tests as a consumer when that Issue
+  implements the decoder.
+- Sanitization: raw pcap bytes are not committed; `DCLP`, `DKDN` and `DKUP`
+  side-effect frame bytes are excluded and retained only as counts. The current
+  command record redacts the peer address; one earlier public
+  PR-history revision exposed that address and is recorded as a review risk, not
+  consumable protocol evidence.
+- Geometry privacy: the retained screen-info values are real display/cursor
+  geometry from the controlled peer. They are retained as low-sensitivity
+  M1-031 protocol evidence, not as host identity or private content.
+- Non-claims: no mouse, button, wheel, keyboard, clipboard, Windows behavior,
+  production TLS behavior, full linked-screen compatibility, non-zero setup
+  option semantics, enter modifier-mask bit meanings, keepalive interval or
+  timeout behavior, screen-info cursor signedness, CINN coordinate signedness or
+  CINN sequence semantics, screen-info width/height signedness beyond positive
+  non-zero bounded size handling, excluded-token body semantics or complete
+  control-message ordering/state-machine behavior is established.
