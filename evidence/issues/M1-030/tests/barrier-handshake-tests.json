@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-030",
+  "framework": "swift-testing",
+  "baseCommit": "3a75589acb7028fb8148c85b62c508bcc1fd3368",
+  "testFirstOutcome": "pass-on-first-run",
+  "testFirstNote": "The 11 M1-030 tests were run against the unchanged M1-029 source before any other M1-030 file was written and all passed. M1-029 already implements the required behavior, so no RED phase is claimed. Test sensitivity is shown by the mutation runs below.",
+  "rawReport": "evidence/issues/M1-030/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Written by `swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-030/tests/swift-testing-xunit.xml`; Swift Testing names the file with the -swift-testing suffix. It records 151 tests, 0 failures, 0 skipped.",
+  "runs": [
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierHandshakeTestsTests",
+      "phase": "test-first-focused",
+      "startedAt": "2026-10-15T02:38:50Z",
+      "endedAt": "2026-10-15T02:38:55Z",
+      "exitCode": 0,
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-030/tests/swift-testing-xunit.xml",
+      "phase": "full-package",
+      "startedAt": "2026-10-15T02:39:56Z",
+      "endedAt": "2026-10-15T02:39:57Z",
+      "exitCode": 0,
+      "total": 151,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "note": "140 existing tests plus 11 M1-030 tests."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility -Xswiftc -warnings-as-errors",
+      "phase": "full-package-warnings-as-errors",
+      "startedAt": "2026-10-15T02:40:34Z",
+      "endedAt": "2026-10-15T02:40:37Z",
+      "exitCode": 0,
+      "total": 151,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-030/tests/swift-testing-xunit.xml",
+      "phase": "full-package-post-review-fix",
+      "startedAt": "2026-10-15T02:46:30Z",
+      "endedAt": "2026-10-15T02:46:32Z",
+      "exitCode": 0,
+      "total": 151,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "note": "Run against the final test code after the Medium review fix, validating the cycle-safe reflected traversal change (class instances end the walk without being traversed, so reference cycles cannot recurse). This run regenerated the raw report; it records tests=151, failures=0, errors=0, skipped=0."
+    }
+  ],
+  "mutationRuns": {
+    "note": "Each mutant is one edited line in BarrierClientHandshake.swift inside a throw-away copy of Packages/KVMContracts and Packages/BarrierCompatibility under /tmp, removed afterwards. The repository source was not edited. Command: swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierHandshakeTestsTests.",
+    "mutants": [
+      {
+        "id": "proceed-on-unsupported-version",
+        "change": "catch { if error != .unsupportedVersion { try fail(.serverHelloRejected(error)) } }",
+        "exitCode": 1,
+        "failedTests": [
+          "unsupportedVersionFailsWithTheFixedErrorAtEveryFragmentationBoundary()",
+          "unsupportedMultiByteVersionsFailWithTheSameFixedError()",
+          "unsupportedVersionDoesNotProceedForAnyLaterEvent()"
+        ],
+        "issues": 42858
+      },
+      {
+        "id": "ignore-signals-in-awaitHello",
+        "change": "terminate(_:) treats .awaitHello like .protocolConnected (no state change)",
+        "exitCode": 1,
+        "failedTests": [
+          "helloAtExactlyThePayloadLimitCompletesAndOneBelowNeverReachesTheHandshake()",
+          "timeoutAndCancelLeaveNoRetainedStringOrReferenceAtAnyByteBoundary()",
+          "cancelAtEveryByteBoundaryEndsWithCancelledAndNoLaterOutput()",
+          "timeoutAtEveryByteBoundaryEndsWithTimedOutAndNoLaterOutput()"
+        ],
+        "issues": 196
+      },
+      {
+        "id": "keep-screen-name-on-terminal-signal",
+        "change": "terminate(_:) no longer sets screenName = nil",
+        "exitCode": 1,
+        "failedTests": [
+          "timeoutAndCancelLeaveNoRetainedStringOrReferenceAtAnyByteBoundary()"
+        ],
+        "issues": 30
+      }
+    ]
+  },
+  "m1_030_source": "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift",
+  "testCases": [
+    {"name": "fragmentedHelloCompletesTheHandshakeForEverySplitOfTheFrame()", "category": "happy-path/fragmentation", "status": "passed", "cases": 16384},
+    {"name": "oneByteChunksWithEmptyAppendsKeepTheHandshakeWaitingUntilTheLastByte()", "category": "happy-path/fragmentation/boundary", "status": "passed"},
+    {"name": "helloAtExactlyThePayloadLimitCompletesAndOneBelowNeverReachesTheHandshake()", "category": "boundary", "status": "passed"},
+    {"name": "unsupportedVersionFailsWithTheFixedErrorAtEveryFragmentationBoundary()", "category": "invalid-input/version-mismatch", "status": "passed", "cases": 14280},
+    {"name": "unsupportedMultiByteVersionsFailWithTheSameFixedError()", "category": "invalid-input/version-mismatch", "status": "passed", "cases": 7},
+    {"name": "unsupportedVersionDoesNotProceedForAnyLaterEvent()", "category": "invalid-input/idempotency", "status": "passed"},
+    {"name": "timeoutAtEveryByteBoundaryEndsWithTimedOutAndNoLaterOutput()", "category": "timeout/idempotency", "status": "passed", "cases": 15},
+    {"name": "timeoutAfterTheHelloButBeforeHelloBackIsSentNeverConnects()", "category": "timeout", "status": "passed"},
+    {"name": "cancelAtEveryByteBoundaryEndsWithCancelledAndNoLaterOutput()", "category": "cancel/idempotency", "status": "passed", "cases": 16},
+    {"name": "timeoutAndCancelLeaveNoRetainedStringOrReferenceAtAnyByteBoundary()", "category": "cleanup", "status": "passed", "cases": 30},
+    {"name": "lateTimeoutAfterAFragmentedHandshakeCompletesKeepsProtocolConnected()", "category": "idempotency/cleanup", "status": "passed"}
+  ],
+  "m1_030_total": 11,
+  "m1_030_passed": 11
+}

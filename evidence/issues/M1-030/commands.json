@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-030",
+  "githubIssue": 53,
+  "baseCommit": "3a75589acb7028fb8148c85b62c508bcc1fd3368",
+  "branch": "codex/m1-030-barrier-handshake-tests",
+  "implementationCommit": null,
+  "implementationCommitNote": "The author environment could not write to .git (`git add` exit 128: Unable to create .git/index.lock: Operation not permitted), so no commit was created by the author; the files are left unstaged. Whoever commits records the hash or discovers it with git log --oneline -- evidence/issues/M1-030/.",
+  "status": "author_verified_pending_reviewer_rerun",
+  "authorship": {
+    "implementationAuthor": "Claude Code (--model opus)",
+    "independentReviewer": "separate Codex executor; review not recorded in this package"
+  },
+  "toolchain": {
+    "machine": "arm64",
+    "macOS": "26.6.2",
+    "swiftVersion": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "xcodeVersion": "Xcode 26.2 (17C52)",
+    "pythonVersion": "3.9.6"
+  },
+  "environmentNote": "The author session runs inside an outer macOS sandbox. SwiftPM cannot apply its own nested sandbox there (`sandbox-exec: sandbox_apply: Operation not permitted`), so SwiftPM commands were rerun with `--disable-sandbox`, which only disables SwiftPM's manifest/plugin sandbox and does not change compilation or test selection. The same sandbox blocks xcodebuild's CoreSimulator XPC services. This matches the M1-029 and M1-030-SCOPE-001 author environments.",
+  "commands": [
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierHandshakeTestsTests",
+      "phase": "test-first-environment-probe",
+      "startedAt": "2026-10-15T02:38:45Z",
+      "endedAt": "2026-10-15T02:38:47Z",
+      "exitCode": 1,
+      "result": "environment-failure",
+      "summary": "Invalid manifest: sandbox-exec: sandbox_apply: Operation not permitted. No code was compiled; rerun with --disable-sandbox."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierHandshakeTestsTests",
+      "phase": "test-first-focused",
+      "startedAt": "2026-10-15T02:38:50Z",
+      "endedAt": "2026-10-15T02:38:55Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Run against unchanged M1-029 source before docs/evidence were written: 11 tests passed on the first run. No RED phase.",
+      "report": "evidence/issues/M1-030/tests/barrier-handshake-tests.json"
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --filter BarrierHandshakeTestsTests (three mutants in a /tmp copy)",
+      "phase": "mutation-sensitivity",
+      "startedAt": null,
+      "exitCode": 1,
+      "result": "expected-failure",
+      "summary": "Each of three one-line mutants of BarrierClientHandshake.swift in a throw-away copy outside the repository made 1 to 4 M1-030 tests fail. Repository source untouched; copy deleted. Start/end times were not captured.",
+      "report": "evidence/issues/M1-030/tests/barrier-handshake-tests.json"
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-030/tests/swift-testing-xunit.xml",
+      "phase": "full-package",
+      "startedAt": "2026-10-15T02:39:56Z",
+      "endedAt": "2026-10-15T02:39:57Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "151 Swift Testing tests passed (140 existing + 11 M1-030). Raw report written as tests/swift-testing-xunit-swift-testing.xml.",
+      "report": "evidence/issues/M1-030/tests/swift-testing-xunit-swift-testing.xml"
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift",
+      "phase": "lint",
+      "startedAt": "2026-10-15T02:39:57Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "No output."
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "phase": "required-command",
+      "startedAt": "2026-10-15T02:40:02Z",
+      "endedAt": "2026-10-15T02:40:03Z",
+      "exitCode": 66,
+      "result": "environment-failure",
+      "summary": "xcodebuild: error: 'MacKVM.xcworkspace' is not a workspace file. Preceded by CoreSimulator XPC 'Connection invalid' and 'Operation not permitted' opening ~/Library/Logs. The workspace contents file exists unchanged from the base commit, where the M1-029 reviewer rerun of this command succeeded; no M1-030 file is part of the app target. Reviewer must rerun outside the sandbox."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "phase": "required-command",
+      "startedAt": "2026-10-15T02:40:13Z",
+      "endedAt": "2026-10-15T02:40:13Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "command": "make architecture-check",
+      "phase": "required-command",
+      "startedAt": "2026-10-15T02:40:13Z",
+      "endedAt": "2026-10-15T02:40:14Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "architecture check OK"
+    },
+    {
+      "command": "make docs-check",
+      "phase": "gate",
+      "startedAt": "2026-10-15T02:40:14Z",
+      "endedAt": "2026-10-15T02:40:14Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "docs check OK over tracked files only; the untracked M1-030 Markdown/JSON files are checked in the final-hygiene entry.",
+      "scope": "tracked-files-only"
+    },
+    {
+      "command": "make verify REPORT=/tmp/m1030-verify-report.json",
+      "phase": "gate",
+      "startedAt": "2026-10-15T02:40:17Z",
+      "endedAt": "2026-10-15T02:40:19Z",
+      "exitCode": 2,
+      "result": "environment-failure",
+      "summary": "manifest-validation, docs-check and architecture-check passed; code-quality failed and later gates were not run. code-quality's swift-format-lint passed; its `swift test -Xswiftc -warnings-as-errors` step failed with the same SwiftPM nested-sandbox error (reproduced directly: Invalid manifest ... sandbox_apply: Operation not permitted)."
+    },
+    {
+      "command": "swift test --disable-sandbox -Xswiftc -warnings-as-errors",
+      "phase": "code-quality-equivalent",
+      "startedAt": "2026-10-15T02:40:42Z",
+      "endedAt": "2026-10-15T02:40:46Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Root package: 47 Swift Testing tests passed with warnings as errors."
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility -Xswiftc -warnings-as-errors",
+      "phase": "code-quality-equivalent",
+      "startedAt": "2026-10-15T02:40:34Z",
+      "endedAt": "2026-10-15T02:40:37Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "151 tests passed; no warning in the new test file."
+    },
+    {
+      "command": "grep -nE '\\bTask\\b|\\basync\\b|\\bawait\\b|Task\\.sleep|DispatchQueue|Timer\\b|Thread\\b|ContinuousClock|KVMClock' Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientHandshake.swift",
+      "phase": "structural-no-task-check",
+      "exitCode": 1,
+      "result": "passed",
+      "summary": "No match: the system under test contains no task, async code, timer, queue, thread or clock."
+    },
+    {
+      "command": "git diff --no-index --check /dev/null <file> (once per new file); docs-check check_tracked_file applied directly to the new Markdown/JSON files; git diff --check; make docs-check; secret/privacy grep over the new files",
+      "phase": "final-hygiene",
+      "startedAt": "2026-10-15T02:43:03Z",
+      "endedAt": "2026-10-15T02:43:30Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Whitespace check printed nothing for each of the six new files (exit 1 = differs from /dev/null; a whitespace error would print the line and exit 3). docs-check rules returned no violations for the four new Markdown/JSON files. git diff --check exit 0 (no tracked changes). make docs-check printed 'docs check OK'. The secret/privacy grep matched only statements that no secret is recorded, the Swift version string and the substring 'sk-' inside 'task-check'. commands.json was edited after this run only to add this entry.",
+      "files": [
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierHandshakeTestsTests.swift",
+        "docs/components/M1-030-barrier-handshake-tests.md",
+        "evidence/issues/M1-030/summary.md",
+        "evidence/issues/M1-030/commands.json",
+        "evidence/issues/M1-030/tests/barrier-handshake-tests.json",
+        "evidence/issues/M1-030/tests/swift-testing-xunit-swift-testing.xml"
+      ]
+    },
+    {
+      "command": "swift test --disable-sandbox --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-030/tests/swift-testing-xunit.xml",
+      "phase": "full-package-post-review-fix",
+      "startedAt": "2026-10-15T02:46:30Z",
+      "endedAt": "2026-10-15T02:46:32Z",
+      "exitCode": 0,
+      "result": "passed",
+      "summary": "Rerun after the Medium review fix to BarrierHandshakeTestsTests.swift (cycle-safe reflected traversal: class instances end the walk without being traversed, so reference cycles cannot recurse). 151 Swift Testing tests passed; the raw xUnit report records tests=151, failures=0, errors=0, skipped=0. The test binary was linked at 2026-10-15T02:45:40Z, after the last edit to the fixed test file at 2026-10-15T02:45:29Z. This run overwrote tests/swift-testing-xunit-swift-testing.xml, which now reflects the final fixed test code; earlier entries above describe the pre-fix runs.",
+      "report": "evidence/issues/M1-030/tests/swift-testing-xunit-swift-testing.xml"
+    }
+  ],
+  "notRun": [
+    "make verify gates after code-quality (stopped by the environment failure above); PR CI must run them",
+    "xcodebuild build success (environment failure above); reviewer must rerun"
+  ],
+  "requiresReviewerRerun": [
+    "swift test --package-path Packages/BarrierCompatibility (without --disable-sandbox)",
+    "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+    "make verify",
+    "make docs-check and git diff --cached --check after staging"
+  ]
+}
