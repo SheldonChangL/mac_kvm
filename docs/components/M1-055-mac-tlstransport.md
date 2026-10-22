@@ -190,8 +190,10 @@ there is no plaintext fallback from TLS.
 
 In release builds the case, factories, and branches are compiled out, so a
 release build cannot express a plaintext request. This is enforced by
-conditional compilation and checked by a static source audit; no release-
-configuration build has been run for this issue yet.
+conditional compilation and checked by a static source audit. A release
+configuration build (`swift build --package-path Packages/MacPlatform -c
+release`) compiles with the DEBUG-only path compiled out; no release-build
+runtime test exists.
 
 ## Privacy, logging, and key handling
 
@@ -220,7 +222,10 @@ host `""`, port `0`, with a rejecting evaluator. The backend rejects the
 endpoint before creating any connection, so no network is used; connect and
 the stream both fail with `transport.unavailable`.
 
-The 35 test functions in `MacTLSTransportTests.swift` cover:
+`MacTLSTransportTests.swift` declares 34 unconditional `@Test` functions plus
+one DEBUG-only `@Test` (`debugPlaintextSelectionIsExplicitAndRequestsPlaintext`,
+inside `#if DEBUG`). Several are parameterized, so the full MacPlatform run
+reports 118 test cases across the package. They cover:
 
 - `Transport` conformance; the TLS request created only at connect;
 - the static `#if DEBUG` source audit, and (DEBUG) explicit plaintext selection
@@ -250,15 +255,28 @@ The 35 test functions in `MacTLSTransportTests.swift` cover:
 
 ## Validation status
 
-- `swift test --package-path Packages/MacPlatform`, run by Codex after
-  remediation: 118 tests passed, 0 failed; 3 opt-in manual probes unrelated to
-  M1-055 were skipped.
-- Pending: `xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM
-  -destination 'platform=macOS' build`, `python3
-  Tools/Backlog/validate_package.py`, `make architecture-check`, lint, the
-  `evidence/issues/M1-055/` package, and security review.
-- M1-055 has no mandatory manual step. No real peer or network
-  interoperability has been tested.
+Run by the Codex root reviewer at implementation commit
+`1c7ad3f99a3cb53772ec46078800ce624c00c22a`, all exit 0:
+
+1. `swift test --package-path Packages/MacPlatform`: 118 passed, 0 failed;
+   3 opt-in manual probes unrelated to M1-055 (M1-035, M1-036, M1-053)
+   skipped.
+2. `xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination
+   'platform=macOS' build`: `** BUILD SUCCEEDED **`; only nonfatal existing
+   destination warnings, no M1-055 source warning.
+3. `python3 Tools/Backlog/validate_package.py`: `PACKAGE OK`.
+4. `make architecture-check`: `architecture check OK`.
+5. `make docs-check`: `docs check OK`.
+6. `make code-quality-check`: strict lint zero findings; warnings-as-errors
+   test pass.
+7. `swift build --package-path Packages/MacPlatform -c release`:
+   `Build complete!`.
+8. `git diff --check HEAD^ HEAD`: no output.
+
+- Pending: the `evidence/issues/M1-055/` commit, `make verify` at that
+  commit, PR, GitHub CI, and merge.
+- M1-055 has no mandatory manual step; none was performed. No real peer or
+  network interoperability has been tested.
 
 ## Out of scope
 
@@ -276,9 +294,9 @@ The 35 test functions in `MacTLSTransportTests.swift` cover:
   invocation, chain extraction, and `NWError` mapping are verified only by
   compilation and the seam; only invalid-endpoint rejection runs the
   production backend.
-- **Release behavior is static evidence.** Plaintext exclusion from release
-  builds is shown by conditional compilation and a source audit, not by a
-  release build or runtime test.
+- **Release behavior is compile-time evidence.** Plaintext exclusion from
+  release builds is shown by conditional compilation, a source audit, and a
+  successful release-configuration build, not by a release runtime test.
 - **The evaluator runs synchronously** inside the verify block on the
   backend's serial queue. A slow evaluator stalls the handshake.
 - **No transport-owned timeout.** The production backend never emits
