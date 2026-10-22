@@ -10,10 +10,10 @@
     "Packages/MacPlatform/Tests/MacPlatformTests/MacTLSTransportTests.swift",
     "docs/components/M1-055-mac-tlstransport.md"
   ],
-  "evidenceCommit": null,
-  "evidenceCommitNote": "Not yet created at authorship time; make verify at the evidence commit is pending.",
-  "status": "implementation_commit_verified",
-  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. Claude Opus authored this file and ran no commands.",
+  "evidenceCommit": "1206b441b6471be25d2fd1f2ba0d5b118ca86566",
+  "evidenceCommitNote": "make verify at the evidence commit passed (24/24 gates). This metadata update is a later commit; a final-head re-run is pending.",
+  "status": "evidence_commit_verified",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. make verify was run by the Codex root reviewer at the evidence commit and exited 0 with 24/24 gates passed. Claude Opus authored this file and ran no commands.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus",
     "reviewer": "Codex root reviewer",
@@ -121,9 +121,52 @@
       "result": "no output"
     }
   ],
+  "evidenceCommitCommands": [
+    {
+      "id": "evidence-1",
+      "scope": "repository-wide gate at evidence commit; separate from implementation commands 1-8",
+      "commit": "1206b441b6471be25d2fd1f2ba0d5b118ca86566",
+      "command": "make verify",
+      "form": "exact",
+      "startedAt": "2026-10-22T15:03:29.873Z",
+      "endedAt": "2026-10-22T15:04:54.628Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "gatesTotal": 24,
+        "gatesPassed": 24,
+        "gatesFailed": 0,
+        "gates": [
+          "manifest",
+          "docs",
+          "architecture",
+          "code-quality",
+          "discovery gates (2)",
+          "tool tests (9)",
+          "evidence tests (3)",
+          "KVMContracts Swift package tests",
+          "MacPlatform Swift package tests",
+          "BarrierCompatibility Swift package tests",
+          "repository contract tests",
+          "Swift test targets",
+          "native arm64 build"
+        ],
+        "report": {
+          "path": "artifacts/ci/m1-008-report.json",
+          "committed": false,
+          "note": "git-ignored, not committed",
+          "commitField": "1206b441b6471be25d2fd1f2ba0d5b118ca86566",
+          "sha256": "9e32973f45fb866ec6e74ae2ead0de79b7e12a94f7c9ff299ab96bf0b34c4f6b"
+        }
+      }
+    }
+  ],
+  "completed": [
+    { "item": "evidence commit", "status": "complete", "commit": "1206b441b6471be25d2fd1f2ba0d5b118ca86566" },
+    { "item": "make verify at evidence commit", "status": "passed", "gates": "24/24" }
+  ],
   "pending": [
-    { "item": "evidence commit", "status": "pending" },
-    { "item": "make verify at evidence commit", "status": "pending" },
+    { "item": "make verify re-run at final head after this evidence metadata update", "status": "pending" },
     { "item": "pull request", "status": "pending" },
     { "item": "GitHub CI", "status": "pending" },
     { "item": "merge", "status": "pending" }

@@ -273,8 +273,11 @@ Run by the Codex root reviewer at implementation commit
    `Build complete!`.
 8. `git diff --check HEAD^ HEAD`: no output.
 
-- Pending: the `evidence/issues/M1-055/` commit, `make verify` at that
-  commit, PR, GitHub CI, and merge.
+Implementation commands 1-8 passed. Repository-wide `make verify` then passed
+24/24 gates at evidence commit `1206b441b6471be25d2fd1f2ba0d5b118ca86566`.
+
+- Pending: final-head `make verify` re-run after the evidence metadata update,
+  PR, GitHub CI, and merge.
 - M1-055 has no mandatory manual step; none was performed. No real peer or
   network interoperability has been tested.
 

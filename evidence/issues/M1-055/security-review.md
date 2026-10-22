@@ -27,9 +27,11 @@ risks remain open and non-blocking. Machine-readable detail is in
    `package` only, and the backend seam is internal. `KVMContracts`, ADRs and
    wire formats are unchanged. `make architecture-check` passed.
 3. **Security, fail-safe and compatibility: pass.** See the checks below.
-4. **Tests, validation and acceptance: pass at the implementation commit.**
-   Commands 1-8 exited 0 (`commands.json`). `make verify` at the evidence
-   commit, PR, GitHub CI and merge are **pending**.
+4. **Tests, validation and acceptance: pass at the evidence commit.**
+   Commands 1-8 exited 0 at the implementation commit, and repository-wide
+   `make verify` passed 24/24 gates at evidence commit
+   `1206b441b6471be25d2fd1f2ba0d5b118ca86566` (`commands.json`). Final-head
+   re-run, PR, GitHub CI and merge are **pending**.
 5. **Scope, hygiene and rollback: pass.** The implementation commit contains
    exactly the three Exact Files. The protected owner files
    `MacKVM_M1-001_unblock.zip` and `mackvm-unblock/` were not read, modified,
@@ -62,5 +64,7 @@ risks remain open and non-blocking. Machine-readable detail is in
 
 ## Pending
 
-Evidence commit, `make verify` at that commit, PR, GitHub CI and merge. A
+Evidence commit and its `make verify` (24/24) are complete. Pending:
+final-head `make verify` re-run after this evidence metadata update, PR,
+GitHub CI and merge. A
 reviewer must still perform the merge; no model may merge autonomously.
