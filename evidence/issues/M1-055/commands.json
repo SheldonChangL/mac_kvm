@@ -13,12 +13,13 @@
   "evidenceCommit": "1206b441b6471be25d2fd1f2ba0d5b118ca86566",
   "evidenceCommitNote": "make verify at the evidence commit passed (24/24 gates). This metadata update is a later commit; a final-head re-run is pending.",
   "status": "evidence_commit_verified",
-  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. make verify was run by the Codex root reviewer at the evidence commit and exited 0 with 24/24 gates passed. Claude Opus authored this file and ran no commands.",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. make verify was run by the Codex root reviewer at the evidence commit and exited 0 with 24/24 gates passed. Claude Opus authored this file; during authoring it used only read-only repository inspection and search (including ls and grep) and executed none of the recorded commands.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus",
     "reviewer": "Codex root reviewer",
-    "detail": "Claude Opus authored the source, tests, component document and evidence. The Codex root reviewer ran every command, reviewed, and drove fixes. No human or independent external review is claimed.",
-    "authorDidNot": ["run any shell command", "compile or run tests", "commit, stage or push", "open or merge a pull request"]
+    "detail": "Claude Opus authored the source, tests, component document and evidence. The Codex root reviewer ran every recorded validation command, reviewed, and drove fixes. No human or independent external review is claimed.",
+    "authorUsed": ["read-only repository inspection and search, including ls and grep"],
+    "authorDidNot": ["run any build, test, validation or formatter command", "compile or run tests", "run any git mutation: commit, stage or push", "open or merge a pull request", "run any network or runtime verification"]
   },
   "timestampNote": "UTC wrapper timestamps as reported by the reviewer.",
   "requiredCommands": [
@@ -173,5 +174,6 @@
   ],
   "manualVerification": { "required": false, "performed": false },
   "authorCommandAttempts": [],
+  "authorCommandAttemptsNote": "The author attempted none of the recorded build, test, validation, formatter, git or verification commands, so no author command result exists or is claimed. Read-only inspection and search (ls, grep) produced no recorded result.",
   "reviewHistory": "tests/review-findings.json"
 }

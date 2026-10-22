@@ -14,7 +14,10 @@
   None of these is claimed as passed.
 - Authorship: **Claude Opus** authored all repository content (source, tests,
   component document, this evidence). The **Codex root reviewer** ran every
-  command, reviewed, and drove fixes. Claude ran no commands; every result
+  recorded validation command, reviewed, and drove fixes. While authoring,
+  Claude used only read-only repository inspection and search (including `ls`
+  and `grep`); it ran no build, test, validation, formatter, git mutation,
+  push, PR, merge, or network/runtime verification command. Every result
   below is the reviewer's, transcribed. No human or independent external
   review is claimed.
 

@@ -3,7 +3,7 @@
   "issue": "M1-055",
   "githubIssue": 54,
   "commit": "1c7ad3f99a3cb53772ec46078800ce624c00c22a",
-  "source": "Codex root reviewer run, transcribed by Claude Opus, who ran no commands.",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used only read-only repository inspection and search (including ls and grep) and ran no build, test, validation or verification command.",
   "command": "swift test --package-path Packages/MacPlatform",
   "startedAt": "2026-10-22T14:57:58.181Z",
   "endedAt": "2026-10-22T14:58:01.660Z",

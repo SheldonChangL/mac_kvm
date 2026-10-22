@@ -6,7 +6,10 @@
   (base `17687e505c45ab7bb8e9b813bffc0b9ba953de8e`).
 - Reviewer: **Codex root reviewer.** This is a **non-author Codex review, not
   a human or independent external review.** Claude Opus authored the
-  repository content and this document, and ran no commands.
+  repository content and this document, using only read-only repository
+  inspection and search (including `ls` and `grep`); it ran no build, test,
+  validation, formatter, git mutation or verification command. The Codex root
+  reviewer ran every recorded validation command.
 
 ## Disposition
 
