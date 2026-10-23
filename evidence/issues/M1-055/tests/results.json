@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-055",
+  "githubIssue": 54,
+  "commit": "1c7ad3f99a3cb53772ec46078800ce624c00c22a",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used only read-only repository inspection and search (including ls and grep) and ran no build, test, validation or verification command.",
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-10-22T14:57:58.181Z",
+  "endedAt": "2026-10-22T14:58:01.660Z",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "build": "complete",
+    "framework": "Swift Testing",
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "testsPassed": 118,
+    "failures": 0,
+    "skipped": 3,
+    "skippedNote": "Opt-in manual probes for M1-035, M1-036 and M1-053; unrelated to M1-055.",
+    "note": "118 is the full MacPlatform package total, counting parameterized cases; it is not an M1-055 function count."
+  },
+  "m1055DeclaredTests": {
+    "file": "Packages/MacPlatform/Tests/MacPlatformTests/MacTLSTransportTests.swift",
+    "unconditionalTestFunctions": 34,
+    "debugOnlyTestFunctions": 1,
+    "debugOnlyTest": "debugPlaintextSelectionIsExplicitAndRequestsPlaintext",
+    "note": "Counted by source reading. The reviewer did not report per-file pass counts. Parameterized: evaluator rejection over SecurityErrorCode.allCases; connect (7), receive (4) and send (4) failure mappings.",
+    "coverage": {
+      "happyPath": [
+        "tlsTransportConformsToTheFrozenTransportContract",
+        "tlsTransportRequestsTLSForTheConfiguredPeerOnlyWhenConnecting",
+        "tlsTransportPassesThePresentedChainToTheEvaluatorExactlyOnceBeforeReady",
+        "tlsTransportYieldsNonEmptyChunksInOrderAndSkipsEmptyReads",
+        "tlsTransportSendsInCallOrderAndTreatsEmptySendAsANoOp"
+      ],
+      "boundaryAndLimit": [
+        "tlsTransportPeerChainBoundsAreFixed",
+        "tlsTransportPeerChainAtBothBoundsReachesTheEvaluator",
+        "tlsTransportPeerChainAboveEitherBoundFailsClosedWithoutConsultingTheEvaluator",
+        "tlsTransportReceivesWithAFixedSixtyFourKibibyteMaximum",
+        "tlsTransportBackendReadAboveTheMaximumFailsWithResourceExhausted",
+        "tlsTransportBufferOverflowReportsResourceExhaustedInsteadOfDropping"
+      ],
+      "invalidInputAndFailure": [
+        "tlsTransportSendBeforeConnectFailsClosedWithoutCreatingABackend",
+        "tlsTransportConnectIsSingleUseAfterSuccess",
+        "tlsTransportConcurrentSecondConnectFailsClosedWhileTheFirstIsPending",
+        "tlsTransportConnectFailureMapsToTheTypedError",
+        "tlsTransportDefaultBackendRejectsAnInvalidEndpointWithoutNetwork",
+        "tlsTransportPeerEndOfStreamFailsTheStreamAsDisconnected",
+        "tlsTransportReceiveFailureMapsToTheTypedErrorAndCancelsOnce",
+        "tlsTransportSendFailureMapsToTheTypedErrorAndIsTerminal"
+      ],
+      "cancelCleanupIdempotency": [
+        "tlsTransportDisconnectBeforeConnectFinishesTheStreamAndForbidsConnect",
+        "tlsTransportDisconnectCancelsOnceFinishesOnceAndIsIdempotent",
+        "tlsTransportDisconnectCompletesCleanupFromAnAlreadyCancelledTask",
+        "tlsTransportTaskCancellationDuringConnectCancelsTheBackendOnce",
+        "tlsTransportDisconnectDuringConnectCancelsTheHandshakeAndFinishesNormally",
+        "tlsTransportConsumerCancellationCancelsTheBackendOnce"
+      ],
+      "failClosed": [
+        "tlsTransportEvaluatorRejectionFailsClosedWithTheExactSecurityError",
+        "tlsTransportEmptyCertificateChainFailsClosedWithoutConsultingTheEvaluator",
+        "tlsTransportReadyWithoutPeerVerificationFailsClosed",
+        "tlsTransportRejectedPeerCannotSendOrReconnect",
+        "tlsTransportEvaluatesEveryVerifyCallbackOnceInOrder"
+      ],
+      "identityChangedOrInvalid": [
+        "tlsTransportIdentityChangeIsDistinctFromTrustRejection",
+        "tlsTransportIdentityChangeOnALaterVerifyCallbackFailsClosed",
+        "tlsTransportEvaluatorRejectionFailsClosedWithTheExactSecurityError"
+      ],
+      "debugIsolation": [
+        "tlsTransportPlaintextSelectionExistsOnlyInsideDebugBuilds",
+        "debugPlaintextSelectionIsExplicitAndRequestsPlaintext"
+      ],
+      "privacy": [
+        "tlsTransportFailuresCarryNoPeerBytesHostOrDiagnosticPayload"
+      ]
+    }
+  },
+  "focusMapping": {
+    "tlsOnByDefault": {
+      "implementation": "MacTLSTransport production init always uses MacTLSNetworkBackend with .tls; release builds can express no other mode",
+      "tests": ["happyPath", "debugIsolation"],
+      "supplementary": "command 7 release build"
+    },
+    "peerCertificateMaterialToTrustEvaluator": {
+      "implementation": "verify block collects DER in platform callback order, bounded, and hands it to the injected evaluator; no index semantics",
+      "tests": ["happyPath", "boundaryAndLimit", "failClosed", "identityChangedOrInvalid"]
+    },
+    "debugInsecurePathBuildFlagIsolated": {
+      "implementation": "debugInsecurePlaintext case, factories and branches exist only inside #if DEBUG",
+      "tests": ["debugIsolation"],
+      "supplementary": "command 7 release build"
+    }
+  },
+  "tdd": {
+    "redRunRecorded": true,
+    "runs": [
+      { "phase": "initial RED", "exitCode": 1, "cause": "MacTLSTransport and expected internal seam types did not exist" },
+      { "phase": "first production compile", "cause": "Task inferred Task<()?, Never>; new SDK .wifiAware missing from NWError switch", "fixed": true },
+      { "phase": "GREEN", "testsPassed": 112 },
+      { "phase": "security regression RED", "exitCode": 1, "cause": "new chain bound constants absent" },
+      { "phase": "GREEN after chain bounds", "testsPassed": 118 },
+      { "phase": "GREEN after package-surface fix", "testsPassed": 118 }
+    ],
+    "note": "History only; superseded by the final run above. All runs were by the Codex root reviewer."
+  },
+  "networkInteroperability": "untested",
+  "privacy": "No payload bytes, certificate bytes, host, secret, credential or private key is recorded in this evidence."
+}

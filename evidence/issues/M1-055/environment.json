@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-055",
+  "githubIssue": 54,
+  "commit": "1c7ad3f99a3cb53772ec46078800ce624c00c22a",
+  "source": "Codex root reviewer runs, transcribed by Claude Opus. Only reported facts are recorded; no private identifier is included.",
+  "timestamps": {
+    "firstCommandStartedAt": "2026-10-22T14:57:58.181Z",
+    "lastCommandEndedAt": "2026-10-22T14:58:16.925Z",
+    "timezone": "UTC"
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "uname": "Darwin 25.6.0 arm64",
+    "note": "Collected by Codex at the implementation commit via sw_vers and uname -mrs."
+  },
+  "toolchain": {
+    "swiftFormat": "6.2.3",
+    "swiftTestingTarget": "arm64e-apple-macos14.0",
+    "xcodebuildCompilerTarget": "arm64-apple-macos14.0",
+    "swiftVersion": "swift-driver version: 1.127.14.1 Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDefaultTarget": "arm64-apple-macosx26.0",
+    "xcodeVersion": "26.2",
+    "xcodeBuildVersion": "17C52",
+    "macOSSDKVersion": "26.2",
+    "note": "Collected by Codex at the implementation commit via swift --version and xcodebuild -version."
+  },
+  "manualVerification": {
+    "required": false,
+    "performed": false
+  },
+  "network": {
+    "exercised": false,
+    "note": "Tests use an in-memory backend; the one production-backend test rejects an invalid endpoint before any connection is created."
+  },
+  "peer": {
+    "exercised": false,
+    "note": "No real TLS peer or handshake interoperability was tested."
+  }
+}

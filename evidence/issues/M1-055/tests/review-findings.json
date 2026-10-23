@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-055",
+  "githubIssue": 54,
+  "commit": "1c7ad3f99a3cb53772ec46078800ce624c00c22a",
+  "reviewer": "Codex root reviewer",
+  "author": "Claude Opus",
+  "history": [
+    {
+      "id": "H-1",
+      "severity": "high",
+      "status": "resolved",
+      "summary": "The platform verify callback may run more than once; the implementation rejected the second callback and could race.",
+      "resolution": "Each valid callback is evaluated once in order with sticky rejection; regression tests added."
+    },
+    {
+      "id": "H-2",
+      "severity": "high",
+      "status": "resolved",
+      "summary": "Peer certificate chain count and bytes were unbounded.",
+      "resolution": "10-certificate and 262,144-byte bounds in transport and live collector; tests added. Security regression RED exited 1 before the fix; 118 passed after."
+    },
+    {
+      "id": "H-3",
+      "severity": "high",
+      "status": "resolved",
+      "summary": "Transport and trust decision were module-internal and unusable by future package targets.",
+      "resolution": "Package-only surface; backend seam remains internal; 118 passed."
+    },
+    {
+      "id": "M-1",
+      "severity": "medium",
+      "status": "resolved",
+      "summary": "Comments and docs claimed leaf-first certificate order, which neither the SDK header nor Apple documentation guarantees.",
+      "resolution": "Naming and docs changed to platform callback order with explicitly no index semantics.",
+      "reference": "https://developer.apple.com/documentation/security/sec_protocol_metadata_access_peer_certificate_chain%28_%3A_%3A%29"
+    },
+    {
+      "id": "F-1",
+      "severity": "none",
+      "status": "resolved",
+      "summary": "Strict formatter findings (23, then 5 tuple-layout).",
+      "resolution": "Formatting-only fixes without behavior change."
+    }
+  ],
+  "currentFindings": {
+    "criticalUnresolved": 0,
+    "highUnresolved": 0,
+    "mediumUnresolved": 0,
+    "lowOpenNonBlocking": 8
+  },
+  "findings": [
+    { "id": "L-1", "severity": "low", "status": "open", "blocking": false, "summary": "No real network or peer handshake is exercised." },
+    { "id": "L-2", "severity": "low", "status": "open", "blocking": false, "summary": "The evaluator is synchronous and a slow evaluator may stall the handshake." },
+    { "id": "L-3", "severity": "low", "status": "open", "blocking": false, "summary": "No transport-owned connect, read or write timeout." },
+    { "id": "L-4", "severity": "low", "status": "open", "blocking": false, "summary": ".waiting fails immediately as unavailable." },
+    { "id": "L-5", "severity": "low", "status": "open", "blocking": false, "summary": "A clean peer EOF is reported as a disconnected failure." },
+    { "id": "L-6", "severity": "low", "status": "open", "blocking": false, "summary": "Outbound Data has no transport size cap." },
+    { "id": "L-7", "severity": "low", "status": "open", "blocking": false, "summary": "The platform callback gives no documented meaning to certificate indices." },
+    { "id": "L-8", "severity": "low", "status": "open", "blocking": false, "summary": "Source and tests are large (826 + 1174 lines before any later evidence-only edit), costing maintainability." }
+  ],
+  "blockers": [],
+  "finalReview": {
+    "reviewer": "Codex root reviewer",
+    "kind": "non-author Codex review; not a human or independent external review",
+    "distinctFromAuthor": true,
+    "humanReview": false,
+    "independentExternalReview": false,
+    "reviewedCommit": "1c7ad3f99a3cb53772ec46078800ce624c00c22a",
+    "axes": {
+      "sourceValidityAndTraceability": "pass",
+      "productAndArchitecture": "pass",
+      "securityFailSafeCompatibility": "pass",
+      "testsValidationAcceptance": "pass at implementation commit; make verify, PR and CI pending",
+      "scopeHygieneRollback": "pass"
+    },
+    "detail": "../security-review.md"
+  }
+}
