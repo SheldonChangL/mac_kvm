@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-056",
+  "githubIssue": 61,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/61",
+  "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882",
+  "source": "Codex root reviewer runs, transcribed by Claude Opus. Only reported facts are recorded; no private identifier is included.",
+  "timestamps": {
+    "firstCommandStartedAt": "2026-10-23T01:57:17Z",
+    "lastCommandEndedAt": "2026-10-23T01:57:48Z",
+    "timezone": "UTC"
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "uname": "Darwin 25.6.0 arm64"
+  },
+  "toolchain": {
+    "swiftVersion": "Swift 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDefaultTarget": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "xcodeVersion": "26.2",
+    "xcodeBuildVersion": "17C52"
+  },
+  "manualVerification": {
+    "required": false,
+    "performed": false
+  },
+  "network": {
+    "exercised": false,
+    "note": "The unit performs no network I/O; tests are pure in-memory computations."
+  },
+  "peer": {
+    "exercised": false,
+    "note": "No real certificate or TLS peer is used; tests use published SHA-256 vectors and synthetic bytes."
+  }
+}
