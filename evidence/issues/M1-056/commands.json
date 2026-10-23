@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-056",
+  "githubIssue": 61,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/61",
+  "branch": "codex/m1-056-certificate-fingerprint",
+  "parentCommit": "221c6281646e5a58e9e1c515f7e43cf3fca7957e",
+  "parentCommitNote": "Merge commit of PR #322 (M1-055), the parent of the implementation commit in branch history; full hash verified by the Codex root reviewer.",
+  "implementationCommit": "27300d6dadb5506b8a0825cab2c2fb04a996e882",
+  "implementationCommitFiles": [
+    "Packages/MacPlatform/Sources/MacPlatform/CertificateFingerprint.swift",
+    "Packages/MacPlatform/Tests/MacPlatformTests/CertificateFingerprintTests.swift",
+    "docs/components/M1-056-certificate-fingerprint.md"
+  ],
+  "implementationCommitFilesNote": "The issue's Exact Files.",
+  "evidenceCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+  "evidenceCommitNote": "Commit that added the M1-056 evidence package on top of the implementation commit; repository-wide make verify was run here by the Codex root reviewer.",
+  "status": "evidence_commit_verified",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. Command 9 (make verify) was run by the Codex root reviewer at the evidence commit and passed 24 of 24 gates. GitHub CI, PR review comment and merge are pending. This metadata update is a later commit, so a final-head make verify rerun will be required after it. Claude Opus authored this file using only Read, Grep, Glob and Edit and executed none of the recorded commands.",
+  "authorship": {
+    "repositoryContentAuthor": "Claude Opus",
+    "reviewer": "Codex root reviewer",
+    "detail": "Claude Opus authored the source, tests, component document and evidence. The Codex root reviewer executed every recorded command, reviewed, and drove the workflow. No human or independent external review is claimed.",
+    "authorUsed": ["Read", "Grep", "Glob", "Edit"],
+    "authorDidNot": [
+      "run any build, test, validation or formatter command",
+      "run any git mutation, including commit, stage or push",
+      "open or merge a pull request",
+      "run any network or runtime verification"
+    ]
+  },
+  "timestampNote": "UTC timestamps at one-second resolution as reported by the reviewer for commands 1-8; command 9 timestamps are millisecond resolution as reported. Commands 3-6 share start times as reported.",
+  "requiredCommands": [
+    {
+      "id": 1,
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "startedAt": "2026-10-23T01:57:17Z",
+      "endedAt": "2026-10-23T01:57:18Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "testsPassed": 144,
+        "failures": 0,
+        "skipped": 3,
+        "skippedNote": "Unrelated existing opt-in manual probes."
+      },
+      "report": "tests/results.json"
+    },
+    {
+      "id": 2,
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build",
+      "form": "shell-equivalent",
+      "formNote": "The issue quotes 'platform=macOS'; the quotes do not change the argument passed to xcodebuild.",
+      "startedAt": "2026-10-23T01:57:24Z",
+      "endedAt": "2026-10-23T01:57:27Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "id": 3,
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "startedAt": "2026-10-23T01:57:33Z",
+      "endedAt": "2026-10-23T01:57:33Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "id": 4,
+      "command": "make architecture-check",
+      "form": "exact",
+      "startedAt": "2026-10-23T01:57:33Z",
+      "endedAt": "2026-10-23T01:57:34Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK"
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "id": 5,
+      "command": "make docs-check",
+      "startedAt": "2026-10-23T01:57:33Z",
+      "endedAt": "2026-10-23T01:57:33Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "docs check OK"
+    },
+    {
+      "id": 6,
+      "command": "git diff --check HEAD^ HEAD",
+      "startedAt": "2026-10-23T01:57:33Z",
+      "endedAt": "2026-10-23T01:57:33Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "no output"
+    },
+    {
+      "id": 7,
+      "command": "make code-quality-check",
+      "startedAt": "2026-10-23T01:57:38Z",
+      "endedAt": "2026-10-23T01:57:40Z",
+      "exitCode": 0,
+      "status": "passed",
+      "subSteps": [
+        { "name": "swift-format-version", "version": "6.2.3" },
+        { "name": "swift-format-lint-strict", "exitCode": 0 },
+        { "name": "swift-test-warnings-as-errors", "exitCode": 0 }
+      ]
+    },
+    {
+      "id": 8,
+      "command": "swift build --package-path Packages/MacPlatform -c release",
+      "startedAt": "2026-10-23T01:57:47Z",
+      "endedAt": "2026-10-23T01:57:48Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Build complete"
+    }
+  ],
+  "repositoryVerifyCommands": [
+    {
+      "id": 9,
+      "command": "make verify",
+      "commit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+      "startedAt": "2026-10-23T02:04:50.366Z",
+      "endedAt": "2026-10-23T02:06:22.256Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "gatesPassed": 24,
+        "gatesTotal": 24
+      },
+      "report": "artifacts/ci/m1-008-report.json",
+      "reportSha256": "321f8e62329e4bc768e85ddb11b537f1553bf1aa282b3582fb98c5a38c97c0e8",
+      "reportCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+      "reportCommitMatchesEvidenceCommit": true,
+      "note": "Applies to the evidence commit only; a final-head rerun is required after the metadata commit that records this result."
+    }
+  ],
+  "tddHistory": [
+    {
+      "phase": "rejected in-sandbox RED attempt",
+      "acceptedAsEvidence": false,
+      "cause": "SwiftPM could not invoke nested sandbox-exec"
+    },
+    {
+      "phase": "RED outside the outer sandbox",
+      "acceptedAsEvidence": true,
+      "exitCode": 1,
+      "cause": "CertificateFingerprint and CertificateFingerprintFailure did not exist"
+    },
+    {
+      "phase": "GREEN after implementation",
+      "acceptedAsEvidence": true,
+      "status": "passed",
+      "note": "Superseded by command 1."
+    }
+  ],
+  "completed": [
+    { "item": "implementation commit commands 1-8", "status": "passed", "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882" },
+    { "item": "make verify at the evidence commit (command 9, 24 of 24 gates)", "status": "passed", "commit": "0bd900d97deee9cc48ba387fe32118fbda0ba842" }
+  ],
+  "pendingNote": "A final-head make verify rerun will be required after the metadata commit that records command 9.",
+  "pending": [
+    { "item": "GitHub CI at the final pushed head", "status": "pending" },
+    { "item": "pull request review comment", "status": "pending" },
+    { "item": "merge by an authorized reviewer", "status": "pending" }
+  ],
+  "manualVerification": { "required": false, "performed": false },
+  "authorCommandAttempts": [],
+  "authorCommandAttemptsNote": "The author attempted none of the recorded commands, so no author command result exists or is claimed.",
+  "reviewHistory": "tests/review-findings.json"
+}

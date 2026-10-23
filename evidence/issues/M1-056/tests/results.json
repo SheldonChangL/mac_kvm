@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-056",
+  "githubIssue": 61,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/61",
+  "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used only Read, Grep, Glob and Edit and ran no build, test, validation or verification command.",
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-10-23T01:57:17Z",
+  "endedAt": "2026-10-23T01:57:18Z",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "framework": "Swift Testing",
+    "testsPassed": 144,
+    "failures": 0,
+    "skipped": 3,
+    "skippedNote": "Unrelated existing opt-in manual probes.",
+    "note": "144 is the full MacPlatform package total as reported; it is not an M1-056 function count."
+  },
+  "m1056DeclaredTests": {
+    "file": "Packages/MacPlatform/Tests/MacPlatformTests/CertificateFingerprintTests.swift",
+    "testFunctions": 26,
+    "parameterized": {
+      "function": "digestOfAnyLengthOtherThanThirtyTwoFailsClosed",
+      "arguments": [0, 1, 16, 20, 31, 33, 48, 64, 95]
+    },
+    "note": "Counted by source reading. The reviewer did not report per-file pass counts.",
+    "coverage": {
+      "happyPath": [
+        "digestLengthIsThirtyTwoBytes",
+        "sha256OfASCIIabcMatchesTheFIPSVector",
+        "canonicalDisplayOfTheABCDigestMatchesTheVector",
+        "formattingBytesZeroThroughThirtyOneMatchesTheExplicitVector",
+        "formattingUsesUppercaseHexForEveryByteValue",
+        "hashThenFormatProducesTheCanonicalFingerprint"
+      ],
+      "rawDigestDisplaySeparation": [
+        "digestIsRawBytesNotHexText",
+        "formattingDoesNotHashItsInput",
+        "hashingDoesNotPassAThirtyTwoByteInputThrough"
+      ],
+      "boundaryAndLimit": [
+        "smallestNonEmptyCertificateIsHashed",
+        "multiBlockInputMatchesTheFIPSVector",
+        "largeCertificateStillYieldsAThirtyTwoByteDigest",
+        "dataSlicesWithANonZeroStartIndexAreHandled"
+      ],
+      "invalidInputAndFailClosed": [
+        "emptyCertificateFailsClosedWithATypedError",
+        "emptyCertificateNeverYieldsTheEmptyInputDigest",
+        "emptySliceOfANonEmptyBufferFailsClosed",
+        "digestOfAnyLengthOtherThanThirtyTwoFailsClosed",
+        "displayTextIsNotAcceptedAsADigest",
+        "failureReasonsAreClosedAndDistinct"
+      ],
+      "fingerprintChanged": [
+        "differentCertificatesProduceDifferentFingerprints",
+        "anySingleBitFlipChangesTheFingerprint",
+        "appendedOrTruncatedCertificateChangesTheFingerprint"
+      ],
+      "determinismAndIdempotency": [
+        "sameCertificateAlwaysYieldsTheSameFingerprint",
+        "failuresDoNotPoisonLaterCalls"
+      ],
+      "privacy": [
+        "failureRenderingsCarryNoInputBytes"
+      ],
+      "statelessness": [
+        "fingerprintHoldsNoStateAndCannotBeInstantiated"
+      ]
+    },
+    "cancelCleanup": {
+      "applicable": false,
+      "reason": "Both operations are pure synchronous functions over in-memory Data and own no task, stream, socket, file, timer or stored state. Documented in the component doc and test file; covered by statelessness and determinism tests."
+    }
+  },
+  "fixedVectors": {
+    "source": "Published SHA-256 vectors transcribed in the test file and component doc; independently checked by the Codex root reviewer with shasum.",
+    "vectors": [
+      { "input": "ASCII \"abc\" (FIPS 180-2 B.1)", "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", "reviewerChecked": true },
+      { "input": "single byte 0x00", "sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d", "reviewerChecked": true },
+      { "input": "56-byte FIPS 180-2 B.2 message", "sha256": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1", "reviewerChecked": true }
+    ]
+  },
+  "focusMapping": {
+    "canonicalUppercaseColonFormat": {
+      "implementation": "CertificateFingerprint.canonicalDisplay(ofSHA256Digest:) renders exactly 32 bytes as uppercase hex pairs from a fixed table joined by single colons",
+      "tests": ["happyPath", "invalidInputAndFailClosed"]
+    },
+    "rawDigestAndDisplaySeparated": {
+      "implementation": "sha256Digest(ofCertificateDER:) returns raw Data; canonicalDisplay(ofSHA256Digest:) only formats; neither calls the other",
+      "tests": ["rawDigestDisplaySeparation"]
+    },
+    "fixedTestVectors": {
+      "implementation": "Published SHA-256 vectors transcribed byte by byte in CertificateFingerprintTests.swift",
+      "tests": ["happyPath", "boundaryAndLimit"]
+    }
+  },
+  "tdd": {
+    "redRunRecorded": true,
+    "runs": [
+      { "phase": "in-sandbox RED attempt", "acceptedAsEvidence": false, "cause": "SwiftPM could not invoke nested sandbox-exec" },
+      { "phase": "RED outside the outer sandbox", "exitCode": 1, "cause": "CertificateFingerprint and CertificateFingerprintFailure did not exist" },
+      { "phase": "GREEN after implementation", "status": "passed" }
+    ],
+    "note": "History only; superseded by the final run above. All runs were by the Codex root reviewer."
+  },
+  "privacy": "No real certificate bytes, real peer fingerprint, secret, credential or private key is recorded in this evidence."
+}
