@@ -13,8 +13,10 @@
     "docs/components/M1-056-certificate-fingerprint.md"
   ],
   "implementationCommitFilesNote": "The issue's Exact Files.",
-  "status": "implementation_commit_verified",
-  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. make verify and GitHub CI have not yet run at the evidence commit. Claude Opus authored this file using only Read, Grep, Glob and Edit and executed none of the recorded commands.",
+  "evidenceCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+  "evidenceCommitNote": "Commit that added the M1-056 evidence package on top of the implementation commit; repository-wide make verify was run here by the Codex root reviewer.",
+  "status": "evidence_commit_verified",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer at the implementation commit and all exited 0. Command 9 (make verify) was run by the Codex root reviewer at the evidence commit and passed 24 of 24 gates. GitHub CI, PR review comment and merge are pending. This metadata update is a later commit, so a final-head make verify rerun will be required after it. Claude Opus authored this file using only Read, Grep, Glob and Edit and executed none of the recorded commands.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus",
     "reviewer": "Codex root reviewer",
@@ -27,7 +29,7 @@
       "run any network or runtime verification"
     ]
   },
-  "timestampNote": "UTC timestamps at one-second resolution as reported by the reviewer. Commands 3-6 share start times as reported.",
+  "timestampNote": "UTC timestamps at one-second resolution as reported by the reviewer for commands 1-8; command 9 timestamps are millisecond resolution as reported. Commands 3-6 share start times as reported.",
   "requiredCommands": [
     {
       "id": 1,
@@ -119,6 +121,26 @@
       "result": "Build complete"
     }
   ],
+  "repositoryVerifyCommands": [
+    {
+      "id": 9,
+      "command": "make verify",
+      "commit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+      "startedAt": "2026-10-23T02:04:50.366Z",
+      "endedAt": "2026-10-23T02:06:22.256Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "gatesPassed": 24,
+        "gatesTotal": 24
+      },
+      "report": "artifacts/ci/m1-008-report.json",
+      "reportSha256": "321f8e62329e4bc768e85ddb11b537f1553bf1aa282b3582fb98c5a38c97c0e8",
+      "reportCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+      "reportCommitMatchesEvidenceCommit": true,
+      "note": "Applies to the evidence commit only; a final-head rerun is required after the metadata commit that records this result."
+    }
+  ],
   "tddHistory": [
     {
       "phase": "rejected in-sandbox RED attempt",
@@ -139,12 +161,13 @@
     }
   ],
   "completed": [
-    { "item": "implementation commit commands 1-8", "status": "passed", "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882" }
+    { "item": "implementation commit commands 1-8", "status": "passed", "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882" },
+    { "item": "make verify at the evidence commit (command 9, 24 of 24 gates)", "status": "passed", "commit": "0bd900d97deee9cc48ba387fe32118fbda0ba842" }
   ],
+  "pendingNote": "A final-head make verify rerun will be required after the metadata commit that records command 9.",
   "pending": [
-    { "item": "make verify at the evidence commit", "status": "pending" },
-    { "item": "GitHub CI at the evidence commit", "status": "pending" },
-    { "item": "pull request review", "status": "pending" },
+    { "item": "GitHub CI at the final pushed head", "status": "pending" },
+    { "item": "pull request review comment", "status": "pending" },
     { "item": "merge by an authorized reviewer", "status": "pending" }
   ],
   "manualVerification": { "required": false, "performed": false },

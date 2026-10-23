@@ -4,6 +4,8 @@
   (<https://github.com/SheldonChangL/mac_kvm/issues/61>); risk high,
   execution tier `A/S`, `low_model_autonomous_merge: false`.
 - Reviewed commit: `27300d6dadb5506b8a0825cab2c2fb04a996e882`.
+- Repository-wide verify commit (evidence commit):
+  `0bd900d97deee9cc48ba387fe32118fbda0ba842`.
 - Reviewer: **Codex root reviewer.** This is a **non-author Codex review, not
   a human or independent external review.** Claude Opus authored the
   repository content and this document using only Read, Grep, Glob and Edit;
@@ -29,9 +31,13 @@ detail is in `tests/review-findings.json`.
    changed. Architecture guardrails remain satisfied; `make
    architecture-check` passed.
 3. **Security, fail-safe and compatibility: pass.** See the checks below.
-4. **Tests, validation and acceptance: pass at the implementation commit.**
-   Commands 1-8 exited 0 (`commands.json`). `make verify` and GitHub CI at
-   the evidence commit are **pending**.
+4. **Tests, validation and acceptance: pass.** Commands 1-8 exited 0 at the
+   implementation commit, and `make verify` passed at the evidence commit
+   with 24 of 24 gates (report `artifacts/ci/m1-008-report.json`, SHA-256
+   `321f8e62329e4bc768e85ddb11b537f1553bf1aa282b3582fb98c5a38c97c0e8`,
+   report commit equal to the evidence commit; `commands.json`). A
+   final-head rerun is required after the metadata commit. GitHub CI is
+   **pending**.
 5. **Scope, hygiene and rollback: pass.** Changes are the three Exact Files.
    Rollback is a revert with no persisted data or resource to clean up.
 
@@ -60,5 +66,6 @@ detail is in `tests/review-findings.json`.
 
 ## Pending
 
-`make verify` and GitHub CI at the evidence commit, PR review, and merge by
-an authorized reviewer. No model may merge autonomously.
+Final-head `make verify` rerun after the metadata commit, GitHub CI, PR
+review comment, and merge by an authorized reviewer. No model may merge
+autonomously.

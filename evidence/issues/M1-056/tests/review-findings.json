@@ -46,11 +46,12 @@
     "humanReview": false,
     "independentExternalReview": false,
     "reviewedCommit": "27300d6dadb5506b8a0825cab2c2fb04a996e882",
+    "repositoryVerifyCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
     "axes": {
       "sourceValidityAndTraceability": "pass",
       "productAndArchitecture": "pass",
       "securityFailSafeCompatibility": "pass",
-      "testsValidationAcceptance": "pass at implementation commit; make verify and GitHub CI at evidence commit pending",
+      "testsValidationAcceptance": "pass; commands 1-8 at implementation commit; make verify passed at evidence commit 0bd900d97deee9cc48ba387fe32118fbda0ba842 (24 of 24 gates); final-head rerun required after the metadata commit; GitHub CI pending",
       "scopeHygieneRollback": "pass"
     },
     "detail": "../security-review.md"

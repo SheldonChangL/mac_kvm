@@ -4,11 +4,20 @@
   "githubIssue": 61,
   "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/61",
   "commit": "27300d6dadb5506b8a0825cab2c2fb04a996e882",
+  "evidenceCommit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
   "source": "Codex root reviewer runs, transcribed by Claude Opus. Only reported facts are recorded; no private identifier is included.",
   "timestamps": {
     "firstCommandStartedAt": "2026-10-23T01:57:17Z",
-    "lastCommandEndedAt": "2026-10-23T01:57:48Z",
-    "timezone": "UTC"
+    "lastCommandEndedAt": "2026-10-23T02:06:22.256Z",
+    "timezone": "UTC",
+    "note": "lastCommandEndedAt is the end of make verify (command 9) at the evidence commit, reported at millisecond resolution."
+  },
+  "repositoryVerifyReport": {
+    "command": "make verify",
+    "path": "artifacts/ci/m1-008-report.json",
+    "sha256": "321f8e62329e4bc768e85ddb11b537f1553bf1aa282b3582fb98c5a38c97c0e8",
+    "commit": "0bd900d97deee9cc48ba387fe32118fbda0ba842",
+    "commitMatchesEvidenceCommit": true
   },
   "os": {
     "productName": "macOS",
