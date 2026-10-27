@@ -169,6 +169,50 @@ resolves this contradiction.
   timeout bounds enter delivery itself; add a non-cooperative-send test. Do not
   hide the race with sleep/retry.
 
+### H-9 — Unsupported physical events are swallowed but never forwarded
+
+`MacMouseCapture` deliberately returns `nil` for unsupported auxiliary mouse
+buttons. `LocalEventSuppressor.decide`, however, suppresses every non-synthetic,
+non-escape event whenever suppression is enabled, regardless of whether a
+capture adapter can map and forward it. The same shape applies to other event
+types that M2-001 says the MVP does not capture.
+
+- Production locations:
+  `Packages/MacPlatform/Sources/MacPlatform/MacMouseCapture.swift` and
+  `Packages/MacPlatform/Sources/MacPlatform/LocalEventSuppressor.swift`.
+- Reviewer probe: create physical `otherMouseDown` button number 7, prove the
+  capture mapper returns `nil`, enable suppression, then request the suppressor
+  decision.
+- Exact result: decision was `.suppress` instead of `.passThrough`; the probe
+  failed with one issue.
+- Owner: M2-004/M2-013 implementation author (Claude) and M2-001 decision owner.
+- Priority: P0 local-input safety.
+- Blocking relation: blocks M2-013, event-tap composition and M2-035.
+- Required disposition: freeze an explicit suppressible-event allowlist that
+  cannot exceed successfully forwardable events, and add tests for unsupported
+  buttons plus tablet/gesture/system-defined types. Unsupported input must fail
+  open locally.
+
+### H-10 — Cursor association failure is reported as successful restoration
+
+`CursorRestorer.restore` discards the Boolean result of
+`CGAssociateMouseAndMouseCursorPosition(true)`. It can then return
+`.restored(...)` after a successful warp even though mouse/cursor association
+failed and the cursor may remain frozen.
+
+- Production location: `Packages/MacPlatform/Sources/MacPlatform/CursorRestorer.swift`,
+  around lines 78–89.
+- Reviewer probe: make association return `false`, retain a valid saved point
+  and allow warp to succeed.
+- Exact result: returned `.restored(.saved)` instead of `.failed`; the probe
+  failed with one issue.
+- Owner: M2-021 implementation author (Claude).
+- Priority: P0 fail-safe correctness.
+- Blocking relation: blocks M2-021, M2-033 and M2-035.
+- Required disposition: propagate association failure in the outcome and into
+  cleanup disposition, with a regression test. A warp alone must not claim
+  complete local restoration.
+
 ## Medium findings
 
 ### M-1 — Listener stop does not close pending admissions
@@ -202,6 +246,22 @@ sessions. The composition owner must either prove start-before-register as an
 invariant or the manager must reject sessions that are not ready; otherwise a
 registered screen can be selected without a usable protocol session.
 
+### M-5 — Held-input state has no explicit recovery reset API
+
+`EnterRemoteTrigger` stores held keys/buttons and blocks activation while either
+collection is non-empty. Capture overflow or a missed release can leave these
+collections stale, but the type exposes no explicit transient-state reset for
+the fail-safe's `clearTransientState` effect. The composition design must own a
+deterministic reset/reconstruction path and test missed-release recovery.
+
+### M-6 — Event-tap control is invoked while the lifecycle lock is held
+
+`EventTapLifecycle` calls external `install`, `reenable` and `remove`
+implementations under its `NSLock`. A concrete control that synchronously calls
+back into lifecycle state can deadlock, and a slow platform call lengthens the
+critical section. Define the non-reentrancy contract or move external calls
+outside the state lock while preserving idempotence.
+
 ## Low findings
 
 None recorded yet. Lower-severity review continues after the High findings are
@@ -230,6 +290,14 @@ returned to the author.
    concurrentRecoverAllWaitsForLocalRecovery`: **exit 1**; build succeeded and
    the reviewer probe failed with two issues: disposition was `.notRequired`
    and the local-first hook observed incomplete recovery.
+7. `swift test --disable-sandbox --package-path Packages/MacPlatform --filter
+   unsupportedPhysicalEventsPassThrough`: **exit 1**; build succeeded and the
+   reviewer probe failed because an unsupported physical mouse button was
+   suppressed after its capture mapper returned `nil`.
+8. `swift test --disable-sandbox --package-path Packages/MacPlatform --filter
+   associationFailureFailsClosed`: **exit 1**; build succeeded and the reviewer
+   probe failed because failed mouse/cursor association returned
+   `.restored(.saved)`.
 
 The temporary probes were review instrumentation only, were never committed,
 and were removed immediately after execution. Their required final form is an
@@ -254,7 +322,7 @@ and fail-safe interactions, but final composition and live behavior remain
 unavailable. Claude OAuth currently returns
 `401 OAuth access token has expired`, so the designated implementation author
 cannot receive these fixes yet. Resume the same Claude session only after
-successful re-authentication; then require RED→GREEN fixes for H-2/H-3/H-4/H-7,
-resolve H-8 before effect execution, formalize H-1/H-5/H-6 in the backlog,
-rerun `make verify`, and repeat this independent review before any PR is made
-Ready.
+successful re-authentication; then require RED→GREEN fixes for
+H-2/H-3/H-4/H-7/H-9/H-10, resolve H-8 before effect execution, formalize
+H-1/H-5/H-6 in the backlog, rerun `make verify`, and repeat this independent
+review before any PR is made Ready.
