@@ -4,8 +4,8 @@
   "githubIssue": 69,
   "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/69",
   "commit": "5c87ba53a45d3312c282b41702138522b36e3c57",
-  "commitNote": "Implementation commit (final implementation head). Evidence commit pending.",
-  "source": "Codex root reviewer run, transcribed by Claude Opus, who used file tools only and ran no build, test, validation or verification command.",
+  "commitNote": "Implementation commit (final implementation head). Evidence commit 9137ab23fad2f52a7cf959e06155e6e7b87d8af4; repository-wide make verify passed there (24/24 gates, see ../commands.json command 9). Final-head make verify pending.",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used file tools and ran no build, test, validation or verification command; Claude's only shell command was one accidental inert `echo skip` (no repository read/write, no evidence; see ../commands.json authorship.authorInertCommand).",
   "files": [
     {
       "path": "Packages/MacPlatform/Sources/MacPlatform/KeychainTrustStore.swift",

@@ -13,17 +13,21 @@
   `5c87ba53a45d3312c282b41702138522b36e3c57`
   (`feat(mac-platform): add keychain trust store`); 3 files, 2605
   insertions.
-- Evidence commit: **pending** (not yet created; no hash is claimed).
-- Status: **Implementation, commands 1-8, manual real-Keychain probe and
-  non-author review pass.** Pending: evidence commit, repository-wide
-  `make verify` at the final head, GitHub CI, PR review comment and merge.
-  M1-058 is **not** claimed merged or complete.
+- Evidence commit: `9137ab23fad2f52a7cf959e06155e6e7b87d8af4`
+  (`docs(m1-058): add keychain trust store evidence`). This metadata update
+  is a later commit, so the evidence commit is not the final head.
+- Status: **Implementation, commands 1-8, repository-wide `make verify` at
+  the evidence commit, manual real-Keychain probe and non-author review
+  pass.** Pending: `make verify` at the final head, GitHub CI, PR review
+  comment and merge. M1-058 is **not** claimed merged or complete.
 - Authorship and roles:
   - **Claude Opus** authored all repository content (source, tests,
     component document, formatting fix, the temporary probe source, and this
-    evidence) using file read/search/write/edit tools only. Claude ran no
-    build, test, validation, formatter, git, signing, Keychain, network or
-    runtime command.
+    evidence) using file read/search/write/edit tools. During the latest
+    metadata edit Claude also accidentally ran one inert shell command,
+    exactly `echo skip`; it performed no repository read/write and produced
+    no evidence. Claude ran no build, test, validation, formatter, git,
+    signing, Keychain, network or runtime command.
   - The **Codex root reviewer** executed every recorded command, performed the
     non-author five-axis/security review, signing setup and diagnosis, and
     drove the workflow.
@@ -100,7 +104,7 @@ signing/probe work happened outside the repository and never modified it.
 | 1 | 所有 Focus 項目均有可定位的 implementation、test 或簽核證據 | **Met.** Every scope item maps to source, named tests and manual output. | table above; `tests/results.json` `focusMapping` |
 | 2 | Happy path、boundary、invalid input、error/cancel/cleanup tests 全部通過 | **Met.** 228 package tests passed, 0 failures; 56 M1-058 `@Test` declarations cover every category. | `tests/results.json` |
 | 3 | Public behavior 與 CONTRACT_CATALOG／凍結 ADR 一致，沒有新增隱含 API | **Met.** C-009 and Frozen Decisions (Keychain, fail-closed) followed via M1-057 `TrustPolicy`; package/internal only, no public API. | component doc; `security-review.md` |
-| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at implementation head.** Commands 1-8 exit 0, including strict lint and warnings-as-errors tests. Repository-wide `make verify` at the final head and GitHub CI are **pending**. | `commands.json` |
+| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at implementation head and evidence commit.** Commands 1-8 exit 0, including strict lint and warnings-as-errors tests; repository-wide `make verify` passed 24/24 at evidence commit `9137ab2`. `make verify` at the final head and GitHub CI are **pending**. | `commands.json` |
 | 5 | Production logs 不包含 typed text、clipboard payload、secret/private key 或可還原內容 | **Met.** No logging; errors carry only numeric `OSStatus`; manual output is closed vocabulary. | privacy tests; `manual.md` |
 | 6 | Security reviewer 已檢查 fail-closed、key/secret handling、identity change 與 abuse path | **Met (non-author Codex review).** Critical 0, High 0, Medium 0, Low 4 open non-blocking. | `security-review.md` |
 | 7 | Manual/實機 evidence 已由非執行 Agent 的 reviewer 驗證 | **Met.** Human Product Owner executed the signed real-Keychain probe; Codex (non-author, non-executing) verified exact output; cleanup verified absent. | `manual.md` |
@@ -136,8 +140,49 @@ Run by the Codex root reviewer on 2026-10-27 at implementation commit
 | 7 | `make code-quality-check` | 0 | swift-format 6.2.3; strict lint exit 0; warnings-as-errors tests exit 0 |
 | 8 | `swift build --package-path Packages/MacPlatform -c release` | 0 | Build complete 0.56s |
 
-Repository-wide `make verify` has **not** yet been run at the evidence
-commit or final head; it is pending.
+### Repository-wide verification (command 9)
+
+`make verify` at evidence commit
+`9137ab23fad2f52a7cf959e06155e6e7b87d8af4`, run in normal macOS execution
+permissions: **passed**. Report `artifacts/ci/m1-008-report.json`
+(SHA-256 `1604fbab0059b53c04e95b59ec71d56b9143ab5dd80afb260461427af53f8c6c`),
+status `passed`, `2026-10-27T06:30:26.453+00:00` to
+`2026-10-27T06:32:07.914+00:00`; 24 gates total, 24 passed, 0 failed, 0
+not-run. The 24 passed gates, as supplied by the reviewer:
+
+1. `manifest-validation`
+2. `docs-check`
+3. `architecture-check`
+4. `code-quality`
+5. `tool-test-discovery`
+6. `evidence-test-discovery`
+7. `tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py`
+8. `tool-test:Evidence/tests/test_run_e2e.py`
+9. `tool-test:Evidence/tests/test_validate_evidence.py`
+10. `tool-test:architecture-check/tests/test_architecture_check.py`
+11. `tool-test:async-harness/tests/test_async_harness.py`
+12. `tool-test:cigates/tests/test_cigates.py`
+13. `tool-test:code-quality/tests/test_code_quality.py`
+14. `tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py`
+15. `tool-test:docs-check/tests/test_docs_check.py`
+16. `evidence-test:M1-023/tests/test_register.py`
+17. `evidence-test:M1-EVIDENCE-001/tests/test_registration.py`
+18. `evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py`
+19. `swift-package-test:KVMContracts`
+20. `swift-package-test:MacPlatform`
+21. `swift-package-test:BarrierCompatibility`
+22. `repository-contract-tests`
+23. `swift-test-targets`
+24. `native-arm64-build`
+
+Diagnostic (not a product failure, not acceptance evidence): an earlier
+restricted-host `make verify` attempt at the same commit failed
+`code-quality` because SwiftPM could not apply its own macOS sandbox
+(`sandbox_apply: Operation not permitted`); a direct reproduction showed the
+same host restriction. It was superseded by the normal-permissions run above.
+
+This metadata update changes HEAD, so `make verify` at the final head is
+still pending.
 
 ### TDD and debug history (not final results)
 
@@ -210,5 +255,6 @@ fixed manual probe record is already absent (removed and verified
 ## Pending / Reviewer Required
 
 Tier `C/S/H`, risk critical; no autonomous merge. Pending, none claimed as
-passed: evidence commit, repository-wide `make verify` at the final head,
-GitHub CI, PR review comment, and merge by an authorized reviewer.
+passed: repository-wide `make verify` at the final head (this metadata
+update is later than evidence commit `9137ab2`), GitHub CI, PR review
+comment, and merge by an authorized reviewer.

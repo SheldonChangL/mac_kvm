@@ -7,15 +7,28 @@
   "timezone": "Asia/Taipei",
   "implementationCommit": "5c87ba53a45d3312c282b41702138522b36e3c57",
   "implementationCommitNote": "Commit at which commands 1-8 ran. The manual probe app was built outside the repository from a temporary probe source identified by probeSourceSha256; see manualVerification.buildProvenance.",
-  "evidenceCommit": null,
-  "evidenceCommitStatus": "pending",
-  "evidenceCommitNote": "The evidence commit has not been created; repository-wide make verify at the final head is pending.",
+  "evidenceCommit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+  "evidenceCommitStatus": "created",
+  "evidenceCommitNote": "Repository-wide make verify (command 9) passed at this commit in normal macOS execution permissions; see repositoryVerify. This metadata update is a later commit, so make verify at the final head is pending.",
   "source": "Codex root reviewer and human Product Owner runs, transcribed by Claude Opus. Only non-sensitive facts are recorded; no serial number, hardware UUID, UDID, profile UUID, Apple ID or certificate private data is included.",
   "timestamps": {
     "firstCommandStartedAt": "2026-10-27T06:21:00Z",
     "lastCommandEndedAt": "2026-10-27T06:21:45Z",
     "timezone": "UTC",
     "note": "Span of commands 1-8 at the implementation commit."
+  },
+  "repositoryVerify": {
+    "command": "make verify",
+    "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+    "executionContext": "normal macOS execution permissions",
+    "status": "passed",
+    "reportStartedAt": "2026-10-27T06:30:26.453+00:00",
+    "reportEndedAt": "2026-10-27T06:32:07.914+00:00",
+    "gates": { "total": 24, "passed": 24, "failed": 0, "notRun": 0 },
+    "reportPath": "artifacts/ci/m1-008-report.json",
+    "reportSha256": "1604fbab0059b53c04e95b59ec71d56b9143ab5dd80afb260461427af53f8c6c",
+    "diagnostic": "An earlier restricted-host make verify attempt at the same commit failed the code-quality gate because SwiftPM could not apply its own macOS sandbox (sandbox_apply: Operation not permitted); a direct reproduction showed the same host restriction. It is a host-environment diagnostic, not a product failure, was superseded by the normal-permissions run and is not acceptance evidence.",
+    "note": "Final-head make verify is pending because this metadata update changes HEAD."
   },
   "os": {
     "productName": "macOS",

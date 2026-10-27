@@ -30,18 +30,27 @@
     }
   ],
   "implementationFilesNote": "The issue's Exact Files; together with this evidence package they are the full scope.",
-  "evidenceCommit": null,
-  "evidenceCommitStatus": "pending",
-  "evidenceCommitNote": "The evidence commit has not been created; no hash is claimed.",
-  "status": "implementation_head_verified",
-  "statusNote": "Commands 1-8 were run by the Codex root reviewer on 2026-10-27 at the implementation commit and all exited 0. The human-executed signed real-Keychain manual probe passed and was verified by the non-executing Codex reviewer. Evidence commit, repository-wide make verify at the final head, GitHub CI, PR review comment and merge are pending. M1-058 is not claimed merged or complete.",
+  "evidenceCommit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+  "evidenceCommitSubject": "docs(m1-058): add keychain trust store evidence",
+  "evidenceCommitStatus": "created",
+  "evidenceCommitNote": "Full hash reported by the Codex root reviewer. Repository-wide make verify (command 9) ran at this commit. This metadata update is a later commit, so the evidence commit is not the final head.",
+  "status": "evidence_commit_verified",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer on 2026-10-27 at the implementation commit and all exited 0. Repository-wide make verify (command 9) was run at the evidence commit in normal macOS execution permissions and passed with 24 of 24 gates. The human-executed signed real-Keychain manual probe passed and was verified by the non-executing Codex reviewer. Because this metadata update changes HEAD, make verify at the final head is still required. Final-head make verify, GitHub CI, PR review comment and merge are pending. M1-058 is not claimed merged or complete.",
   "authorship": {
     "repositoryContentAuthor": "Claude Opus",
     "commandExecutor": "Codex root reviewer",
     "manualProbeOperator": "human Product Owner",
     "reviewer": "Codex root reviewer",
-    "detail": "Claude Opus authored the source, tests, component document, formatting fix, temporary probe source and this evidence. The Codex root reviewer executed commands 1-8, performed the non-author five-axis/security review, signing setup, diagnosis and workflow. The human Product Owner executed the final signed real-Keychain probe; Codex reviewed its exact output without executing it. No second independent external engineer reviewed the source.",
-    "authorUsed": ["file read", "file search", "file write", "file edit"],
+    "detail": "Claude Opus authored the source, tests, component document, formatting fix, temporary probe source and this evidence, using file tools plus one accidental inert shell command (`echo skip`, disclosed in authorInertCommand) that produced no repository read/write, verification or evidence. The Codex root reviewer executed commands 1-8, performed the non-author five-axis/security review, signing setup, diagnosis and workflow. The human Product Owner executed the final signed real-Keychain probe; Codex reviewed its exact output without executing it. No second independent external engineer reviewed the source.",
+    "authorUsed": ["file read", "file search", "file write", "file edit", "one inert shell command (see authorInertCommand)"],
+    "authorInertCommand": {
+      "command": "echo skip",
+      "count": 1,
+      "when": "during the latest metadata edit",
+      "intentional": false,
+      "effect": "Inert. No repository read or write; no build, test, validation, formatter, git, signing, Keychain, network or runtime verification; produced no evidence.",
+      "acceptedAsEvidence": false
+    },
     "authorDidNot": [
       "run any build, test, validation or formatter command",
       "run any git command, including commit, stage or push",
@@ -51,7 +60,8 @@
     ]
   },
   "commandsCommit": "5c87ba53a45d3312c282b41702138522b36e3c57",
-  "timestampNote": "UTC timestamps at second resolution as reported by the reviewer.",
+  "commandsCommitNote": "Commit at which commands 1-8 ran. Command 9 ran at the evidence commit and records its own commit below.",
+  "timestampNote": "Commands 1-8: UTC timestamps at second resolution as reported by the reviewer. Command 9: the make verify report's internal timestamps at millisecond resolution.",
   "requiredCommands": [
     {
       "id": 1,
@@ -147,8 +157,71 @@
       "result": "Build complete 0.56s"
     }
   ],
-  "repositoryVerifyCommands": [],
-  "repositoryVerifyCommandsNote": "Repository-wide make verify has not been run at the evidence commit or final head; it is pending.",
+  "repositoryVerifyCommands": [
+    {
+      "id": 9,
+      "command": "make verify",
+      "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+      "commitRole": "evidence commit",
+      "executionContext": "normal macOS execution permissions",
+      "status": "passed",
+      "report": {
+        "path": "artifacts/ci/m1-008-report.json",
+        "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+        "status": "passed",
+        "startedAt": "2026-10-27T06:30:26.453+00:00",
+        "endedAt": "2026-10-27T06:32:07.914+00:00",
+        "gatesTotal": 24,
+        "gatesPassed": 24,
+        "gatesFailed": 0,
+        "gatesNotRun": 0,
+        "sha256": "1604fbab0059b53c04e95b59ec71d56b9143ab5dd80afb260461427af53f8c6c",
+        "gatesPassedNamed": [
+          "manifest-validation",
+          "docs-check",
+          "architecture-check",
+          "code-quality",
+          "tool-test-discovery",
+          "evidence-test-discovery",
+          "tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py",
+          "tool-test:Evidence/tests/test_run_e2e.py",
+          "tool-test:Evidence/tests/test_validate_evidence.py",
+          "tool-test:architecture-check/tests/test_architecture_check.py",
+          "tool-test:async-harness/tests/test_async_harness.py",
+          "tool-test:cigates/tests/test_cigates.py",
+          "tool-test:code-quality/tests/test_code_quality.py",
+          "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
+          "tool-test:docs-check/tests/test_docs_check.py",
+          "evidence-test:M1-023/tests/test_register.py",
+          "evidence-test:M1-EVIDENCE-001/tests/test_registration.py",
+          "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
+          "swift-package-test:KVMContracts",
+          "swift-package-test:MacPlatform",
+          "swift-package-test:BarrierCompatibility",
+          "repository-contract-tests",
+          "swift-test-targets",
+          "native-arm64-build"
+        ],
+        "gateNamesNote": "All 24 passed gate names exactly as supplied by the reviewer. Every one of the 24 gates passed. Per-gate durations were not supplied and are not recorded.",
+        "note": "Generated by make verify; timestamps are the report's internal values."
+      }
+    }
+  ],
+  "repositoryVerifyCommandsNote": "Command 9 passed at the evidence commit. This metadata update is a later commit, so make verify at the final head is still required and pending.",
+  "repositoryVerifyDiagnosticHistory": [
+    {
+      "phase": "restricted-host make verify attempt",
+      "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+      "acceptedAsEvidence": false,
+      "classification": "host-environment diagnostic, not a product failure",
+      "command": "make verify",
+      "status": "failed",
+      "failedGate": "code-quality",
+      "cause": "SwiftPM could not apply its own macOS sandbox (sandbox_apply: Operation not permitted) under the restricted host permissions.",
+      "reproduction": "A direct reproduction showed the same host restriction.",
+      "supersededBy": "command 9 (normal macOS execution permissions, passed 24/24)"
+    }
+  ],
   "tddHistory": [
     {
       "phase": "RED",
@@ -238,18 +311,19 @@
   "completed": [
     { "item": "implementation commit commands 1-8", "status": "passed", "commit": "5c87ba53a45d3312c282b41702138522b36e3c57" },
     { "item": "signed real-Keychain manual probe", "status": "passed", "operator": "human Product Owner", "reviewer": "Codex root reviewer" },
-    { "item": "non-author five-axis/security review", "status": "passed", "disposition": "C0/H0/M0/L4" }
+    { "item": "non-author five-axis/security review", "status": "passed", "disposition": "C0/H0/M0/L4" },
+    { "item": "evidence commit", "status": "created", "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4" },
+    { "item": "repository-wide make verify (command 9)", "status": "passed", "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4" }
   ],
   "pending": [
-    { "item": "evidence commit", "status": "pending" },
-    { "item": "repository-wide make verify at the final head", "status": "pending" },
+    { "item": "make verify at the final head", "status": "pending", "note": "Required because this metadata update is a later commit than the evidence commit." },
     { "item": "GitHub CI at the final pushed head", "status": "pending" },
     { "item": "pull request review comment", "status": "pending" },
     { "item": "merge by an authorized reviewer", "status": "pending" }
   ],
   "manualVerification": { "required": true, "performed": true, "status": "passed", "detail": "manual.md" },
   "authorCommandAttempts": [],
-  "authorCommandAttemptsNote": "The author attempted none of the recorded commands, so no author command result exists or is claimed.",
+  "authorCommandAttemptsNote": "The author attempted none of the recorded commands, so no author command result exists or is claimed. The only shell command the author ran was the inert `echo skip` disclosed in authorship.authorInertCommand; it is not a recorded command and produced no result or evidence.",
   "protectedArtifacts": {
     "paths": ["MacKVM_M1-001_unblock.zip", "mackvm-unblock/"],
     "readModifiedStagedOrCommitted": false

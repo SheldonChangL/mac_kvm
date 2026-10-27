@@ -6,11 +6,16 @@
   C-009; dependency M1-057 merged/closed.
 - Reviewed commit: implementation `5c87ba53a45d3312c282b41702138522b36e3c57`
   on parent `2bfbb0fdeadb1f783abe75a057b6a4774f04fc3a`.
-- Evidence commit: pending.
+- Evidence commit: `9137ab23fad2f52a7cf959e06155e6e7b87d8af4`
+  (`docs(m1-058): add keychain trust store evidence`).
 - Reviewer: **Codex root reviewer**, non-author. It executed every recorded
   command and reviewed — without executing — the human Product Owner's
   signed real-Keychain probe. Claude Opus authored the repository content,
-  the temporary probe source and this document using file tools only. **No
+  the temporary probe source and this document using file tools, plus one
+  accidental inert shell command (exactly `echo skip`, during the latest
+  metadata edit) that performed no repository read/write, no build, test,
+  validation, formatter, git, signing, Keychain, network or runtime
+  verification, and produced no evidence. **No
   second independent external engineer reviewed the source.**
 
 ## Disposition
@@ -44,8 +49,12 @@ Machine-readable detail: `tests/review-findings.json`.
    boundary, invalid, error, cancellation, cleanup, fail-closed, identity
    change, race/concurrency, query contract and privacy. The human-executed
    signed real-Keychain probe passed and was verified by the non-executing
-   reviewer. Commands 1-8 exited 0. Final-head `make verify` and GitHub CI
-   are **pending**.
+   reviewer. Commands 1-8 exited 0. Repository-wide `make verify` passed at
+   evidence commit `9137ab2` (24/24 gates, normal macOS execution
+   permissions). An earlier restricted-host attempt that failed
+   `code-quality` on SwiftPM's `sandbox_apply` restriction is a host
+   diagnostic, not a product failure, and not acceptance evidence.
+   Final-head `make verify` and GitHub CI are **pending**.
 5. **Scope, hygiene and rollback: pass.** Three Exact Files in the
    implementation commit; the evidence package is the only additional scope.
    `git diff --check HEAD^ HEAD` produced no output. Protected owner artifacts
@@ -115,6 +124,7 @@ implementation commit `5c87ba53a45d3312c282b41702138522b36e3c57`.
 
 ## Pending
 
-Evidence commit, repository-wide `make verify` at the final head, GitHub CI,
-PR review comment, and merge by an authorized reviewer. No model may merge
+Repository-wide `make verify` at the final head (this metadata update changes
+HEAD after evidence commit `9137ab2`), GitHub CI, PR review comment, and merge
+by an authorized reviewer. No model may merge
 autonomously. M1-058 is not claimed merged or complete.

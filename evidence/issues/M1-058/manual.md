@@ -5,7 +5,10 @@ provisioned probe app against the real local macOS data-protection Keychain.
 The **Codex root reviewer** — non-author and non-executing for this step —
 reviewed the exact output, exit status, artifact hashes and signature facts.
 Claude Opus authored the temporary probe source and this document using file
-tools only and ran nothing.
+tools; apart from one accidental inert shell command (exactly `echo skip`,
+during the latest metadata edit, with no repository read/write and no
+evidence produced), Claude ran nothing — no build, test, signing, Keychain or
+probe execution.
 
 ## Metadata
 
@@ -14,7 +17,7 @@ tools only and ran nothing.
 | Date | 2026-10-27 (Asia/Taipei) |
 | Observed launch time | `2026-10-27T14:19:50+08:00` (`2026-10-27T06:19:50Z`) — from a launch-adjacent kernel event; observed, not a user-supplied start time |
 | Implementation commit | `5c87ba53a45d3312c282b41702138522b36e3c57` |
-| Evidence commit | pending |
+| Evidence commit | `9137ab23fad2f52a7cf959e06155e6e7b87d8af4` |
 | Operator | human Product Owner, in Terminal |
 | Reviewer | Codex root reviewer (non-author, non-executing) |
 | OS / build | macOS 26.6.2, build 25G83 |
