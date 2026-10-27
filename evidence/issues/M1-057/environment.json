@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-057",
+  "githubIssue": 65,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/65",
+  "commit": "c423e4991df67caec277cc97a3b940c4879617e1",
+  "commitNote": "Final implementation head at which commands 1-8 ran. Command 9 (make verify) ran at evidenceCommit.",
+  "evidenceCommit": "8943a5fdbe9343526dfa984312fff1a437441b8f",
+  "evidenceCommitNote": "Commit at which repository-wide make verify ran. This metadata update will be a later commit, so make verify at the final head is still required.",
+  "source": "Codex root reviewer runs, transcribed by Claude Opus. Only reported facts are recorded; no private identifier is included.",
+  "timestamps": {
+    "firstCommandStartedAt": "2026-10-27T00:11:44.586Z",
+    "lastCommandEndedAt": "2026-10-27T00:12:14.916Z",
+    "timezone": "UTC",
+    "note": "Span of commands 1-8 at the final implementation head, millisecond resolution as reported."
+  },
+  "repositoryVerifyReport": {
+    "command": "make verify",
+    "commandId": 9,
+    "commit": "8943a5fdbe9343526dfa984312fff1a437441b8f",
+    "commandStartedAt": "2026-10-27T00:16:31.490Z",
+    "commandEndedAt": "2026-10-27T00:18:10.197Z",
+    "exitCode": 0,
+    "path": "artifacts/ci/m1-008-report.json",
+    "reportCommit": "8943a5fdbe9343526dfa984312fff1a437441b8f",
+    "status": "passed",
+    "gatesTotal": 24,
+    "gatesPassed": 24,
+    "reportStartedAt": "2026-10-27T00:16:33.476+00:00",
+    "reportEndedAt": "2026-10-27T00:18:10.187+00:00",
+    "sha256": "d03573487903e0376c4225672777bfdcc3f41a667135db03b4542ae59bd3da11"
+  },
+  "repositoryVerifyReportNote": "Run by the Codex root reviewer at the evidence commit. A make verify at the final head is pending.",
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "swiftVersion": "Apple Swift 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDefaultTarget": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "xcodeVersion": "26.2",
+    "xcodeBuildVersion": "17C52",
+    "python": "3.9.6"
+  },
+  "manualVerification": {
+    "required": false,
+    "performed": false
+  },
+  "network": {
+    "exercised": false,
+    "note": "The unit performs no network I/O; tests are pure in-memory decisions."
+  },
+  "peer": {
+    "exercised": false,
+    "note": "No real certificate, TLS peer or peer fingerprint is used; tests use published SHA-256 vectors and synthetic bytes."
+  }
+}
