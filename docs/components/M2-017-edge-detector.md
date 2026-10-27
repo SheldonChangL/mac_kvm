@@ -18,7 +18,8 @@ samples (logical points, monotonic timestamps) into `idle`, `pending(edge)` or
 - Non-finite samples, degenerate screen sizes and timestamps that run
   backwards cancel and return `idle` (fail safe: no switch).
 - Coordinates outside the screen are clamped; `offset` is the clamped
-  normalized position along the edge.
+  normalized position along the edge with the `(size − 1)` denominator
+  shared by capture normalization and the M2-019/M2-020 mappers.
 
 ## Tests
 

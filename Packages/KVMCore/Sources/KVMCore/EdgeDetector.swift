@@ -46,7 +46,8 @@ package struct EdgeDetector: Sendable {
     case idle
     case pending(ScreenEdge)
     /// `offset` is the normalized position along the edge (y for left/right,
-    /// x for top/bottom), in `0...1`.
+    /// x for top/bottom), in `0...1`, using the same `(size - 1)` denominator
+    /// as capture normalization and the M2-019/M2-020 mappers.
     case activated(ScreenEdge, offset: Double)
   }
 
@@ -137,10 +138,10 @@ package struct EdgeDetector: Sendable {
     let inVerticalBand = y >= zone && y <= maxY - zone
     let inHorizontalBand = x >= zone && x <= maxX - zone
     let candidates: [(ScreenEdge, Bool, Bool, Double)] = [
-      (.left, x <= 0, inVerticalBand, y / screenSize.height),
-      (.right, x >= maxX, inVerticalBand, y / screenSize.height),
-      (.top, y <= 0, inHorizontalBand, x / screenSize.width),
-      (.bottom, y >= maxY, inHorizontalBand, x / screenSize.width),
+      (.left, x <= 0, inVerticalBand, y / maxY),
+      (.right, x >= maxX, inVerticalBand, y / maxY),
+      (.top, y <= 0, inHorizontalBand, x / maxX),
+      (.bottom, y >= maxY, inHorizontalBand, x / maxX),
     ]
     for (edge, onEdge, outsideCorner, offset) in candidates
     where onEdge && outsideCorner && linkedEdges.contains(edge) {
