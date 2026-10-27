@@ -145,7 +145,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
   private func waitForReady() async -> Result<Void, CoreError> {
     let timeout = handshakeTimeout
     let clock = clock
-    return await withTaskGroup(of: Result<Void, CoreError>?.self) { group in
+    return await withTaskGroup(of: Result<Void, CoreError>.self) { group in
       group.addTask {
         await withCheckedContinuation { continuation in
           let immediate = self.lock.withLock { () -> Result<Void, CoreError>? in
@@ -161,15 +161,12 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
           try await clock.sleep(for: timeout)
           return .failure(Self.error(.timeout(.handshake)))
         } catch {
-          return nil
+          // A cancelled wait (for example the caller cancelled `connect()`)
+          // must fail the handshake; it must never disable the timeout.
+          return .failure(error)
         }
       }
-      var outcome: Result<Void, CoreError> = .failure(Self.error(.timeout(.handshake)))
-      while let next = await group.next() {
-        guard let next else { continue }
-        outcome = next
-        break
-      }
+      let outcome = await group.next() ?? .failure(Self.error(.timeout(.handshake)))
       let waiter = lock.withLock {
         let waiter = readyWaiter
         readyWaiter = nil

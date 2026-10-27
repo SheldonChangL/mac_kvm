@@ -249,6 +249,23 @@ struct BarrierServerProtocolSessionTests {
     #expect(pipe.disconnectCount == 1)
   }
 
+  @Test("cancelling connect fails closed instead of disabling the timeout")
+  func cancelledConnect() async throws {
+    let pipe = PipeTransport()
+    let clock = ManualClock()
+    let session = try makeSession(pipe, clock: clock)
+    let connecting = Task { try await session.connect() }
+    await clock.waitForSleeper()
+    connecting.cancel()
+    do {
+      try await connecting.value
+      Issue.record("cancelled connect succeeded")
+    } catch {
+      #expect((error as? CoreError)?.code == .cancellation(.requested))
+    }
+    #expect(pipe.disconnectCount == 1)
+  }
+
   @Test("an unexpected client identity is rejected as a trust failure")
   func identityRejected() async throws {
     let pipe = PipeTransport()
