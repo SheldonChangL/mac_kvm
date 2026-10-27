@@ -98,6 +98,26 @@ struct EnterRemoteTriggerTests {
         .edge == .right)
   }
 
+  @Test("no switch while a local key or button is held; release re-enables it")
+  func heldInputBlocksSwitch() throws {
+    var trigger = try makeTrigger()
+    trigger.observe(.mouseButton(button: .left, phase: .down))
+    trigger.observe(.key(key: .shift, phase: .down, modifiers: ModifierState(shift: true)))
+    _ = trigger.pointer(x: 1000, y: 250, at: .zero, state: .local, available: [linux])
+    #expect(
+      trigger.pointer(x: 1000, y: 250, at: .seconds(1), state: .local, available: [linux]) == nil)
+    #expect(trigger.tick(at: .seconds(2), state: .local, available: [linux]) == nil)
+    trigger.observe(.mouseButton(button: .left, phase: .up))
+    #expect(trigger.tick(at: .seconds(3), state: .local, available: [linux]) == nil)
+    trigger.observe(.key(key: .shift, phase: .up, modifiers: ModifierState()))
+    trigger.observe(.mouseButton(button: .right, phase: .up))
+    _ = trigger.pointer(x: 1000, y: 250, at: .seconds(4), state: .local, available: [linux])
+    #expect(
+      trigger.pointer(
+        x: 1000, y: 250, at: .seconds(4) + .milliseconds(50), state: .local, available: [linux])?
+        .edge == .right)
+  }
+
   @Test("invalid configuration: degenerate local size")
   func invalid() throws {
     let topology = try ScreenTopology(screens: [mac], links: [])

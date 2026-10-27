@@ -14,7 +14,8 @@ package struct EnterIntent: Equatable, Sendable {
 ///
 /// Composes the M2-017 `EdgeDetector`, the M2-031 `ScreenRouter` and one
 /// M2-019 `OutboundCoordinateMapper` per remote screen. An intent is emitted
-/// only in the `local` state, only once per edge dwell, only for a linked edge
+/// only in the `local` state with no local key or button held (M2-008
+/// activation precondition), only once per edge dwell, only for a linked edge
 /// whose neighbor has a ready session and known geometry. Any other state
 /// resets the dwell, so a trigger never repeats while a switch is in flight.
 /// The trigger is a pure value with no clock, network or platform dependency.
@@ -22,6 +23,8 @@ package struct EnterRemoteTrigger: Sendable {
   private let router: ScreenRouter
   private let remoteMappers: [ScreenID: OutboundCoordinateMapper]
   private var detector: EdgeDetector
+  private var heldButtons: [MouseButton] = []
+  private var heldKeys: [VirtualKey] = []
 
   /// Returns `nil` for a local size smaller than 2×2 points or non-finite.
   package init?(
@@ -37,11 +40,30 @@ package struct EnterRemoteTrigger: Sendable {
       configuration: configuration, screenSize: localSize, linkedEdges: router.linkedEdges)
   }
 
+  /// Records local key and button state from captured events.
+  ///
+  /// The owner calls this for every event captured while input is local.
+  /// Releases without a matching press are ignored.
+  package mutating func observe(_ event: KVMEvent) {
+    switch event {
+    case .mouseButton(let button, .down):
+      if !heldButtons.contains(button) { heldButtons.append(button) }
+    case .mouseButton(let button, .up):
+      heldButtons.removeAll { $0 == button }
+    case .key(let key, .down, _):
+      if !heldKeys.contains(key) { heldKeys.append(key) }
+    case .key(let key, .up, _):
+      heldKeys.removeAll { $0 == key }
+    default:
+      break
+    }
+  }
+
   /// Processes one local pointer sample in local logical points.
   package mutating func pointer(
     x: Double, y: Double, at timestamp: Duration, state: InputState, available: Set<ScreenID>
   ) -> EnterIntent? {
-    guard state == .local else {
+    guard state == .local, heldButtons.isEmpty, heldKeys.isEmpty else {
       detector.reset()
       return nil
     }
@@ -52,7 +74,7 @@ package struct EnterRemoteTrigger: Sendable {
   package mutating func tick(at timestamp: Duration, state: InputState, available: Set<ScreenID>)
     -> EnterIntent?
   {
-    guard state == .local else {
+    guard state == .local, heldButtons.isEmpty, heldKeys.isEmpty else {
       detector.reset()
       return nil
     }
