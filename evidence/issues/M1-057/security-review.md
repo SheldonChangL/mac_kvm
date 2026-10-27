@@ -7,6 +7,8 @@
   and formatting follow-up `c423e4991df67caec277cc97a3b940c4879617e1`
   (final implementation head), on parent
   `496551632a4667511c384bede29a6043e1aa4c7e`.
+- Evidence commit: `8943a5fdbe9343526dfa984312fff1a437441b8f`, at which the
+  reviewer ran repository-wide `make verify` (exit 0, 24 of 24 gates).
 - Reviewer: **Codex root reviewer.** This is a **non-author Codex review, not
   a human or independent external review.** Claude Opus authored the
   repository content and this document using only Read, Grep, Glob, Edit and
@@ -52,7 +54,11 @@ new follow-up issue is required. Machine-readable detail is in
 4. **Tests, validation and acceptance: pass.** 28 `@Test` functions cover
    every issue test category; AC 1-6 are mapped explicitly in `summary.md`.
    Commands 1-8 exited 0 at the final implementation head (`commands.json`).
-   Repository-wide `make verify`, the evidence commit, a final-head
+   Repository-wide `make verify` (command 9) exited 0 at evidence commit
+   `8943a5fdbe9343526dfa984312fff1a437441b8f`; the generated
+   `artifacts/ci/m1-008-report.json` reports status passed, 24 of 24 gates,
+   SHA-256 `d03573487903e0376c4225672777bfdcc3f41a667135db03b4542ae59bd3da11`.
+   This metadata update will be a later commit, so a final-head
    `make verify` and GitHub CI are **pending**.
 5. **Scope, hygiene and rollback: pass.** Changes are the three Exact Files
    plus this evidence package. `git diff --check` over the parent..head range
@@ -90,6 +96,7 @@ new follow-up issue is required. Machine-readable detail is in
 
 ## Pending
 
-Repository-wide `make verify`, the evidence commit, a final-head
-`make verify`, GitHub CI, PR review comment, and merge by an authorized
-reviewer. No model may merge autonomously.
+A final-head `make verify` (required because this metadata update will be a
+later commit than evidence commit `8943a5f`), GitHub CI, PR review comment,
+and merge by an authorized reviewer. No model may merge autonomously.
+Repository-wide `make verify` at the evidence commit is complete.

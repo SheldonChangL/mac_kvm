@@ -13,11 +13,13 @@
 - Formatting follow-up commit: `c423e4991df67caec277cc97a3b940c4879617e1`
   (whitespace-only change to `TrustPolicyTests.swift`).
 - Final implementation head: `c423e4991df67caec277cc97a3b940c4879617e1`
-- Evidence commit: not yet created; no hash is recorded here.
-- Status: **Commands 1-8 passed at the final implementation head.** Pending:
-  repository-wide `make verify`, the evidence commit, a final-head
-  `make verify`, GitHub CI, PR review comment and merge; none of these is
-  claimed as passed.
+- Evidence commit: `8943a5fdbe9343526dfa984312fff1a437441b8f`
+  (`docs(m1-057): add trust policy evidence`).
+- Status: **Commands 1-8 passed at the final implementation head;
+  repository-wide `make verify` (command 9) passed at the evidence commit.**
+  This metadata update will be a later commit, so a final-head `make verify`
+  is still required. Pending: final-head `make verify`, GitHub CI, PR review
+  comment and merge; none of these is claimed as passed.
 - Authorship: **Claude Opus** authored all repository content (source, tests,
   component document, this evidence) using only Read, Grep, Glob, Edit and
   Write. Claude ran no build, test, validation, formatter, git mutation, push,
@@ -78,7 +80,7 @@ were not read, modified, staged or committed.
 | 1 | 所有 Focus 項目均有可定位的 implementation、test 或簽核證據 | **Met.** Each scope item maps to source and named tests (table above). | `tests/results.json` `focusMapping` |
 | 2 | Happy path、boundary、invalid input、error/cancel/cleanup tests 全部通過 | **Met.** Swift Testing 172 passed, 0 failures at the final implementation head; existing opt-in manual Tier-H probes skipped (exact skipped count not reported). Cancel/cleanup is not applicable to a pure synchronous resource-free function; determinism, idempotency and concurrency are tested instead. | `tests/results.json`; table below |
 | 3 | Public behavior 與 CONTRACT_CATALOG／凍結 ADR 一致，沒有新增隱含 API | **Met.** Behavior matches C-009 and Frozen Decision 6. All declarations `internal`; no `public` or `package` API (review finding H-1, resolved before the implementation commit). No frozen contract, ADR, wire format or `SecurityErrorCode` case changed. | component doc; `security-review.md` |
-| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at the final implementation head.** architecture-check, strict lint, warnings-as-errors Swift tests, xcodebuild, release build and unit tests all exit 0. Repository-wide `make verify` and GitHub CI are pending. | `commands.json` |
+| 4 | Architecture checker、lint、build、unit tests 全部通過且沒有新增 warning | **Met at the final implementation head.** architecture-check, strict lint, warnings-as-errors Swift tests, xcodebuild, release build and unit tests all exit 0. Repository-wide `make verify` passed at the evidence commit (24 of 24 gates). Final-head `make verify` and GitHub CI are pending. | `commands.json` |
 | 5 | Production logs 不包含 typed text、clipboard payload、secret/private key 或可還原內容 | **Met.** No logging. `TrustPolicyDecision` carries no fingerprint; a test shows decisions for different fingerprints are equal. | `decisionsForDifferentFingerprintsAreIndistinguishable` |
 | 6 | Security reviewer 已檢查 fail-closed、key/secret handling、identity change 與 abuse path | **Met (non-author Codex review).** | `security-review.md` |
 
@@ -121,6 +123,24 @@ Run by the Codex root reviewer on 2026-10-27 at final implementation head
 
 Command 2 is the shell-equivalent of the issue's quoted
 `-destination 'platform=macOS'`.
+
+### Repository-wide verification
+
+Run by the Codex root reviewer on 2026-10-27 at evidence commit
+`8943a5fdbe9343526dfa984312fff1a437441b8f`.
+
+| # | Command | Exit | Result |
+| --- | --- | --- | --- |
+| 9 | `make verify` | 0 | 2026-10-27T00:16:31.490Z to 2026-10-27T00:18:10.197Z; report status passed, 24 of 24 gates |
+
+Generated report `artifacts/ci/m1-008-report.json`: commit
+`8943a5fdbe9343526dfa984312fff1a437441b8f`, status passed, 24 gates total,
+24 passed; internal timestamps 2026-10-27T00:16:33.476+00:00 to
+2026-10-27T00:18:10.187+00:00; SHA-256
+`d03573487903e0376c4225672777bfdcc3f41a667135db03b4542ae59bd3da11`.
+
+This metadata update will be a later commit than the evidence commit, so
+`make verify` at the final head is still required and is pending.
 
 ### Debug history (not final results)
 
@@ -180,7 +200,7 @@ clean up.
 
 ## Reviewer Required
 
-Tier `C/S`, risk critical: security-critical; no autonomous merge. Remaining:
-repository-wide `make verify`, the evidence commit, a final-head
-`make verify`, GitHub CI, PR review comment, and merge by an authorized
-reviewer.
+Tier `C/S`, risk critical: security-critical; no autonomous merge.
+Complete: repository-wide `make verify` at evidence commit `8943a5f`.
+Remaining: a final-head `make verify` (this metadata update is a later
+commit), GitHub CI, PR review comment, and merge by an authorized reviewer.
