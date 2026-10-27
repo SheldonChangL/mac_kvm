@@ -5,13 +5,18 @@ package enum ServerSessionState: Equatable, Sendable {
   case idle
   case connecting
   case ready
+  /// The enter is being written; the session is not yet active.
+  case entering
   case active
   case closed
 }
 
 /// Owns one protocol-neutral client session for the server role.
 ///
-/// Lifecycle: `idle` → `connecting` → `ready` ⇄ `active` → `closed`.
+/// Lifecycle: `idle` → `connecting` → `ready` → `entering` → `active` →
+/// `ready` (leave) …, and any state → `closed`. A leave requested while the
+/// enter is still being written closes the session, so the peer can never be
+/// left entered with no leave.
 /// The session is single-use. Every send goes through one FIFO writer, so
 /// events reach the protocol session in call order even when a send suspends.
 /// Any connect or send failure is terminal: the session disconnects once with
@@ -52,8 +57,9 @@ package actor ServerSession {
   /// Sends the enter for this session's screen; `active` on success.
   package func enter(at position: NormalizedPoint) async throws(CoreError) {
     try require(.ready)
+    state = .entering
     try await write(.enterScreen(screen: screen, position: position))
-    guard state == .ready else { throw Self.closedError }
+    guard state == .entering else { throw Self.closedError }
     state = .active
   }
 
@@ -64,7 +70,14 @@ package actor ServerSession {
   }
 
   /// Sends the leave for this session's screen; back to `ready` on success.
+  ///
+  /// During an in-flight enter the session is closed instead (superseded),
+  /// because the enter may still reach the peer after the leave decision.
   package func leave() async throws(CoreError) {
+    if state == .entering {
+      await close(reason: .cancellation(.superseded))
+      return
+    }
     try require(.active)
     state = .ready
     try await write(.leaveScreen(screen: screen))

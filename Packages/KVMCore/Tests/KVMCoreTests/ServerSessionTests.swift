@@ -193,6 +193,23 @@ struct ServerSessionTests {
     #expect(Array(fake.sent.suffix(2)) == [keyDown, keyUp])
   }
 
+  @Test("a leave during an in-flight enter closes the session instead of leaving it entered")
+  func leaveDuringPendingEnter() async throws {
+    let fake = FakeProtocolSession()
+    let session = try await readySession(fake)
+    let enterEvent = KVMEvent.enterScreen(screen: screen, position: entry)
+    fake.hold(enterEvent)
+    let entering = Task { try await session.enter(at: entry) }
+    await fake.waitUntilHeld()
+    #expect(await session.state == .entering)
+    try await session.leave()
+    #expect(await session.state == .closed)
+    fake.releaseHeld()
+    await #expect(throws: CoreError.self) { try await entering.value }
+    #expect(await session.state == .closed)
+    #expect(fake.disconnects == [.cancellation(.superseded)])
+  }
+
   @Test("cleanup: close is idempotent and later operations fail")
   func closeIdempotent() async throws {
     let fake = FakeProtocolSession()

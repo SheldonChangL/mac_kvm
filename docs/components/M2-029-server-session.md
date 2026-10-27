@@ -8,14 +8,14 @@
 
 ## Lifecycle
 
-`idle` → `connecting` → `ready` ⇄ `active` → `closed`
+`idle` → `connecting` → `ready` → `entering` → `active` → `ready` …; any → `closed`
 
 | Call | Requires | Effect |
 | --- | --- | --- |
 | `start()` | idle | `connect()`; `ready`, or `closed` on failure |
-| `enter(at:)` | ready | sends `enterScreen`; `active` |
+| `enter(at:)` | ready | `entering` while `enterScreen` is written; then `active` |
 | `forward(_:)` | active | sends the event |
-| `leave()` | active | `ready`, then sends `leaveScreen` |
+| `leave()` | active / entering | active: `ready`, then sends `leaveScreen`; entering: closes the session (superseded) so the peer is never left entered |
 | `close(reason:)` | any | disconnects once; idempotent |
 | `monitorPeer()` | any | drains the peer stream; closes with `transportClosed` or the failure |
 
