@@ -12,8 +12,9 @@ Declarations are `package`; the environment seam is module-internal.
 - `restore(preferred:)` first re-associates mouse and cursor
   (`CGAssociateMouseAndMouseCursorPosition(true)`), so a cursor frozen for
   remote routing never stays frozen. It then warps to the first candidate on
-  a currently active display: the preferred re-entry point from M2-020, the
-  saved point, then the center of the first active display.
+  a currently active display whose warp succeeds, falling through on a
+  failed warp: the preferred re-entry point from M2-020, the saved point, then
+  the center of the first active display.
 - Active displays are re-read on every restore, covering hot-plug and
   resolution changes. No display, or a failing warp, reports `failed`.
 - `clear()` forgets the saved point. All calls are synchronous, idempotent and

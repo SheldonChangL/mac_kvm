@@ -10,13 +10,14 @@ private final class FakeCursor: @unchecked Sendable {
   var location: CGPoint? = CGPoint(x: 100, y: 100)
   var displays: [CGRect] = [CGRect(x: 0, y: 0, width: 1000, height: 500)]
   var warpSucceeds = true
+  var failingWarpPoints: [CGPoint] = []
   var associateSucceeds = true
   private(set) var warps: [CGPoint] = []
   private(set) var associations: [Bool] = []
 
   func record(warp point: CGPoint) -> Bool {
     lock.withLock { warps.append(point) }
-    return warpSucceeds
+    return warpSucceeds && !failingWarpPoints.contains(point)
   }
 
   func record(associate value: Bool) -> Bool {
@@ -80,6 +81,16 @@ struct CursorRestorerTests {
     fake.warpSucceeds = false
     #expect(restorer.restore(preferred: CGPoint(x: 1, y: 1)) == .failed)
     #expect(fake.associations == [true, true])
+  }
+
+  @Test("a failed warp falls through to the next candidate")
+  func warpFallthrough() {
+    let fake = FakeCursor()
+    let restorer = CursorRestorer(environment: fake.environment)
+    _ = restorer.saveCurrent()
+    fake.failingWarpPoints = [CGPoint(x: 998, y: 250)]
+    #expect(restorer.restore(preferred: CGPoint(x: 998, y: 250)) == .restored(.saved))
+    #expect(fake.warps == [CGPoint(x: 998, y: 250), CGPoint(x: 100, y: 100)])
   }
 
   @Test("save rejects unreadable locations and keeps the previous point")

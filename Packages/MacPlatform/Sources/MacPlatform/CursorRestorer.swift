@@ -40,7 +40,8 @@ package enum CursorRestoreOutcome: Equatable, Sendable {
 ///
 /// `restore(preferred:)` always re-associates the mouse with the cursor
 /// first, so a cursor frozen for remote routing can never stay frozen, then
-/// warps to the first candidate that lies on a currently active display:
+/// warps to the first candidate that lies on a currently active display and
+/// whose warp succeeds, falling through to the next candidate on failure:
 /// the preferred re-entry point (M2-020), the saved point, then the center of
 /// the first active display. Display hot-plug is handled by re-reading the
 /// active displays on every restore. Every call is synchronous, idempotent and
@@ -82,8 +83,8 @@ package final class CursorRestorer: @unchecked Sendable {
       (preferred, .preferred), (saved, .saved), (displays.first.map(Self.center), .displayCenter),
     ]
     for case (let point?, let source) in candidates
-    where displays.contains(where: { $0.contains(point) }) {
-      return environment.warp(point) ? .restored(source) : .failed
+    where displays.contains(where: { $0.contains(point) }) && environment.warp(point) {
+      return .restored(source)
     }
     return .failed
   }
