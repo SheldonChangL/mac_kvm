@@ -132,6 +132,43 @@ production-behavior Mac server MVP.
   Network.framework listener integration, identity-change rejection, and live
   evidence. No plaintext production fallback.
 
+### H-7 — Concurrent `recoverAll` can pass the local-first gate before recovery completes
+
+`ServerFailSafe.recoverLocal()` returns `.notRequired` immediately when another
+recovery is in progress. `recoverAll()` treats that return as if local recovery
+had completed: it invokes `afterLocalRestore` and proceeds to
+`SessionManager.closeAll`. A concurrent recovery can therefore begin remote
+teardown before suppression has even stopped.
+
+- Production location: `Packages/KVMCore/Sources/KVMCore/ServerFailSafe.swift`,
+  the reentrancy guard around lines 39–46 and `recoverAll` around lines 92–101.
+- Reviewer probe: block the first recovery inside `stopSuppression`, then call
+  `recoverAll` concurrently and observe its local-first hook.
+- Exact result: the second outcome was `.notRequired` and the hook observed
+  `hasCompleted == false`; the probe failed with two issues.
+- Owner: M2-033 implementation author (Claude).
+- Priority: P0; local-input fail-safe ordering.
+- Blocking relation: blocks M2-033, app composition and M2-035.
+- Required disposition: concurrent/reentrant `recoverAll` must join or otherwise
+  prove completion of the in-flight local recovery before remote teardown,
+  without blocking the event-tap callback path. Add a deterministic regression
+  test for the exact interleaving.
+
+### H-8 — Enter timeout is ordered after the potentially suspending enter send
+
+The proposed M2-008 ADR says effects execute in listed order and lists
+`sendEnter` before `startEnterTimeout`, while also claiming the timeout starts
+on entry to `enteringRemote`. If the future effect executor is sequential and
+the send suspends, the timeout is never started. No current composition root
+resolves this contradiction.
+
+- Owner: M2-008 decision owner + app-composition author (Claude).
+- Priority: P0.
+- Blocking relation: blocks approving M2-008, M2-011 and the effect executor.
+- Required disposition: freeze unambiguous timeout ownership/order so the
+  timeout bounds enter delivery itself; add a non-cooperative-send test. Do not
+  hide the race with sleep/retry.
+
 ## Medium findings
 
 ### M-1 — Listener stop does not close pending admissions
@@ -148,6 +185,22 @@ M2-004 and M2-005 require independent real-hardware evidence. Their summaries
 explicitly say it was not performed. Unit tests demonstrate mapping only; they
 do not demonstrate the final signed application's event-tap identity,
 permission, callback latency or cleanup behavior.
+
+### M-3 — `SessionManager.closeAll` is not a terminal admission barrier
+
+`closeAll` clears its dictionaries and then awaits each session close. Actor
+reentrancy permits a new `register` during those awaits, so the method may
+return with a newly registered live session. Define whether shutdown/recovery
+closes the admission gate; if it does, add a stopped phase and a concurrent
+register-vs-close test.
+
+### M-4 — Session readiness is not enforced by registration or activation
+
+`SessionManager.register` accepts idle or closed `ServerSession` values, and
+`activate` checks only screen registration. Tests intentionally register idle
+sessions. The composition owner must either prove start-before-register as an
+invariant or the manager must reject sessions that are not ready; otherwise a
+registered screen can be selected without a usable protocol session.
 
 ## Low findings
 
@@ -171,8 +224,12 @@ returned to the author.
    cancelledQueuedWriterDoesNotSend`: **exit 1**; build succeeded and the
    single reviewer probe failed with two issues: no cancellation error and a
    stale key-up was sent.
-5. `git status --short --branch`: clean branch after removing both temporary
+5. `git status --short --branch`: clean branch after removing all temporary
    probe changes.
+6. `swift test --disable-sandbox --package-path Packages/KVMCore --filter
+   concurrentRecoverAllWaitsForLocalRecovery`: **exit 1**; build succeeded and
+   the reviewer probe failed with two issues: disposition was `.notRequired`
+   and the local-first hook observed incomplete recovery.
 
 The temporary probes were review instrumentation only, were never committed,
 and were removed immediately after execution. Their required final form is an
@@ -192,10 +249,12 @@ These passes do not override the open High findings or missing Tier-H evidence.
 
 ## Remaining risks and next gate
 
-The review is incomplete for the remaining session manager, routing,
-suppression and fail-safe interactions. Claude OAuth currently returns
+The review has now covered the principal session manager, routing, suppression
+and fail-safe interactions, but final composition and live behavior remain
+unavailable. Claude OAuth currently returns
 `401 OAuth access token has expired`, so the designated implementation author
 cannot receive these fixes yet. Resume the same Claude session only after
-successful re-authentication; then require RED→GREEN fixes for H-2/H-3/H-4,
-formalize H-1/H-5/H-6 in the backlog, rerun `make verify`, and repeat this
-independent review before any PR is made Ready.
+successful re-authentication; then require RED→GREEN fixes for H-2/H-3/H-4/H-7,
+resolve H-8 before effect execution, formalize H-1/H-5/H-6 in the backlog,
+rerun `make verify`, and repeat this independent review before any PR is made
+Ready.
