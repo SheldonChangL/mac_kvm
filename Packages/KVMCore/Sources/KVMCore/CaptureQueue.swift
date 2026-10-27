@@ -146,7 +146,7 @@ package final class CaptureQueue: @unchecked Sendable {
           let arrivals = consumerArrivals
           consumerArrivals = []
           lock.unlock()
-          arrivals.forEach { $0.resume() }
+          for arrival in arrivals { arrival.resume() }
         }
       } onCancel: {
         let waiting = lock.withLock {
