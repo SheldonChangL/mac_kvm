@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-057",
+  "githubIssue": 65,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/65",
+  "branch": "codex/m1-057-trust-policy",
+  "parentCommit": "496551632a4667511c384bede29a6043e1aa4c7e",
+  "parentCommitNote": "Merge commit of PR #323 (M1-056), the parent of the implementation commit in branch history; full hash reported by the Codex root reviewer.",
+  "implementationCommits": [
+    {
+      "commit": "848eb62c20972bc8f9bcec9af1edd4a26c9788ac",
+      "role": "implementation",
+      "subject": "feat(mac-platform): add trust policy state machine"
+    },
+    {
+      "commit": "c423e4991df67caec277cc97a3b940c4879617e1",
+      "role": "formatting follow-up",
+      "subject": "style(mac-platform): format trust policy tests",
+      "note": "Whitespace-only change to TrustPolicyTests.swift resolving the swift-format AddLines/Indentation finding at lines 305-307."
+    }
+  ],
+  "finalImplementationHead": "c423e4991df67caec277cc97a3b940c4879617e1",
+  "implementationFiles": [
+    "Packages/MacPlatform/Sources/MacPlatform/TrustPolicy.swift",
+    "Packages/MacPlatform/Tests/MacPlatformTests/TrustPolicyTests.swift",
+    "docs/components/M1-057-trust-policy.md"
+  ],
+  "implementationFilesNote": "The issue's Exact Files; together with this evidence package they are the full scope.",
+  "evidenceCommit": null,
+  "evidenceCommitNote": "The evidence commit has not been created yet; no hash is recorded.",
+  "status": "implementation_head_verified",
+  "statusNote": "Commands 1-8 were run by the Codex root reviewer on 2026-10-27 at the final implementation head and all exited 0. Repository-wide make verify, the evidence commit, a final-head make verify, GitHub CI, PR review comment and merge are pending. Claude Opus authored this file using only Read, Grep, Glob and Write and executed none of the recorded commands.",
+  "authorship": {
+    "repositoryContentAuthor": "Claude Opus",
+    "reviewer": "Codex root reviewer",
+    "detail": "Claude Opus authored the source, tests, component document and evidence. The Codex root reviewer executed every recorded command, performed the non-author five-axis review, and drove the workflow. No human or independent external review is claimed.",
+    "authorUsed": ["Read", "Grep", "Glob", "Edit", "Write"],
+    "authorDidNot": [
+      "run any build, test, validation or formatter command",
+      "run any git mutation, including commit, stage or push",
+      "open or merge a pull request",
+      "run any network or runtime verification"
+    ]
+  },
+  "commandsCommit": "c423e4991df67caec277cc97a3b940c4879617e1",
+  "timestampNote": "UTC timestamps at millisecond resolution as reported by the reviewer; commands 1-8 ran back to back on 2026-10-27.",
+  "requiredCommands": [
+    {
+      "id": 1,
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "startedAt": "2026-10-27T00:11:44.586Z",
+      "endedAt": "2026-10-27T00:11:53.784Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "framework": "Swift Testing",
+        "testsPassed": 172,
+        "failures": 0,
+        "skipped": null,
+        "skippedNote": "Existing opt-in manual Tier-H probes were skipped; the reviewer did not report the exact skipped count, so none is recorded."
+      },
+      "report": "tests/results.json"
+    },
+    {
+      "id": 2,
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build",
+      "form": "shell-equivalent",
+      "formNote": "The issue quotes 'platform=macOS'; the quotes do not change the argument passed to xcodebuild.",
+      "startedAt": "2026-10-27T00:11:53.785Z",
+      "endedAt": "2026-10-27T00:12:00.972Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "BUILD SUCCEEDED"
+    },
+    {
+      "id": 3,
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "startedAt": "2026-10-27T00:12:00.972Z",
+      "endedAt": "2026-10-27T00:12:01.109Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "id": 4,
+      "command": "make architecture-check",
+      "form": "exact",
+      "startedAt": "2026-10-27T00:12:01.109Z",
+      "endedAt": "2026-10-27T00:12:02.483Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK"
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "id": 5,
+      "command": "make docs-check",
+      "startedAt": "2026-10-27T00:12:02.484Z",
+      "endedAt": "2026-10-27T00:12:02.741Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "docs check OK"
+    },
+    {
+      "id": 6,
+      "command": "git diff --check 496551632a4667511c384bede29a6043e1aa4c7e HEAD",
+      "commandNote": "HEAD was the final implementation head c423e4991df67caec277cc97a3b940c4879617e1, so the range covers both implementation commits.",
+      "startedAt": "2026-10-27T00:12:02.741Z",
+      "endedAt": "2026-10-27T00:12:02.814Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "no output"
+    },
+    {
+      "id": 7,
+      "command": "make code-quality-check",
+      "startedAt": "2026-10-27T00:12:02.814Z",
+      "endedAt": "2026-10-27T00:12:10.670Z",
+      "exitCode": 0,
+      "status": "passed",
+      "subSteps": [
+        { "name": "swift-format-version", "version": "6.2.3" },
+        { "name": "swift-format-lint-strict", "exitCode": 0 },
+        { "name": "swift-test-warnings-as-errors", "exitCode": 0 }
+      ]
+    },
+    {
+      "id": 8,
+      "command": "swift build --package-path Packages/MacPlatform -c release",
+      "startedAt": "2026-10-27T00:12:10.670Z",
+      "endedAt": "2026-10-27T00:12:14.916Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Build complete"
+    }
+  ],
+  "repositoryVerifyCommands": [],
+  "repositoryVerifyCommandsNote": "make verify has not yet been recorded for M1-057; it is pending at the evidence commit and again at the final head.",
+  "debugHistory": [
+    {
+      "phase": "earlier final-evidence attempt",
+      "commit": "848eb62c20972bc8f9bcec9af1edd4a26c9788ac",
+      "acceptedAsEvidence": false,
+      "commandsPassed": [1, 2, 3, 4, 5, 6],
+      "commandFailed": 7,
+      "cause": "swift-format reported AddLines/Indentation at Packages/MacPlatform/Tests/MacPlatformTests/TrustPolicyTests.swift lines 305-307",
+      "note": "Command 8 is not recorded for this attempt."
+    },
+    {
+      "phase": "formatting fix",
+      "acceptedAsEvidence": false,
+      "detail": "Claude Opus made a whitespace-only Edit; the Codex root reviewer reproduced lint success and committed c423e4991df67caec277cc97a3b940c4879617e1."
+    },
+    {
+      "phase": "full rerun at final implementation head",
+      "commit": "c423e4991df67caec277cc97a3b940c4879617e1",
+      "acceptedAsEvidence": true,
+      "note": "The entire 8-command set above was rerun and all commands exited 0."
+    }
+  ],
+  "tddHistory": [
+    {
+      "phase": "RED",
+      "acceptedAsEvidence": true,
+      "status": "failed",
+      "cause": "TrustPolicyState, TrustPolicyDecision and TrustPolicy did not exist; no other failure"
+    },
+    {
+      "phase": "GREEN after implementation",
+      "acceptedAsEvidence": true,
+      "status": "passed",
+      "note": "Superseded by command 1."
+    }
+  ],
+  "completed": [
+    { "item": "final implementation head commands 1-8", "status": "passed", "commit": "c423e4991df67caec277cc97a3b940c4879617e1" }
+  ],
+  "pending": [
+    { "item": "repository-wide make verify", "status": "pending" },
+    { "item": "evidence commit", "status": "pending" },
+    { "item": "make verify at the final head", "status": "pending" },
+    { "item": "GitHub CI at the final pushed head", "status": "pending" },
+    { "item": "pull request review comment", "status": "pending" },
+    { "item": "merge by an authorized reviewer", "status": "pending" }
+  ],
+  "manualVerification": { "required": false, "performed": false },
+  "authorCommandAttempts": [],
+  "authorCommandAttemptsNote": "The author attempted none of the recorded commands, so no author command result exists or is claimed.",
+  "protectedArtifacts": {
+    "paths": ["MacKVM_M1-001_unblock.zip", "mackvm-unblock/"],
+    "readModifiedStagedOrCommitted": false
+  },
+  "reviewHistory": "tests/review-findings.json"
+}

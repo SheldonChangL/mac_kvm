@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-057",
+  "githubIssue": 65,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/65",
+  "commit": "c423e4991df67caec277cc97a3b940c4879617e1",
+  "commitNote": "Final implementation head.",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used only Read, Grep, Glob, Edit and Write and ran no build, test, validation or verification command.",
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-10-27T00:11:44.586Z",
+  "endedAt": "2026-10-27T00:11:53.784Z",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "framework": "Swift Testing",
+    "testsPassed": 172,
+    "failures": 0,
+    "skipped": null,
+    "skippedNote": "Existing opt-in manual Tier-H probes were skipped; the reviewer did not report the exact skipped count, so none is recorded.",
+    "note": "172 is the full MacPlatform package total as reported; it is not an M1-057 function count."
+  },
+  "m1057DeclaredTests": {
+    "file": "Packages/MacPlatform/Tests/MacPlatformTests/TrustPolicyTests.swift",
+    "testFunctions": 28,
+    "parameterized": [
+      {
+        "function": "wrongLengthPresentedFingerprintIsRejectedInEveryState",
+        "arguments": [0, 1, 16, 20, 31, 33, 48, 64, 95, 4096]
+      },
+      {
+        "function": "trustedStateWithAWrongLengthStoredFingerprintIsRejected",
+        "arguments": [0, 1, 16, 20, 31, 33, 48, 64, 95, 4096]
+      }
+    ],
+    "note": "Counted by source reading. The reviewer did not report per-file pass counts.",
+    "coverage": {
+      "stateDecisionTable": [
+        "fullStateDecisionTable",
+        "digestLengthUsedByThePolicyIsThirtyTwoBytes"
+      ],
+      "happyPath": [
+        "unknownIdentityPromptsAndIsNeverAllowed",
+        "trustedIdentityWithTheSameFingerprintIsAllowed",
+        "trustedMatchComparesBytesNotStorage",
+        "dataSlicesWithNonZeroStartIndicesAreHandled"
+      ],
+      "boundaryAndLimit": [
+        "exactlyThirtyTwoBytesIsTheOnlyAcceptedLength"
+      ],
+      "invalidInputAndFailClosed": [
+        "wrongLengthPresentedFingerprintIsRejectedInEveryState",
+        "trustedStateWithAWrongLengthStoredFingerprintIsRejected",
+        "emptyStoredAndEmptyPresentedDoNotMatch",
+        "concatenatedDigestsDoNotMatchByPrefixOrSuffix",
+        "displayTextIsNotAcceptedAsAFingerprint"
+      ],
+      "identityChanged": [
+        "flippingAnySingleBitOfThePresentedFingerprintIsAnIdentityChange",
+        "flippingAnySingleBitOfTheStoredFingerprintIsAnIdentityChange",
+        "firstAndLastByteChangesAreIdentityChanges",
+        "reorderedBytesAreAnIdentityChange",
+        "oneBitChangesDoNotAlterUnknownOrRevokedOutcomes"
+      ],
+      "noAutoAcceptAndRevocation": [
+        "allowAndPromptAreReachableOnlyThroughTheirOwnRows",
+        "rejectionsUseOnlyTheTableCodes",
+        "revocationCannotBeBypassedByAnyValidFingerprint"
+      ],
+      "closedTypes": [
+        "decisionAndStateCaseSetsAreClosed",
+        "valueTypesAreEquatableAndSendable"
+      ],
+      "determinismIdempotencyAndConcurrency": [
+        "repeatedCallsReturnTheSameDecision",
+        "earlierCallsDoNotChangeLaterDecisions",
+        "rejectionsDoNotPoisonLaterCalls",
+        "decidingDoesNotMutateTheCallersInputs",
+        "concurrentCallsAgreeWithSerialCalls"
+      ],
+      "privacy": [
+        "decisionsForDifferentFingerprintsAreIndistinguishable"
+      ]
+    },
+    "bitFlipCoverage": {
+      "presentedFingerprintFlips": 256,
+      "storedFingerprintFlips": 256,
+      "note": "32 bytes x 8 bits, each expected to reject identityChanged."
+    },
+    "cancelCleanup": {
+      "applicable": false,
+      "reason": "decide is a pure synchronous function over two caller-owned values and owns no task, stream, socket, file, timer, lock or stored state. Documented in the component doc and test file; idempotency and concurrency are covered by the determinism, non-poisoning, input-immutability and concurrency tests."
+    }
+  },
+  "issueTestRequirements": {
+    "happyPath": { "met": true, "tests": "happyPath" },
+    "boundaryOrLimit": { "met": true, "tests": "boundaryAndLimit" },
+    "invalidInputOrFailure": { "met": true, "tests": "invalidInputAndFailClosed" },
+    "cancelCleanupIdempotency": { "met": true, "tests": "determinismIdempotencyAndConcurrency", "note": "Cancel/cleanup not applicable; idempotency covered." },
+    "failClosed": { "met": true, "tests": ["invalidInputAndFailClosed", "noAutoAcceptAndRevocation"] },
+    "identityFingerprintChangedOrInvalid": { "met": true, "tests": ["identityChanged", "invalidInputAndFailClosed"] }
+  },
+  "fixedVectors": {
+    "source": "Published FIPS 180-2 SHA-256 vectors transcribed byte by byte in TrustPolicyTests.swift; not computed by code under test.",
+    "vectors": [
+      { "name": "fingerprintA", "input": "ASCII \"abc\" (FIPS 180-2 B.1)", "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" },
+      { "name": "fingerprintB", "input": "56-byte FIPS 180-2 B.2 message", "sha256": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1" }
+    ],
+    "synthetic": [
+      "distinctiveFingerprint: 32 bytes of 0xC7",
+      "all-0x00 and all-0xFF 32-byte values",
+      "resized, bit-flipped, reversed, rotated and concatenated variants of the vectors",
+      "UTF-8 display text of fingerprintA in upper, lower and bare-hex form"
+    ]
+  },
+  "focusMapping": {
+    "unknownPromptTrustedAllowChangedRevokedReject": {
+      "implementation": "TrustPolicy.decide switches over TrustPolicyState: unknown -> prompt; trusted with equal bytes -> allow, otherwise reject(identityChanged); revoked -> reject(identityRevoked)",
+      "tests": ["stateDecisionTable", "happyPath", "identityChanged", "noAutoAcceptAndRevocation"]
+    },
+    "decisionIsATestablePureFunction": {
+      "implementation": "Caseless enum TrustPolicy with one static function; no stored state, clock, randomness, global mutable state or I/O",
+      "tests": ["determinismIdempotencyAndConcurrency", "closedTypes"]
+    },
+    "noAutoAccept": {
+      "implementation": "allow only from a trusted state with valid equal fingerprints; wrong-length stored or presented data rejects trustRejected before comparison; prompt is not acceptance and nothing is learned between calls",
+      "tests": ["noAutoAcceptAndRevocation", "invalidInputAndFailClosed", "determinismIdempotencyAndConcurrency"]
+    }
+  },
+  "tdd": {
+    "redRunRecorded": true,
+    "runs": [
+      { "phase": "RED", "status": "failed", "cause": "TrustPolicyState, TrustPolicyDecision and TrustPolicy did not exist; no other failure" },
+      { "phase": "GREEN after implementation", "status": "passed" }
+    ],
+    "note": "History only; superseded by the final run above. All runs were by the Codex root reviewer."
+  },
+  "privacy": "No real certificate bytes, real peer fingerprint, secret, credential or private key is recorded in this evidence."
+}
