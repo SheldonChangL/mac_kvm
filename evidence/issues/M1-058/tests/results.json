@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-058",
+  "githubIssue": 69,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/69",
+  "commit": "5c87ba53a45d3312c282b41702138522b36e3c57",
+  "commitNote": "Implementation commit (final implementation head). Evidence commit 9137ab23fad2f52a7cf959e06155e6e7b87d8af4; repository-wide make verify passed there (24/24 gates, see ../commands.json command 9). Final-head make verify pending.",
+  "source": "Codex root reviewer run, transcribed by Claude Opus, who used file tools and ran no build, test, validation or verification command; Claude's only shell command was one accidental inert `echo skip` (no repository read/write, no evidence; see ../commands.json authorship.authorInertCommand).",
+  "files": [
+    {
+      "path": "Packages/MacPlatform/Sources/MacPlatform/KeychainTrustStore.swift",
+      "sha256": "5b411a659e45866917a5dbb86cff759550a7da73ade072ac133dfa72733bfa09"
+    },
+    {
+      "path": "Packages/MacPlatform/Tests/MacPlatformTests/KeychainTrustStoreTests.swift",
+      "sha256": "0c6eaa9ff3bc479018f7381cd74cc9ebffee10088286f312acdf85f2012d4729"
+    }
+  ],
+  "command": "swift test --package-path Packages/MacPlatform",
+  "startedAt": "2026-10-27T06:21:00Z",
+  "endedAt": "2026-10-27T06:21:02Z",
+  "exitCode": 0,
+  "status": "passed",
+  "suite": {
+    "framework": "Swift Testing",
+    "build": "Build complete 0.53s",
+    "testsPassed": 228,
+    "failures": 0,
+    "duration": "0.027s",
+    "skipped": 4,
+    "skippedNote": "Four pre-existing/opt-in Tier-H probes skipped in the ordinary run, including manualKeychainProbeRunsTheRealFirstUseRoundTrip. Manual evidence is recorded separately below.",
+    "note": "228 is the full MacPlatform package total as reported; it is not an M1-058 function count."
+  },
+  "warningsAsErrorsRun": {
+    "command": "make code-quality-check",
+    "exitCode": 0,
+    "note": "Includes strict swift-format lint and Swift tests with warnings as errors (command 7)."
+  },
+  "m1058DeclaredTests": {
+    "file": "Packages/MacPlatform/Tests/MacPlatformTests/KeychainTrustStoreTests.swift",
+    "testDeclarations": 56,
+    "fileLines": 1785,
+    "note": "Declaration count from source; categories below are assigned by test name from source reading. The reviewer did not report per-file pass counts. Parameterized tests are counted once.",
+    "coverage": {
+      "closedTypesAndProductionSeam": [
+        "firstUseTypesAreClosedEquatableAndSendable",
+        "productionInitializerTakesNoArgumentsAndIsNeverCalledHere"
+      ],
+      "queryContract": [
+        "productionServiceIsAFixedVersionedIdentifier",
+        "accountIsTheCanonicalLowercasedDeviceUUID",
+        "readQueryAsksTheDataProtectionKeychainForExactlyOneDataResult",
+        "addQueryStoresOnlyTheRawDigestAsThisDeviceOnlyWhenUnlocked",
+        "deleteQueryAddressesOnlyTheOneRecord"
+      ],
+      "storeHappyPathAndBoundary": [
+        "loadReportsAMissingRecordAsNilNotAsAFailure",
+        "loadReturnsTheStoredBytesUnchanged",
+        "insertAddsTheFingerprintWhenNoRecordExists",
+        "insertNeverOverwritesAnExistingRecord",
+        "insertRefusesAWrongLengthFingerprintWithoutKeychainIO",
+        "storeAddressesOnlyTheCanonicalAccountOfTheGivenDevice"
+      ],
+      "cleanupIdempotency": [
+        "removeIsIdempotentAndTreatsAMissingRecordAsSuccess",
+        "removeClearsAnUnreadableRecord"
+      ],
+      "firstUseDecisionTable": [
+        "fullFirstUseEvaluationTable",
+        "fullOwnerApplicationTable",
+        "missingRecordPromptsAndPromptingNeverPersists",
+        "sameStoredFingerprintAllowsByContentNotStorage"
+      ],
+      "identityChanged": [
+        "changedFingerprintRejectsAndLeavesTheRecord",
+        "everySingleBitChangeOfThePresentedFingerprintIsAnIdentityChange",
+        "everySingleBitChangeOfTheStoredFingerprintIsAnIdentityChange",
+        "everySingleBitChangeOnDuplicateTrustRejectsAndKeepsTheRecord",
+        "duplicateTrustWithADifferentFingerprintRejectsAndKeepsTheOriginal"
+      ],
+      "invalidInputAndBoundary": [
+        "malformedStoredValueRejectsEvenAgainstIdenticalBytes",
+        "invalidPresentedLengthRejectsWithoutKeychainIO",
+        "exactlyThirtyTwoBytesIsTheOnlyAcceptedLength",
+        "duplicateTrustWithAMalformedStoredValueRejects"
+      ],
+      "explicitOwnerDecision": [
+        "explicitRejectRejectsAndNeverWrites",
+        "explicitTrustInsertsOnceAndLaterEvaluationAllows",
+        "duplicateTrustWithTheSameFingerprintAllowsWithoutRewriting"
+      ],
+      "storageErrorFailClosed": [
+        "duplicateWhoseRecordVanishedFailsClosedWithoutRetrying",
+        "duplicateWhoseRecordCannotBeReadFailsClosed",
+        "addFailurePropagatesFailClosedWithoutRetrying",
+        "operationOrderingIsFixed",
+        "readFailureMapsToSecureStorageUnavailableWithOnlyTheStatus",
+        "deleteFailureMapsToSecureStorageUnavailableAndKeepsTheRecord",
+        "interactionAndAuthenticationFailuresNeedAPersonAndOthersNeverRetry",
+        "readSuccessWithoutDataFailsClosed",
+        "aFailureDoesNotPoisonLaterCalls"
+      ],
+      "privacyAndInputs": [
+        "failuresCarryNoDeviceOrFingerprintPayload",
+        "outcomesForDifferentFingerprintsAreIndistinguishable",
+        "callerInputsAreNotMutatedAndSlicesAreStoredByContent"
+      ],
+      "concurrencyAndActor": [
+        "keychainOperationsRunOffTheCallersMainActor",
+        "concurrentTrustOfTheSameFingerprintInsertsExactlyOnce",
+        "concurrentTrustOfCompetingFingerprintsHasExactlyOneWinner",
+        "concurrentEvaluationsAgreeWithSerialEvaluations"
+      ],
+      "cancellation": [
+        "cancellationBeforeStartPerformsNoKeychainIO",
+        "cancelledExplicitRejectNeverAllowsOrWrites",
+        "cancellingDuringTheOwnersAddReportsTheAddsRealResult"
+      ],
+      "manualHarness": [
+        "manualKeychainProbeSelectionFailsClosedAndIsSkippedByDefault",
+        "manualKeychainProbeSequenceProducesTheExpectedClosedResultOnAFake",
+        "manualKeychainProbeCleansUpOnEveryFailurePath",
+        "manualKeychainProbeOutputIsClosedVocabularyOnly",
+        "onlyTheTierHLiveRegionNamesTheProductionKeychainSeam",
+        "manualKeychainProbeRunsTheRealFirstUseRoundTrip"
+      ]
+    },
+    "coverageNote": "manualKeychainProbeRunsTheRealFirstUseRoundTrip is the opt-in Tier-H test, skipped in the ordinary run. The other five manualHarness tests run against fakes or source text."
+  },
+  "issueTestRequirements": {
+    "happyPath": { "met": true, "tests": ["storeHappyPathAndBoundary", "explicitOwnerDecision", "firstUseDecisionTable"] },
+    "boundaryOrLimit": { "met": true, "tests": ["invalidInputAndBoundary", "storeHappyPathAndBoundary"] },
+    "invalidInputOrFailure": { "met": true, "tests": ["invalidInputAndBoundary", "storageErrorFailClosed"] },
+    "cancelCleanupIdempotency": { "met": true, "tests": ["cancellation", "cleanupIdempotency", "manualHarness"] },
+    "failClosed": { "met": true, "tests": ["storageErrorFailClosed", "invalidInputAndBoundary"] },
+    "identityFingerprintChangedOrInvalid": { "met": true, "tests": ["identityChanged", "invalidInputAndBoundary"] }
+  },
+  "focusMapping": {
+    "trustRecordNotInUserDefaultsOrPlist": {
+      "implementation": "One generic-password item per DeviceID in the data-protection Keychain; fixed versioned service; canonical lowercase UUID account; synchronizable false; WhenUnlockedThisDeviceOnly; raw 32-byte digest only",
+      "tests": ["queryContract", "storeHappyPathAndBoundary"],
+      "manual": "signed real-Keychain probe passed (manual.md)"
+    },
+    "firstUseDecisionFromUIOrOwner": {
+      "implementation": "evaluate returns prompt with no write; only apply(ownerDecision: trust) inserts; explicit reject returns trustRejected with no write",
+      "tests": ["firstUseDecisionTable", "explicitOwnerDecision", "cancellation"],
+      "manual": "absent=prompt, explicitReject=reject.trustRejected, afterReject=prompt, explicitTrust=allow"
+    },
+    "keychainErrorDiagnosableAndFailClosed": {
+      "implementation": "Storage failures map to security.secureStorageUnavailable with only numeric OSStatus as UnderlyingDiagnosticCode; no logging",
+      "tests": ["storageErrorFailClosed", "privacyAndInputs"],
+      "manual": "diagnostic attempts D-1 and D-3 failed closed with secureStorageUnavailable (not acceptance passes)"
+    },
+    "successBoundaryErrorCancellationCleanupTests": {
+      "tests": ["storeHappyPathAndBoundary", "invalidInputAndBoundary", "storageErrorFailClosed", "cancellation", "cleanupIdempotency", "concurrencyAndActor"]
+    }
+  },
+  "manualProbe": {
+    "status": "passed",
+    "separateFromPackageRun": true,
+    "operator": "human Product Owner",
+    "reviewer": "Codex root reviewer (non-author, non-executing)",
+    "output": "M1-058 manual probe: action=keychain-first-use-round-trip initialCleanup=removed absent=prompt explicitReject=reject.trustRejected afterReject=prompt explicitTrust=allow same=allow changed=reject.identityChanged finalCleanup=removed afterCleanup=absent",
+    "exitCode": 0,
+    "executableSha256": "24da7eb60eef795e3cb59934de7a32975dbc945200edf5f79aaca0d353b11029",
+    "cleanupVerified": true,
+    "buildProvenance": "Not a test result. The final signed probe executable was built outside the repository by linking the temporary probe main source with the production MacPlatform object files for KeychainTrustStore, TrustPolicy, CertificateFingerprint, CoreErrors and DomainIdentifiers produced at implementation commit 5c87ba53a45d3312c282b41702138522b36e3c57.",
+    "detail": "../manual.md"
+  },
+  "tdd": {
+    "redRunRecorded": true,
+    "runs": [
+      { "phase": "RED", "status": "failed", "cause": "KeychainTrustStore, KeychainTrustStoreEnvironment, FirstUseTrustCoordinator, FirstUseOwnerDecision, FirstUseTrustOutcome, KeychainTrustInsertOutcome and KeychainItemReadReply did not exist; secondary inference failures were cascades" },
+      { "phase": "GREEN after implementation", "status": "passed", "testsPassed": 228 }
+    ],
+    "note": "History only; superseded by the final run above. All runs were by the Codex root reviewer."
+  },
+  "privacy": "No real peer fingerprint, certificate, secret, credential, private key, synthetic DeviceID or Keychain account value is recorded in this evidence."
+}

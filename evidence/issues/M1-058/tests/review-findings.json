@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-058",
+  "githubIssue": 69,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/69",
+  "commit": "5c87ba53a45d3312c282b41702138522b36e3c57",
+  "commitNote": "Implementation commit (final implementation head). Evidence commit 9137ab23fad2f52a7cf959e06155e6e7b87d8af4.",
+  "reviewer": "Codex root reviewer",
+  "author": "Claude Opus",
+  "manualProbeOperator": "human Product Owner",
+  "currentFindings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "lowOpenNonBlocking": 4,
+    "resolved": 1
+  },
+  "findings": [
+    {
+      "id": "FMT-1",
+      "severity": null,
+      "severityNote": "Recorded as a code-quality gate failure; no severity level was assigned.",
+      "status": "resolved",
+      "blocking": false,
+      "followUpRequired": false,
+      "summary": "The first make code-quality-check attempt failed on strict swift-format LineLength at 11 lines in KeychainTrustStoreTests.swift.",
+      "resolution": "Whitespace/line-wrap-only edits by Claude Opus with no behavior change; the Codex root reviewer reran the strict gate successfully (command 7 exit 0)."
+    },
+    {
+      "id": "L-1",
+      "severity": "low",
+      "status": "open",
+      "blocking": false,
+      "followUpRequired": false,
+      "summary": "The production data-protection Keychain requires a correctly signed/provisioned host. Unsigned or entitlement-less tools fail closed; deployment signing is outside this issue. Manual evidence proves the signed path and negative paths."
+    },
+    {
+      "id": "L-2",
+      "severity": "low",
+      "status": "open",
+      "blocking": false,
+      "followUpRequired": false,
+      "summary": "removeFingerprint intentionally ignores pre-start cancellation because cleanup withdraws trust; documented and tested, but integrators must not treat cleanup failure as success."
+    },
+    {
+      "id": "L-3",
+      "severity": "low",
+      "status": "open",
+      "blocking": false,
+      "followUpRequired": false,
+      "summary": "Prompt UI, TLS wiring and re-pair/revocation workflows are out of scope and remain follow-on integration. Callers must never map .prompt to accept."
+    },
+    {
+      "id": "L-4",
+      "severity": "low",
+      "status": "open",
+      "blocking": false,
+      "followUpRequired": false,
+      "summary": "The test file is large (1785 lines, 56 declarations), increasing maintenance cost, but it is deterministic, partitioned, strict-lint clean and provides exhaustive security/race/manual-harness coverage. No follow-up issue required during M1 unless maintainability degrades."
+    }
+  ],
+  "blockers": [],
+  "finalReview": {
+    "reviewer": "Codex root reviewer",
+    "kind": "non-author Codex five-axis/security review; non-executing reviewer of the human-executed manual probe; not a second independent external engineer review",
+    "distinctFromAuthor": true,
+    "distinctFromManualOperator": true,
+    "humanReview": false,
+    "independentExternalReview": false,
+    "reviewedCommits": ["5c87ba53a45d3312c282b41702138522b36e3c57"],
+    "evidenceCommit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+    "evidenceCommitStatus": "created",
+    "repositoryVerify": "passed at the evidence commit (24/24 gates, normal macOS execution permissions); final-head make verify pending",
+    "repositoryVerifyDiagnostic": "An earlier restricted-host attempt at the same commit failed code-quality because SwiftPM could not apply its own macOS sandbox (sandbox_apply: Operation not permitted); host-environment diagnostic, not a product failure, superseded and not acceptance evidence.",
+    "githubCI": "pending",
+    "axes": {
+      "sourceValidityAndTraceability": "pass; issue #69, C-009, Frozen Decisions (Keychain, fail-closed), Security Baseline and Architecture Guardrails consistent; canonical §60–64 has no contradictory Keychain/trust text; M1-057 merged; uses TrustPolicy and CertificateFingerprint.sha256DigestLength",
+      "productAndArchitecture": "pass; native Swift; package/internal only, no public API; Protocol/Core/Input/Barrier untouched; Exact Files plus evidence only; architecture check OK",
+      "securityFailSafeCompatibility": "pass; Keychain schema, ThisDeviceOnly/non-sync, insert-only/no update, explicit owner decision, no auto-accept, full-length validation before state/I/O, whole Data equality, malformed/changed reject, duplicate/race handling, cancellation semantics, OSStatus-only diagnostics, no logs, signed real-Keychain run with cleanup",
+      "testsValidationAcceptance": "pass at implementation head; 56 @Test declarations; 228 package tests passed; human-executed signed real-Keychain probe passed and verified by non-executing reviewer; commands 1-8 exit 0; repository-wide make verify passed 24/24 at evidence commit 9137ab2; final-head make verify and GitHub CI pending",
+      "scopeHygieneRollback": "pass; three Exact Files plus evidence; git diff --check clean; protected owner artifacts untouched; rollback removes existing M1-058 Keychain records via owner-driven removeFingerprint before reverting, using a build that still contains it, then reverts implementation/evidence; after revert unremoved records are inert but the removal API is no longer available; fixed probe record already absent (removed and verified)"
+    },
+    "detail": "../security-review.md"
+  }
+}

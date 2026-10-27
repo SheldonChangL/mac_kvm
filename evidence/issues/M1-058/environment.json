@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-058",
+  "githubIssue": 69,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/69",
+  "date": "2026-10-27",
+  "timezone": "Asia/Taipei",
+  "implementationCommit": "5c87ba53a45d3312c282b41702138522b36e3c57",
+  "implementationCommitNote": "Commit at which commands 1-8 ran. The manual probe app was built outside the repository from a temporary probe source identified by probeSourceSha256; see manualVerification.buildProvenance.",
+  "evidenceCommit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+  "evidenceCommitStatus": "created",
+  "evidenceCommitNote": "Repository-wide make verify (command 9) passed at this commit in normal macOS execution permissions; see repositoryVerify. This metadata update is a later commit, so make verify at the final head is pending.",
+  "source": "Codex root reviewer and human Product Owner runs, transcribed by Claude Opus. Only non-sensitive facts are recorded; no serial number, hardware UUID, UDID, profile UUID, Apple ID or certificate private data is included.",
+  "timestamps": {
+    "firstCommandStartedAt": "2026-10-27T06:21:00Z",
+    "lastCommandEndedAt": "2026-10-27T06:21:45Z",
+    "timezone": "UTC",
+    "note": "Span of commands 1-8 at the implementation commit."
+  },
+  "repositoryVerify": {
+    "command": "make verify",
+    "commit": "9137ab23fad2f52a7cf959e06155e6e7b87d8af4",
+    "executionContext": "normal macOS execution permissions",
+    "status": "passed",
+    "reportStartedAt": "2026-10-27T06:30:26.453+00:00",
+    "reportEndedAt": "2026-10-27T06:32:07.914+00:00",
+    "gates": { "total": 24, "passed": 24, "failed": 0, "notRun": 0 },
+    "reportPath": "artifacts/ci/m1-008-report.json",
+    "reportSha256": "1604fbab0059b53c04e95b59ec71d56b9143ab5dd80afb260461427af53f8c6c",
+    "diagnostic": "An earlier restricted-host make verify attempt at the same commit failed the code-quality gate because SwiftPM could not apply its own macOS sandbox (sandbox_apply: Operation not permitted); a direct reproduction showed the same host restriction. It is a host-environment diagnostic, not a product failure, was superseded by the normal-permissions run and is not acceptance evidence.",
+    "note": "Final-head make verify is pending because this metadata update changes HEAD."
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "architecture": "arm64"
+  },
+  "hardware": {
+    "model": "MacBook Pro",
+    "modelIdentifier": "Mac16,7",
+    "chip": "Apple M4 Pro",
+    "cores": { "total": 14, "performance": 10, "efficiency": 4 },
+    "memory": "24 GB"
+  },
+  "toolchain": {
+    "swiftVersion": "Apple Swift 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDefaultTarget": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "xcodeVersion": "26.2",
+    "xcodeBuildVersion": "17C52",
+    "python": "3.9.6"
+  },
+  "manualVerification": {
+    "required": true,
+    "performed": true,
+    "status": "passed",
+    "operator": "human Product Owner",
+    "reviewer": "Codex root reviewer (non-author, non-executing)",
+    "platform": "local macOS data-protection Keychain; device unlocked during the run",
+    "observedLaunchAdjacentAt": "2026-10-27T06:19:50Z",
+    "observedLaunchAdjacentAtNote": "Launch-adjacent kernel event (2026-10-27T14:19:50+08:00); observed, not a user-supplied start time.",
+    "executableSha256": "24da7eb60eef795e3cb59934de7a32975dbc945200edf5f79aaca0d353b11029",
+    "probeSourceSha256": "05f5c0f4ddc88a3d78923d0d2323451e84d80f398fe9028a01f067002547dd4c",
+    "buildProvenance": "Not a test result. The final signed probe executable was built outside the repository by linking the temporary probe main source with the production MacPlatform object files for KeychainTrustStore, TrustPolicy, CertificateFingerprint, CoreErrors and DomainIdentifiers produced at implementation commit 5c87ba53a45d3312c282b41702138522b36e3c57.",
+    "signature": {
+      "certificateKind": "Apple Development",
+      "teamIdentifier": "4V223Y472D",
+      "bundleIdentifier": "com.sheldonchang.mackvm.m1-058-probe",
+      "hardenedRuntime": true,
+      "entitlements": ["application-identifier", "team-identifier", "get-task-allow", "keychain-access-groups"],
+      "entitlementsNote": "Exactly these entitlement keys; values not recorded.",
+      "codesignDeepStrictVerification": "passed"
+    },
+    "provisioningProfile": {
+      "name": "Mac Team Provisioning Profile: *",
+      "platform": "OSX",
+      "teamIdentifier": "4V223Y472D",
+      "applicationIdentifier": "wildcard",
+      "keychainAccessGroup": "wildcard",
+      "expires": "2027-10-27",
+      "containsCurrentMac": true,
+      "sha256": "e66f31721f63818100dfff1babab8b22767079b3619a8193eb74309ba780eecf",
+      "note": "Profile UUID and device UDID intentionally not recorded."
+    },
+    "authorization": "The human explicitly authorized use of the signing identity, creation of temporary macOS App ID/profile resources, and registration of the current Mac. The repository was never modified by the temporary signing work.",
+    "detail": "manual.md"
+  },
+  "network": {
+    "exercised": false,
+    "note": "The component and probe perform no network I/O."
+  },
+  "peer": {
+    "exercised": false,
+    "note": "No real TLS peer or peer fingerprint is used; the probe uses a fixed synthetic record."
+  },
+  "displayLayout": {
+    "applicable": false,
+    "note": "Not applicable to Keychain validation."
+  },
+  "keyboardLayout": {
+    "applicable": false,
+    "note": "Not applicable to Keychain validation."
+  }
+}
