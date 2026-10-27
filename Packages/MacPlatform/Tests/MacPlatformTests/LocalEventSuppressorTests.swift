@@ -98,21 +98,29 @@ struct LocalEventSuppressorTests {
     #expect(suppressor.decide(type: .mouseMoved, event: own) == .passThrough)
   }
 
-  @Test("concurrent enable and disable leave a consistent final state")
+  @Test("concurrent decisions observe enable and disable consistently")
   func concurrency() async throws {
     let suppressor = try makeSuppressor()
-    await withTaskGroup(of: Void.self) { group in
-      for index in 0..<64 {
-        group.addTask {
-          if index % 2 == 0 {
-            suppressor.enableSuppression()
-          } else {
-            suppressor.disableSuppression()
-          }
-        }
-      }
-    }
+    suppressor.enableSuppression()
+    let whileOn = await decideConcurrently(suppressor, count: 32)
+    #expect(whileOn.allSatisfy { $0 == .suppress })
     suppressor.disableSuppression()
-    #expect(!suppressor.isSuppressing)
+    let whileOff = await decideConcurrently(suppressor, count: 32)
+    #expect(whileOff.allSatisfy { $0 == .passThrough })
+  }
+}
+
+private func decideConcurrently(_ suppressor: LocalEventSuppressor, count: Int) async
+  -> [LocalEventSuppressor.Decision]
+{
+  await withTaskGroup(of: LocalEventSuppressor.Decision?.self) { group in
+    for _ in 0..<count {
+      group.addTask { (try? moveEvent()).map { suppressor.decide(type: .mouseMoved, event: $0) } }
+    }
+    var decisions: [LocalEventSuppressor.Decision] = []
+    for await decision in group {
+      decisions.append(decision ?? .failOpen)
+    }
+    return decisions
   }
 }
