@@ -11,6 +11,8 @@ private final class FakeTransport: Transport, @unchecked Sendable {
     case succeed
     case fail(CoreError)
     case hang
+    /// Ignores cancellation; returns only once `disconnect()` is called.
+    case hangUntilDisconnect
   }
 
   private let lock = NSLock()
@@ -33,6 +35,13 @@ private final class FakeTransport: Transport, @unchecked Sendable {
       return
     case .fail(let error):
       throw error
+    case .hangUntilDisconnect:
+      await withCheckedContinuation { continuation in
+        lock.withLock { hanging = continuation }
+      }
+      throw CoreError(
+        code: .transport(.disconnected), severity: .warning, retryDisposition: .never,
+        cleanupDisposition: .notRequired)
     case .hang:
       await withTaskCancellationHandler {
         await withCheckedContinuation { continuation in
@@ -55,7 +64,13 @@ private final class FakeTransport: Transport, @unchecked Sendable {
   func send(_ data: Data) async throws(CoreError) {}
 
   func disconnect() async {
-    lock.withLock { disconnects += 1 }
+    let waiting = lock.withLock {
+      disconnects += 1
+      let waiting = hanging
+      hanging = nil
+      return waiting
+    }
+    waiting?.resume()
     continuation.finish()
   }
 }
@@ -192,6 +207,19 @@ struct BarrierListenerTransportTests {
     await #expect(throws: BarrierListenerError.connectTimedOut) { try await attempt.value }
     #expect(slow.disconnectCount == 1)
     #expect(await listener.activeCount == 0)
+  }
+
+  @Test("timeout: a connect that ignores cancellation is forced to end by disconnect")
+  func nonCooperativeTimeout() async throws {
+    let clock = ManualClock()
+    let listener = BarrierListenerTransport(policy: try policy(1), clock: clock)
+    let stubborn = FakeTransport(.hangUntilDisconnect)
+    let attempt = Task { try await listener.admit(stubborn) }
+    await clock.waitForSleeper()
+    clock.fire()
+    await #expect(throws: BarrierListenerError.connectTimedOut) { try await attempt.value }
+    #expect(stubborn.disconnectCount == 1)
+    _ = try await listener.admit(FakeTransport())
   }
 
   @Test("stop disconnects admitted transports, is idempotent and rejects later connections")

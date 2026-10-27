@@ -64,7 +64,8 @@ actor BarrierListenerTransport {
   var activeCount: Int { admitted.count }
 
   /// Connects `transport` within the timeout and admits it, or disconnects it
-  /// and throws. The slot is reserved before connecting, so concurrent admits
+  /// and throws. The timeout holds even if the transport's `connect()` ignores
+  /// cancellation, because the transport is disconnected when the timeout wins. The slot is reserved before connecting, so concurrent admits
   /// cannot exceed the limit.
   func admit(_ transport: any Transport) async throws(BarrierListenerError)
     -> BarrierListenerAdmission
@@ -80,16 +81,16 @@ actor BarrierListenerTransport {
     pendingCount += 1
     let outcome = await connect(transport)
     pendingCount -= 1
-    let failure: BarrierListenerError? =
-      switch outcome {
-      case .connected: isStopped ? .stopped : nil
-      case .failed(let error): .connectFailed(error)
-      case .timedOut: .connectTimedOut
-      case .cancelled: .cancelled
+    switch outcome {
+    case .connected:
+      if isStopped {
+        await transport.disconnect()
+        throw .stopped
       }
-    if let failure {
-      await transport.disconnect()
-      throw failure
+    // `connect(_:)` has already disconnected the transport in these cases.
+    case .failed(let error): throw .connectFailed(error)
+    case .timedOut: throw .connectTimedOut
+    case .cancelled: throw .cancelled
     }
     nextIdentifier += 1
     let admission = BarrierListenerAdmission(identifier: nextIdentifier)
@@ -134,6 +135,11 @@ actor BarrierListenerTransport {
       }
       let first = await group.next() ?? .cancelled
       group.cancelAll()
+      if case .connected = first { return first }
+      // The task group waits for every child. Disconnecting here forces a
+      // connect that ignores cancellation to end, so the timeout really bounds
+      // the admission and the reserved slot is released.
+      await transport.disconnect()
       return first
     }
   }
