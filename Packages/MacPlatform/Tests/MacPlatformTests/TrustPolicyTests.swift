@@ -302,9 +302,10 @@ func trustedStateWithAWrongLengthStoredFingerprintIsRejected(length: Int) {
     flipping(fingerprintA, byte: 31, bit: 0),
     Data(), resized(fingerprintA, to: 31), resized(fingerprintA, to: 33),
   ]
-  let statePool = everyStateShape + [
-    .trusted(fingerprint: fingerprintB), .trusted(fingerprint: distinctiveFingerprint),
-  ]
+  let statePool =
+    everyStateShape + [
+      .trusted(fingerprint: fingerprintB), .trusted(fingerprint: distinctiveFingerprint),
+    ]
   for state in statePool {
     for presented in presentedPool {
       let decision = decide(state, presented)
