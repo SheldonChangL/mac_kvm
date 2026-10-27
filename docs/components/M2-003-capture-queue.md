@@ -12,7 +12,7 @@ declarations are `package`; no public API is added.
 | --- | --- |
 | `init?(capacity:)` | capacity `2...4096`; otherwise `nil` |
 | `enqueue(_:) -> CaptureEnqueueResult` | producer side; never awaits |
-| `next() async throws(CoreError) -> KVMEvent?` | single consumer |
+| `next() async throws(CoreError) -> KVMEvent?` | single consumer; a second concurrent caller fails with `internal.preconditionFailed` |
 | `drain(maximumCount:)` | synchronous batch removal |
 | `reset()`, `close()` | clear overflow latch / finish; idempotent |
 | `waitForPendingConsumer()` | test scheduling barrier, no sleep or polling |

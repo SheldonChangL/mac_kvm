@@ -142,6 +142,13 @@ package final class CaptureQueue: @unchecked Sendable {
             continuation.resume(throwing: Self.cancellationError)
             return
           }
+          // Single consumer: a second concurrent waiter must not replace the
+          // first, which would then never be resumed.
+          if consumer != nil {
+            lock.unlock()
+            continuation.resume(throwing: Self.secondConsumerError)
+            return
+          }
           consumer = continuation
           let arrivals = consumerArrivals
           consumerArrivals = []
@@ -208,6 +215,13 @@ package final class CaptureQueue: @unchecked Sendable {
     severity: .error,
     retryDisposition: .never,
     cleanupDisposition: .partial
+  )
+
+  private static let secondConsumerError = CoreError(
+    code: .internalFailure(.preconditionFailed),
+    severity: .error,
+    retryDisposition: .never,
+    cleanupDisposition: .notRequired
   )
 
   private static let cancellationError = CoreError(

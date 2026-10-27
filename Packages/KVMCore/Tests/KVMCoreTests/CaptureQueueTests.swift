@@ -125,6 +125,19 @@ struct CaptureQueueTests {
     #expect(try await received.value == keyDown)
   }
 
+  @Test("a second concurrent consumer is rejected and the first keeps waiting")
+  func secondConsumer() async throws {
+    let queue = try makeQueue(4)
+    let first = Task { try await queue.next() }
+    await queue.waitForPendingConsumer()
+    let precondition = CoreError(
+      code: .internalFailure(.preconditionFailed), severity: .error, retryDisposition: .never,
+      cleanupDisposition: .notRequired)
+    await #expect(throws: precondition) { try await queue.next() }
+    #expect(queue.enqueue(keyDown) == .enqueued)
+    #expect(try await first.value == keyDown)
+  }
+
   @Test("close finishes a waiting consumer and is idempotent")
   func closeIsIdempotent() async throws {
     let queue = try makeQueue(4)
