@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "issue": "M2-029-FOLLOWUP-001",
+  "branch": "codex/m2-mac-server-mvp",
+  "testedTreeParentCommit": "fe2ed63f5558aba382360a8aca148d5782f8ac25",
+  "note": "Run by the implementing agent (Claude Opus 5.5) on the uncommitted slice tree whose parent is testedTreeParentCommit; reviewer must rerun.",
+  "status": "author_run_pending_independent_review",
+  "commands": [
+    {
+      "command": "swift test --filter M2ServerControlPath",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:13+00:00",
+      "endedAt": "2026-10-27T08:46:20+00:00",
+      "summary": [
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "✔ Test run with 1 test in 1 suite passed after 0.001 seconds."
+      ]
+    },
+    {
+      "command": "make code-quality-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:20+00:00",
+      "endedAt": "2026-10-27T08:46:27+00:00",
+      "summary": [
+        "[swift-format-lint] exit=0 stdoutLines=0 stdoutSha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 stderrLines=0 stderrSha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "[swift-test-warnings-as-errors] exit=0 stdoutLines=268 stdoutSha256=a5bd4e586a50644897be64f9b18ffa2ff479ef0e94a764b0cc58a996c5e327d6 stderrLines=91 stderrSha256=4e4690fd9a3f222b23bfe273ad4ff90d15521e77c701f4c5c3ebe03ddfb0e7d7"
+      ]
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:27+00:00",
+      "endedAt": "2026-10-27T08:46:28+00:00",
+      "summary": [
+        "architecture check OK"
+      ]
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:28+00:00",
+      "endedAt": "2026-10-27T08:46:28+00:00",
+      "summary": [
+        "docs check OK"
+      ]
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:28+00:00",
+      "endedAt": "2026-10-27T08:46:28+00:00",
+      "summary": [
+        "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+      ]
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:28+00:00",
+      "endedAt": "2026-10-27T08:46:34+00:00",
+      "summary": [
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "✔ Test run with 213 tests in 4 suites passed after 0.598 seconds."
+      ]
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build -quiet",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:46:34+00:00",
+      "endedAt": "2026-10-27T08:46:37+00:00",
+      "summary": []
+    }
+  ]
+}
