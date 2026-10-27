@@ -114,13 +114,37 @@ struct ServerFailSafeTests {
     let failSafe = ServerFailSafe(local: local)
     let manager = try #require(SessionManager(maximumSessions: 2))
     let order = OrderProbe()
-    let disposition = await failSafe.recoverAll(sessions: manager) {
+    let outcome = await failSafe.recoverAll(sessions: manager) {
       order.mark(local.steps == fullOrder)
     }
-    #expect(disposition == .completed)
+    #expect(outcome.disposition == .completed)
+    #expect(outcome.recoveryAction == nil)
     #expect(order.localFirst == true)
     #expect(await manager.count == 0)
   }
+}
+
+@Suite("M2-033 ServerFailSafe active target")
+struct ServerFailSafeActiveTargetTests {
+  @Test("recoverAll reports the cleared active target as a sessionLost action")
+  func reportsActiveTarget() async throws {
+    let target = ScreenID(rawValue: UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x33, 1)))
+    let manager = try #require(SessionManager(maximumSessions: 1))
+    let session = ServerSession(
+      id: SessionID(rawValue: UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x33, 2))),
+      screen: target, protocolSession: NoopProtocolSession())
+    try await manager.register(session)
+    try await manager.activate(target)
+    let outcome = await ServerFailSafe(local: RecordingLocalSafety()).recoverAll(sessions: manager)
+    #expect(outcome.recoveryAction == .sessionLost(target))
+  }
+}
+
+private final class NoopProtocolSession: KVMProtocolSession, @unchecked Sendable {
+  let events: AsyncThrowingStream<KVMEvent, any Error> = AsyncThrowingStream { $0.finish() }
+  func connect() async throws(CoreError) {}
+  func send(_ event: KVMEvent) async throws(CoreError) {}
+  func disconnect(reason: DisconnectReason) async {}
 }
 
 private final class OrderProbe: @unchecked Sendable {

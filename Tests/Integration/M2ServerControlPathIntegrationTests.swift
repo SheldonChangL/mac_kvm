@@ -108,8 +108,8 @@ struct M2ServerControlPathIntegrationTests {
     #expect(transition.state == .local)
     #expect(transition.effects.first == .disableSuppression)
     let safety = RecordingSafety()
-    let disposition = await ServerFailSafe(local: safety).recoverAll(sessions: manager)
-    #expect(disposition == .completed)
+    let outcome = await ServerFailSafe(local: safety).recoverAll(sessions: manager)
+    #expect(outcome.disposition == .completed)
     #expect(safety.stopCount == 1)
     #expect(await manager.count == 0)
   }

@@ -18,7 +18,8 @@
 - Repeated recoveries rerun the idempotent steps.
 - `recoverAll(sessions:reason:afterLocalRestore:)` restores local input first,
   and only then awaits `SessionManager.closeAll`, so remote teardown can never
-  delay local restoration.
+  delay local restoration. It returns `RecoveryOutcome`: the disposition and,
+  when an active target was cleared, its `sessionLost` action for the reducer.
 
 Any session, tap or router failure maps to one of the reducer's forced-local
 actions; the owner then calls `recoverLocal()` (the `restoreLocal` effect).

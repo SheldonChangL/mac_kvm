@@ -78,6 +78,14 @@ package final class ServerFailSafe: @unchecked Sendable {
     }
   }
 
+  /// Result of `recoverAll`.
+  package struct RecoveryOutcome: Equatable, Sendable {
+    package let disposition: CleanupDisposition
+    /// `sessionLost` for the active target that was cleared, if any; the
+    /// owner must apply it so the input reducer also returns to `local`.
+    package let recoveryAction: InputAction?
+  }
+
   /// Restores local input first, then closes every session.
   ///
   /// `afterLocalRestore` runs between the two phases (test observation hook).
@@ -85,11 +93,12 @@ package final class ServerFailSafe: @unchecked Sendable {
     sessions: SessionManager,
     reason: DisconnectReason = .failure(ServerFailSafe.recoveryError),
     afterLocalRestore: @Sendable () -> Void = {}
-  ) async -> CleanupDisposition {
+  ) async -> RecoveryOutcome {
     let disposition = recoverLocal()
     afterLocalRestore()
-    _ = await sessions.closeAll(reason: reason)
-    return disposition
+    let clearedTarget = await sessions.closeAll(reason: reason)
+    return RecoveryOutcome(
+      disposition: disposition, recoveryAction: clearedTarget.map { .sessionLost($0) })
   }
 
   package static let recoveryError = CoreError(
