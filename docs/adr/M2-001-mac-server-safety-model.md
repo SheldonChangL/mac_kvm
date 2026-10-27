@@ -34,7 +34,7 @@ a conservative proposal and must not weaken it.
 | Event tap callback blocks on network I/O | macOS disables the tap; input lag or loss | Callback only classifies and enqueues into the bounded M2-003 queue; it never awaits |
 | macOS disables the tap (timeout or user input) | Captured events stop; a suppressing tap would freeze input | A tap-disabled notification is a `captureFailure`: fail open to `local` and stop suppression |
 | First-party injected events are captured again | Feedback loop, runaway input | M2-006 synthetic event tagging plus own-process fallback filter |
-| Keys/buttons held at switch time | Stuck modifiers or buttons on either side | Leave and fail-safe paths emit release effects; local held state is restored by M1-063/M2-033 |
+| Keys/buttons held at switch time | Stuck modifiers or buttons on either side | No switch while any local key or button is held (M2-008 activation precondition); leave and fail-safe paths emit release effects; local held state is restored by M1-063/M2-033 |
 | Typed text or clipboard reaches logs | Privacy breach | Capture adapters emit only `KVMEvent`; diagnostics use the M1-011 allowlist and never include key identity, text or clipboard bytes |
 | Unknown or changed client identity | Input routed to an attacker | TLS default on; trust policy C-009 fail closed; no session, no remote state |
 | Permission revoked mid-session | Capture fails | `captureFailure` → fail open to `local` |

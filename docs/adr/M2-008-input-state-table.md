@@ -39,6 +39,14 @@ the current one is stale and ignored.
   cancelled on every exit from it. Its duration is caller configuration, not a
   wire value.
 
+### Activation precondition
+
+`edgeActivated` is emitted (M2-010) only while no local key or mouse button
+is held. Otherwise the matching release would arrive while suppression is on,
+be swallowed, and leave the key or button stuck on the Mac after return. The
+table below therefore never needs to synthesize local releases on a normal
+return; forced-local paths still emit `restoreLocal`.
+
 ### Transition table
 
 Effects are listed in execution order. `restoreLocal` means: stop suppression,
