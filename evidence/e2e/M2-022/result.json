@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "issueId": "M2-022",
+  "status": "passed",
+  "startedAt": "2026-10-28T06:26:52Z",
+  "endedAt": "2026-10-28T06:30:02Z",
+  "commit": "2ca7878807a09f1c9496972b7a405236d6a5707b",
+  "toolchain": {
+    "pythonVersion": "3.9.6",
+    "platform": "Darwin 25.6.0",
+    "machine": "arm64"
+  },
+  "environment": {
+    "localOS": "macOS 26.6.2 build 25G83 arm64, orchestrating over SSH",
+    "peerProduct": "Barrier barriers and barrierc external test peers",
+    "peerVersion": "2.4.0-release protocol 1.6",
+    "peerRole": "EXTERNAL_TEST_PEER_ONLY",
+    "peerOS": "Ubuntu 22.04 x86_64, Linux 6.8, Python 3.10.16",
+    "networkScope": "test-host loopback only, through a byte-logging relay; no wider exposure",
+    "tls": "disabled for these observations only; product default stays enabled"
+  },
+  "cases": [
+    {
+      "id": "server-input-session",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "579 complete frames in both directions with no leftover bytes",
+        "every server input code observed: DMMV, DMDN, DMUP, DMWM, DKDN, DKUP, DKRP, CINN, COUT, CALV",
+        "second enter observed with sequence 3; server keepalive every 3.0 s"
+      ]
+    },
+    {
+      "id": "client-clipboard-keepalive-session",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "36 complete frames in both directions with no leftover bytes",
+        "client sent CCLP on copy and three DCLP frames on leave",
+        "client closed 9.02 s after the last server CALV while the server was paused"
+      ]
+    },
+    {
+      "id": "fixture-sanitization",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "fixtures hold ordered frames only: no timestamp, address or port",
+        "client-to-server DCLP data zero-filled; the probe string bytes are absent",
+        "screen names are synthetic and input was synthetic"
+      ]
+    },
+    {
+      "id": "fixture-metadata",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "both metadata.json files use exactly the fixture metadata schema keys",
+        "recorded payload SHA-256 and byte length match each capture file"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json",
+      "sha256": "506535a774f257dc8f004105c8d6333e2da4727aef9c6f4073533cb5e81dcb9b",
+      "byteLength": 73941,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "pending-review"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-server-input/metadata.json",
+      "sha256": "e10afd68927f8d7c5224aac271c331c950547c0383777922a64fe3a9a7ec1a08",
+      "byteLength": 1269,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "pending-review"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json",
+      "sha256": "72417873132f738a9e256ee73365d09a36c681a59175e010f7be46989d615bb7",
+      "byteLength": 4878,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "pending-review"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/metadata.json",
+      "sha256": "501fad706ea4772690fe5787474094b837adcadebb0e14ab9c8f104bdd927fe3",
+      "byteLength": 1363,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "pending-review"
+    }
+  ],
+  "privacy": {
+    "containsSensitiveData": false,
+    "containsTypedText": false,
+    "containsClipboardPayload": false,
+    "containsCredentials": false,
+    "containsKeyMaterial": false,
+    "containsHostnames": false,
+    "containsIPAddresses": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": false
+  },
+  "approvedDecisionRef": null
+}
