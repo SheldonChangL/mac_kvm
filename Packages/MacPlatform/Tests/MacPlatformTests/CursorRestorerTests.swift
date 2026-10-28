@@ -83,6 +83,18 @@ struct CursorRestorerTests {
     #expect(fake.associations == [true, true])
   }
 
+  /// Codex review H-10: a warp alone never claims restoration.
+  @Test("failure: a failed mouse/cursor re-association is reported even when the warp succeeds")
+  func associationFailureIsReported() {
+    let fake = FakeCursor()
+    fake.associateSucceeds = false
+    let restorer = CursorRestorer(environment: fake.environment)
+    _ = restorer.saveCurrent()
+    #expect(restorer.restore(preferred: nil) == .failed)
+    #expect(fake.associations == [true])
+    #expect(fake.warps == [CGPoint(x: 100, y: 100)], "the cursor is still placed, best effort")
+  }
+
   @Test("a failed warp falls through to the next candidate")
   func warpFallthrough() {
     let fake = FakeCursor()

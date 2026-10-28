@@ -44,8 +44,11 @@ package enum CursorRestoreOutcome: Equatable, Sendable {
 /// whose warp succeeds, falling through to the next candidate on failure:
 /// the preferred re-entry point (M2-020), the saved point, then the center of
 /// the first active display. Display hot-plug is handled by re-reading the
-/// active displays on every restore. Every call is synchronous, idempotent and
-/// never logs positions.
+/// active displays on every restore. A warp alone never claims restoration:
+/// if re-associating the mouse with the cursor fails, the outcome is `.failed`
+/// even when a warp succeeded, so cleanup is never reported as complete while
+/// the cursor may stay frozen. Every call is synchronous, idempotent and never
+/// logs positions.
 package final class CursorRestorer: @unchecked Sendable {
   private let environment: CursorEnvironment
   private let lock = NSLock()
@@ -76,7 +79,7 @@ package final class CursorRestorer: @unchecked Sendable {
   }
 
   package func restore(preferred: CGPoint?) -> CursorRestoreOutcome {
-    _ = environment.associateMouseAndCursor(true)
+    let associated = environment.associateMouseAndCursor(true)
     let displays = environment.displayBounds()
     let saved = lock.withLock { savedPoint }
     let candidates: [(CGPoint?, CursorRestoreOutcome.Source)] = [
@@ -84,7 +87,7 @@ package final class CursorRestorer: @unchecked Sendable {
     ]
     for case (let point?, let source) in candidates
     where displays.contains(where: { $0.contains(point) }) && environment.warp(point) {
-      return .restored(source)
+      return associated ? .restored(source) : .failed
     }
     return .failed
   }
