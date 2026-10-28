@@ -12,7 +12,6 @@ let package = Package(
     .executableTarget(
       name: "MacKVM",
       dependencies: [
-        "KVMContracts",
         "KVMCore",
         "BarrierCompatibility",
         "MacPlatform",
