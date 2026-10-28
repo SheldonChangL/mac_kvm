@@ -79,8 +79,10 @@ for c in "key a down" "key a up" "key shift down" "key b down" "key b up" "key s
   send "$c"
 done
 send "key a down"; send "move -500 0"; sleep 0.5
+check held-key-locks "$(grep -c 'input is local again' "$work/server.log")" 0
+send "key a up"; send "key shift down"; send "move -500 0"; sleep 0.5
 check return "$(grep -c 'input is local again' "$work/server.log")" 1
-send "key a up"
+send "key shift up"
 
 send edge; sleep 0.3; send "key control down"; send escape; sleep 0.5; send "key control up"
 check escape "$(grep -c 'local recovery: completed' "$work/server.log")" 1
@@ -106,8 +108,8 @@ check quit-while-remote "$(grep -c '^\[.*\] stopped$' "$work/server.log")" 1
 expected="KeyPress38 KeyRelease38 KeyPress50 KeyPress56 KeyRelease56 KeyRelease50 KeyPress36 \
 KeyRelease36 KeyPress10 KeyRelease10 KeyPress71 KeyRelease71 ButtonPress1 ButtonRelease1 \
 ButtonPress3 ButtonRelease3 ButtonPress2 ButtonRelease2 ButtonPress4 ButtonRelease4 ButtonPress5 \
-ButtonRelease5 ButtonPress5 ButtonRelease5 KeyPress38 KeyRelease38 KeyPress37 KeyRelease37 \
-KeyPress50 KeyRelease50 KeyPress50 KeyRelease50"
+ButtonRelease5 ButtonPress5 ButtonRelease5 KeyPress38 KeyRelease38 KeyPress50 KeyRelease50 \
+KeyPress37 KeyRelease37 KeyPress50 KeyRelease50 KeyPress50 KeyRelease50"
 actual=$(rssh "awk '/^EVENT type/{t=\$4} /^ +detail:/{if (t ~ /Raw(Key|Button)(Press|Release)/) {gsub(/[()]/,\"\",t); sub(/^Raw/,\"\",t); printf \"%s%s \", t, \$2}; t=\"\"}' $remote/xi2.log" | sed 's/ $//')
 check x-events "$actual" "$expected"
 
