@@ -8,7 +8,7 @@
 import KVMContracts
 
 /// Typed listener failure. Carries no address, port or peer data.
-enum BarrierListenerError: Error, Equatable, Sendable {
+package enum BarrierListenerError: Error, Equatable, Sendable {
   case invalidPolicy
   case capacityExceeded
   case connectFailed(CoreError)
@@ -18,14 +18,16 @@ enum BarrierListenerError: Error, Equatable, Sendable {
 }
 
 /// Validated admission limits.
-struct BarrierListenerPolicy: Equatable, Sendable {
+package struct BarrierListenerPolicy: Equatable, Sendable {
   /// Upper bound on simultaneously admitted connections.
-  static let largestConnectionLimit = 8
+  package static let largestConnectionLimit = 8
 
-  let maximumConcurrentConnections: Int
-  let connectTimeout: Duration
+  package let maximumConcurrentConnections: Int
+  package let connectTimeout: Duration
 
-  init(maximumConcurrentConnections: Int, connectTimeout: Duration) throws(BarrierListenerError) {
+  package init(maximumConcurrentConnections: Int, connectTimeout: Duration)
+    throws(BarrierListenerError)
+  {
     guard (1...Self.largestConnectionLimit).contains(maximumConcurrentConnections),
       connectTimeout > .zero
     else { throw .invalidPolicy }
@@ -35,12 +37,12 @@ struct BarrierListenerPolicy: Equatable, Sendable {
 }
 
 /// Opaque handle for one admitted connection.
-struct BarrierListenerAdmission: Hashable, Sendable {
+package struct BarrierListenerAdmission: Hashable, Sendable {
   fileprivate let identifier: UInt64
 }
 
 /// Admits accepted transports within the policy.
-actor BarrierListenerTransport {
+package actor BarrierListenerTransport {
   private enum ConnectOutcome: Sendable {
     case connected
     case failed(CoreError)
@@ -55,19 +57,19 @@ actor BarrierListenerTransport {
   private var nextIdentifier: UInt64 = 0
   private var isStopped = false
 
-  init(policy: BarrierListenerPolicy, clock: any KVMClock) {
+  package init(policy: BarrierListenerPolicy, clock: any KVMClock) {
     self.policy = policy
     self.clock = clock
   }
 
   /// Number of admitted connections not yet released.
-  var activeCount: Int { admitted.count }
+  package var activeCount: Int { admitted.count }
 
   /// Connects `transport` within the timeout and admits it, or disconnects it
   /// and throws. The timeout holds even if the transport's `connect()` ignores
   /// cancellation, because the transport is disconnected when the timeout wins. The slot is reserved before connecting, so concurrent admits
   /// cannot exceed the limit.
-  func admit(_ transport: any Transport) async throws(BarrierListenerError)
+  package func admit(_ transport: any Transport) async throws(BarrierListenerError)
     -> BarrierListenerAdmission
   {
     guard !isStopped else {
@@ -99,12 +101,12 @@ actor BarrierListenerTransport {
   }
 
   /// Forgets an admitted connection whose owner has ended it. Idempotent.
-  func release(_ admission: BarrierListenerAdmission) {
+  package func release(_ admission: BarrierListenerAdmission) {
     admitted[admission] = nil
   }
 
   /// Disconnects every admitted transport and rejects later admits. Idempotent.
-  func stop() async {
+  package func stop() async {
     isStopped = true
     let transports = Array(admitted.values)
     admitted = [:]
