@@ -1,20 +1,35 @@
 // Server-role Barrier protocol session (M2 follow-up, not an Exact File of any Issue).
-// Binds the M2-025 handshake and the M2-028 control encoder to an already admitted
-// `Transport` (M2-024) behind the protocol-neutral `KVMProtocolSession` contract (C-003),
-// so KVMCore's `ServerSession` (M2-029) never sees Barrier tokens. Only the proposed
-// M2-023 subset is spoken: setup, a single enter, leave. Every input event and clipboard
-// fails closed with a typed error and emits no bytes, because their wire encodings are
-// not frozen. Keepalive timing is not frozen either, so no periodic keepalive is sent.
+// Binds the M2-025 handshake, the M2-028 control encoder and the M2-026/M2-027 input
+// encoder to an already admitted `Transport` (M2-024) behind the protocol-neutral
+// `KVMProtocolSession` contract (C-003), so KVMCore's `ServerSession` (M2-029) never sees
+// Barrier tokens. Pointer, button, wheel, key, enter and leave frames, the keepalive
+// cadence and the client clipboard frames it tolerates all follow the M2-022 capture
+// (evidence/e2e/M2-022/README.md). Clipboard has no frozen encoding and fails closed.
 
 import Foundation
 import KVMContracts
 
+/// The client screen size the client reported in its latest `DINF`.
+package struct BarrierClientScreen: Equatable, Sendable {
+  package let width: Int
+  package let height: Int
+
+  package init(width: Int, height: Int) {
+    self.width = width
+    self.height = height
+  }
+}
+
 /// Barrier server session over one admitted, already connected transport.
 ///
 /// `connect()` runs the handshake and returns once the client is set up, or
-/// fails within `handshakeTimeout`. After setup, client `CALV`/`CNOP` and
-/// screen-info updates are accepted silently; any other client frame ends the
-/// session. `send(_:)` supports only `enterScreen` (once) and `leaveScreen`.
+/// fails within `handshakeTimeout`. After setup the session sends `CALV` every
+/// three seconds and drops a client that sends nothing for three intervals in a
+/// row as `timeout.keepalive`. Client `CALV`, `CNOP`, screen-info updates and
+/// clipboard frames (`CCLP`, `DCLP`) are accepted; clipboard frames are
+/// ignored because clipboard sharing is not supported. Any other client frame
+/// ends the session. `send(_:)` writes enter, leave, pointer, button, wheel and
+/// supported key events; `canSend(_:)` says which events those are.
 /// `disconnect(reason:)` is idempotent and never waits for the peer.
 ///
 /// State lives behind one `NSLock`, hence `@unchecked Sendable`. Nothing is
@@ -38,9 +53,14 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
   private var reassembler: BarrierFrameReassembler
   private var decoder: BarrierControlDecoder
   private var encoder: BarrierClipboardControlEncoder?
+  private var input: BarrierServerInputEncoder?
   private var readyWaiter: CheckedContinuation<Result<Void, CoreError>, Never>?
   private var readyResult: Result<Void, CoreError>?
   private var reader: Task<Void, Never>?
+  private var keepalive: Task<Void, Never>?
+  private var clientHeard = false
+  private var receivedFrames = 0
+  private var frameWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
 
   /// Fails with `nil` when the name set, name bound or timeout is invalid.
   package init?(
@@ -60,6 +80,25 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     self.reassembler = reassembler
     self.decoder = decoder
     (events, eventContinuation) = AsyncThrowingStream.makeStream()
+  }
+
+  /// Whether `send(_:)` can write `event`: everything but clipboard and keys
+  /// without an evidence-backed Barrier identifier.
+  package static func canSend(_ event: KVMEvent) -> Bool {
+    switch event {
+    case .enterScreen, .leaveScreen, .mouseMove, .mouseButton, .scroll: true
+    case .key(let key, _, _): BarrierServerInputEncoder.canEncode(key)
+    case .clipboard: false
+    }
+  }
+
+  /// The client's latest reported screen size, or `nil` before setup.
+  package var clientScreen: BarrierClientScreen? {
+    lock.withLock {
+      input.map {
+        BarrierClientScreen(width: Int($0.screen.width), height: Int($0.screen.height))
+      }
+    }
   }
 
   package func connect() async throws(CoreError) {
@@ -87,34 +126,56 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
       await fail(error)
       throw error
     }
+    let keepaliveTask = Task { await self.keepaliveLoop() }
+    let stale = lock.withLock { () -> Bool in
+      guard phase == .ready else { return true }
+      keepalive = keepaliveTask
+      return false
+    }
+    if stale { keepaliveTask.cancel() }
   }
 
   package func send(_ event: KVMEvent) async throws(CoreError) {
-    let frame = try withState { () -> Result<[UInt8], CoreError> in
-      guard phase == .ready, var current = encoder else {
+    let frames = try withState { () -> Result<[UInt8], CoreError> in
+      guard phase == .ready, var control = encoder, let input else {
         return .failure(Self.error(.lifecycle(.subsystemUnavailable)))
       }
       switch event {
       case .enterScreen(_, let position):
         do throws(BarrierClipboardControlEncoderError) {
-          let frame = try current.enter(position: position)
-          encoder = current
+          let frame = try control.enter(position: position)
+          encoder = control
           return .success(frame)
         } catch {
           return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
         }
       case .leaveScreen:
-        return .success(current.leave())
-      case .mouseMove, .mouseButton, .scroll, .key, .clipboard:
+        let frame = control.leave()
+        encoder = control
+        return .success(frame)
+      case .mouseMove(let position):
+        return .success(input.pointer(to: position))
+      case .mouseButton(let button, let phase):
+        return .success(input.button(button, phase: phase))
+      case .scroll(let deltaX, let deltaY):
+        return .success(input.scroll(deltaX: deltaX, deltaY: deltaY) ?? [])
+      case .key(let key, let phase, let modifiers):
+        do throws(BarrierServerInputEncoderError) {
+          return .success(try input.key(key, phase: phase, modifiers: modifiers).flatMap { $0 })
+        } catch {
+          return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
+        }
+      case .clipboard:
         // M2-023: no frozen server encoding; fail closed without bytes.
         return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
       }
     }
-    try await transport.send(Data(frame))
+    guard !frames.isEmpty else { return }
+    try await transport.send(Data(frames))
   }
 
   package func disconnect(reason: DisconnectReason) async {
-    let (wasOpen, task, waiter) = lock.withLock {
+    let (wasOpen, tasks, waiter, waiters) = lock.withLock {
       let wasOpen = phase != .closed
       phase = .closed
       let waiter = readyWaiter
@@ -122,11 +183,14 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
       if readyResult == nil {
         readyResult = .failure(Self.error(.lifecycle(.subsystemUnavailable)))
       }
-      return (wasOpen, reader, waiter)
+      let waiters = frameWaiters.map(\.continuation)
+      frameWaiters = []
+      return (wasOpen, [reader, keepalive], waiter, waiters)
     }
+    for frameWaiter in waiters { frameWaiter.resume() }
     guard wasOpen else { return }
     waiter?.resume(returning: .failure(Self.error(.lifecycle(.subsystemUnavailable))))
-    task?.cancel()
+    for task in tasks { task?.cancel() }
     await transport.disconnect()
     switch reason {
     case .failure(let error): eventContinuation.finish(throwing: error)
@@ -140,7 +204,20 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     }
   }
 
-  // MARK: - Handshake and reading
+  /// Test scheduling barrier: completes once at least `count` client frames
+  /// have been handled after setup, or the session closed.
+  package func waitForReceivedFrames(atLeast count: Int) async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+      let ready = lock.withLock { () -> Bool in
+        guard receivedFrames < count, phase != .closed else { return true }
+        frameWaiters.append((count, continuation))
+        return false
+      }
+      if ready { continuation.resume() }
+    }
+  }
+
+  // MARK: - Handshake, keepalive and reading
 
   private func waitForReady() async -> Result<Void, CoreError> {
     let timeout = handshakeTimeout
@@ -179,6 +256,36 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     }
   }
 
+  /// Sends `CALV` every interval and drops a client that stayed silent for
+  /// `silentIntervalsBeforeTimeout` intervals in a row (M2-022: the client
+  /// answers every `CALV` at once and itself gives up after about nine seconds).
+  private func keepaliveLoop() async {
+    var silentIntervals = 0
+    while true {
+      do throws(CoreError) {
+        try await clock.sleep(for: Self.keepaliveInterval)
+      } catch {
+        return
+      }
+      let (ready, heard) = lock.withLock { () -> (Bool, Bool) in
+        defer { clientHeard = false }
+        return (phase == .ready, clientHeard)
+      }
+      guard ready else { return }
+      silentIntervals = heard ? 0 : silentIntervals + 1
+      if silentIntervals >= Self.silentIntervalsBeforeTimeout {
+        await fail(Self.error(.timeout(.keepalive)))
+        return
+      }
+      do throws(CoreError) {
+        try await transport.send(Data(Self.keepaliveFrame))
+      } catch {
+        await fail(error)
+        return
+      }
+    }
+  }
+
   private func readLoop() async {
     do {
       for try await chunk in transport.incomingBytes {
@@ -206,6 +313,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
 
   private enum Step {
     case reply([UInt8], ready: Bool)
+    case received([CheckedContinuation<Void, Never>])
     case ignore
   }
 
@@ -219,28 +327,45 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
             return .success(.reply(reply, ready: false))
           }
           encoder = BarrierClipboardControlEncoder(screen: screen)
+          input = BarrierServerInputEncoder(screen: screen)
           return .success(.reply(reply, ready: true))
         } catch {
           return .failure(Self.map(error))
         }
       case .ready:
-        let outcome: BarrierControlOutcome
-        do throws(BarrierControlMessageError) {
-          outcome = try decoder.decode(payload: payload, direction: .clientToServer)
-        } catch {
-          return .failure(Self.error(.protocolViolation(.malformed)))
+        if !Self.isClientClipboard(payload) {
+          let outcome: BarrierControlOutcome
+          do throws(BarrierControlMessageError) {
+            outcome = try decoder.decode(payload: payload, direction: .clientToServer)
+          } catch {
+            return .failure(Self.error(.protocolViolation(.malformed)))
+          }
+          switch outcome {
+          case .keepalive: break
+          case .event(.screenInfo(let screen)):
+            encoder?.screen = screen
+            input = BarrierServerInputEncoder(screen: screen)
+          case .event, .skipped:
+            return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
+          }
         }
-        switch outcome {
-        case .keepalive, .event(.screenInfo): return .success(.ignore)
-        case .event, .skipped: return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
-        }
+        clientHeard = true
+        receivedFrames += 1
+        let due = frameWaiters.filter { receivedFrames >= $0.count }.map(\.continuation)
+        frameWaiters.removeAll { receivedFrames >= $0.count }
+        return .success(.received(due))
       case .idle, .closed:
         return .success(.ignore)
       }
     }
-    guard case .reply(let frames, let ready) = step else { return }
-    if !frames.isEmpty { try await transport.send(Data(frames)) }
-    if ready {
+    switch step {
+    case .ignore:
+      return
+    case .received(let due):
+      for waiter in due { waiter.resume() }
+    case .reply(let frames, let ready):
+      if !frames.isEmpty { try await transport.send(Data(frames)) }
+      guard ready else { return }
       let waiter = lock.withLock {
         phase = phase == .handshaking ? .ready : phase
         readyResult = readyResult ?? .success(())
@@ -250,6 +375,14 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
       }
       waiter?.resume(returning: .success(()))
     }
+  }
+
+  /// Client clipboard frames: `CCLP` announces ownership and `DCLP` carries
+  /// data (M2-022). Clipboard sharing is not supported, so both are ignored
+  /// before decoding instead of ending the session.
+  private static func isClientClipboard(_ payload: [UInt8]) -> Bool {
+    let code = payload.prefix(4)
+    return code.elementsEqual("CCLP".utf8) || code.elementsEqual("DCLP".utf8)
   }
 
   /// Runs `body` under the lock and unwraps its typed result.
@@ -274,9 +407,13 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     await disconnect(reason: .failure(error))
   }
 
-  // MARK: - Errors
+  // MARK: - Constants and errors
 
   private static let frameLimit = 4096
+  /// M2-022: the server sent `CALV` every 3.0 s.
+  private static let keepaliveInterval = Duration.seconds(3)
+  private static let silentIntervalsBeforeTimeout = 3
+  private static let keepaliveFrame: [UInt8] = [0x00, 0x00, 0x00, 0x04] + Array("CALV".utf8)
 
   private static func error(_ code: CoreErrorCode) -> CoreError {
     CoreError(

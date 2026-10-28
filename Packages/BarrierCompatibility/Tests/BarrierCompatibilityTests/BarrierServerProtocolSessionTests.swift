@@ -73,11 +73,15 @@ private final class PipeTransport: Transport, @unchecked Sendable {
   }
 }
 
-/// Clock whose sleeps only end on cancellation or `fire()`.
+/// Clock whose sleeps only end on cancellation or `fire()`. Sleepers can be
+/// selected by duration, so the handshake timeout and the keepalive interval
+/// never fire each other.
 private final class ManualClock: KVMClock, @unchecked Sendable {
   private let lock = NSLock()
-  private var sleepers: [Int: CheckedContinuation<Bool, Never>] = [:]
-  private var arrivals: [CheckedContinuation<Void, Never>] = []
+  private var sleepers:
+    [Int: (duration: Duration, continuation: CheckedContinuation<Bool, Never>)] = [:]
+  private var arrivals: [(duration: Duration?, continuation: CheckedContinuation<Void, Never>)] =
+    []
   private var nextID = 0
 
   func sleep(for duration: Duration) async throws(CoreError) {
@@ -89,10 +93,10 @@ private final class ManualClock: KVMClock, @unchecked Sendable {
       await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
         let waiting: [CheckedContinuation<Void, Never>]? = lock.withLock {
           if Task.isCancelled { return nil }
-          sleepers[id] = continuation
-          let waiting = arrivals
-          arrivals = []
-          return waiting
+          sleepers[id] = (duration, continuation)
+          let matching = arrivals.filter { $0.duration == nil || $0.duration == duration }
+          arrivals.removeAll { $0.duration == nil || $0.duration == duration }
+          return matching.map(\.continuation)
         }
         guard let waiting else {
           continuation.resume(returning: false)
@@ -102,7 +106,7 @@ private final class ManualClock: KVMClock, @unchecked Sendable {
       }
     } onCancel: {
       let sleeper = lock.withLock { sleepers.removeValue(forKey: id) }
-      sleeper?.resume(returning: false)
+      sleeper?.continuation.resume(returning: false)
     }
     guard fired else {
       throw CoreError(
@@ -111,25 +115,73 @@ private final class ManualClock: KVMClock, @unchecked Sendable {
     }
   }
 
-  func waitForSleeper() async {
+  /// Completes once a sleeper exists, of `duration` when given.
+  func waitForSleeper(duration: Duration? = nil) async {
     await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-      let ready = lock.withLock {
-        if sleepers.isEmpty { arrivals.append(continuation) }
-        return !sleepers.isEmpty
+      let ready = lock.withLock { () -> Bool in
+        let present = sleepers.values.contains { duration == nil || $0.duration == duration }
+        if !present { arrivals.append((duration, continuation)) }
+        return present
       }
       if ready { continuation.resume() }
     }
   }
 
-  func fire() {
-    let due = lock.withLock {
-      let due = Array(sleepers.values)
-      sleepers = [:]
-      return due
+  /// Ends every sleep, or only those of `duration` when given.
+  func fire(duration: Duration? = nil) {
+    let due = lock.withLock { () -> [CheckedContinuation<Bool, Never>] in
+      let selected = sleepers.filter { duration == nil || $0.value.duration == duration }
+      for id in selected.keys { sleepers.removeValue(forKey: id) }
+      return selected.values.map(\.continuation)
     }
     for sleeper in due { sleeper.resume(returning: true) }
   }
 }
+
+/// The keepalive interval observed in the M2-022 capture.
+private let keepaliveInterval = Duration.seconds(3)
+
+/// `DINF` for a 1600 x 900 client at the origin, as sent in the M2-022 capture.
+private let dinf1600: [UInt8] = [
+  0x00, 0x00, 0x00, 0x12, 0x44, 0x49, 0x4E, 0x46, 0x00, 0x00, 0x00, 0x00, 0x06, 0x40, 0x03, 0x84,
+  0x00, 0x00, 0x03, 0x20, 0x01, 0xC2,
+]
+private let cnop: [UInt8] = [0x00, 0x00, 0x00, 0x04, 0x43, 0x4E, 0x4F, 0x50]
+
+private func repositoryRoot() -> URL {
+  URL(fileURLWithPath: #filePath)
+    .deletingLastPathComponent()  // BarrierCompatibilityTests
+    .deletingLastPathComponent()  // Tests
+    .deletingLastPathComponent()  // BarrierCompatibility
+    .deletingLastPathComponent()  // Packages
+    .deletingLastPathComponent()
+}
+
+/// The client's `CCLP` and `DCLP` frames from the M2-022 clipboard capture, in
+/// order; `DCLP` data is zero-filled by the fixture's sanitization.
+private func capturedClientClipboardFrames() throws -> [[UInt8]] {
+  let url = repositoryRoot().appendingPathComponent(
+    "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/"
+      + "client-clipboard-keepalive-capture.json")
+  let json = try #require(
+    try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+  let observations = try #require(json["observations"] as? [[String: Any]])
+  var frames: [[UInt8]] = []
+  for observation in observations
+  where observation["direction"] as? String == "client-to-server" {
+    let base64 = try #require(observation["applicationPayloadBase64"] as? String)
+    let frame = [UInt8](try #require(Data(base64Encoded: base64)))
+    let code = frame.dropFirst(4).prefix(4)
+    if code.elementsEqual("CCLP".utf8) || code.elementsEqual("DCLP".utf8) {
+      frames.append(frame)
+    }
+  }
+  return frames
+}
+/// `DMMV` at (1599, 899): the far corner of a 1600 x 900 client.
+private let cornerMove: [UInt8] = [
+  0x00, 0x00, 0x00, 0x08, 0x44, 0x4D, 0x4D, 0x56, 0x06, 0x3F, 0x03, 0x83,
+]
 
 private func makeSession(
   _ pipe: PipeTransport, clock: ManualClock = ManualClock(), names: Set<String> = ["m1-control"]
@@ -141,13 +193,15 @@ private func makeSession(
       transport: pipe, expectedScreenNames: names, clock: clock, handshakeTimeout: .seconds(5)))
 }
 
-private func connected(_ pipe: PipeTransport) async throws -> BarrierServerProtocolSession {
-  let session = try makeSession(pipe)
+private func connected(
+  _ pipe: PipeTransport, clock: ManualClock = ManualClock(), screenInfo: [UInt8] = dinf
+) async throws -> BarrierServerProtocolSession {
+  let session = try makeSession(pipe, clock: clock)
   let connecting = Task { try await session.connect() }
   await pipe.waitForSent(byteCount: hello.count)
   pipe.feed(helloBack)
   await pipe.waitForSent(byteCount: hello.count + qinf.count)
-  pipe.feed(dinf)
+  pipe.feed(screenInfo)
   try await connecting.value
   return session
 }
@@ -178,7 +232,7 @@ struct BarrierServerProtocolSessionTests {
     #expect(pipe.sent == hello + qinf + setup)
   }
 
-  @Test("enter once and leave map to CINN and COUT inside the client rectangle")
+  @Test("enter, leave and enter again map to CINN and COUT with the captured sequence")
   func enterAndLeave() async throws {
     let pipe = PipeTransport()
     let session = try await connected(pipe)
@@ -187,29 +241,48 @@ struct BarrierServerProtocolSessionTests {
     let cinn = Array(pipe.sent[before...])
     #expect(Array(cinn.prefix(8)) == [0x00, 0x00, 0x00, 0x0E, 0x43, 0x49, 0x4E, 0x4E])
     #expect(Array(cinn[8..<12]) == [0x06, 0xBF, 0x01, 0x17])
+    #expect(Array(cinn[12..<18]) == [0, 0, 0, 1, 0, 0])
     try await session.send(.leaveScreen(screen: screen))
     #expect(Array(pipe.sent.suffix(cout.count)) == cout)
-    await #expect(throws: CoreError.self) {
-      try await session.send(.enterScreen(screen: screen, position: NormalizedPoint(x: 1, y: 0.5)))
-    }
+    try await session.send(.enterScreen(screen: screen, position: NormalizedPoint(x: 1, y: 0.25)))
+    #expect(Array(pipe.sent.suffix(6)) == [0, 0, 0, 3, 0, 0])
   }
 
-  @Test("input and clipboard fail closed without writing bytes")
-  func inputFailsClosed() async throws {
+  @Test("input events are written as the encoder's frames; clipboard and unknown keys fail closed")
+  func inputEncodes() async throws {
     let pipe = PipeTransport()
-    let session = try await connected(pipe)
-    let before = pipe.sent
+    let session = try await connected(pipe, screenInfo: dinf1600)
+    let encoder = BarrierServerInputEncoder(
+      screen: BarrierScreenInfo(
+        originX: 0, originY: 0, width: 1600, height: 900, cursorX: 800, cursorY: 450))
+    let a = KVMEvent.key(key: .letter(0), phase: .down, modifiers: ModifierState())
+    let cases: [(KVMEvent, [UInt8])] = [
+      (
+        .mouseMove(position: NormalizedPoint(x: 10.0 / 1599, y: 450.0 / 899)),
+        encoder.pointer(to: NormalizedPoint(x: 10.0 / 1599, y: 450.0 / 899))
+      ),
+      (.mouseButton(button: .left, phase: .down), encoder.button(.left, phase: .down)),
+      (.scroll(deltaX: 0, deltaY: 1), try #require(encoder.scroll(deltaX: 0, deltaY: 1))),
+      (a, try encoder.key(.letter(0), phase: .down, modifiers: ModifierState()).flatMap { $0 }),
+    ]
+    for (event, frame) in cases {
+      let before = pipe.sent.count
+      try await session.send(event)
+      #expect(Array(pipe.sent[before...]) == frame)
+    }
+    let quiet = pipe.sent
+    try await session.send(.scroll(deltaX: 0, deltaY: 0))
+    #expect(pipe.sent == quiet)
+
     let unsupported: [KVMEvent] = [
-      .mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5)),
-      .mouseButton(button: .left, phase: .down),
-      .scroll(deltaX: 0, deltaY: 1),
-      .key(key: .letter(0), phase: .down, modifiers: ModifierState()),
+      .key(key: .unknown(42), phase: .down, modifiers: ModifierState()),
       .clipboard(
         ClipboardPayload(
           transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "probe",
           contentHash: "h")),
     ]
     for event in unsupported {
+      #expect(!BarrierServerProtocolSession.canSend(event))
       do {
         try await session.send(event)
         Issue.record("unsupported event was accepted")
@@ -217,7 +290,70 @@ struct BarrierServerProtocolSessionTests {
         #expect(error.code == .protocolViolation(.unsupportedMessage))
       }
     }
-    #expect(pipe.sent == before)
+    #expect(pipe.sent == quiet)
+    for (event, _) in cases { #expect(BarrierServerProtocolSession.canSend(event)) }
+  }
+
+  @Test("client clipboard frames are ignored and the session stays usable")
+  func clientClipboardIgnored() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    let clipboard = try capturedClientClipboardFrames()
+    #expect(clipboard.count == 4)
+    pipe.feed(clipboard.flatMap { $0 } + cnop)
+    await session.waitForReceivedFrames(atLeast: clipboard.count + 1)
+    try await session.send(.leaveScreen(screen: screen))
+    #expect(Array(pipe.sent.suffix(cout.count)) == cout)
+    #expect(pipe.disconnectCount == 0)
+  }
+
+  @Test("a screen-info update rescales later pointer frames")
+  func screenInfoUpdate() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    pipe.feed(dinf1600)
+    await session.waitForReceivedFrames(atLeast: 1)
+    #expect(session.clientScreen == BarrierClientScreen(width: 1600, height: 900))
+    let before = pipe.sent.count
+    try await session.send(.mouseMove(position: NormalizedPoint(x: 1, y: 1)))
+    #expect(Array(pipe.sent[before...]) == cornerMove)
+  }
+
+  @Test("keepalive: CALV every interval while the client answers")
+  func keepaliveWhileAnswered() async throws {
+    let pipe = PipeTransport()
+    let clock = ManualClock()
+    let session = try await connected(pipe, clock: clock)
+    for round in 1...4 {
+      await clock.waitForSleeper(duration: keepaliveInterval)
+      let before = pipe.sent.count
+      clock.fire(duration: keepaliveInterval)
+      await pipe.waitForSent(byteCount: before + calv.count)
+      #expect(Array(pipe.sent[before...]) == calv)
+      pipe.feed(calv)
+      await session.waitForReceivedFrames(atLeast: round)
+    }
+    #expect(pipe.disconnectCount == 0)
+  }
+
+  @Test("keepalive: a client silent for three intervals is dropped as a keepalive timeout")
+  func silentClientTimesOut() async throws {
+    let pipe = PipeTransport()
+    let clock = ManualClock()
+    let session = try await connected(pipe, clock: clock)
+    let afterSetup = pipe.sent.count
+    for _ in 1...3 {
+      await clock.waitForSleeper(duration: keepaliveInterval)
+      clock.fire(duration: keepaliveInterval)
+    }
+    do {
+      for try await _ in session.events {}
+      Issue.record("a silent client was not dropped")
+    } catch {
+      #expect((error as? CoreError)?.code == .timeout(.keepalive))
+    }
+    #expect(pipe.disconnectCount == 1)
+    #expect(Array(pipe.sent[afterSetup...]) == calv + calv)
   }
 
   @Test("client keepalives are accepted; an unexpected client frame ends the session")

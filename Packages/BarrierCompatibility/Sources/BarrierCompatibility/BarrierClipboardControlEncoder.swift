@@ -1,8 +1,10 @@
 // Server-role control and clipboard encoder for the Barrier protocol adapter (M2-028).
-// Emits only the frames listed in the proposed docs/adr/M2-023: CINN with the observed
-// sequence 1 and opaque mask 0x2000 once per session, token-only COUT and CALV, all
-// from the accepted BARRIER-EVID-0005 contract. Clipboard has no frozen wire encoding
-// and always fails closed without emitting bytes.
+// Token-only COUT and CALV come from the accepted BARRIER-EVID-0005 contract. CINN
+// follows the M2-022 server-role capture (evidence/e2e/M2-022/README.md): a client
+// can be entered any number of times, the sequence advances on every enter and every
+// leave (1, then 3 after one leave), and the mask is 0 because lock state is not
+// synchronized. Clipboard has no frozen wire encoding and always fails closed without
+// emitting bytes.
 
 import KVMContracts
 
@@ -12,8 +14,6 @@ enum BarrierClipboardControlEncoderError: Error, Equatable, Sendable {
   case coordinateOutOfRange
   /// A coordinate is outside the client's `DINF` rectangle.
   case coordinateOutsideScreen
-  /// Only the single observed `CINN` (sequence 1) is frozen for one session.
-  case repeatedEnterUnsupported
   /// The clipboard payload exceeds the caller's byte limit.
   case clipboardOversized
   /// No clipboard wire encoding is frozen (M2-023); nothing is emitted.
@@ -23,11 +23,12 @@ enum BarrierClipboardControlEncoderError: Error, Equatable, Sendable {
 /// Encodes server-to-client control frames for one client session.
 struct BarrierClipboardControlEncoder: Sendable {
   private static let maximumRawCoordinate: UInt16 = 0x7FFF
-  private static let observedSequence: UInt32 = 1
-  private static let observedModifierMask: UInt16 = 0x2000
+  private static let enterModifierMask: UInt16 = 0
 
-  let screen: BarrierScreenInfo
-  private var enterSent = false
+  /// The client screen; replaced when the client reports new screen info.
+  var screen: BarrierScreenInfo
+  /// Advanced on every enter and every leave; the next `CINN` carries it.
+  private var sequence: UInt32 = 0
 
   init(screen: BarrierScreenInfo) {
     self.screen = screen
@@ -44,26 +45,26 @@ struct BarrierClipboardControlEncoder: Sendable {
     return try enter(x: UInt16(x), y: UInt16(y))
   }
 
-  /// Encodes `CINN` at a raw client coordinate. A failed call does not consume
-  /// the single supported enter.
+  /// Encodes `CINN` at a raw client coordinate. A failed call does not advance
+  /// the sequence.
   mutating func enter(x: UInt16, y: UInt16) throws(BarrierClipboardControlEncoderError) -> [UInt8] {
-    guard !enterSent else { throw .repeatedEnterUnsupported }
     guard x <= Self.maximumRawCoordinate, y <= Self.maximumRawCoordinate else {
       throw .coordinateOutOfRange
     }
     guard screen.contains(x: x, y: y) else { throw .coordinateOutsideScreen }
-    enterSent = true
+    sequence &+= 1
     let body =
       Self.bigEndian(x) + Self.bigEndian(y)
-      + Self.bigEndian(UInt16(Self.observedSequence >> 16))
-      + Self.bigEndian(UInt16(Self.observedSequence & 0xFFFF))
-      + Self.bigEndian(Self.observedModifierMask)
+      + Self.bigEndian(UInt16(sequence >> 16))
+      + Self.bigEndian(UInt16(sequence & 0xFFFF))
+      + Self.bigEndian(Self.enterModifierMask)
     return Self.frame(BarrierControlToken.cinn.bytes + body)
   }
 
-  /// Encodes token-only `COUT`.
-  func leave() -> [UInt8] {
-    Self.frame(BarrierControlToken.cout.bytes)
+  /// Encodes token-only `COUT` and advances the sequence.
+  mutating func leave() -> [UInt8] {
+    sequence &+= 1
+    return Self.frame(BarrierControlToken.cout.bytes)
   }
 
   /// Encodes token-only `CALV`.
