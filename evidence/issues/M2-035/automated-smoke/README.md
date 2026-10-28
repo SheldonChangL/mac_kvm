@@ -35,7 +35,7 @@ run and removed afterwards.
 | Pointer motion | C4 | +(100, 50) → (101, 500); +(300, -200) → (401, 300) | pass |
 | Buttons and wheel | C4 | X raw buttons 1, 3, 2; wheel up 4 once, down 5 twice | pass |
 | Keys and modifiers | C5 | X raw keycodes 38 (a), 50+56 (Shift+b), 36 (Return), 10 (1), 71 (F5) | pass |
-| Return edge releases held keys | C3/C7 | `a` held, pushed back past the left edge: client got the release, then `leaving screen` | pass |
+| Return edge releases held keys | C3/C7 | `a` held, pushed back past the left edge: client got the release, then `leaving screen` (runs 1–2; since run 3 a held letter keeps the pointer on the client and a held Shift is released instead) | pass |
 | Emergency escape while remote | C6 (protocol half) | Control held then escape: release 37 delivered, `leaving screen`, server `local recovery: completed` | pass |
 | Client lost while remote | C7 | client killed with Shift held: server `local recovery: completed`, `client disconnected` | pass |
 | Reconnect | — | new session; enter + (20, 20) → (21, 470) | pass |
@@ -52,9 +52,12 @@ The full X raw event sequence on the client display is in `x-events.txt`
    UTC), `client.log` (the last client instance) and `x-events.txt` (decoded X
    raw events on the client display).
 2. Scripted re-run at `99f77bd` with the reusable script below: every case
-   passed (`script-output.txt`). Both machines were checked clean afterwards: no
-   smoke process, Xvfb, temporary directory or Keychain item remained, and the
-   host's own `barrierc` was untouched.
+   passed. Both machines were checked clean afterwards: no smoke process, Xvfb,
+   temporary directory or Keychain item remained, and the host's own `barrierc`
+   was untouched.
+3. Scripted re-run at `6700cdf`, after the independent review fixes (a held key
+   or button now keeps the pointer on the client, so the return case releases a
+   held modifier instead): every case passed (`script-output.txt`).
 
 ```sh
 MACKVM_SMOKE_HOST=<ssh-alias> Tests/SystemTests/Scripts/M2-035-linux-smoke.sh

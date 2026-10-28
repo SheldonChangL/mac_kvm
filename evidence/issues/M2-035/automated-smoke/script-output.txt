@@ -4,6 +4,7 @@ M2-035 smoke: fingerprint-pinned=pass
 M2-035 smoke: enter=pass
 M2-035 smoke: move-1=pass
 M2-035 smoke: move-2=pass
+M2-035 smoke: held-key-locks=pass
 M2-035 smoke: return=pass
 M2-035 smoke: escape=pass
 M2-035 smoke: client-loss=pass
