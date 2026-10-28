@@ -106,6 +106,11 @@ package final class ServerCoordinator: @unchecked Sendable {
     var tracker: RemotePointerTracker?
     var leftThrough: ScreenEdge?
     var cursorParked = false
+    /// Whether local input can be captured at all (no secure input active).
+    var capturable = true
+    /// Set by a forced return to local; the edge stays inert until the
+    /// pointer has moved `rearmDistance` away from every linked edge.
+    var edgeDisarmed = false
     /// Keys and buttons physically held, as far as observed.
     var heldKeys: [VirtualKey] = []
     var heldButtons: [MouseButton] = []
@@ -117,17 +122,28 @@ package final class ServerCoordinator: @unchecked Sendable {
     var remoteButtons: [MouseButton] = []
   }
 
+  /// Local points the pointer must move away from the linked edges before a
+  /// forced return to local lets the edge activate again.
+  package static let rearmDistance: Double = 50
+  /// Upper bound on one relative motion, in local points per axis.
+  static let maximumMotion: Double = 10_000
+
   private let configuration: ServerCoordinatorConfiguration
   private let effects: any ServerCoordinatorEffects
   private let canForward: @Sendable (KVMEvent) -> Bool
+  private let inputCapturable: @Sendable () -> Bool
   private let lock = NSLock()
   private var current: State
 
   /// `canForward` says whether the remote can receive an input event; other
-  /// input is swallowed while remote and never delivered.
+  /// input is swallowed while remote and never delivered. `inputCapturable`
+  /// says whether local input can be captured at all; it is false while the
+  /// system routes keys past every event tap (secure input), and is checked
+  /// on each tick without the lock held.
   package init?(
     configuration: ServerCoordinatorConfiguration, effects: any ServerCoordinatorEffects,
-    canForward: @escaping @Sendable (KVMEvent) -> Bool
+    canForward: @escaping @Sendable (KVMEvent) -> Bool,
+    inputCapturable: @escaping @Sendable () -> Bool = { true }
   ) {
     guard
       let trigger = EnterRemoteTrigger(
@@ -137,10 +153,12 @@ package final class ServerCoordinator: @unchecked Sendable {
     self.configuration = configuration
     self.effects = effects
     self.canForward = canForward
+    self.inputCapturable = inputCapturable
     current = State(trigger: trigger)
+    current.capturable = inputCapturable()
   }
 
-  /// The current input current.
+  /// The current input state.
   package var state: InputState {
     lock.withLock { current.input }
   }
@@ -154,18 +172,29 @@ package final class ServerCoordinator: @unchecked Sendable {
       notePhysical(event)
       noteLocal(event)
       guard case .mouseMove(let position) = event, current.input == .local else { return }
+      let x = position.x * (configuration.localSize.width - 1)
+      let y = position.y * (configuration.localSize.height - 1)
+      if current.edgeDisarmed {
+        guard distanceToLinkedEdges(x: x, y: y) >= Self.rearmDistance else { return }
+        current.edgeDisarmed = false
+      }
       let intent = current.trigger.pointer(
-        x: position.x * (configuration.localSize.width - 1),
-        y: position.y * (configuration.localSize.height - 1), at: timestamp, state: current.input,
-        available: Set(current.mappers.keys))
+        x: x, y: y, at: timestamp, state: current.input, available: Set(current.mappers.keys))
       if let intent { requestEnter(intent) }
     }
   }
 
-  /// Completes an edge dwell when the pointer rests on the edge.
+  /// Completes an edge dwell when the pointer rests on the edge, and returns
+  /// input to local when it can no longer be captured.
   package func tick(at timestamp: Duration) {
+    let capturable = inputCapturable()
     lock.withLock {
-      guard current.input == .local,
+      current.capturable = capturable
+      if !capturable, current.input != .local {
+        apply(.captureFailure)
+        return
+      }
+      guard current.input == .local, !current.edgeDisarmed,
         let intent = current.trigger.tick(
           at: timestamp, state: current.input, available: Set(current.mappers.keys))
       else { return }
@@ -201,10 +230,18 @@ package final class ServerCoordinator: @unchecked Sendable {
       guard case .remote(let target) = current.input, var tracker = current.tracker,
         let mapper = current.mappers[target], deltaX.isFinite, deltaY.isFinite
       else { return false }
+      let limit = Self.maximumMotion
       let motion = Self.apply(
-        deltaX: deltaX, deltaY: deltaY, to: &tracker, localSize: configuration.localSize)
+        deltaX: min(max(deltaX, -limit), limit), deltaY: min(max(deltaY, -limit), limit),
+        to: &tracker, localSize: configuration.localSize)
       current.tracker = tracker
       switch motion {
+      case .returned where holdsRemoteInput:
+        // Held input locks the pointer to the client, as a drag or a held
+        // key must not end on this Mac (its repeats would reach local apps).
+        if !effects.deliver(.mouseMove(position: mapper.normalized(tracker.position)), to: target) {
+          apply(.captureFailure)
+        }
       case .moved(let point):
         if !effects.deliver(.mouseMove(position: mapper.normalized(point)), to: target) {
           apply(.captureFailure)
@@ -223,17 +260,20 @@ package final class ServerCoordinator: @unchecked Sendable {
 
   // MARK: Sessions and outcomes
 
-  /// A client finished its handshake and reported its screen size.
-  package func clientReady(_ screen: ScreenID, width: Int, height: Int) {
+  /// A client finished its handshake and reported its screen size. Returns
+  /// `false`, and the client stays unreachable, when the size is unusable.
+  @discardableResult
+  package func clientReady(_ screen: ScreenID, width: Int, height: Int) -> Bool {
     lock.withLock {
       guard
         let mapper = OutboundCoordinateMapper(
           remoteSize: OutboundCoordinateMapper.LogicalSize(
             width: Double(width), height: Double(height)),
           entryInset: configuration.entryInset)
-      else { return }
+      else { return false }
       current.mappers[screen] = mapper
       rebuildTrigger()
+      return true
     }
   }
 
@@ -273,6 +313,7 @@ package final class ServerCoordinator: @unchecked Sendable {
   // MARK: Reducer and effects (lock held)
 
   private func requestEnter(_ intent: EnterIntent) {
+    guard current.capturable else { return }
     current.pendingEnter = intent
     apply(intent.action)
   }
@@ -282,10 +323,16 @@ package final class ServerCoordinator: @unchecked Sendable {
   private func apply(_ action: InputAction) {
     var queue = [action]
     while !queue.isEmpty {
-      let transition = InputStateReducer.reduce(current.input, queue.removeFirst())
+      let previous = current.input
+      let transition = InputStateReducer.reduce(previous, queue.removeFirst())
       current.input = transition.state
       for effect in transition.effects {
         execute(effect, followUps: &queue)
+      }
+      if previous != .local, transition.state == .local,
+        transition.effects.contains(.restoreLocal)
+      {
+        current.edgeDisarmed = true
       }
       if current.input == .local {
         current.pendingEnter = nil
@@ -350,6 +397,29 @@ package final class ServerCoordinator: @unchecked Sendable {
   }
 
   // MARK: Bookkeeping (lock held)
+
+  /// Whether the remote holds a button or a non-modifier key.
+  private var holdsRemoteInput: Bool {
+    let modifiers: [VirtualKey] = [.shift, .control, .option, .command]
+    return !current.remoteButtons.isEmpty
+      || current.remoteKeys.contains { !modifiers.contains($0.0) }
+  }
+
+  /// The smallest distance, in local points, from `(x, y)` to a linked edge.
+  private func distanceToLinkedEdges(x: Double, y: Double) -> Double {
+    let maxX = configuration.localSize.width - 1
+    let maxY = configuration.localSize.height - 1
+    let distances = configuration.links.compactMap { link -> Double? in
+      guard link.from == configuration.localScreen else { return nil }
+      switch link.edge {
+      case .left: return x
+      case .right: return maxX - x
+      case .top: return y
+      case .bottom: return maxY - y
+      }
+    }
+    return distances.min() ?? .infinity
+  }
 
   private func rebuildTrigger() {
     guard

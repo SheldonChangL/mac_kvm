@@ -54,8 +54,17 @@ private final class FakeEffects: ServerCoordinatorEffects, @unchecked Sendable {
   func cancelEnterTimeout(for screen: ScreenID) { record(.cancelTimeout(screen)) }
 }
 
+/// Whether local input can currently be captured (no secure input active).
+private final class CapturableFlag: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value = true
+  var isCapturable: Bool { lock.withLock { value } }
+  func set(_ capturable: Bool) { lock.withLock { value = capturable } }
+}
+
 private func makeCoordinator(
-  canForward: @escaping @Sendable (KVMEvent) -> Bool = { _ in true }
+  canForward: @escaping @Sendable (KVMEvent) -> Bool = { _ in true },
+  capturable: CapturableFlag = CapturableFlag()
 ) throws -> (ServerCoordinator, FakeEffects) {
   let effects = FakeEffects()
   let edgeDetection = try #require(
@@ -65,9 +74,10 @@ private func makeCoordinator(
       localScreen: mac, localSize: localSize,
       links: [ScreenLink(from: mac, edge: .right, to: linux)], edgeDetection: edgeDetection,
       entryInset: 1, reentryInset: 2))
-  let coordinator = try #require(
-    ServerCoordinator(configuration: configuration, effects: effects, canForward: canForward))
-  return (coordinator, effects)
+  let created = ServerCoordinator(
+    configuration: configuration, effects: effects, canForward: canForward,
+    inputCapturable: { capturable.isCapturable })
+  return (try #require(created), effects)
 }
 
 private let rightEdge = KVMEvent.mouseMove(position: NormalizedPoint(x: 1, y: 0.5))
@@ -79,7 +89,7 @@ private func key(_ key: VirtualKey, _ phase: KeyPhase) -> KVMEvent {
 
 /// Dwells on the linked edge until the enter is requested.
 private func requestEnter(_ coordinator: ServerCoordinator) {
-  coordinator.clientReady(linux, width: 1921, height: 1081)
+  _ = coordinator.clientReady(linux, width: 1921, height: 1081)
   coordinator.observeLocal(rightEdge, at: .zero)
   coordinator.observeLocal(rightEdge, at: .milliseconds(50))
 }
@@ -106,7 +116,7 @@ struct ServerCoordinatorTests {
   @Test("a dwell on the linked edge sends the enter, and the delivered enter commits remote")
   func enter() throws {
     let (coordinator, effects) = try makeCoordinator()
-    coordinator.clientReady(linux, width: 1921, height: 1081)
+    #expect(coordinator.clientReady(linux, width: 1921, height: 1081))
     coordinator.observeLocal(rightEdge, at: .zero)
     #expect(coordinator.state == .local)
     #expect(effects.calls.isEmpty)
@@ -128,7 +138,7 @@ struct ServerCoordinatorTests {
   @Test("a tick completes a dwell when the pointer rests on the edge")
   func tickCompletesDwell() throws {
     let (coordinator, effects) = try makeCoordinator()
-    coordinator.clientReady(linux, width: 1921, height: 1081)
+    #expect(coordinator.clientReady(linux, width: 1921, height: 1081))
     coordinator.observeLocal(rightEdge, at: .zero)
     coordinator.tick(at: .milliseconds(20))
     #expect(coordinator.state == .local)
@@ -181,12 +191,13 @@ struct ServerCoordinatorTests {
       ])
   }
 
-  @Test("pushing back past the arrival edge releases held input, leaves and restores the cursor")
+  @Test(
+    "pushing back past the arrival edge releases held modifiers, leaves and restores the cursor")
   func returnEdge() throws {
     let (coordinator, effects) = try makeCoordinator()
     enterRemote(coordinator, effects)
-    #expect(coordinator.handleSuppressed(key(.letter(0), .down)) == .swallow)
-    #expect(coordinator.handleSuppressed(.mouseButton(button: .right, phase: .down)) == .swallow)
+    #expect(coordinator.handleSuppressed(key(.control, .down)) == .swallow)
+    #expect(coordinator.handleSuppressed(key(.option, .down)) == .swallow)
     #expect(coordinator.handleSuppressed(key(.capsLock, .down)) == .swallow)
     effects.reset()
 
@@ -195,8 +206,8 @@ struct ServerCoordinatorTests {
     #expect(
       effects.calls == [
         .disableSuppression,
-        .deliver(key(.letter(0), .up), linux),
-        .deliver(.mouseButton(button: .right, phase: .up), linux),
+        .deliver(key(.option, .up), linux),
+        .deliver(key(.control, .up), linux),
         .deliver(.leaveScreen(screen: linux), linux),
         .restoreCursor(try returnPoint(remoteY: 540)),
       ])
@@ -317,5 +328,102 @@ struct ServerCoordinatorTests {
     #expect(coordinator.handleSuppressed(.mouseButton(button: .left, phase: .up)) == .passLocally)
     #expect(coordinator.handleSuppressed(key(.letter(1), .down)) == .swallow)
     #expect(effects.deliveries == [key(.letter(1), .down)])
+  }
+
+  @Test("a client size the mapper cannot use is refused")
+  func unusableClientSize() throws {
+    let (coordinator, _) = try makeCoordinator()
+    #expect(!coordinator.clientReady(linux, width: 1, height: 1081))
+    coordinator.observeLocal(rightEdge, at: .zero)
+    coordinator.observeLocal(rightEdge, at: .milliseconds(80))
+    #expect(coordinator.state == .local)
+  }
+
+  @Test("a held remote button or key keeps the pointer on the client at the arrival edge")
+  func heldInputLocksToClient() throws {
+    let (coordinator, effects) = try makeCoordinator()
+    enterRemote(coordinator, effects)
+    _ = coordinator.handleSuppressed(.mouseButton(button: .left, phase: .down))
+    effects.reset()
+
+    #expect(coordinator.moveRemote(deltaX: -20, deltaY: 0))
+    #expect(coordinator.state == .remote(linux))
+    #expect(effects.deliveries == [.mouseMove(position: NormalizedPoint(x: 0, y: 0.5))])
+
+    _ = coordinator.handleSuppressed(.mouseButton(button: .left, phase: .up))
+    _ = coordinator.handleSuppressed(key(.letter(22), .down))
+    #expect(coordinator.moveRemote(deltaX: -5, deltaY: 0))
+    #expect(coordinator.state == .remote(linux))
+
+    _ = coordinator.handleSuppressed(key(.letter(22), .up))
+    _ = coordinator.handleSuppressed(key(.shift, .down))
+    effects.reset()
+    #expect(coordinator.moveRemote(deltaX: -5, deltaY: 0))
+    #expect(coordinator.state == .leavingRemote(linux))
+    #expect(effects.deliveries.first == key(.shift, .up))
+  }
+
+  @Test("after a forced return the edge stays disarmed until the pointer moves well away")
+  func forcedReturnDisarmsTheEdge() throws {
+    let (coordinator, effects) = try makeCoordinator()
+    enterRemote(coordinator, effects)
+    coordinator.dispatch(.emergencyEscape)
+    effects.reset()
+
+    coordinator.observeLocal(rightEdge, at: .seconds(1))
+    coordinator.observeLocal(rightEdge, at: .milliseconds(1080))
+    coordinator.tick(at: .milliseconds(1200))
+    #expect(coordinator.state == .local)
+    #expect(effects.calls.isEmpty)
+
+    coordinator.observeLocal(.mouseMove(position: NormalizedPoint(x: 0.9, y: 0.5)), at: .seconds(2))
+    coordinator.observeLocal(rightEdge, at: .milliseconds(2100))
+    coordinator.observeLocal(rightEdge, at: .milliseconds(2150))
+    #expect(coordinator.state == .enteringRemote(linux))
+  }
+
+  @Test("a normal return re-arms the edge at once")
+  func normalReturnRearms() throws {
+    let (coordinator, effects) = try makeCoordinator()
+    enterRemote(coordinator, effects)
+    #expect(coordinator.moveRemote(deltaX: -20, deltaY: 0))
+    coordinator.leaveCompleted(linux)
+
+    // The cursor is back just inside the edge; the next push re-enters.
+    coordinator.observeLocal(
+      .mouseMove(position: try returnPoint(remoteY: 540)), at: .milliseconds(900))
+    coordinator.observeLocal(rightEdge, at: .seconds(1))
+    coordinator.observeLocal(rightEdge, at: .milliseconds(1050))
+    #expect(coordinator.state == .enteringRemote(linux))
+  }
+
+  @Test("while input cannot be captured, no enter starts and remote input returns to local")
+  func secureInputBlocksRemote() throws {
+    let capturable = CapturableFlag()
+    let (coordinator, effects) = try makeCoordinator(capturable: capturable)
+    capturable.set(false)
+    coordinator.tick(at: .zero)
+    requestEnter(coordinator)
+    #expect(coordinator.state == .local)
+
+    capturable.set(true)
+    coordinator.tick(at: .milliseconds(60))
+    coordinator.observeLocal(
+      .mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5)), at: .milliseconds(70))
+    enterRemote(coordinator, effects)
+    #expect(coordinator.state == .remote(linux))
+
+    capturable.set(false)
+    coordinator.tick(at: .seconds(1))
+    #expect(coordinator.state == .local)
+    #expect(effects.calls.last == .recoverLocal(cursorWasParked: true))
+  }
+
+  @Test("an absurd motion delta is bounded and lands on the far edge", .timeLimit(.minutes(1)))
+  func hugeDeltaIsBounded() throws {
+    let (coordinator, effects) = try makeCoordinator()
+    enterRemote(coordinator, effects)
+    #expect(coordinator.moveRemote(deltaX: 1e15, deltaY: 0))
+    #expect(effects.deliveries == [.mouseMove(position: NormalizedPoint(x: 1, y: 0.5))])
   }
 }
