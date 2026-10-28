@@ -17,6 +17,10 @@ private let resetError = CoreError(
   code: .transport(.reset), severity: .error, retryDisposition: .backoff,
   cleanupDisposition: .notRequired)
 
+private let cancellationError = CoreError(
+  code: .cancellation(.requested), severity: .info, retryDisposition: .never,
+  cleanupDisposition: .notRequired)
+
 /// Fake protocol session recording sends; individual sends can be held open or failed.
 private final class FakeProtocolSession: KVMProtocolSession, @unchecked Sendable {
   private let lock = NSLock()
@@ -221,6 +225,80 @@ struct ServerSessionTests {
       code: .lifecycle(.subsystemUnavailable), severity: .warning, retryDisposition: .never,
       cleanupDisposition: .notRequired)
     await #expect(throws: closed) { try await session.enter(at: entry) }
+  }
+
+  /// Codex review H-4: a cancelled queued writer neither sends nor strands
+  /// later writers.
+  @Test("cancellation: a cancelled queued forward never sends and never strands later writers")
+  func cancelledQueuedForwardNeverSends() async throws {
+    let fake = FakeProtocolSession()
+    let session = try await readySession(fake)
+    try await session.enter(at: entry)
+    fake.hold(keyDown)
+    let first = Task { try await session.forward(keyDown) }
+    await fake.waitUntilHeld()
+    let stale = Task { try await session.forward(keyUp) }
+    await session.waitForQueuedWriters(count: 1)
+    stale.cancel()
+    fake.releaseHeld()
+
+    try await first.value
+    await #expect(throws: cancellationError) { try await stale.value }
+    #expect(!fake.sent.contains(keyUp))
+    #expect(fake.sent.last == keyDown)
+
+    let later = KVMEvent.key(key: .letter(2), phase: .down, modifiers: ModifierState())
+    try await session.forward(later)
+    #expect(fake.sent.last == later)
+    #expect(await session.state == .active)
+  }
+
+  /// A leave is cleanup: cancelling it never drops the leave, so the peer is
+  /// never left entered.
+  @Test("cancellation: a cancelled queued leave is still sent")
+  func cancelledQueuedLeaveIsStillSent() async throws {
+    let fake = FakeProtocolSession()
+    let session = try await readySession(fake)
+    try await session.enter(at: entry)
+    fake.hold(keyDown)
+    let first = Task { try await session.forward(keyDown) }
+    await fake.waitUntilHeld()
+    let leaving = Task { try await session.leave() }
+    await session.waitForQueuedWriters(count: 1)
+    leaving.cancel()
+    fake.releaseHeld()
+
+    try await first.value
+    try await leaving.value
+    #expect(fake.sent.last == .leaveScreen(screen: screen))
+    #expect(await session.state == .ready)
+  }
+
+  /// An enter that was cancelled before it was written never reached the
+  /// peer, so the session stays usable.
+  @Test("cancellation: a cancelled queued enter sends nothing and the session stays ready")
+  func cancelledQueuedEnterSendsNothing() async throws {
+    let fake = FakeProtocolSession()
+    let session = try await readySession(fake)
+    try await session.enter(at: entry)
+    fake.hold(keyDown)
+    let first = Task { try await session.forward(keyDown) }
+    await fake.waitUntilHeld()
+    // The leave queues behind the held key; the session is ready at once.
+    let leaving = Task { try await session.leave() }
+    await session.waitForQueuedWriters(count: 1)
+    let entering = Task { try await session.enter(at: entry) }
+    await session.waitForQueuedWriters(count: 2)
+    entering.cancel()
+    fake.releaseHeld()
+
+    try await first.value
+    try await leaving.value
+    await #expect(throws: cancellationError) { try await entering.value }
+    #expect(await session.state == .ready)
+    #expect(fake.sent.last == .leaveScreen(screen: screen))
+    try await session.enter(at: entry)
+    #expect(await session.state == .active)
   }
 
   @Test("peer end: monitoring the event stream reports closure")
