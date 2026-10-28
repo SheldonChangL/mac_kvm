@@ -57,10 +57,12 @@ struct MacKVMApplication {
 
     let suppressor = LocalEventSuppressor(
       filter: .live(), isEmergencyEscape: { EmergencyEscape.isChordKey($0) })
+    let secureInput = SecureInputWatch()
     guard
       let runtime = ServerRuntime(
         configuration: configuration, identity: identity, desktop: desktop,
-        suppressor: suppressor, cursor: CursorRestorer())
+        suppressor: suppressor, cursor: CursorRestorer(),
+        inputCapturable: { secureInput.allowsCapture() })
     else { exit(1) }
     let input = InputTap(
       coordinator: runtime.coordinator, effects: runtime.effects, suppressor: suppressor,
@@ -70,21 +72,29 @@ struct MacKVMApplication {
       let lifecycle = EventTapLifecycle(
         control: MacEventTapControl(tap: tap), restartBudget: 10)
     else { exit(1) }
-    input.attach(lifecycle)
+    // The tap goes first, so nothing new is captured while the session
+    // drains; local input never depends on the network.
+    let stop: @Sendable (InputLifecycleTrigger) -> Void = { trigger in
+      lifecycle.terminate()
+      Task {
+        await runtime.shutdown(trigger)
+        report("stopped; input is local")
+        flushReports()
+        exit(0)
+      }
+    }
+    let fail: @Sendable (String) -> Void = { reason in
+      report("stopping: \(reason)")
+      stop(.termination)
+    }
+    input.attach(lifecycle, onFailure: fail)
+    runtime.onFailure(fail)
     do {
       try lifecycle.start()
     } catch {
       report("the event tap could not be created: \(error.code)")
+      flushReports()
       exit(77)
-    }
-
-    let stop: @Sendable (InputLifecycleTrigger) -> Void = { trigger in
-      Task {
-        await runtime.shutdown(trigger)
-        lifecycle.terminate()
-        report("stopped; input is local")
-        exit(0)
-      }
     }
     let signals = installSignalHandlers(stop)
     let sleepObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -100,8 +110,9 @@ struct MacKVMApplication {
           "move the pointer across the \(configuration.edge.rawValue) edge to control the client")
         report("Control+Option+Command+Delete returns input to this Mac at any time")
       } catch {
-        report("could not listen: \(error.code)")
         lifecycle.terminate()
+        report("could not listen: \(error.code)")
+        flushReports()
         exit(69)
       }
     }
@@ -109,6 +120,27 @@ struct MacKVMApplication {
       CFRunLoopRun()
     }
     exit(0)
+  }
+
+  /// Reports when secure keyboard entry starts or stops blocking input capture.
+  final class SecureInputWatch: @unchecked Sendable {
+    private let lock = NSLock()
+    private var secure: Bool?
+
+    func allowsCapture() -> Bool {
+      let now = MacSecureInput.isEnabled
+      let previous = lock.withLock {
+        defer { secure = now }
+        return secure
+      }
+      if previous != now, now || previous != nil {
+        report(
+          now
+            ? "secure keyboard entry is on in an app on this Mac; input stays here"
+            : "secure keyboard entry is off again")
+      }
+      return !now
+    }
   }
 
   static func loadIdentity(_ store: MacServerIdentityStore) -> MacServerIdentity {

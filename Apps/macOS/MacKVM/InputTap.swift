@@ -16,6 +16,7 @@ final class InputTap: @unchecked Sendable {
   private let suppressor: LocalEventSuppressor
   private let mouse: MacMouseCapture
   private var lifecycle: EventTapLifecycle?
+  private var onFailure: (@Sendable (String) -> Void)?
 
   init(
     coordinator: ServerCoordinator, effects: MacServerEffects, suppressor: LocalEventSuppressor,
@@ -27,25 +28,31 @@ final class InputTap: @unchecked Sendable {
     self.mouse = mouse
   }
 
-  /// Set once before the tap is installed; only the tap callback reads it.
-  func attach(_ lifecycle: EventTapLifecycle) {
+  /// Set once before the tap is installed; only the tap callback reads them.
+  func attach(
+    _ lifecycle: EventTapLifecycle, onFailure: @escaping @Sendable (String) -> Void
+  ) {
     self.lifecycle = lifecycle
+    self.onFailure = onFailure
   }
 
   func handle(_ type: CGEventType, _ event: CGEvent) -> CGEvent? {
     switch suppressor.decide(type: type, event: event) {
     case .failOpen:
       coordinator.dispatch(.captureFailure)
-      let decision = lifecycle?.handleSystemDisable()
-      report("event tap disabled by the system; input is local (\(String(describing: decision)))")
+      if lifecycle?.handleSystemDisable() == .gaveUp {
+        onFailure?("the event tap kept being disabled")
+      } else {
+        report("the system disabled the event tap; input is local, tap re-enabled")
+      }
       return event
     case .emergencyEscape:
-      if let captured = MacKeyboardCapture.map(event),
-        let action = EmergencyEscape.action(for: captured.event)
-      {
-        coordinator.dispatch(action)
-        report("emergency escape: input is local")
-      }
+      // The suppressor has already stopped suppressing for any phase of the
+      // chord key, so every phase must return input to local, or a chord
+      // completed by a release or a repeat would leave the state remote.
+      let wasLocal = coordinator.state == .local
+      coordinator.dispatch(LeaveRemoteFlow.escapeAction)
+      if !wasLocal { report("emergency escape: input is local") }
       return event
     case .passThrough:
       observeLocal(type, event)

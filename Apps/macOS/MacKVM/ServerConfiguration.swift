@@ -31,6 +31,15 @@ struct ServerConfiguration: Equatable {
   var scope = MacTLSServerListenerScope.anyInterface
   var identityLabel = MacServerIdentityStore.productionLabel
 
+  /// A Barrier screen name the server accepts: 1...64 of `[A-Za-z0-9_-]`.
+  static func isScreenName(_ name: String) -> Bool {
+    (1...64).contains(name.utf8.count)
+      && name.unicodeScalars.allSatisfy {
+        ("a"..."z").contains($0) || ("A"..."Z").contains($0) || ("0"..."9").contains($0)
+          || $0 == "-" || $0 == "_"
+      }
+  }
+
   /// Parses `arguments` without the executable name; `nil` means usage error.
   static func parse(_ arguments: [String]) -> ServerConfiguration? {
     guard let first = arguments.first else { return nil }
@@ -73,10 +82,10 @@ struct ServerConfiguration: Equatable {
     }
     switch configuration.command {
     case .serve:
-      return configuration.clientName.isEmpty ? nil : configuration
+      return isScreenName(configuration.clientName) ? configuration : nil
     #if DEBUG
       case .smoke:
-        return configuration.clientName.isEmpty ? nil : configuration
+        return isScreenName(configuration.clientName) ? configuration : nil
     #endif
     case .fingerprint, .forgetIdentity:
       return configuration

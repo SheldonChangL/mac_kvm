@@ -25,13 +25,17 @@ final class ServerRuntime: @unchecked Sendable {
   private let identity: MacServerIdentity
   private let listener: MacTLSServerListener
   private let gate: BarrierListenerTransport
+  private let lock = NSLock()
   private var tasks: [Task<Void, Never>] = []
+  private var stopping = false
+  private var onFailure: (@Sendable (String) -> Void)?
 
   /// Builds the runtime; `nil` with a reported reason when the configuration
   /// or the desktop geometry is unusable.
   init?(
     configuration: ServerConfiguration, identity: MacServerIdentity, desktop: CGRect,
-    suppressor: LocalEventSuppressor?, cursor: CursorRestorer?
+    suppressor: LocalEventSuppressor?, cursor: CursorRestorer?,
+    inputCapturable: @escaping @Sendable () -> Bool
   ) {
     self.configuration = configuration
     self.identity = identity
@@ -49,7 +53,7 @@ final class ServerRuntime: @unchecked Sendable {
         edgeDetection: edgeDetection, entryInset: 1, reentryInset: 2),
       let coordinator = ServerCoordinator(
         configuration: coordinatorConfiguration, effects: effects,
-        canForward: BarrierServerProtocolSession.canSend),
+        canForward: BarrierServerProtocolSession.canSend, inputCapturable: inputCapturable),
       let policy = try? BarrierListenerPolicy(
         maximumConcurrentConnections: 2, connectTimeout: Self.connectTimeout)
     else {
@@ -63,17 +67,23 @@ final class ServerRuntime: @unchecked Sendable {
     effects.onEnterTimeout { [weak coordinator] screen in coordinator?.enterTimedOut(screen) }
   }
 
+  /// Called once if the server cannot go on (the listener died).
+  func onFailure(_ handler: @escaping @Sendable (String) -> Void) {
+    lock.withLock { onFailure = handler }
+  }
+
   /// Starts listening and the background tasks.
   func start() async throws(CoreError) {
     try await listener.start()
     report(
-      "listening on port \(configuration.port)"
-        + (configuration.scope == .loopback ? " (loopback only)" : "")
-        + "; waiting for \(configuration.clientName) on the \(configuration.edge.rawValue) edge")
+      "listening" + (configuration.scope == .loopback ? " on loopback only" : "")
+        + "; the client is beyond the \(configuration.edge.rawValue) edge")
     let accept = Task { [self] in
       for await transport in listener.connections {
         Task { await self.serve(transport) }
       }
+      let (stopping, failure) = lock.withLock { (self.stopping, self.onFailure) }
+      if !stopping { failure?("the listener stopped") }
     }
     let ticker = Task { [coordinator] in
       while !Task.isCancelled {
@@ -87,12 +97,15 @@ final class ServerRuntime: @unchecked Sendable {
   /// Returns input to local, sends what is queued for the client, then closes
   /// everything.
   func shutdown(_ trigger: InputLifecycleTrigger) async {
+    lock.withLock { stopping = true }
     coordinator.dispatch(.lifecycle(trigger))
     if let outbox = clients.outbox {
       let deadline = ContinuousClock.now + Self.flushTimeout
       while outbox.count > 0, ContinuousClock.now < deadline {
         try? await Task.sleep(for: .milliseconds(10))
       }
+      // The last dequeued write may still be in flight.
+      try? await Task.sleep(for: .milliseconds(100))
     }
     for task in tasks { task.cancel() }
     listener.stop()
@@ -138,8 +151,16 @@ final class ServerRuntime: @unchecked Sendable {
       return
     }
     let sender = Task { await self.send(outbox, through: session) }
-    coordinator.clientReady(clientScreen, width: size.width, height: size.height)
-    report("client \(configuration.clientName) ready (\(size.width)x\(size.height))")
+    guard coordinator.clientReady(clientScreen, width: size.width, height: size.height) else {
+      report("the client reported an unusable screen size; disconnecting")
+      await session.close(reason: .userRequested)
+      outbox.close()
+      clients.release(clientScreen)
+      await sender.value
+      await gate.release(admission)
+      return
+    }
+    report("client ready (\(size.width)x\(size.height))")
 
     let reason = await session.monitorPeer()
     outbox.close()
@@ -157,8 +178,9 @@ final class ServerRuntime: @unchecked Sendable {
       do {
         next = try await outbox.next()
       } catch {
-        // Overflow: the coordinator has already failed open.
-        outbox.reset()
+        // Overflow: the coordinator has already failed open and the producer
+        // resets the queue before it queues the releases and the leave.
+        await Task.yield()
         continue
       }
       guard let event = next else { return }

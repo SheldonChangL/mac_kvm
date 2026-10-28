@@ -64,7 +64,7 @@ rssh "set -e; cd $remote; mkdir -p profile/SSL/Fingerprints
   barrierc -f --no-tray --debug INFO --name $name --profile-dir $remote/profile \
     --display $display 127.0.0.1:$port > barrierc.log 2>&1 & echo \$! > barrierc.pid"
 sleep 5
-check handshake "$(grep -c "client $name ready (1600x900)" "$work/server.log")" 1
+check handshake "$(grep -c "client ready (1600x900)" "$work/server.log")" 1
 check fingerprint-pinned "$(rssh "grep -c 'Fingerprint matches trusted fingerprint' $remote/barrierc.log")" 1
 
 send edge; sleep 0.5

@@ -20,7 +20,7 @@
       guard
         let runtime = ServerRuntime(
           configuration: configuration, identity: identity, desktop: desktop, suppressor: nil,
-          cursor: nil)
+          cursor: nil, inputCapturable: { true })
       else { exit(1) }
       Task {
         do throws(CoreError) {
@@ -41,6 +41,7 @@
         Task {
           await runtime.shutdown(.termination)
           report("stopped")
+          flushReports()
           exit(0)
         }
       }
@@ -55,7 +56,11 @@
       let coordinator = runtime.coordinator
       switch words[0] {
       case "edge":
+        // Approach from the middle, as a real pointer does; an edge disarmed by
+        // a forced return re-arms only once the pointer was away from it.
         let position = edgePosition(edge)
+        coordinator.observeLocal(
+          .mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5)), at: uptime())
         coordinator.observeLocal(.mouseMove(position: position), at: uptime())
         Thread.sleep(forTimeInterval: 0.08)
         coordinator.observeLocal(.mouseMove(position: position), at: uptime())

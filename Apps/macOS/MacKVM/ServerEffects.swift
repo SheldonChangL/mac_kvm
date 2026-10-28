@@ -4,12 +4,23 @@ import KVMContracts
 import KVMCore
 import MacPlatform
 
-/// One status line on standard output. Callers never pass input content, key
-/// identities, addresses or certificate material.
+/// Status lines are written on their own queue, so a slow standard output can
+/// never stall the event tap callback or a caller holding a lock.
+private let reportQueue = DispatchQueue(label: "MacKVM.report")
+
+/// One status line on standard output. Callers never pass typed text, key
+/// identities, screen names, addresses, ports or key material (ADR M2-001).
 func report(_ message: String) {
   let stamp = Date().formatted(.iso8601.time(includingFractionalSeconds: true))
-  print("[\(stamp)] \(message)")
-  fflush(stdout)
+  reportQueue.async {
+    print("[\(stamp)] \(message)")
+    fflush(stdout)
+  }
+}
+
+/// Waits until every queued status line is written.
+func flushReports() {
+  reportQueue.sync {}
 }
 
 /// Monotonic time for edge dwell, independent of event timestamps.
@@ -80,20 +91,24 @@ struct LocalInputSafety: ServerLocalInputSafety {
   func stopSuppression() throws(CoreError) { suppressor?.disableSuppression() }
   func releaseAllKeys() throws(CoreError) {}
   func releaseAllMouseButtons() throws(CoreError) {}
+  /// Window-server calls run on the main queue, the event tap's thread, so a
+  /// caller holding the coordinator lock never waits on the window server
+  /// while the tap callback waits on that lock. A failure is reported there.
   func restoreLocalCursor() throws(CoreError) {
     let target = flag.target
     guard target.restore, let cursor else { return }
-    if case .failed = cursor.restore(preferred: target.preferred) {
-      throw CoreError(
-        code: .inputSafety(.localStateRestoreFailed), severity: .error,
-        retryDisposition: .never, cleanupDisposition: .failed)
+    DispatchQueue.main.async {
+      if case .failed = cursor.restore(preferred: target.preferred) {
+        report("cursor restore failed")
+      }
     }
   }
   func clearTransientState() throws(CoreError) {}
 }
 
 /// Executes the coordinator's effects on this Mac. Called with the coordinator
-/// lock held, so nothing here waits or calls back into the coordinator.
+/// lock held, so nothing here waits or calls back into the coordinator; cursor
+/// and window-server work is queued on the main queue in effect order.
 final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   /// Local points the parked cursor keeps away from the linked edge.
   static let parkInset: Double = 4
@@ -141,13 +156,15 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
 
   func saveLocalCursor() {
     guard let cursor else { return }
-    cursor.saveCurrent()
-    let location = MacDesktop.cursorLocation()
-    lock.withLock { parkPoint = location.map(parked) }
+    DispatchQueue.main.async { [self] in
+      cursor.saveCurrent()
+      let location = MacDesktop.cursorLocation()
+      lock.withLock { parkPoint = location.map(parked) }
+    }
   }
 
   func enableSuppression() {
-    repark()
+    if cursor != nil { DispatchQueue.main.async { [self] in repark() } }
     suppressor?.enableSuppression()
     report("input is now remote")
   }
@@ -163,8 +180,10 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
     let point = CGPoint(
       x: desktop.minX + position.x * (desktop.width - 1),
       y: desktop.minY + position.y * (desktop.height - 1))
-    if case .failed = cursor.restore(preferred: point) {
-      report("cursor restore failed")
+    DispatchQueue.main.async {
+      if case .failed = cursor.restore(preferred: point) {
+        report("cursor restore failed")
+      }
     }
   }
 
@@ -181,8 +200,15 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   func deliver(_ event: KVMEvent, to screen: ScreenID) -> Bool {
     guard let outbox = clients.outbox(for: screen) else { return false }
     switch outbox.enqueue(event) {
-    case .enqueued, .coalesced, .droppedMove: return true
-    case .overflow, .closed: return false
+    case .enqueued, .coalesced, .droppedMove:
+      return true
+    case .overflow:
+      // Drop the backlog so the releases and the leave of the fail-open that
+      // follows can still be queued.
+      outbox.reset()
+      return false
+    case .closed:
+      return false
     }
   }
 
