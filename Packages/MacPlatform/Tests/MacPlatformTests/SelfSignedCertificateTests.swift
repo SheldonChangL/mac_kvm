@@ -146,7 +146,8 @@ struct SelfSignedCertificateTests {
   func parses() throws {
     let key = try ephemeralKey()
     let der = try SelfSignedCertificate.make(
-      request(notBefore: try utc("2026-10-28T00:00:00Z"), notAfter: try utc("2036-10-25T00:00:00Z")),
+      request(
+        notBefore: try utc("2026-10-28T00:00:00Z"), notAfter: try utc("2036-10-25T00:00:00Z")),
       privateKey: key)
     let certificate = try #require(SecCertificateCreateWithData(nil, der as CFData))
     #expect(SecCertificateCopySubjectSummary(certificate) as String? == "MacKVM Test Server")
@@ -156,14 +157,16 @@ struct SelfSignedCertificateTests {
     #expect(
       SecKeyCopyExternalRepresentation(embedded, nil) as Data?
         == SecKeyCopyExternalRepresentation(publicKey, nil) as Data?)
-    #expect(SecCertificateCopySerialNumberData(certificate, nil) as Data? == Data([0x01, 0x23, 0x45]))
+    #expect(
+      SecCertificateCopySerialNumberData(certificate, nil) as Data? == Data([0x01, 0x23, 0x45]))
   }
 
   @Test("the certificate is a valid anchor for itself exactly inside its validity")
   func validityWindow() throws {
     let key = try ephemeralKey()
     let der = try SelfSignedCertificate.make(
-      request(notBefore: try utc("2026-10-28T00:00:00Z"), notAfter: try utc("2036-10-25T00:00:00Z")),
+      request(
+        notBefore: try utc("2026-10-28T00:00:00Z"), notAfter: try utc("2036-10-25T00:00:00Z")),
       privateKey: key)
     #expect(try selfTrustEvaluates(der, at: try utc("2027-01-01T00:00:00Z")))
     #expect(try !selfTrustEvaluates(der, at: try utc("2026-10-27T23:59:59Z")))
@@ -188,7 +191,8 @@ struct SelfSignedCertificateTests {
   @Test("validity beyond 2049 is encoded as GeneralizedTime and still evaluates")
   func generalizedTimeValidity() throws {
     let der = try SelfSignedCertificate.make(
-      request(notBefore: try utc("2048-01-01T00:00:00Z"), notAfter: try utc("2051-01-01T00:00:00Z")),
+      request(
+        notBefore: try utc("2048-01-01T00:00:00Z"), notAfter: try utc("2051-01-01T00:00:00Z")),
       privateKey: try ephemeralKey())
     #expect(try selfTrustEvaluates(der, at: try utc("2050-06-01T00:00:00Z")))
     #expect(try !selfTrustEvaluates(der, at: try utc("2051-01-01T00:00:01Z")))
@@ -201,7 +205,8 @@ struct SelfSignedCertificateTests {
     let end = try utc("2036-10-25T00:00:00Z")
     for serial: [UInt8] in [[], [0x00], [0x00, 0x01], [0x80], Array(repeating: 0x01, count: 21)] {
       #expect(throws: SelfSignedCertificateError.invalidSerialNumber) {
-        try SelfSignedCertificate.make(request(serial: serial, notBefore: start, notAfter: end), privateKey: key)
+        try SelfSignedCertificate.make(
+          request(serial: serial, notBefore: start, notAfter: end), privateKey: key)
       }
     }
     #expect(throws: SelfSignedCertificateError.invalidValidity) {

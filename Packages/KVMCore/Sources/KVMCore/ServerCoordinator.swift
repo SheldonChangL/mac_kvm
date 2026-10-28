@@ -453,7 +453,8 @@ package final class ServerCoordinator: @unchecked Sendable {
     let limitY = max(spanY / 2 - 1, 1)
     let steps = max(1, Int((max(abs(deltaX) / limitX, abs(deltaY) / limitY)).rounded(.up)))
     let anchor = NormalizedPoint(x: 0.5, y: 0.5)
-    let size = OutboundCoordinateMapper.LogicalSize(width: localSize.width, height: localSize.height)
+    let size = OutboundCoordinateMapper.LogicalSize(
+      width: localSize.width, height: localSize.height)
     var motion = RemotePointerTracker.Motion.moved(tracker.position)
     for _ in 0..<steps {
       let position = NormalizedPoint(

@@ -43,7 +43,9 @@ struct MacKVMApplication {
     let permissions = EventTapPermissionService()
     guard permissions.preflight() == .ready else {
       _ = permissions.requestMissingAccess()
-      report("Input Monitoring and Accessibility are required for the event tap; grant them and retry")
+      report(
+        "Input Monitoring and Accessibility are required for the event tap;"
+          + " grant them and retry")
       exit(77)
     }
     guard let desktop = MacDesktop.bounds(), let mouse = MacMouseCapture(bounds: desktop) else {
@@ -64,7 +66,9 @@ struct MacKVMApplication {
       coordinator: runtime.coordinator, effects: runtime.effects, suppressor: suppressor,
       mouse: mouse)
     let tap = MacEventTap { type, event in input.handle(type, event) }
-    guard let lifecycle = EventTapLifecycle(control: MacEventTapControl(tap: tap), restartBudget: 10)
+    guard
+      let lifecycle = EventTapLifecycle(
+        control: MacEventTapControl(tap: tap), restartBudget: 10)
     else { exit(1) }
     input.attach(lifecycle)
     do {
@@ -92,7 +96,8 @@ struct MacKVMApplication {
     Task {
       do throws(CoreError) {
         try await runtime.start()
-        report("move the pointer across the \(configuration.edge.rawValue) edge to control the client")
+        report(
+          "move the pointer across the \(configuration.edge.rawValue) edge to control the client")
         report("Control+Option+Command+Delete returns input to this Mac at any time")
       } catch {
         report("could not listen: \(error.code)")

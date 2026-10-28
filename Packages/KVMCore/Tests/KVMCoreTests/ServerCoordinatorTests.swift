@@ -43,7 +43,9 @@ private final class FakeEffects: ServerCoordinatorEffects, @unchecked Sendable {
   func enableSuppression() { record(.enableSuppression) }
   func disableSuppression() { record(.disableSuppression) }
   func restoreLocalCursor(at position: NormalizedPoint) { record(.restoreCursor(position)) }
-  func recoverLocal(cursorWasParked: Bool) { record(.recoverLocal(cursorWasParked: cursorWasParked)) }
+  func recoverLocal(cursorWasParked: Bool) {
+    record(.recoverLocal(cursorWasParked: cursorWasParked))
+  }
   func deliver(_ event: KVMEvent, to screen: ScreenID) -> Bool {
     record(.deliver(event, screen))
     return lock.withLock { deliveryAccepted }
@@ -135,7 +137,7 @@ struct ServerCoordinatorTests {
     #expect(effects.calls.first == .saveCursor)
   }
 
-  @Test("without a ready client, a held key or button, the edge does nothing; Caps Lock does not block")
+  @Test("no client, a held key or a held button keeps input local; Caps Lock does not")
   func enterPreconditions() throws {
     let (alone, aloneEffects) = try makeCoordinator()
     alone.observeLocal(rightEdge, at: .zero)
@@ -166,11 +168,17 @@ struct ServerCoordinatorTests {
     enterRemote(coordinator, effects)
 
     #expect(coordinator.moveRemote(deltaX: 10, deltaY: 5))
-    #expect(effects.calls == [.deliver(.mouseMove(position: NormalizedPoint(x: 11.0 / 1920, y: 545.0 / 1080)), linux)])
+    #expect(
+      effects.calls == [
+        .deliver(.mouseMove(position: NormalizedPoint(x: 11.0 / 1920, y: 545.0 / 1080)), linux)
+      ])
 
     effects.reset()
     #expect(coordinator.moveRemote(deltaX: 900, deltaY: 0))
-    #expect(effects.deliveries == [.mouseMove(position: NormalizedPoint(x: 911.0 / 1920, y: 545.0 / 1080))])
+    #expect(
+      effects.deliveries == [
+        .mouseMove(position: NormalizedPoint(x: 911.0 / 1920, y: 545.0 / 1080))
+      ])
   }
 
   @Test("pushing back past the arrival edge releases held input, leaves and restores the cursor")
