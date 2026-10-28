@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-059",
+  "githubIssue": 71,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/71",
+  "implementationCommit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+  "author": "Claude Opus",
+  "independentSecurityReview": {
+    "required": true,
+    "status": "pending",
+    "note": "Acceptance Criterion 6 needs a security reviewer who is not the author. No such review has happened yet; the review below is not it."
+  },
+  "freshContextReview": {
+    "reviewer": "Claude Opus subagent with a fresh context, read-only, instructed to find defects",
+    "independentOfAuthor": false,
+    "independenceNote": "Same model family as the author and launched by the author's session. It shares no conversation context with the author, but it is not an independent reviewer for Acceptance Criteria 6 or 7.",
+    "reviewedState": "the three Exact Files in the working tree before the implementation commit; every finding below was addressed before commit 59f83da",
+    "frozenBehaviors": {
+      "1-changedFingerprintRejectsImmediately": "holds",
+      "2-neverAutoOverwriteOrAutoAccept": "holds",
+      "3-fingerprintsOnlyInTheWarningModel": "holds",
+      "4-repairNeedsAnExplicitOwnerAction": "holds",
+      "5-repairFailsClosedOnFailureAndCancellation": "holds",
+      "6-noTrustGapAndVerifiedSuccessOnly": "holds",
+      "7-malformedFailsClosedBeforeMutation": "holds",
+      "8-internalOrPackageAPIOnly": "holds"
+    },
+    "counts": { "critical": 0, "high": 0, "medium": 1, "low": 4, "nit": 4, "openAfterFixes": 0 }
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "verdict": "CONFIRMED",
+      "summary": "concurrentRepairsOfOneWarningConvergeOnThePresentedFingerprint was flaky, and the document and test comment claimed concurrent re-pairs only answer allow or prompt. When one re-pair's insert finds a duplicate that another re-pair removes before the store reads it back, the store fails closed with secureStorageUnavailable carrying errSecItemNotFound, and the flow passes it on. The reviewer reproduced it in 11 of 13 batches of up to 20000 repetitions.",
+      "status": "resolved",
+      "resolution": "The test now accepts exactly allow, prompt, or that store failure; a deterministic test (repairFailsClosedWhenItsDuplicateVanishesBeforeItIsRead) pins the interleaving; the document and comment were corrected. Afterwards 20000 repetitions of each concurrency test (40000 runs) passed, and 2000 repetitions of all 41 M1-059 tests passed (82000 test runs reported, the opt-in probe skipped in each repetition)."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "verdict": "CONFIRMED",
+      "summary": "Tests that wait for a held Keychain call would hang the run, rather than fail, if a regression stopped the flow reaching that call.",
+      "status": "resolved",
+      "resolution": "Waiting for a hold now ends when the waiting task is cancelled, a release that comes first lets the call through, and the seven hold-based tests have a one-minute time limit."
+    },
+    {
+      "id": "L2",
+      "severity": "low",
+      "verdict": "CONFIRMED values, PLAUSIBLE impact",
+      "summary": "The same cancellation value is returned whether nothing changed, the trusted record was removed, or the presented fingerprint was stored.",
+      "status": "resolved",
+      "resolution": "The failure values stay the store's frozen taxonomy. The type and apply documentation now state that a failure says why the flow stopped, not what the record holds, and that callers keep the connection rejected and evaluate again. Listed as a known limitation."
+    },
+    {
+      "id": "L3",
+      "severity": "low",
+      "verdict": "PLAUSIBLE (design trade-off)",
+      "summary": "A task cancelled while removal ran was refused the insert, leaving the device with no record, so a later impostor would get a first-use prompt instead of an identity-change warning.",
+      "status": "resolved",
+      "resolution": "Design change, test first: once removal has been issued, the insert of the owner-approved fingerprint is issued in a task of its own that cancelling the caller does not cancel, mirroring M1-058, where an issued add completes. The verifying read still refuses a cancelled task, so a cancelled re-pair is reported as cancellation, never success. The updated test failed against the previous implementation and passes now; mutation M9 confirms it. Only a Keychain insert failure can still leave the gap. The independent security reviewer should confirm this trade-off."
+    },
+    {
+      "id": "L4",
+      "severity": "low",
+      "verdict": "traced, untested",
+      "summary": "The store has no compare-and-delete: a record replaced between the check and the removal is removed, and the presented fingerprint is stored.",
+      "status": "resolved",
+      "resolution": "Documented as a known limitation and pinned by repairRemovalSupersedesARecordReplacedAfterTheCheck. Only owner-approved fingerprints are ever stored."
+    },
+    {
+      "id": "N1",
+      "severity": "nit",
+      "status": "resolved",
+      "summary": "The document attributed the fingerprint logging ban to Frozen Decision 8 alone; the explicit ban is in the M1-011 logging policy.",
+      "resolution": "Attribution corrected."
+    },
+    {
+      "id": "N2",
+      "severity": "nit",
+      "status": "resolved",
+      "summary": "The document pointed to evidence that did not exist yet.",
+      "resolution": "Reworded to the evidence package that accompanies the change; the package is this directory."
+    },
+    {
+      "id": "N3",
+      "severity": "nit",
+      "status": "resolved",
+      "summary": "The document said the probe needs exactly the action name, but the selection ignores surrounding whitespace and treats a blank value as not selected.",
+      "resolution": "Document corrected."
+    },
+    {
+      "id": "N4",
+      "severity": "nit",
+      "status": "resolved",
+      "summary": "A source comment said only the verifying read can answer allow, but the check read can too when the presented fingerprint is already stored.",
+      "resolution": "Source and test comments corrected."
+    }
+  ],
+  "authorFindings": [
+    {
+      "id": "A1",
+      "severity": null,
+      "status": "resolved",
+      "summary": "The first GREEN run failed 1 of 39 tests: the static source audit looked for the text print( and matched inside loadFingerprint(.",
+      "resolution": "The audit now matches whole identifiers only, and checks itself against a real call and an identifier ending in the same name. No production change."
+    }
+  ],
+  "blockers": []
+}

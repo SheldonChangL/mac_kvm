@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-059",
+  "githubIssue": 71,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/71",
+  "commit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+  "commitNote": "Implementation commit. Every result below ran at this commit on a clean working tree, by Claude Opus (the author) in this session.",
+  "files": [
+    {
+      "path": "Packages/MacPlatform/Sources/MacPlatform/FingerprintChangeFlow.swift",
+      "sha256": "0f0c854855dff6ef09cb22f9d253528c3774de2d260b74bb5644ea2fba2da4c2",
+      "lines": 276
+    },
+    {
+      "path": "Packages/MacPlatform/Tests/MacPlatformTests/FingerprintChangeFlowTests.swift",
+      "sha256": "278e7c050cd8337c5aa5e7df3b3faa5c7e7a55e575bb3ccea99f16e07fb7dadd",
+      "lines": 1799
+    },
+    {
+      "path": "docs/components/M1-059-fingerprint-change-flow.md",
+      "sha256": "801356156bb57c32e3f1a2eb93e0cf366cce8ed8c38633e1581a6a41285dfa98",
+      "lines": 368
+    }
+  ],
+  "requiredRun": {
+    "command": "swift test --package-path Packages/MacPlatform",
+    "startedAt": "2026-10-28T05:07:00Z",
+    "endedAt": "2026-10-28T05:07:02Z",
+    "exitCode": 0,
+    "status": "passed",
+    "framework": "Swift Testing",
+    "summaryLine": "Test run with 269 tests in 0 suites passed after 0.036 seconds.",
+    "skipped": 5,
+    "skippedTests": [
+      "manualRealInjectionProbeRunsOneReviewerSelectedAction",
+      "manualUniquePasteboardProbeRunsTheRealAdapterPath",
+      "manualRealAPIProbeRunsOneReviewerSelectedAction",
+      "manualFingerprintChangeProbeRunsTheRealRepairRoundTrip",
+      "manualKeychainProbeRunsTheRealFirstUseRoundTrip"
+    ],
+    "skippedNote": "All five are opt-in Tier-H probes, skipped unless a reviewer selects one; the M1-059 probe is one of them. Swift Testing's 269 counts the skipped tests; XCTest ran 0 tests.",
+    "warnings": 0
+  },
+  "machineReadableReports": [
+    {
+      "path": "tests/full-swift-testing.xml",
+      "sha256": "3511b992ae5dc6ed9908a0a1baf52cafea7165cb218c12cf050e6f909ae62636",
+      "command": "swift test --package-path Packages/MacPlatform --xunit-output <evidence>/tests/full-xunit.xml",
+      "exitCode": 0,
+      "testsuite": {
+        "tests": 264,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "testcases": 269
+      }
+    },
+    {
+      "path": "tests/focused-swift-testing.xml",
+      "sha256": "f9dafd1d565a1578b57fb0af0cf9973ba9be633ba3771d08dd5aa4771d90c88f",
+      "command": "swift test --package-path Packages/MacPlatform --filter '<the 41 M1-059 test names>' --xunit-output <evidence>/tests/focused-xunit.xml",
+      "exitCode": 0,
+      "testsuite": {
+        "tests": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "testcases": 41
+      }
+    }
+  ],
+  "machineReadableReportsNote": "xUnit reports written by Swift Testing. Their tests attribute excludes skipped tests. They hold test names and durations only: no path, host name, fingerprint or device identifier.",
+  "m1059DeclaredTests": {
+    "file": "Packages/MacPlatform/Tests/MacPlatformTests/FingerprintChangeFlowTests.swift",
+    "testDeclarations": 41,
+    "parameterized": 7,
+    "optInTierH": 1,
+    "fileLines": 1799,
+    "coverage": {
+      "closedTypes": [
+        "fingerprintChangeTypesAreClosedEquatableAndSendable"
+      ],
+      "warningPresentationModel": [
+        "changeWarningShowsBothFingerprintsOnlyAsCanonicalDisplayText",
+        "changeWarningRefusesAFingerprintOfAnyOtherLength",
+        "changeWarningRefusesIdenticalFingerprints",
+        "changeWarningIsRedactedInEveryRenderingButItsDisplayFields"
+      ],
+      "evaluationRejectsImmediately": [
+        "fingerprintChangeEvaluationTable",
+        "changedFingerprintRejectsImmediatelyWithAWarningAndNeverWrites",
+        "everySingleBitChangeOfThePresentedFingerprintCarriesAWarning",
+        "wrongLengthPresentedFingerprintIsRejectedBeforeAnyKeychainRead",
+        "malformedStoredFingerprintRejectsWithoutAWarningOrAWrite",
+        "changeEvaluationStorageFailureFailsClosed"
+      ],
+      "explicitOwnerDecision": [
+        "ownerRejectKeepsTheTrustedRecordWithoutKeychainIO",
+        "repairReplacesTheRecordInAFixedOrderAndVerifiesBeforeAllowing",
+        "repairIsIdempotentOnceThePresentedFingerprintIsStored",
+        "repairOnlyEverAddressesTheWarningsDevice"
+      ],
+      "staleWarning": [
+        "staleWarningRepairChangesNothingAndJudgesTheRecordAsRead"
+      ],
+      "transitionFailsClosed": [
+        "repairFailsClosedWhenTheRecordCannotBeRead",
+        "repairRemovalFailureNeverInsertsAndKeepsTheTrustedRecord",
+        "repairInsertFailureAfterRemovalLeavesNoRecordAndNeverRestores",
+        "repairSucceedsOnlyWhenTheFinalReadAllowsThePresentedFingerprint",
+        "repairFailsClosedWhenItsDuplicateVanishesBeforeItIsRead"
+      ],
+      "trustGapAndRaces": [
+        "repairGapBetweenRemovalAndInsertionNeverAllowsEitherFingerprint",
+        "repairNeverReplacesARecordAnotherWriterStoresInTheGap",
+        "repairAcceptsThePresentedFingerprintAnotherWriterStoresInTheGap",
+        "repairRemovalSupersedesARecordReplacedAfterTheCheck"
+      ],
+      "cancellation": [
+        "repairCancelledBeforeStartPerformsNoKeychainIO",
+        "repairCancelledAfterTheCheckLeavesTheTrustedRecord",
+        "repairCancelledDuringRemovalStillStoresTheApprovedFingerprint",
+        "repairCancelledDuringInsertionReportsCancellationNotSuccess"
+      ],
+      "concurrencyAndActor": [
+        "fingerprintChangeFlowRunsKeychainCallsOffTheCallersMainActor",
+        "concurrentRepairsOfOneWarningConvergeOnThePresentedFingerprint",
+        "concurrentChangeEvaluationsAgreeAndNeverWrite"
+      ],
+      "privacyAndInputs": [
+        "fingerprintChangeFailuresCarryNoDeviceOrFingerprintPayload",
+        "fingerprintChangeInputsAreNotMutatedAndSlicesAreCopiedByContent",
+        "fingerprintChangeFlowSourceNeverLogsOrBypassesTheStore"
+      ],
+      "manualHarness": [
+        "manualFingerprintChangeProbeSelectionFailsClosedAndIsSkippedByDefault",
+        "manualFingerprintChangeProbeProducesTheExpectedClosedResultOnAFake",
+        "manualFingerprintChangeProbeCleansUpOnEveryFailurePath",
+        "manualFingerprintChangeProbeOutputIsClosedVocabularyOnly",
+        "onlyTheTierHRegionNamesTheProductionSeamForTheChangeProbe",
+        "manualFingerprintChangeProbeRunsTheRealRepairRoundTrip"
+      ]
+    },
+    "note": "Categories assigned by the author from the test names; each declaration is listed exactly once. Parameterized tests count once."
+  },
+  "issueTestRequirements": {
+    "happyPath": {
+      "met": true,
+      "tests": [
+        "repairReplacesTheRecordInAFixedOrderAndVerifiesBeforeAllowing",
+        "fingerprintChangeEvaluationTable",
+        "repairIsIdempotentOnceThePresentedFingerprintIsStored"
+      ]
+    },
+    "boundaryOrLimit": {
+      "met": true,
+      "tests": [
+        "wrongLengthPresentedFingerprintIsRejectedBeforeAnyKeychainRead",
+        "changeWarningRefusesAFingerprintOfAnyOtherLength",
+        "malformedStoredFingerprintRejectsWithoutAWarningOrAWrite",
+        "everySingleBitChangeOfThePresentedFingerprintCarriesAWarning"
+      ]
+    },
+    "invalidInputOrFailure": {
+      "met": true,
+      "tests": [
+        "changeWarningRefusesIdenticalFingerprints",
+        "changeEvaluationStorageFailureFailsClosed",
+        "repairFailsClosedWhenTheRecordCannotBeRead",
+        "repairRemovalFailureNeverInsertsAndKeepsTheTrustedRecord",
+        "repairInsertFailureAfterRemovalLeavesNoRecordAndNeverRestores"
+      ]
+    },
+    "cancelCleanupIdempotency": {
+      "met": true,
+      "tests": [
+        "repairCancelledBeforeStartPerformsNoKeychainIO",
+        "repairCancelledAfterTheCheckLeavesTheTrustedRecord",
+        "repairCancelledDuringRemovalStillStoresTheApprovedFingerprint",
+        "repairCancelledDuringInsertionReportsCancellationNotSuccess",
+        "repairIsIdempotentOnceThePresentedFingerprintIsStored",
+        "manualFingerprintChangeProbeCleansUpOnEveryFailurePath"
+      ]
+    },
+    "failClosed": {
+      "met": true,
+      "tests": [
+        "repairSucceedsOnlyWhenTheFinalReadAllowsThePresentedFingerprint",
+        "repairFailsClosedWhenItsDuplicateVanishesBeforeItIsRead",
+        "repairGapBetweenRemovalAndInsertionNeverAllowsEitherFingerprint",
+        "staleWarningRepairChangesNothingAndJudgesTheRecordAsRead"
+      ]
+    },
+    "identityFingerprintChangedOrInvalid": {
+      "met": true,
+      "tests": [
+        "changedFingerprintRejectsImmediatelyWithAWarningAndNeverWrites",
+        "everySingleBitChangeOfThePresentedFingerprintCarriesAWarning",
+        "repairNeverReplacesARecordAnotherWriterStoresInTheGap",
+        "malformedStoredFingerprintRejectsWithoutAWarningOrAWrite"
+      ]
+    }
+  },
+  "focusMapping": {
+    "abortOnChangedFingerprintForTheSameDevice": {
+      "implementation": "FingerprintChangeFlow.evaluate: one read; TrustPolicy identityChanged becomes .identityChanged(warning), a rejection; never writes",
+      "tests": [
+        "evaluationRejectsImmediately"
+      ]
+    },
+    "showOldAndNewWithoutOverwriting": {
+      "implementation": "FingerprintChangeWarning: canonical display text of the trusted and presented fingerprints; every other rendering redacted; evaluate never writes",
+      "tests": [
+        "warningPresentationModel",
+        "evaluationRejectsImmediately",
+        "privacyAndInputs"
+      ]
+    },
+    "explicitRepairAction": {
+      "implementation": "FingerprintChangeFlow.apply(ownerDecision:warning:): writes only on .repair; check, remove, insert-if-absent, verify",
+      "tests": [
+        "explicitOwnerDecision",
+        "staleWarning",
+        "transitionFailsClosed",
+        "trustGapAndRaces",
+        "cancellation"
+      ]
+    },
+    "successBoundaryErrorCancellationCleanupTests": {
+      "tests": [
+        "evaluationRejectsImmediately",
+        "transitionFailsClosed",
+        "cancellation",
+        "concurrencyAndActor",
+        "manualHarness"
+      ]
+    }
+  },
+  "tdd": {
+    "redRunRecorded": true,
+    "runs": [
+      {
+        "phase": "RED",
+        "command": "swift test --package-path Packages/MacPlatform",
+        "startedAt": "2026-10-28T04:34:45Z",
+        "endedAt": "2026-10-28T04:35:04Z",
+        "exitCode": 1,
+        "state": "base 963638036cfbea39933a7c611afbeddf14ec0bfc plus the new test file only",
+        "cause": "131 compile errors, all in FingerprintChangeFlowTests.swift: FingerprintChangeFlow, FingerprintChangeWarning, FingerprintChangeOutcome and FingerprintChangeOwnerDecision did not exist; the remaining errors were inference cascades"
+      },
+      {
+        "phase": "first GREEN",
+        "command": "swift test --package-path Packages/MacPlatform --filter '<the 39 M1-059 test names>'",
+        "startedAt": "2026-10-28T04:37:35Z",
+        "endedAt": "2026-10-28T04:37:36Z",
+        "exitCode": 1,
+        "cause": "1 of 39 failed: the static source audit's print( token matched inside loadFingerprint(; the audit, not the implementation, was wrong (author finding A1)"
+      },
+      {
+        "phase": "GREEN",
+        "startedAt": "2026-10-28T04:38:10Z",
+        "endedAt": "2026-10-28T04:38:23Z",
+        "exitCode": 0,
+        "result": "39 tests: 38 passed, 1 opt-in probe skipped"
+      },
+      {
+        "phase": "RED for review finding L3",
+        "startedAt": "2026-10-28T05:01:36Z",
+        "endedAt": "2026-10-28T05:01:46Z",
+        "exitCode": 1,
+        "cause": "tests updated first; against the previous unshielded insert, exactly repairCancelledDuringRemovalStillStoresTheApprovedFingerprint failed (4 issues)",
+        "detail": "tests/mutation.json reviewFixRed"
+      },
+      {
+        "phase": "GREEN after review fixes",
+        "startedAt": "2026-10-28T05:01:52Z",
+        "endedAt": "2026-10-28T05:02:02Z",
+        "exitCode": 0,
+        "result": "41 tests: 40 passed, 1 opt-in probe skipped"
+      }
+    ],
+    "note": "History only; superseded by requiredRun above. RED can be reproduced by removing FingerprintChangeFlow.swift from a checkout of the implementation commit and running the required command."
+  },
+  "stressRuns": [
+    {
+      "tests": [
+        "concurrentRepairsOfOneWarningConvergeOnThePresentedFingerprint",
+        "concurrentChangeEvaluationsAgreeAndNeverWrite"
+      ],
+      "repetitions": 20000,
+      "repeatUntil": "fail",
+      "startedAt": "2026-10-28T05:02:27Z",
+      "endedAt": "2026-10-28T05:02:38Z",
+      "exitCode": 0,
+      "result": "Test run with 40000 tests in 0 suites passed"
+    },
+    {
+      "tests": "all 41 M1-059 tests",
+      "repetitions": 2000,
+      "repeatUntil": "fail",
+      "startedAt": "2026-10-28T05:02:48Z",
+      "endedAt": "2026-10-28T05:03:23Z",
+      "exitCode": 0,
+      "result": "Test run with 82000 tests in 0 suites passed"
+    }
+  ],
+  "stressRunsNote": "Run through the toolchain's swiftpm-testing-helper with --repetitions and --repeat-until fail, on the source that differs from the implementation commit only in documentation comments. Before the M1 fix the fresh-context reviewer saw the first concurrency test fail in 11 of 13 such batches.",
+  "mutationCheck": {
+    "detail": "tests/mutation.json",
+    "killed": 9,
+    "total": 9
+  },
+  "manualProbe": {
+    "status": "pending",
+    "performed": false,
+    "detail": "../manual.md",
+    "expectedOutput": "M1-059 manual probe: action=fingerprint-change-repair-round-trip initialCleanup=removed seedTrust=allow changed=identityChanged warning=match declined=reject.trustRejected afterDecline=identityChanged repair=allow presented=allow previous=identityChanged repeatRepair=allow finalCleanup=removed afterCleanup=absent"
+  },
+  "privacy": "No real peer fingerprint, certificate, secret, credential, private key, Keychain account value or device identifier is recorded in this evidence. The test vectors are the published FIPS 180-2 SHA-256 digests."
+}

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-059",
+  "githubIssue": 71,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/71",
+  "date": "2026-10-28",
+  "timezone": "Asia/Taipei",
+  "baseCommit": "963638036cfbea39933a7c611afbeddf14ec0bfc",
+  "baseCommitNote": "main at the start of the work: merge of PR #325 (M1-058).",
+  "implementationCommit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+  "implementationCommitNote": "Commit at which the recorded gate commands ran (see commands.json).",
+  "source": "Collected by Claude Opus in this session with sw_vers, uname -m, sysctl, system_profiler SPHardwareDataType, swift --version, xcodebuild -version, swift format --version, python3 --version and git --version. No serial number, hardware UUID, UDID, provisioning data, Apple ID, user name or certificate data is recorded.",
+  "executionContext": {
+    "host": "the owner's Mac, normal macOS execution permissions",
+    "checkout": "a dedicated git worktree of the repository on branch codex/m1-059-fingerprint-change-flow",
+    "sandboxNote": "No SwiftPM sandbox_apply failure occurred; every SwiftPM command, including the warnings-as-errors run inside make code-quality-check, ran normally.",
+    "realKeychainTouched": false,
+    "realKeychainNote": "No command in this package selected the opt-in Tier-H probe, so no automated run read or wrote the real Keychain."
+  },
+  "os": {
+    "productName": "macOS",
+    "productVersion": "26.6.2",
+    "buildVersion": "25G83",
+    "architecture": "arm64"
+  },
+  "hardware": {
+    "model": "MacBook Pro",
+    "modelIdentifier": "Mac16,7",
+    "chip": "Apple M4 Pro",
+    "cores": { "total": 14, "performance": 10, "efficiency": 4 },
+    "memory": "24 GB"
+  },
+  "toolchain": {
+    "swiftVersion": "Apple Swift 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "swiftDriverVersion": "1.127.14.1",
+    "swiftDefaultTarget": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "xcodeVersion": "26.2",
+    "xcodeBuildVersion": "17C52",
+    "python": "3.9.6",
+    "git": "2.50.1 (Apple Git-155)"
+  },
+  "manualVerification": {
+    "required": true,
+    "performed": false,
+    "status": "pending",
+    "note": "The Tier-H real-Keychain probe has not been run. It must be run or verified by a reviewer who is not the executing agent; see manual.md for the exact command, the expected closed-vocabulary line and the signed-host requirement."
+  },
+  "network": {
+    "exercised": false,
+    "note": "The flow performs no network I/O."
+  },
+  "peer": {
+    "exercised": false,
+    "note": "No real TLS peer or peer fingerprint is used; tests use the published FIPS 180-2 SHA-256 vectors and synthetic device identifiers."
+  },
+  "displayLayout": {
+    "applicable": false,
+    "note": "Not applicable: the flow has no UI in scope."
+  },
+  "keyboardLayout": {
+    "applicable": false,
+    "note": "Not applicable: the flow handles no input."
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-059",
+  "purpose": "Shows the M1-059 tests are not vacuous: each mutation reintroduces one defect into FingerprintChangeFlow.swift, the 41 focused M1-059 tests run against it, and the mutation counts as killed when that run fails. The original bytes are restored after every mutation and checked by SHA-256.",
+  "executor": "Claude Opus (author), in this session",
+  "sourceFile": "Packages/MacPlatform/Sources/MacPlatform/FingerprintChangeFlow.swift",
+  "sourceSha256": "0f0c854855dff6ef09cb22f9d253528c3774de2d260b74bb5644ea2fba2da4c2",
+  "sourceSha256Note": "SHA-256 of the source at implementation commit 59f83da8535255aee174e1c508724fcec6c4a09c; the run happened on the identical working-tree bytes immediately before that commit.",
+  "restoredAfterRun": true,
+  "command": "swift test --package-path Packages/MacPlatform --filter '<the 41 M1-059 test names>' (once per mutation)",
+  "killed": 9,
+  "total": 9,
+  "mutations": [
+    {
+      "id": "M1-no-cancellation-check-before-removal",
+      "change": "Delete the cancellation check before removal (step 2).",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "repairCancelledAfterTheCheckLeavesTheTrustedRecord"
+      ]
+    },
+    {
+      "id": "M2-report-success-without-verifying-read",
+      "change": "Return .allow after the insert instead of the verifying read (step 5).",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "fingerprintChangeFailuresCarryNoDeviceOrFingerprintPayload",
+        "fingerprintChangeFlowRunsKeychainCallsOffTheCallersMainActor",
+        "repairCancelledDuringInsertionReportsCancellationNotSuccess",
+        "repairCancelledDuringRemovalStillStoresTheApprovedFingerprint",
+        "repairNeverReplacesARecordAnotherWriterStoresInTheGap",
+        "repairReplacesTheRecordInAFixedOrderAndVerifiesBeforeAllowing",
+        "repairSucceedsOnlyWhenTheFinalReadAllowsThePresentedFingerprint"
+      ]
+    },
+    {
+      "id": "M3-skip-stale-warning-check",
+      "change": "Make the stale-warning check always pass, so any record is removed (step 1).",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "manualFingerprintChangeProbeCleansUpOnEveryFailurePath",
+        "manualFingerprintChangeProbeProducesTheExpectedClosedResultOnAFake",
+        "repairIsIdempotentOnceThePresentedFingerprintIsStored",
+        "staleWarningRepairChangesNothingAndJudgesTheRecordAsRead"
+      ]
+    },
+    {
+      "id": "M4-unredacted-description",
+      "change": "Render the trusted fingerprint display text in the warning's description.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "changeWarningIsRedactedInEveryRenderingButItsDisplayFields"
+      ]
+    },
+    {
+      "id": "M5-auto-accept-changed-identity",
+      "change": "Answer .allow instead of .identityChanged for a changed fingerprint.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "changeWarningIsRedactedInEveryRenderingButItsDisplayFields",
+        "changedFingerprintRejectsImmediatelyWithAWarningAndNeverWrites",
+        "concurrentChangeEvaluationsAgreeAndNeverWrite",
+        "everySingleBitChangeOfThePresentedFingerprintCarriesAWarning",
+        "fingerprintChangeEvaluationTable",
+        "fingerprintChangeInputsAreNotMutatedAndSlicesAreCopiedByContent",
+        "manualFingerprintChangeProbeCleansUpOnEveryFailurePath",
+        "manualFingerprintChangeProbeProducesTheExpectedClosedResultOnAFake",
+        "ownerRejectKeepsTheTrustedRecordWithoutKeychainIO",
+        "repairNeverReplacesARecordAnotherWriterStoresInTheGap",
+        "repairOnlyEverAddressesTheWarningsDevice",
+        "repairRemovalFailureNeverInsertsAndKeepsTheTrustedRecord",
+        "repairReplacesTheRecordInAFixedOrderAndVerifiesBeforeAllowing",
+        "repairSucceedsOnlyWhenTheFinalReadAllowsThePresentedFingerprint",
+        "staleWarningRepairChangesNothingAndJudgesTheRecordAsRead"
+      ]
+    },
+    {
+      "id": "M6-owner-reject-performs-repair",
+      "change": "Make the owner's .reject decision run the re-pair.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "manualFingerprintChangeProbeCleansUpOnEveryFailurePath",
+        "manualFingerprintChangeProbeProducesTheExpectedClosedResultOnAFake",
+        "ownerRejectKeepsTheTrustedRecordWithoutKeychainIO",
+        "repairCancelledBeforeStartPerformsNoKeychainIO"
+      ]
+    },
+    {
+      "id": "M7-warning-allows-identical-fingerprints",
+      "change": "Drop the 'fingerprints differ' requirement from the warning initializer.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "changeWarningRefusesIdenticalFingerprints"
+      ]
+    },
+    {
+      "id": "M8-warning-keeps-caller-slice",
+      "change": "Store the caller's presented slice instead of a copy by content.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "fingerprintChangeInputsAreNotMutatedAndSlicesAreCopiedByContent"
+      ]
+    },
+    {
+      "id": "M9-insert-observes-cancellation-after-removal",
+      "change": "Call the store's insert directly, so a task cancelled after removal is refused the insert.",
+      "applied": true,
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "repairCancelledDuringRemovalStillStoresTheApprovedFingerprint"
+      ]
+    }
+  ],
+  "reviewFixRed": {
+    "finding": "L3 (fresh-context review): a task cancelled while removal ran left the device with no record.",
+    "procedure": "Tests were updated first. The previous, unshielded insert was restored temporarily, the focused tests ran, and the current bytes were restored and checked by SHA-256.",
+    "exitCode": 1,
+    "failingTests": [
+      "repairCancelledDuringRemovalStillStoresTheApprovedFingerprint"
+    ],
+    "summary": [
+      "✘ Test run with 41 tests in 0 suites failed after 0.017 seconds with 4 issues."
+    ],
+    "restored": true,
+    "currentSourceSha256AtThatTime": "46842bc3a934d66c92afddb81694f8a402af5d64c39f41a3867dad7e64c6f215",
+    "note": "The source changed afterwards only in documentation comments, to the SHA-256 above; the mutation run against that final source killed M9, the same defect."
+  }
+}
