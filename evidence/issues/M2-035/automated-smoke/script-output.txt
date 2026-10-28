@@ -1,0 +1,15 @@
+M2-035 smoke: identity=pass
+M2-035 smoke: handshake=pass
+M2-035 smoke: fingerprint-pinned=pass
+M2-035 smoke: enter=pass
+M2-035 smoke: move-1=pass
+M2-035 smoke: move-2=pass
+M2-035 smoke: return=pass
+M2-035 smoke: escape=pass
+M2-035 smoke: client-loss=pass
+M2-035 smoke: wrong-name-rejected=pass
+M2-035 smoke: reconnect=pass
+M2-035 smoke: keepalive=pass
+M2-035 smoke: quit-while-remote=pass
+M2-035 smoke: x-events=pass
+M2-035 smoke: result=pass
