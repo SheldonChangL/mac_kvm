@@ -24,6 +24,29 @@ private func scroll(_ vertical: Int32, _ horizontal: Int32) throws -> CGEvent {
 
 @Suite("M2-004 MacMouseCapture")
 struct MacMouseCaptureTests {
+  /// The suppression allowlist (M2-013, Codex review H-9) relies on `canMap`
+  /// agreeing with `map` for every event shape.
+  @Test("canMap agrees with map for every event type and button number")
+  func canMapAgreesWithMap() throws {
+    let capture = try #require(MacMouseCapture(bounds: bounds))
+    var corpus: [CGEvent] = []
+    for raw in UInt32(0)...40 {
+      guard let type = CGEventType(rawValue: raw) else { continue }
+      for number: Int64 in [0, 1, 2, 3, 4, 7] {
+        let event = try mouse(.mouseMoved, at: CGPoint(x: 10, y: 10))
+        event.type = type
+        event.setIntegerValueField(.mouseEventButtonNumber, value: number)
+        corpus.append(event)
+      }
+    }
+    corpus += [try scroll(0, 0), try scroll(1, 0), try scroll(0, -1), try scroll(5, 5)]
+    for event in corpus {
+      #expect(
+        MacMouseCapture.canMap(event) == (capture.map(event) != nil),
+        "type \(event.type.rawValue)")
+    }
+  }
+
   @Test("moves and drags map to normalized positions within the capture bounds")
   func moves() throws {
     let capture = try #require(MacMouseCapture(bounds: bounds))

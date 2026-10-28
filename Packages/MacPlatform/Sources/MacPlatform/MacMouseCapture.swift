@@ -36,6 +36,24 @@ package struct MacMouseCapture: Sendable {
     return MacCapturedInput(event: mapped, timestamp: event.timestamp)
   }
 
+  /// Whether `map` produces an event for `event`, whatever the bounds.
+  ///
+  /// The local suppressor swallows a pointer event only when this is true
+  /// (M2-013), so input that cannot be forwarded always reaches the Mac.
+  package static func canMap(_ event: CGEvent) -> Bool {
+    switch event.type {
+    case .mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
+      .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp:
+      return true
+    case .otherMouseDown, .otherMouseUp:
+      return otherButton(event) != nil
+    case .scrollWheel:
+      return scrollDeltas(event) != nil
+    default:
+      return false
+    }
+  }
+
   private func mapEvent(_ event: CGEvent) -> KVMEvent? {
     switch event.type {
     case .mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
@@ -52,13 +70,19 @@ package struct MacMouseCapture: Sendable {
       guard let button = Self.otherButton(event) else { return nil }
       return .mouseButton(button: button, phase: event.type == .otherMouseDown ? .down : .up)
     case .scrollWheel:
-      let vertical = Self.int32(event.getIntegerValueField(.scrollWheelEventDeltaAxis1))
-      let horizontal = Self.int32(event.getIntegerValueField(.scrollWheelEventDeltaAxis2))
-      guard vertical != 0 || horizontal != 0 else { return nil }
-      return .scroll(deltaX: horizontal, deltaY: vertical)
+      guard let deltas = Self.scrollDeltas(event) else { return nil }
+      return .scroll(deltaX: deltas.horizontal, deltaY: deltas.vertical)
     default:
       return nil
     }
+  }
+
+  /// Line deltas of a scroll, or `nil` when both are zero.
+  private static func scrollDeltas(_ event: CGEvent) -> (horizontal: Int32, vertical: Int32)? {
+    let vertical = int32(event.getIntegerValueField(.scrollWheelEventDeltaAxis1))
+    let horizontal = int32(event.getIntegerValueField(.scrollWheelEventDeltaAxis2))
+    guard vertical != 0 || horizontal != 0 else { return nil }
+    return (horizontal, vertical)
   }
 
   private func normalized(_ location: CGPoint) -> NormalizedPoint {

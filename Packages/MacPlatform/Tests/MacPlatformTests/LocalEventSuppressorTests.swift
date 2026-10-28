@@ -35,6 +35,24 @@ private func moveEvent() throws -> CGEvent {
   return event
 }
 
+private func buttonEvent(_ type: CGEventType, number: Int64) throws -> CGEvent {
+  let event = try #require(
+    CGEvent(
+      mouseEventSource: nil, mouseType: type, mouseCursorPosition: .zero, mouseButton: .center))
+  event.setIntegerValueField(.mouseEventButtonNumber, value: number)
+  event.setIntegerValueField(.eventSourceUnixProcessID, value: 1)
+  return event
+}
+
+private func scrollEvent(vertical: Int32, horizontal: Int32) throws -> CGEvent {
+  let event = try #require(
+    CGEvent(
+      scrollWheelEvent2Source: nil, units: .line, wheelCount: 2, wheel1: vertical,
+      wheel2: horizontal, wheel3: 0))
+  event.setIntegerValueField(.eventSourceUnixProcessID, value: 1)
+  return event
+}
+
 @Suite("M2-013 LocalEventSuppressor")
 struct LocalEventSuppressorTests {
   @Test("events pass through until suppression is enabled for committed remote")
@@ -96,6 +114,47 @@ struct LocalEventSuppressorTests {
     let own = try moveEvent()
     own.setIntegerValueField(.eventSourceUnixProcessID, value: ownPID)
     #expect(suppressor.decide(type: .mouseMoved, event: own) == .passThrough)
+  }
+
+  /// Codex review H-9: suppression never exceeds what capture forwards, so
+  /// input the server cannot send to the remote screen fails open locally.
+  @Test("unsupported input passes through while suppressing")
+  func unsupportedInputPassesThrough() throws {
+    let suppressor = try makeSuppressor()
+    suppressor.enableSuppression()
+    let mouse = try #require(MacMouseCapture(bounds: CGRect(x: 0, y: 0, width: 100, height: 100)))
+
+    for number: Int64 in [4, 5, 7, 31] {
+      for type in [CGEventType.otherMouseDown, .otherMouseUp] {
+        let event = try buttonEvent(type, number: number)
+        #expect(mouse.map(event) == nil)
+        #expect(suppressor.decide(type: type, event: event) == .passThrough, "button \(number)")
+      }
+    }
+    let zeroScroll = try scrollEvent(vertical: 0, horizontal: 0)
+    #expect(mouse.map(zeroScroll) == nil)
+    #expect(suppressor.decide(type: .scrollWheel, event: zeroScroll) == .passThrough)
+
+    let tabletPointer = CGEventType.tabletPointer
+    let tabletProximity = CGEventType.tabletProximity
+    let others = [
+      tabletPointer, tabletProximity,
+      try #require(CGEventType(rawValue: 29)),  // gesture
+      try #require(CGEventType(rawValue: 14)),  // system-defined
+    ]
+    for type in others {
+      let event = try moveEvent()
+      event.type = type
+      #expect(suppressor.decide(type: type, event: event) == .passThrough, "type \(type.rawValue)")
+    }
+
+    // Forwardable input is still suppressed.
+    let middle = try buttonEvent(.otherMouseDown, number: 2)
+    #expect(suppressor.decide(type: .otherMouseDown, event: middle) == .suppress)
+    let wheel = try scrollEvent(vertical: 1, horizontal: 0)
+    #expect(suppressor.decide(type: .scrollWheel, event: wheel) == .suppress)
+    #expect(suppressor.decide(type: .mouseMoved, event: try moveEvent()) == .suppress)
+    #expect(suppressor.decide(type: .keyDown, event: try keyEvent(kVK_ANSI_A)) == .suppress)
   }
 
   @Test("concurrent decisions observe enable and disable consistently")

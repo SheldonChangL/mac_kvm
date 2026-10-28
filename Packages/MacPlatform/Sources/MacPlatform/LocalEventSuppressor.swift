@@ -14,7 +14,11 @@ import KVMContracts
 ///    never swallowed.
 /// 4. The system Force Quit chord (Command + Option + Escape) passes through.
 /// 5. Otherwise the event is suppressed only while suppression is enabled,
-///    which the owner does solely for the committed `remote` state (M2-008).
+///    which the owner does solely for the committed `remote` state (M2-008),
+///    and only when it is on the suppressible allowlist: exactly the events the
+///    capture adapters forward (M2-004, M2-005). Unsupported buttons, zero
+///    scrolls, unmapped keys, tablet, gesture and system-defined events fail
+///    open locally, because nothing would deliver them to the remote screen.
 ///
 /// The flag lives behind one `NSLock`; `decide` never awaits, allocates only
 /// the mapped event, and never logs. Disabling is idempotent and always wins:
@@ -77,7 +81,19 @@ package final class LocalEventSuppressor: @unchecked Sendable {
         return .passThrough
       }
     }
-    return isSuppressing ? .suppress : .passThrough
+    guard isSuppressing else { return .passThrough }
+    return Self.isForwardable(type: type, event: event) ? .suppress : .passThrough
+  }
+
+  /// The suppressible-event allowlist: an event may be swallowed only when a
+  /// capture adapter maps it, so suppression can never exceed forwarding.
+  private static func isForwardable(type: CGEventType, event: CGEvent) -> Bool {
+    switch type {
+    case .keyDown, .keyUp, .flagsChanged:
+      return MacKeyboardCapture.map(event) != nil
+    default:
+      return MacMouseCapture.canMap(event)
+    }
   }
 
   private static func isForceQuit(_ event: KVMEvent) -> Bool {
