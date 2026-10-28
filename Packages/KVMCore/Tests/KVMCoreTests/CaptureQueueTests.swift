@@ -184,4 +184,27 @@ struct CaptureQueueTests {
     #expect(queue.enqueue(keyDown) == .enqueued)
     #expect(try await queue.next() == keyDown)
   }
+
+  /// Codex review H-2: cancellation may only remove its own waiter.
+  @Test("a cancelled second consumer never cancels the waiting first consumer")
+  func cancelledSecondConsumerLeavesTheFirstWaiting() async throws {
+    let queue = try makeQueue(4)
+    let first = Task { try await queue.next() }
+    await queue.waitForPendingConsumer()
+
+    let second = Task {
+      withUnsafeCurrentTask { $0?.cancel() }
+      return try await queue.next()
+    }
+    let cancelled = CoreError(
+      code: .cancellation(.requested),
+      severity: .info,
+      retryDisposition: .never,
+      cleanupDisposition: .notRequired
+    )
+    await #expect(throws: cancelled) { try await second.value }
+
+    #expect(queue.enqueue(keyDown) == .enqueued)
+    #expect(try await first.value == keyDown)
+  }
 }

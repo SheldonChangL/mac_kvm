@@ -52,7 +52,10 @@ package final class CaptureQueue: @unchecked Sendable {
   private var head = 0
   private var stored = 0
   private var phase = Phase.open
-  private var consumer: CheckedContinuation<KVMEvent?, any Error>?
+  /// The one waiting consumer, tagged with the token of the `next()` call that
+  /// owns it, so a cancellation can only ever remove its own waiter.
+  private var consumer: (token: UInt64, continuation: CheckedContinuation<KVMEvent?, any Error>)?
+  private var lastConsumerToken: UInt64 = 0
   private var consumerArrivals: [CheckedContinuation<Void, Never>] = []
 
   /// Creates a queue holding at most `capacity` events, or `nil` when the
@@ -88,7 +91,7 @@ package final class CaptureQueue: @unchecked Sendable {
     if let waiting = consumer {
       consumer = nil
       lock.unlock()
-      waiting.resume(returning: event)
+      waiting.continuation.resume(returning: event)
       return .enqueued
     }
     if stored > 0, let merged = Self.merge(newest: storage[tailIndex]!, with: event) {
@@ -127,7 +130,13 @@ package final class CaptureQueue: @unchecked Sendable {
   ///
   /// Returns `nil` after `close()`. Throws `inputSafety.cleanupRequired` after
   /// overflow and a typed cancellation when the waiting task is cancelled.
+  /// Cancelling a call only ever ends that call's own wait; it never touches
+  /// a consumer that another call registered.
   package func next() async throws(CoreError) -> KVMEvent? {
+    let token = lock.withLock {
+      lastConsumerToken &+= 1
+      return lastConsumerToken
+    }
     do {
       return try await withTaskCancellationHandler {
         try await withCheckedThrowingContinuation { continuation in
@@ -149,17 +158,17 @@ package final class CaptureQueue: @unchecked Sendable {
             continuation.resume(throwing: Self.secondConsumerError)
             return
           }
-          consumer = continuation
+          consumer = (token, continuation)
           let arrivals = consumerArrivals
           consumerArrivals = []
           lock.unlock()
           for arrival in arrivals { arrival.resume() }
         }
       } onCancel: {
-        let waiting = lock.withLock {
-          let waiting = consumer
+        let waiting = lock.withLock { () -> CheckedContinuation<KVMEvent?, any Error>? in
+          guard let current = consumer, current.token == token else { return nil }
           consumer = nil
-          return waiting
+          return current.continuation
         }
         waiting?.resume(throwing: Self.cancellationError)
       }
@@ -193,7 +202,7 @@ package final class CaptureQueue: @unchecked Sendable {
       consumer = nil
       return waiting
     }
-    waiting?.resume(returning: nil)
+    waiting?.continuation.resume(returning: nil)
   }
 
   /// Test scheduling barrier: completes once a consumer is waiting in `next()`.
