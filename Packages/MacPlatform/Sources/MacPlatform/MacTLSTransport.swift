@@ -12,6 +12,11 @@ import Security
 /// every release build.
 enum MacTLSTransportSecurity: Equatable, Sendable {
   case tls
+  /// Server role over a connection `MacTLSServerListener` accepted with the
+  /// local identity. Client certificates are not requested, so the handshake
+  /// presents no peer chain and none is required; a chain presented anyway is
+  /// rejected.
+  case acceptedServer
   #if DEBUG
     case debugInsecurePlaintext
   #endif
@@ -151,6 +156,25 @@ package final class MacTLSTransport: Transport, @unchecked Sendable {
     self.init(
       request: MacTLSTransportConnectionRequest(host: host, port: port, security: .tls),
       trustEvaluator: trustEvaluator,
+      backendFactory: backendFactory
+    )
+  }
+
+  /// Server role: wraps one connection the TLS listener accepted. `connect()`
+  /// starts it and completes the server side of the handshake.
+  static func acceptedServer(_ connection: NWConnection) -> MacTLSTransport {
+    acceptedServer(backendFactory: { _ in MacTLSNetworkBackend(acceptedConnection: connection) })
+  }
+
+  /// Test seam: the server role over an injected backend. The evaluator rejects
+  /// every chain, so only a handshake that presents none can succeed.
+  static func acceptedServer(
+    backendFactory:
+      @escaping @Sendable (MacTLSTransportConnectionRequest) -> any MacTLSTransportBackend
+  ) -> MacTLSTransport {
+    MacTLSTransport(
+      request: MacTLSTransportConnectionRequest(host: "", port: 0, security: .acceptedServer),
+      trustEvaluator: { _ in .reject(.trustRejected) },
       backendFactory: backendFactory
     )
   }
@@ -329,6 +353,8 @@ package final class MacTLSTransport: Transport, @unchecked Sendable {
     switch request.security {
     case .tls:
       return true
+    case .acceptedServer:
+      return false
     #if DEBUG
       case .debugInsecurePlaintext:
         return false
@@ -572,6 +598,8 @@ package final class MacTLSTransport: Transport, @unchecked Sendable {
 /// an `NSLock`, hence `@unchecked Sendable`. No retry and no logging.
 final class MacTLSNetworkBackend: MacTLSTransportBackend, @unchecked Sendable {
   private let request: MacTLSTransportConnectionRequest
+  /// A not yet started connection a TLS listener accepted; `nil` for outbound.
+  private let acceptedConnection: NWConnection?
   private let queue = DispatchQueue(label: "MacPlatform.MacTLSNetworkBackend")
   private let lock = NSLock()
   private var connection: NWConnection?
@@ -582,21 +610,32 @@ final class MacTLSNetworkBackend: MacTLSTransportBackend, @unchecked Sendable {
 
   init(request: MacTLSTransportConnectionRequest) {
     self.request = request
+    acceptedConnection = nil
+  }
+
+  /// Server role: `start` starts `connection`, whose TLS parameters (local
+  /// identity, no client authentication) the listener already set.
+  init(acceptedConnection: NWConnection) {
+    request = MacTLSTransportConnectionRequest(host: "", port: 0, security: .acceptedServer)
+    self.acceptedConnection = acceptedConnection
   }
 
   func start(
     verifyPeer: @escaping @Sendable ([Data]) -> Bool
   ) async throws(MacTLSTransportBackendFailure) {
-    guard request.port != 0,
-      let port = NWEndpoint.Port(rawValue: request.port),
-      Self.isUsableHost(request.host)
-    else { throw .unavailable }
-
-    let connection = NWConnection(
-      host: NWEndpoint.Host(request.host),
-      port: port,
-      using: Self.parameters(for: request.security, verifyPeer: verifyPeer, queue: queue)
-    )
+    let connection: NWConnection
+    if request.security == .acceptedServer {
+      guard let acceptedConnection else { throw .unavailable }
+      connection = acceptedConnection
+    } else {
+      guard acceptedConnection == nil, request.port != 0,
+        let port = NWEndpoint.Port(rawValue: request.port),
+        Self.isUsableHost(request.host),
+        let parameters = Self.parameters(
+          for: request.security, verifyPeer: verifyPeer, queue: queue)
+      else { throw .unavailable }
+      connection = NWConnection(host: NWEndpoint.Host(request.host), port: port, using: parameters)
+    }
     connection.stateUpdateHandler = { [weak self] state in self?.handle(state) }
 
     let outcome: Result<Void, MacTLSTransportBackendFailure> = await withCheckedContinuation {
@@ -754,12 +793,16 @@ final class MacTLSNetworkBackend: MacTLSTransportBackend, @unchecked Sendable {
       }
   }
 
+  /// Outbound parameters; `nil` for the server role, whose parameters only the
+  /// listener creates.
   private static func parameters(
     for security: MacTLSTransportSecurity,
     verifyPeer: @escaping @Sendable ([Data]) -> Bool,
     queue: DispatchQueue
-  ) -> NWParameters {
+  ) -> NWParameters? {
     switch security {
+    case .acceptedServer:
+      return nil
     case .tls:
       let tls = NWProtocolTLS.Options()
       sec_protocol_options_set_verify_block(
