@@ -69,7 +69,9 @@ private func id(_ value: UInt8) -> UUID {
 
 @Suite("M2 server control path integration")
 struct M2ServerControlPathIntegrationTests {
-  @Test("edge enter reaches the Barrier client; unsupported input fails closed back to local")
+  @Test(
+    "edge enter reaches the Barrier client, pointer input follows, unsupported input fails closed"
+  )
   func controlPath() async throws {
     let linux = ScreenID(rawValue: id(2))
     let pipe = PipeTransport()
@@ -97,10 +99,14 @@ struct M2ServerControlPathIntegrationTests {
     #expect(transition.state == .remote(linux))
     #expect(Array(pipe.sent.suffix(14).prefix(4)) == [0x43, 0x49, 0x4E, 0x4E])
 
+    try await session.forward(.mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5)))
+    #expect(Array(pipe.sent.suffix(8).prefix(4)) == [0x44, 0x4D, 0x4D, 0x56])
+
     let written = pipe.sent.count
-    await #expect(throws: CoreError.self) {
-      try await session.forward(.mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5)))
-    }
+    let clipboard = ClipboardPayload(
+      transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "m2-probe",
+      contentHash: "hash")
+    await #expect(throws: CoreError.self) { try await session.forward(.clipboard(clipboard)) }
     #expect(pipe.sent.count == written)
     #expect(await session.state == .closed)
 
