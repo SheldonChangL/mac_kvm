@@ -49,13 +49,21 @@ final class ClientSlot: @unchecked Sendable {
   var outbox: CaptureQueue? { lock.withLock { client?.outbox } }
 }
 
-/// Whether the next fail-safe recovery must put the cursor back.
+/// Whether the next fail-safe recovery must put the cursor back, and where.
+/// The park point sits inside the linked edge, so a recovered cursor does not
+/// rest on the edge and re-enter the client on the next sample.
 final class RecoveryCursorFlag: @unchecked Sendable {
   private let lock = NSLock()
-  private var value = false
+  private var restore = false
+  private var point: CGPoint?
 
-  func set(_ restore: Bool) { lock.withLock { value = restore } }
-  var restoresCursor: Bool { lock.withLock { value } }
+  func set(restore: Bool, preferred: CGPoint?) {
+    lock.withLock {
+      self.restore = restore
+      point = preferred
+    }
+  }
+  var target: (restore: Bool, preferred: CGPoint?) { lock.withLock { (restore, point) } }
 }
 
 /// The local half of the fail-safe (ServerFailSafe).
@@ -73,8 +81,9 @@ struct LocalInputSafety: ServerLocalInputSafety {
   func releaseAllKeys() throws(CoreError) {}
   func releaseAllMouseButtons() throws(CoreError) {}
   func restoreLocalCursor() throws(CoreError) {
-    guard flag.restoresCursor, let cursor else { return }
-    if case .failed = cursor.restore(preferred: nil) {
+    let target = flag.target
+    guard target.restore, let cursor else { return }
+    if case .failed = cursor.restore(preferred: target.preferred) {
       throw CoreError(
         code: .inputSafety(.localStateRestoreFailed), severity: .error,
         retryDisposition: .never, cleanupDisposition: .failed)
@@ -160,8 +169,11 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   }
 
   func recoverLocal(cursorWasParked: Bool) {
-    lock.withLock { parkPoint = nil }
-    recoveryFlag.set(cursorWasParked && cursor != nil)
+    let park = lock.withLock {
+      defer { parkPoint = nil }
+      return parkPoint
+    }
+    recoveryFlag.set(restore: cursorWasParked && cursor != nil, preferred: park)
     let disposition = failSafe.recoverLocal()
     report("local recovery: \(disposition)")
   }
