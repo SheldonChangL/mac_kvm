@@ -23,11 +23,15 @@ package protocol ServerLocalInputSafety: Sendable {
 /// earlier one fails. It never awaits, so any session, tap or router failure
 /// can call it from any context. A call made while a recovery is already
 /// running returns `notRequired` immediately instead of recursing or blocking.
-/// Remote teardown happens only after local input was restored.
+/// `recoverAll` instead joins a recovery already running and waits for its
+/// result, so remote teardown happens only after local input was restored.
 package final class ServerFailSafe: @unchecked Sendable {
   private let local: any ServerLocalInputSafety
   private let lock = NSLock()
   private var recovering = false
+  private var lastDisposition: CleanupDisposition?
+  private var joiners: [CheckedContinuation<CleanupDisposition, Never>] = []
+  private var joinerObservers: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
 
   package init(local: any ServerLocalInputSafety) {
     self.local = local
@@ -43,7 +47,6 @@ package final class ServerFailSafe: @unchecked Sendable {
       return running
     }
     guard !alreadyRunning else { return .notRequired }
-    defer { lock.withLock { recovering = false } }
 
     var failures = 0
     for step in Step.allCases {
@@ -53,10 +56,52 @@ package final class ServerFailSafe: @unchecked Sendable {
         failures += 1
       }
     }
+    let disposition: CleanupDisposition
     switch failures {
-    case 0: return .completed
-    case Step.allCases.count: return .failed
-    default: return .partial
+    case 0: disposition = .completed
+    case Step.allCases.count: disposition = .failed
+    default: disposition = .partial
+    }
+    let waiting = lock.withLock { () -> [CheckedContinuation<CleanupDisposition, Never>] in
+      recovering = false
+      lastDisposition = disposition
+      defer { joiners = [] }
+      return joiners
+    }
+    for joiner in waiting { joiner.resume(returning: disposition) }
+    return disposition
+  }
+
+  /// Restores local input, or, when a recovery is already running, waits for
+  /// that recovery and returns its result. Only async callers wait; the
+  /// synchronous `recoverLocal()` keeps returning at once.
+  private func recoverLocalJoiningInFlight() async -> CleanupDisposition {
+    let started = recoverLocal()
+    guard started == .notRequired else { return started }
+    return await withCheckedContinuation {
+      (continuation: CheckedContinuation<CleanupDisposition, Never>) in
+      let finished = lock.withLock { () -> CleanupDisposition? in
+        guard recovering else { return lastDisposition ?? .notRequired }
+        joiners.append(continuation)
+        let satisfied = joinerObservers.filter { joiners.count >= $0.count }
+        joinerObservers.removeAll { joiners.count >= $0.count }
+        for observer in satisfied { observer.continuation.resume() }
+        return nil
+      }
+      if let finished { continuation.resume(returning: finished) }
+    }
+  }
+
+  /// Test scheduling barrier: completes once `count` callers are waiting for
+  /// an in-flight recovery.
+  package func waitForJoinedRecoveries(count: Int) async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+      let ready = lock.withLock { () -> Bool in
+        guard joiners.count < count else { return true }
+        joinerObservers.append((count, continuation))
+        return false
+      }
+      if ready { continuation.resume() }
     }
   }
 
@@ -88,13 +133,15 @@ package final class ServerFailSafe: @unchecked Sendable {
 
   /// Restores local input first, then closes every session.
   ///
+  /// If another local recovery is already running, this waits for it to
+  /// finish and reports its result before any session is closed.
   /// `afterLocalRestore` runs between the two phases (test observation hook).
   package func recoverAll(
     sessions: SessionManager,
     reason: DisconnectReason = .failure(ServerFailSafe.recoveryError),
     afterLocalRestore: @Sendable () -> Void = {}
   ) async -> RecoveryOutcome {
-    let disposition = recoverLocal()
+    let disposition = await recoverLocalJoiningInFlight()
     afterLocalRestore()
     let clearedTarget = await sessions.closeAll(reason: reason)
     return RecoveryOutcome(

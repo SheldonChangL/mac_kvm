@@ -147,6 +147,92 @@ private final class NoopProtocolSession: KVMProtocolSession, @unchecked Sendable
   func disconnect(reason: DisconnectReason) async {}
 }
 
+/// Holds the first `stopSuppression` until released, so one recovery can be
+/// kept in flight while another caller arrives.
+private final class BlockingLocalSafety: ServerLocalInputSafety, @unchecked Sendable {
+  private let lock = NSLock()
+  private let gate = DispatchSemaphore(value: 0)
+  private var shouldBlock = true
+  private var isBlocked = false
+  private var blockedArrival: CheckedContinuation<Void, Never>?
+  private var completed = 0
+
+  /// Recoveries that reached their last step.
+  var completedRecoveries: Int { lock.withLock { completed } }
+
+  func waitUntilBlocked() async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+      let ready = lock.withLock { () -> Bool in
+        if isBlocked { return true }
+        blockedArrival = continuation
+        return false
+      }
+      if ready { continuation.resume() }
+    }
+  }
+
+  func release() { gate.signal() }
+
+  func stopSuppression() throws(CoreError) {
+    let (block, arrival) = lock.withLock { () -> (Bool, CheckedContinuation<Void, Never>?) in
+      guard shouldBlock else { return (false, nil) }
+      shouldBlock = false
+      isBlocked = true
+      defer { blockedArrival = nil }
+      return (true, blockedArrival)
+    }
+    guard block else { return }
+    arrival?.resume()
+    gate.wait()
+  }
+  func releaseAllKeys() throws(CoreError) {}
+  func releaseAllMouseButtons() throws(CoreError) {}
+  func restoreLocalCursor() throws(CoreError) {}
+  func clearTransientState() throws(CoreError) { lock.withLock { completed += 1 } }
+}
+
+@Suite("M2-033 ServerFailSafe in-flight recovery")
+struct ServerFailSafeInFlightTests {
+  /// Codex review H-7: recoverAll must not reach remote teardown while
+  /// another local recovery is still running; it joins that recovery.
+  @Test("recoverAll joins an in-flight recovery before remote teardown")
+  func recoverAllJoinsInFlightRecovery() async throws {
+    let local = BlockingLocalSafety()
+    let failSafe = ServerFailSafe(local: local)
+    let manager = try #require(SessionManager(maximumSessions: 1))
+    let first = Task.detached { failSafe.recoverLocal() }
+    await local.waitUntilBlocked()
+
+    let order = OrderProbe()
+    let second = Task {
+      await failSafe.recoverAll(sessions: manager) {
+        order.mark(local.completedRecoveries == 1)
+      }
+    }
+    await failSafe.waitForJoinedRecoveries(count: 1)
+    #expect(order.localFirst == nil, "remote teardown started before local recovery finished")
+    local.release()
+
+    #expect(await first.value == .completed)
+    let outcome = await second.value
+    #expect(order.localFirst == true)
+    #expect(outcome.disposition == .completed)
+    #expect(local.completedRecoveries == 1, "the joiner ran a second recovery instead of joining")
+  }
+
+  /// A synchronous caller never waits for the in-flight recovery.
+  @Test("recoverLocal still returns notRequired at once during an in-flight recovery")
+  func synchronousCallerNeverWaits() async {
+    let local = BlockingLocalSafety()
+    let failSafe = ServerFailSafe(local: local)
+    let first = Task.detached { failSafe.recoverLocal() }
+    await local.waitUntilBlocked()
+    #expect(failSafe.recoverLocal() == .notRequired)
+    local.release()
+    #expect(await first.value == .completed)
+  }
+}
+
 private final class OrderProbe: @unchecked Sendable {
   private let lock = NSLock()
   private var value: Bool?
