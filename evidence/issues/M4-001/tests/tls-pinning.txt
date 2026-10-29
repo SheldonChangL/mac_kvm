@@ -1,0 +1,4 @@
+Build complete! (330.36s)
+tls handshake done; leaf sha256 hex length: 64
+binary size: 106M
+dynamic libraries: libm.so.6 libstdc++.so.6 libgcc_s.so.1 libc.so.6 /lib64/ld-linux-x86-64.so.2 

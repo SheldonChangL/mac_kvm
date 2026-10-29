@@ -1,0 +1,11 @@
+Swift version 6.2.3 (swift-6.2.3-RELEASE)
+x86_64
+== KVMContracts
+◇ Test run started.
+✔ Test run with 64 tests in 1 suite passed after 0.391 seconds.
+== BarrierCompatibility
+◇ Test run started.
+✔ Test run with 245 tests in 8 suites passed after 1.177 seconds.
+== KVMCore
+◇ Test run started.
+✔ Test run with 172 tests in 17 suites passed after 0.801 seconds.
