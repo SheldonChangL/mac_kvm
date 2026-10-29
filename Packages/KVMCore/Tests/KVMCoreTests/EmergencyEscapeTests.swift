@@ -13,9 +13,10 @@ private func key(_ key: VirtualKey, _ phase: KeyPhase, _ modifiers: ModifierStat
 
 @Suite("M2-014 EmergencyEscape")
 struct EmergencyEscapeTests {
-  @Test("the documented chord on key down is the escape")
+  @Test("the documented chord on key down is the escape, with Delete or Return")
   func chordMatches() {
     #expect(EmergencyEscape.action(for: key(.backspace, .down, chord)) == .emergencyEscape)
+    #expect(EmergencyEscape.action(for: key(.enter, .down, chord)) == .emergencyEscape)
     var withShift = chord
     withShift.shift = true
     withShift.capsLock = true
@@ -56,6 +57,8 @@ struct EmergencyEscapeTests {
   func neverForwarded() {
     #expect(EmergencyEscape.isChordKey(key(.backspace, .down, chord)))
     #expect(EmergencyEscape.isChordKey(key(.backspace, .up, chord)))
+    #expect(EmergencyEscape.isChordKey(key(.enter, .up, chord)))
     #expect(!EmergencyEscape.isChordKey(key(.backspace, .down, ModifierState())))
+    #expect(!EmergencyEscape.isChordKey(key(.enter, .down, ModifierState())))
   }
 }

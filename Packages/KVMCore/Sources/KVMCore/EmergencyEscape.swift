@@ -1,7 +1,10 @@
 import KVMContracts
 
 /// The fixed emergency escape gesture frozen by the proposed M2-001:
-/// Control + Option + Command + Delete (Backspace).
+/// Control + Option + Command + Delete (Backspace), or + Return. On the owner's
+/// Mac (macOS 26.6.2, 2026-10-28) the system never delivers Delete with all
+/// three modifiers to a session event tap, while Return arrives, so Return is
+/// accepted as well (M2-035 owner run).
 ///
 /// Detection is a pure function of one `KVMEvent`, so the capture owner can
 /// evaluate it synchronously before suppression is applied, with no network,
@@ -21,7 +24,8 @@ package enum EmergencyEscape {
   ///
   /// The owner must not forward these events to a remote target.
   package static func isChordKey(_ event: KVMEvent) -> Bool {
-    guard case .key(.backspace, _, let modifiers) = event else { return false }
+    guard case .key(let key, _, let modifiers) = event, key == .backspace || key == .enter
+    else { return false }
     return modifiers.control && modifiers.option && modifiers.command
   }
 }
