@@ -9,7 +9,7 @@ risk: "critical"
 execution_tier: "C/S/H"
 low_model_autonomous_merge: false
 depends_on:
-  - "M3-039"
+  []
 contract_refs:
   []
 source_refs:
@@ -26,6 +26,8 @@ labels:
 ---
 
 # M4-001 — 凍結 Cross-platform Toolchain／Language／FFI ADR
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M3-039，可立即開始；本 Issue 凍結 Linux toolchain，Windows toolchain 列為 open question（owner：Product Owner，阻擋 M4-004）。
 
 ## Outcome
 

@@ -11,7 +11,6 @@ low_model_autonomous_merge: false
 depends_on:
   - "M4-021"
   - "M4-022"
-  - "M4-023"
 contract_refs:
   []
 source_refs:
@@ -27,6 +26,8 @@ labels:
 ---
 
 # M4-034 — 實作 Linux Autostart／Background Lifecycle
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M4-023；Linux Server 角色不在目前範圍。
 
 ## Outcome
 

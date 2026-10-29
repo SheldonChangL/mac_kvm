@@ -170,8 +170,8 @@ Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[
 
 | Order | Issue | Tier | Risk | Title | Depends on |
 |---:|---|---|---|---|---|
-| 148 | [M4-001](issues/M4/M4-001-cross-platform-toolchain.md) | C/S/H | critical | 凍結 Cross-platform Toolchain／Language／FFI ADR | M3-039 |
-| 149 | [M4-002](issues/M4/M4-002-platform-backend-contracts.md) | C | critical | 定義 Language-neutral Platform Backend Contracts | M4-001, M1-013, M3-034 |
+| 148 | [M4-001](issues/M4/M4-001-cross-platform-toolchain.md) | C/S/H | critical | 凍結 Cross-platform Toolchain／Language／FFI ADR | — |
+| 149 | [M4-002](issues/M4/M4-002-platform-backend-contracts.md) | C | critical | 定義 Language-neutral Platform Backend Contracts | M4-001, M1-013 |
 | 150 | [M4-003](issues/M4/M4-003-cross-platform-conformance-runner.md) | B | high | 建立 Cross-platform Conformance Runner Contract | M4-001, M3-035, M4-002 |
 | 151 | [M4-004](issues/M4/M4-004-windows-skeleton.md) | A | medium | 建立 Windows App／Build／Test Skeleton | M4-001, M4-002 |
 | 152 | [M4-020](issues/M4/M4-020-linux-skeleton.md) | A | medium | 建立 Linux App／Build／Test Skeleton | M4-001, M4-002 |
@@ -196,7 +196,7 @@ Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[
 | 171 | [M4-038](issues/M4/M4-038-cross-platform-key-matrix.md) | B/H | critical | 建立 Cross-platform VirtualKey Conformance Matrix | M4-009, M4-011, M4-024, M4-025, M1-051 |
 | 172 | [M4-029](issues/M4/M4-029-wayland-backend-adr.md) | C/S/H | critical | 凍結 Wayland Backend／Support Matrix ADR | M4-028, M4-001 |
 | 173 | [M4-015](issues/M4/M4-015-windows-app-shell.md) | B/H | high | 實作 Windows Tray／Settings／Permission Status Shell | M4-005, M4-006, M4-007, M4-013, M4-014 |
-| 175 | [M4-034](issues/M4/M4-034-linux-lifecycle.md) | B/H | high | 實作 Linux Autostart／Background Lifecycle | M4-021, M4-022, M4-023 |
+| 175 | [M4-034](issues/M4/M4-034-linux-lifecycle.md) | B/H | high | 實作 Linux Autostart／Background Lifecycle | M4-021, M4-022 |
 | 176 | [M4-030](issues/M4/M4-030-uinput-helper-security.md) | C/S/H | critical | 完成 uinput Helper Privilege／Threat Model Review | M4-029, M3-002 |
 | 177 | [M4-033](issues/M4/M4-033-wayland-clipboard.md) | C/H | high | 實作 Wayland Clipboard Adapter | M4-029, M4-020, M1-052 |
 | 179 | [M4-016](issues/M4/M4-016-windows-lifecycle.md) | C/H | high | 實作 Windows Startup／Background Lifecycle | M4-015 |
@@ -206,7 +206,7 @@ Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[
 | 184 | [M4-017](issues/M4/M4-017-windows-installer-dev.md) | C/S/H | high | 建立 Windows Installer／Dev Signing Pipeline | M4-016 |
 | 186 | [M4-032](issues/M4/M4-032-wayland-input-backend.md) | C/S/H | critical | 實作凍結 Wayland Input Backend | M4-029, M4-031 |
 | 188 | [M4-018](issues/M4/M4-018-windows-client-e2-e.md) | H | critical | 執行 Windows First-party Client E2E | M4-005, M4-006, M4-008, M4-009, M4-013, M4-014, M4-017 |
-| 189 | [M4-036](issues/M4/M4-036-linux-client-e2-e.md) | H | critical | 執行 Linux First-party Client E2E | M4-022, M4-024, M4-026, M4-027, M4-032, M4-033, M4-035 |
+| 189 | [M4-036](issues/M4/M4-036-linux-client-e2-e.md) | H | critical | 執行 Linux First-party Client E2E | M4-022, M4-024, M4-026, M4-027, M4-035 |
 | 190 | [M4-019](issues/M4/M4-019-windows-server-e2-e.md) | H | critical | 執行 Windows First-party Server E2E | M4-007, M4-010, M4-011, M4-012, M4-018 |
 | 191 | [M4-037](issues/M4/M4-037-linux-server-e2-e.md) | H | critical | 執行 Linux First-party Server E2E | M4-023, M4-025, M4-032, M4-036 |
 | 192 | [M4-040](issues/M4/M4-040-three-oscompatibility-matrix.md) | H | critical | 執行 3-OS Server／Client Compatibility Matrix | M4-019, M4-037, M4-038, M4-039 |

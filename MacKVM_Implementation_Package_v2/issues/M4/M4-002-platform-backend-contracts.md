@@ -11,7 +11,6 @@ low_model_autonomous_merge: false
 depends_on:
   - "M4-001"
   - "M1-013"
-  - "M3-034"
 contract_refs:
   - "C-015"
 source_refs:
@@ -26,6 +25,8 @@ labels:
 ---
 
 # M4-002 — 定義 Language-neutral Platform Backend Contracts
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M3-034；跨語言 conformance 範圍延後到出現非 Swift backend 時（owner：Product Owner）。
 
 ## Outcome
 
