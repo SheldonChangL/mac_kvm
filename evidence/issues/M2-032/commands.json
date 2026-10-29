@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "issue": "M2-032",
+  "branch": "codex/m2-punctuation-clipboard",
+  "testedCommit": "cba4ca864d817dc39ca9dba43e029d94797f7802",
+  "note": "Run by the implementing agent (Claude Opus 5.5) on testedCommit; reviewer must rerun.",
+  "status": "author_run_pending_independent_review",
+  "commands": [
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T01:06:29.298+00:00",
+      "endedAt": "2026-10-29T01:08:40.597+00:00",
+      "summary": [
+        "24 gates passed, including code-quality (swift test -Xswiftc -warnings-as-errors), architecture-check, docs-check, swift-package-test:KVMContracts, swift-package-test:MacPlatform, swift-package-test:BarrierCompatibility and repository-contract-tests"
+      ]
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T01:08:48Z",
+      "endedAt": "2026-10-29T01:08:59Z",
+      "summary": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    {
+      "command": "MACKVM_SMOKE_HOST=<ssh-alias> Tests/SystemTests/Scripts/M2-035-linux-smoke.sh",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T01:09:03Z",
+      "endedAt": "2026-10-29T01:10:16Z",
+      "summary": [
+        "M2-035 smoke: identity=pass",
+        "M2-035 smoke: handshake=pass",
+        "M2-035 smoke: fingerprint-pinned=pass",
+        "M2-035 smoke: enter=pass",
+        "M2-035 smoke: clipboard-to-client=pass",
+        "M2-035 smoke: move-1=pass",
+        "M2-035 smoke: move-2=pass",
+        "M2-035 smoke: held-key-locks=pass",
+        "M2-035 smoke: return=pass",
+        "M2-035 smoke: clipboard-from-client=pass",
+        "M2-035 smoke: escape=pass",
+        "M2-035 smoke: clipboard-not-echoed=pass",
+        "M2-035 smoke: client-loss=pass",
+        "M2-035 smoke: wrong-name-rejected=pass",
+        "M2-035 smoke: reconnect=pass",
+        "M2-035 smoke: clipboard-on-reconnect=pass",
+        "M2-035 smoke: keepalive=pass",
+        "M2-035 smoke: quit-while-remote=pass",
+        "M2-035 smoke: x-events=pass",
+        "M2-035 smoke: result=pass"
+      ]
+    }
+  ]
+}

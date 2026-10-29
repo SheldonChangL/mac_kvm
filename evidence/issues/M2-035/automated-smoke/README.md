@@ -41,6 +41,10 @@ run and removed afterwards.
 | Reconnect | — | new session; enter + (20, 20) → (21, 470) | pass |
 | Keepalive | C8 (idle half) | 13 s idle, then +(30, 0) → (51, 470) | pass |
 | Quit while remote | C10 (protocol half) | Shift held, `quit`: release 50 delivered, `leaving screen`, server `stopped` | pass |
+| Punctuation keys (run 4) | C5 | X raw keycodes 20, 21, 34, 35, 51, 47, 48, 49, 59, 60, 61, then 50+61 (Shift+slash) | pass |
+| Clipboard to the client (run 4) | — | the smoke clipboard's fixed probe, read back on the client display with xclip after the enter | pass |
+| Clipboard from the client (run 4) | — | a second fixed probe set with xclip while entered arrived on the leave and matched exactly | pass |
+| No clipboard echo (run 4) | — | the next enter sent nothing back; reconnecting sent it to the new session once | pass |
 
 The full X raw event sequence on the client display is in `x-events.txt`
 (32 events, all from the fixed probe input above).
@@ -57,7 +61,12 @@ The full X raw event sequence on the client display is in `x-events.txt`
    was untouched.
 3. Scripted re-run at `6700cdf`, after the independent review fixes (a held key
    or button now keeps the pointer on the client, so the return case releases a
-   held modifier instead): every case passed (`script-output.txt`).
+   held modifier instead): every case passed.
+4. Scripted re-run at `cba4ca8` with punctuation keys and clipboard sharing
+   added (2026-10-29): every case passed (`script-output.txt`). The Mac side used
+   the smoke driver's in-memory clipboard, never the Mac pasteboard. Both
+   machines were checked clean afterwards: no smoke directory, xclip process or
+   Keychain item remained.
 
 ```sh
 MACKVM_SMOKE_HOST=<ssh-alias> Tests/SystemTests/Scripts/M2-035-linux-smoke.sh
@@ -75,5 +84,6 @@ real network loss. These are the remaining M2-035 plan cases.
 ## Sanitization
 
 Logs contain only loopback addresses, temporary paths and the fingerprint of the
-disposable identity, which no longer exists. No host names, LAN addresses or
-typed text.
+disposable identity, which no longer exists. No host names, LAN addresses,
+typed text or clipboard text; the clipboard probes are fixed strings in the
+script.
