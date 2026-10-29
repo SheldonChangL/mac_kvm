@@ -70,7 +70,7 @@ struct BarrierClipboardTests {
     #expect(transfer.id == 0)
     #expect(transfer.sequence == 1)
     #expect(transfer.data == dataString(frames[1]))
-    // Text, HTML and bitmap formats; the text content is zero-filled.
+    // Formats 0, 1 and 2; the fixture zero-fills every format's content.
     #expect(
       try BarrierClipboard.text(fromMarshalled: transfer.data) == String(repeating: "\0", count: 37)
     )

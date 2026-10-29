@@ -1,5 +1,5 @@
-// Barrier clipboard transfer (M2-028; wire frozen from the M2-022 punctuation and
-// clipboard capture, evidence/e2e/M2-022/punctuation-clipboard.md).
+// Barrier clipboard transfer (M2-028). The layout comes from the independently reviewed
+// M2-022 evidence (BARRIER-EVID-0006 to 0008, evidence/e2e/M2-022/punctuation-clipboard.md).
 //
 // A transfer is three or more `DCLP` frames for one clipboard id:
 //
@@ -8,8 +8,8 @@
 // mark 1 (start) carries the total size as a decimal ASCII string, mark 2 (chunk)
 // carries the next bytes, mark 3 (end) is empty. The transferred bytes are a
 // marshalled clipboard: a u32 format count, then per format a u32 format id, a u32
-// size and the content. Format 0 is UTF-8 text; HTML (1) and bitmap (2) are not
-// used here. All integers are big-endian. A server sends sequence 0; a client
+// size and the content. Only format 0 is read or written, as UTF-8 text; any other
+// format is ignored. All integers are big-endian. A server sends sequence 0; a client
 // sends the sequence of the enter during which it copied.
 
 /// Why a clipboard transfer was refused. Carries no clipboard bytes.

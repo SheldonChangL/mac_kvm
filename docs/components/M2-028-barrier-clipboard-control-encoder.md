@@ -34,10 +34,12 @@ fail-closed.
 
 ## Clipboard transfer (2026-10-29)
 
-The `DCLP` layout is now frozen from the M2-022 punctuation and clipboard
-addendum (`evidence/e2e/M2-022/punctuation-clipboard.md`, fixture
-`Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/`), so the
-fail-closed clipboard path and `clipboardWireContractNotFrozen` are gone.
+The `DCLP` layout comes from the M2-022 evidence
+(`evidence/e2e/M2-022/punctuation-clipboard.md`, fixture
+`Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/`), registered as
+BARRIER-EVID-0006 to 0008 after an independent review on 2026-10-29. It becomes a
+frozen contract once the M2-023 amendment is accepted. The fail-closed clipboard
+path and `clipboardWireContractNotFrozen` are gone.
 The owner asked for clipboard sharing on 2026-10-29 ("剪貼簿跟標點符號都做").
 
 `BarrierClipboard.swift` (module-internal, outside the M2-028 Exact Files)
@@ -51,8 +53,8 @@ holds the codec both directions use:
 | `BarrierClipboardAssembler(limit:)` | one transfer in flight per id; a start over the limit throws `oversized`; a chunk without a start, a different sequence, too many bytes, or an end that is not empty or not exact throws `malformed` and drops the transfer |
 
 The server sends clipboard 0 only, always with sequence 0, as the capture
-shows. The primary selection (id 1) is neither sent nor applied, and HTML and
-bitmap formats are ignored.
+shows. Clipboard id 1 is neither sent nor applied, and formats other than 0 are
+ignored.
 
 Barrier 2.4 sends clipboards in 32 KiB chunks, and a client's transfer carries
 other formats besides the text (measured in the addendum's chunk table). So the

@@ -1079,6 +1079,738 @@
       "consumingTests": [
         "Tests/Contracts/test_m1_protocol_002_control_message_contracts.py"
       ]
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0006",
+      "relatedIssue": "M2-022",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "Controlled black-box observation of two lawfully installed external Barrier 2.4.0 programs, barriers (server, screen name capserver) and barrierc (client, screen name capclient), each on a throwaway Xvfb display on one owner-approved Ubuntu 22.04 x86_64 test host, connected through a byte-logging loopback relay operated by evidence/e2e/M2-022/tools/capture_server_input.py under Tests/SystemTests/Plans/M2-022-barrier-server-fixtures.md. All input was synthetic xdotool input on the server display in the order listed in the committed driver. Direction labels are the relay's socket roles (client side versus upstream server side), not analysis of payload content. No Barrier or Deskflow source, header, constant table, generated artifact, decompiled material, patched binary, injected packet or instrumentation was used for the bytes; the review found unobservable labels only in the write-ups (see limitations)."
+      },
+      "capture": {
+        "capturedAt": "2026-10-28T06:26:52Z",
+        "tools": [
+          {
+            "name": "Barrier barriers",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "Barrier barrierc",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/capture_server_input.py",
+            "version": "commit 21e7832"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/make_fixtures.py",
+            "version": "commit 21e7832"
+          },
+          {
+            "name": "Xvfb",
+            "version": "Ubuntu package xvfb 2:21.1.4-2ubuntu1.7~22.04.16 (installed 2026-09-01, before the captures)"
+          },
+          {
+            "name": "xdotool",
+            "version": "Ubuntu package xdotool 1:3.20160805.1-4 (installed 2026-10-05, before the captures)"
+          },
+          {
+            "name": "python3 on the peer",
+            "version": "3.10.16"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client-and-server",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported (kernel Linux 6.8 recorded in evidence/e2e/M2-022/result.json)"
+        }
+      },
+      "transport": {
+        "networkScope": "Loopback only on the test host: barrierc connected to a relay on a temporary loopback port, which connected to barriers on another temporary loopback port; the relay recorded every byte of both directions. No address, port, host name or user name is retained in the fixture. The operator's existing Barrier client on the host was not touched.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on a host under that owner's control, used only as external black-box test peers as M1-003 permits. Only externally observable application payload bytes were recorded. Barrier remains an external test peer and is not bundled, linked or copied.",
+        "permittedUse": "Independent clean-room interoperability implementation inside the MacKVM Barrier compatibility adapter only: freezing the server-to-client pointer, button, wheel, key, repeat, enter, leave, keepalive and empty-clipboard frame layouts and the observed value sets for a client decoder, and checking a server encoder's bytes against them. This entry authorises no consumer until a contract entry and its tests are linked.",
+        "producer": "M2-022 capture producer (the Claude Opus executing agent named in evidence/e2e/M2-022/README.md), who also decoded the frames and built the fixture",
+        "reviewer": {
+          "identity": "Independent reviewer agent, not the producer; review recorded in the M2-022 independent review report (filed as evidence/issues/M2-022/independent-review.md), including re-derivation of the fixture byte for byte from the producer's raw stream before its deletion",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-29T03:41:32Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "evidence/e2e/M2-022/tools/make_fixtures.py reassembles complete 4-byte-length-prefixed frames per direction from the relay log and retains, per frame, only its sequence number, direction label and the base64 of the complete frame; timestamps, marker lines, addresses and ports never enter the fixture, and zero bytes were left over in either direction. No clipboard content was present (both server clipboards were empty). The retained key frames encode exactly the synthetic xdotool sweep listed in the committed driver, which the reviewer confirmed marker by marker against the raw stream; no user input or user content was involved. The reviewer's byte scan found no printable run other than message codes, the marker word Barrier and the synthetic screen name capclient, and no address, host, user, path, certificate or probe bytes.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "ip-address",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json",
+        "sha256": "506535a774f257dc8f004105c8d6333e2da4727aef9c6f4073533cb5e81dcb9b",
+        "byteLength": 73941
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "579 complete frames in capture order, 284 server-to-client and 295 client-to-server; every frame is a 4-byte unsigned big-endian length equal to the number of following bytes, then a 4-byte ASCII code.",
+          "Handshake frames 1-7 (hello, HelloBack for capclient, QINF, DINF 0,0,1600,900,0,800,450, CIAK, CROP, DSOP zero) match the layouts already approved in BARRIER-EVID-0004 and 0005.",
+          "The server sent CINN with sequence 1 at the first enter (frame 8) and sequence 3 at the second enter (frame 564), both at x=0 y=450 with mask 0x0000, and COUT with no body at frames 562 and 569.",
+          "Immediately after the first CINN the server sent two empty clipboard transfers, ids 0 and 1, sequence 0, each as start (ASCII 4), chunk (4 zero bytes: format count 0) and end, with one CALV interleaved inside each transfer (frames 9-16).",
+          "The client sent one CNOP for every server frame after DSOP (279 of 279) and answered every server CALV with a CALV (14 of 14); CALV and CNOP have no body.",
+          "Pointer, button, wheel, key, key-repeat frames were observed with the layouts and values stated in the wire claims; every DKDN had a matching DKUP with the same button and no key was left held.",
+          "Timing is not retained: from the raw stream the reviewer measured server CALV every 3.002-3.036 s after the enter burst, client CALV replies within 1.0 ms, client CNOP within 3.22 ms, and 14 DKRP frames 40 ms apart starting 661 ms after the held key went down; these are non-repeatable reviewer observations, not claims."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-001",
+            "assertion": "Server-to-client DMMV carries a 4-byte body read as two unsigned 16-bit big-endian fields, x then y, holding the absolute pointer position on the client in client pixels: the seven observed values (10,450), (10,460), (0,460), (0,450), (100,500), (101,501), (116,506) each equal the previous client position plus the driver's relative move from the enter point (0,450). Only values below 0x8000 were observed; signedness and clamping are not established.",
+            "establishedFieldIds": [
+              "barrier-server-dmmv-layout",
+              "barrier-server-dmmv-absolute-client-coordinates"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/27/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/29/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/31/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/33/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/38/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/40/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/64/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-002",
+            "assertion": "Server-to-client DMDN and DMUP carry a 1-byte body holding a button number. For the driver's X button presses 1, 3, 2, 8, 9 the observed values were 1, 3, 2, 4, 5, each as a DMDN/DMUP pair with equal values, and a held button 1 produced DMDN, a DMMV, then DMUP. No other value was observed.",
+            "establishedFieldIds": [
+              "barrier-server-dmdn-dmup-layout",
+              "barrier-server-button-values-1-to-5"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/42/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/43/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/46/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/50/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/54/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/58/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/62/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/69/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-003",
+            "assertion": "Server-to-client DMWM carries a 4-byte body read as two signed 16-bit big-endian fields, x delta then y delta. One wheel notch up, down, left and right produced bodies 0000 0078, 0000 ff88, ff88 0000 and 0078 0000, that is (0,+120), (0,-120), (-120,0), (+120,0). One notch per direction was observed; other magnitudes are not established.",
+            "establishedFieldIds": [
+              "barrier-server-dmwm-layout",
+              "barrier-server-dmwm-120-per-notch"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/71/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/73/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/75/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/77/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-004",
+            "assertion": "Server-to-client DKDN and DKUP carry a 6-byte body of three unsigned 16-bit big-endian fields: key identifier, modifier mask, button. DKRP carries an 8-byte body of four such fields: key identifier, modifier mask, count, button; 14 DKRP frames with count 1 were observed between the DKDN and DKUP of a key held about 1.2 s. The button is the same in every down/up pair and in the repeats; the key identifier of an up may differ from its down (0x0041 down, 0x0061 up after Shift was released; likewise 0x0021/0x0031 and 0x005F/0x002D).",
+            "establishedFieldIds": [
+              "barrier-server-dkdn-dkup-layout",
+              "barrier-server-dkrp-layout",
+              "barrier-server-key-button-pairing"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/79/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/81/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/405/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/409/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/529/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/531/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/557/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/559/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-005",
+            "assertion": "For this Linux server with the Xvfb default US keymap the key identifiers observed were: a-z 0x0061-0x007A, 0-9 0x0030-0x0039, space 0x0020, minus 0x002D, equal 0x003D, bracketleft 0x005B, bracketright 0x005D, backslash 0x005C, semicolon 0x003B, apostrophe 0x0027, grave 0x0060, comma 0x002C, period 0x002E, slash 0x002F, Return 0xEF0D, Escape 0xEF1B, Tab 0xEF09, BackSpace 0xEF08, Delete 0xEFFF, Insert 0xEF63, Left 0xEF51, Up 0xEF52, Right 0xEF53, Down 0xEF54, Home 0xEF50, End 0xEF57, Page Up 0xEF55, Page Down 0xEF56, keypad Enter 0xEF8D, F1-F12 0xEFBE-0xEFC9, volume up 0xE0AF, volume down 0xE0AE, mute 0xE0AD, Shift left/right 0xEFE1/0xEFE2, Control 0xEFE3/0xEFE4, Alt 0xEFE9/0xEFEA, Super 0xEFEB/0xEFEC, Caps Lock 0xEFE5; with Shift held, A 0x0041, exclam 0x0021, underscore 0x005F; with Caps Lock on, a 0x0041. The input-to-value pairing follows the committed driver order (frames 80-525) and was confirmed by the reviewer against the raw-stream markers. The button values are this server's X keycodes and are not a claim about any other server.",
+            "establishedFieldIds": [
+              "barrier-server-key-identifier-observed-values"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/79/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/229/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/292/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/343/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/387/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/391/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/403/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/518/applicationPayloadBase64",
+              "evidence/e2e/M2-022/tools/capture_server_input.py"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-006",
+            "assertion": "In the DKDN/DKUP/DKRP modifier mask, bit 0x0001 was set while Shift was held, 0x0002 while Control, 0x0004 while Alt, 0x0010 while Super and 0x1000 while Caps Lock was on, and 0x0003 while Control and Shift were held together. A modifier key's own DKDN carries the mask before it took effect and its DKUP carries the mask with its bit set (Shift down 0x0000, up 0x0001). For Caps Lock both the toggle-off DKDN and DKUP carried 0x1000, so a lock key's release does not reveal the resulting lock state. Bits other than these five were never set; their meaning is unknown.",
+            "establishedFieldIds": [
+              "barrier-server-modifier-mask-observed-bits"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/403/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/405/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/407/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/432/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/440/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/448/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/458/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/514/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/516/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/522/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/524/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-007",
+            "assertion": "CINN carries x, y as unsigned 16-bit big-endian, a 4-byte big-endian sequence and a 16-bit mask, as in BARRIER-EVID-0005; here the first enter carried sequence 1 and the second enter sequence 3, both x=0 y=450 mask 0x0000, with COUT (no body) between them. Sequence 2 was never on the wire; the increment rule is not established.",
+            "establishedFieldIds": [
+              "barrier-server-cinn-second-enter-observed-sequence-3"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/7/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/561/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/563/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/568/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-008",
+            "assertion": "Server-to-client DCLP carries id (1 byte), sequence (4 bytes big-endian), mark (1 byte) and a 4-byte big-endian length followed by that many data bytes. On the first enter the server sent, for id 0 and then id 1, each with sequence 0: mark 1 with data ASCII 4, mark 2 with 4 data bytes 00000000, mark 3 with empty data; one CALV frame was interleaved inside each transfer. The mark-1 data is the decimal ASCII byte length of the mark-2 data; the mark-2 data read as a 4-byte big-endian format count was 0.",
+            "establishedFieldIds": [
+              "barrier-server-dclp-header-layout",
+              "barrier-server-dclp-empty-clipboard-on-enter",
+              "barrier-server-calv-interleaved-in-dclp-transfer"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/8/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/9/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/10/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/11/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/12/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/13/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/14/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/15/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0006-CLAIM-009",
+            "assertion": "After DSOP the client sent exactly one CNOP (no body) per server frame, 279 for 279, and one CALV (no body) per server CALV, 14 for 14; COUT has no body in both observed instances.",
+            "establishedFieldIds": [
+              "barrier-client-cnop-per-server-frame",
+              "barrier-client-calv-reply"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/35/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/36/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json#/observations/37/applicationPayloadBase64"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "One session of one external version pair on one host; the server was a Linux Barrier server on an Xvfb display with the default US keymap. No macOS Barrier server and no Windows peer were observed; the claim that frame layouts are server-platform independent is an inference and is not established here.",
+        "Button values in DKDN/DKUP/DKRP are this server's X keycodes; a consumer may rely only on their equality within a down/up pair and across plain and shifted presses of the same key, not on their values.",
+        "TLS was disabled for the observation only; nothing under TLS was observed and the product TLS default remains unvalidated by this entry.",
+        "No clamping of DMMV to the client screen was observed; the README's statement that positions are clamped is not supported.",
+        "Keepalive interval, reply latency and CNOP latency are reviewer measurements from the raw stream, which is not retained; they are not repeatable from the repository and are recorded here only as context.",
+        "The raw stream (SHA-256 6db39890e3000c6b7b445ad23a7c756691f5d9e1a538017d94ac469591e2781e) and the peer logs were held by the producer outside the repository; the reviewer re-derived the fixture from it byte for byte with the committed make_fixtures.py before any deletion. Once deleted, re-derivation is no longer repeatable.",
+        "Xvfb, xdotool and xclip versions and the peer OS build were not recorded by the producer.",
+        "The fixture metadata reference string exceeds the fixture schema's maxLength of 512; no gate enforces that constraint. Recorded as a deviation to be fixed or decided; it does not affect the fixture bytes.",
+        "The producer's write-ups carry labels that no observation supports (clipboard id 1 as primary selection, format ids as HTML and bitmap, a DINF field named warp); none of them is a claim of this entry."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-server-dmmv-signedness-and-clamping",
+          "observation": "Only values 0-116 and 450-506 were observed; signedness, out-of-range handling and clamping are not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-dmwm-magnitudes-beyond-one-notch",
+          "observation": "Only plus or minus 120 was observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-dkrp-count-semantics",
+          "observation": "Count was always 1; the meaning of other values is not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-modifier-mask-unobserved-bits",
+          "observation": "Bits other than 0x0001, 0x0002, 0x0004, 0x0010 and 0x1000 were never set; the 0x2000 seen in BARRIER-EVID-0005 was not observed here.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-key-identifiers-outside-observed-set",
+          "observation": "Non-US layouts, dead keys, keypad digits and other media keys were not pressed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-cinn-sequence-increment-rule",
+          "observation": "Values 1 and 3 were observed; whether leave consumes a sequence number is inferred, not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-control-cinn-modifier-mask-bits",
+          "observation": "Only 0x0000 was observed here.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-dclp-format-id-semantics",
+          "observation": "Only empty clipboards (format count 0) were sent in this session.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-clipboard-id-1-semantics",
+          "observation": "Id 1 was always empty; what it carries is not observed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-keepalive-timing-and-timeout",
+          "observation": "Not retained in the fixture; reviewer-measured from the raw stream only.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-unobserved-tokens",
+          "observation": "No option, screensaver, lock, close or error frame was observed; unknown tokens remain fail-closed.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer field meaning, width, order or signedness beyond the claims above; in particular do not infer DMMV clamping, a CINN increment rule, DKRP counts other than 1, or any modifier-mask bit beyond the five observed.",
+        "Do not infer that button values hold for any other server, keymap or platform, or that any layout holds for a macOS or Windows Barrier server.",
+        "Do not infer clipboard format or clipboard-id semantics from this entry; only empty clipboards were observed.",
+        "Do not infer keepalive interval, latency or timeout as a compatibility claim from this entry.",
+        "Do not infer TLS, certificate or trust behavior; TLS was disabled for the observation.",
+        "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory; the unobservable labels in the producer's write-ups are not evidence.",
+        "Do not infer unobserved message code semantics, additional endian behavior beyond the big-endian reads stated in the claims, framing beyond complete top-level frames, or stream boundary behavior from this entry."
+      ],
+      "frozenContractRefs": [],
+      "consumingTests": []
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0007",
+      "relatedIssue": "M2-022",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "Controlled black-box observation of the same two lawfully installed external Barrier 2.4.0 programs and topology as BARRIER-EVID-0006, operated by evidence/e2e/M2-022/tools/capture_client_clipboard_keepalive.py: handshake, enter, a synthetic clipboard change on the client display (xclip with the fixed non-personal probe string in the committed driver), leave, then SIGSTOP of the server process for 15 s to observe the client giving up on keepalive. Direction labels are the relay's socket roles. No Barrier or Deskflow source, header, constant table, generated artifact, decompiled material, patched binary, injected packet or instrumentation was used."
+      },
+      "capture": {
+        "capturedAt": "2026-10-28T06:26:52Z",
+        "tools": [
+          {
+            "name": "Barrier barriers",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "Barrier barrierc",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/capture_client_clipboard_keepalive.py",
+            "version": "commit 21e7832"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/make_fixtures.py",
+            "version": "commit 21e7832"
+          },
+          {
+            "name": "Xvfb",
+            "version": "Ubuntu package xvfb 2:21.1.4-2ubuntu1.7~22.04.16 (installed 2026-09-01, before the captures)"
+          },
+          {
+            "name": "xdotool",
+            "version": "Ubuntu package xdotool 1:3.20160805.1-4 (installed 2026-10-05, before the captures)"
+          },
+          {
+            "name": "xclip",
+            "version": "Ubuntu package xclip 0.13-2 (installed 2026-10-05, before the captures)"
+          },
+          {
+            "name": "python3 on the peer",
+            "version": "3.10.16"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client-and-server",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported (kernel Linux 6.8 recorded in evidence/e2e/M2-022/result.json)"
+        }
+      },
+      "transport": {
+        "networkScope": "Loopback only on the test host through the byte-logging relay, as in BARRIER-EVID-0006. No address, port, host name or user name is retained.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on a host under that owner's control, used only as external black-box test peers as M1-003 permits. Only externally observable application payload bytes were recorded.",
+        "permittedUse": "Independent clean-room interoperability implementation inside the MacKVM Barrier compatibility adapter only: the client-to-server CCLP layout and the fact that a client sends its clipboard as three DCLP frames after COUT. This entry establishes no client-to-server DCLP field layout (the bodies are zero-filled here; see BARRIER-EVID-0008) and no timing claim.",
+        "producer": "M2-022 capture producer (the Claude Opus executing agent named in evidence/e2e/M2-022/README.md), who also decoded the frames and built the fixture",
+        "reviewer": {
+          "identity": "Independent reviewer agent, not the producer; review recorded in the M2-022 independent review report (filed as evidence/issues/M2-022/independent-review.md), including re-derivation of the fixture byte for byte from the producer's raw stream and verification of the keepalive-timeout observation against the raw stream and the external client's log before their deletion",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-29T03:41:32Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "evidence/e2e/M2-022/tools/make_fixtures.py reassembles complete frames per direction and retains sequence number, direction label and base64 of each frame; timestamps, markers, addresses and ports never enter the fixture. For every client-to-server DCLP frame the entire body after the 4-byte code, that is id, sequence, mark, length and data, is replaced by zero bytes of the same length (frames 34-36, body lengths 12, 93 and 10), so no clipboard content, not even the synthetic probe, is retained; the reviewer confirmed zero bytes for the probe string, for any host, user, path, address or certificate fragment, and that the only printable runs are message codes, the word Barrier and the synthetic screen name capclient.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "clipboard-payload",
+          "ip-address",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json",
+        "sha256": "72417873132f738a9e256ee73365d09a36c681a59175e010f7be46989d615bb7",
+        "byteLength": 4878
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "36 complete frames: the same handshake, CINN (sequence 1, x=0 y=450, mask 0), two empty server clipboard transfers with interleaved CALV, CNOP and CALV replies as in BARRIER-EVID-0006 (frames 1-27).",
+          "After the synthetic copy on the client display the client sent CCLP (frame 28); after the server's COUT (frame 32) the client sent CNOP and then three DCLP frames (34-36) whose bodies are zero-filled in this fixture.",
+          "No server frame follows COUT: the server process was stopped. The fixture retains no timestamp and no close event. From the raw stream and the external client's log the reviewer observed the relay EOF 9.018 s after the last server CALV (8.625 s after the last server frame) and the client log line NOTE: server is dead; this is a non-retained, non-repeatable reviewer observation, not a claim."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0007-CLAIM-001",
+            "assertion": "Client-to-server CCLP carries a 5-byte body: id (1 byte) 0 and a 4-byte big-endian sequence 1, equal to the sequence of the CINN in force; it was sent after the synthetic copy on the client display and before the server's COUT.",
+            "establishedFieldIds": [
+              "barrier-client-cclp-layout",
+              "barrier-client-cclp-sequence-equals-enter-sequence"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/7/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/27/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/31/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0007-CLAIM-002",
+            "assertion": "After the server's COUT the client sent one CNOP and then exactly three DCLP frames with body lengths 12, 93 and 10 bytes. Their bodies are zero-filled in this fixture, so this claim covers frame count, order and lengths only; the client-to-server DCLP field layout is established by BARRIER-EVID-0008, not here. The lengths are consistent with a start frame carrying two ASCII digits, one 83-byte chunk and an empty end.",
+            "establishedFieldIds": [
+              "barrier-client-dclp-three-frames-after-cout"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/31/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/33/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/34/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json#/observations/35/applicationPayloadBase64"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "One session; one copy; one leave. The client-to-server DCLP bodies are zero-filled in their entirety, including id, sequence, mark and length, so nothing inside them is observable here.",
+        "The keepalive-timeout behavior is not in the fixture. The reviewer verified it from the producer's raw stream (SHA-256 acb55a3b4145b60b43c776e22556fd0b9e07887e2a1959c07a0386a7744dc372) and the external client's log before their deletion; it is a single observation and must not be consumed as a compatibility claim.",
+        "The client's clipboard send was triggered by the server's COUT; whether a copy while not entered is sent at once was not observed in this session (the producer's uncommitted chunk measurement suggests it, but no artifact is retained).",
+        "TLS disabled for observation only; no macOS or Windows peer; Xvfb, xdotool and xclip versions and the peer OS build not recorded; metadata reference exceeds the schema maxLength of 512 (deviation, no byte impact)."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-client-dclp-field-layout-in-this-fixture",
+          "observation": "All client DCLP body bytes are zero-filled; no field is observable in this fixture.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-keepalive-timing-and-timeout",
+          "observation": "Not retained; reviewer-verified from non-retained raw data only.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-client-close-behavior",
+          "observation": "The fixture ends at the last client DCLP frame; no close frame was observed, the connection simply ended.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-cclp-to-client",
+          "observation": "A server-to-client CCLP was never captured in any retained fixture.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer any client-to-server DCLP field, mark or size from this entry.",
+        "Do not infer a keepalive interval, timeout or close protocol from this entry.",
+        "Do not infer clipboard content handling, format semantics or the meaning of clipboard id 1.",
+        "Do not infer TLS, certificate, macOS-server or Windows behavior.",
+        "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory.",
+        "Do not infer unobserved message code semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, or full compatibility from this entry."
+      ],
+      "frozenContractRefs": [],
+      "consumingTests": []
+    },
+    {
+      "evidenceId": "BARRIER-EVID-0008",
+      "relatedIssue": "M2-022",
+      "source": {
+        "category": "black-box-capture",
+        "acquisitionMethod": "Controlled black-box observation of the same two lawfully installed external Barrier 2.4.0 programs and topology as BARRIER-EVID-0006, operated by evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py on 2026-10-29: the server clipboard set with xclip to the fixed non-personal probe string in the committed driver (36 UTF-8 bytes), enter, the eleven US punctuation keys plain and shifted by xdotool, the client clipboard set with xclip to the second fixed probe (37 UTF-8 bytes), leave, a second enter and leave. The driver's own checks that each peer's clipboard matched the other's probe after enter and after leave passed (markers in the raw stream, verified by the reviewer). Direction labels are the relay's socket roles. No Barrier or Deskflow source, header, constant table, generated artifact, decompiled material, patched binary, injected packet or instrumentation was used for the bytes."
+      },
+      "capture": {
+        "capturedAt": "2026-10-29T00:38:05Z",
+        "tools": [
+          {
+            "name": "Barrier barriers",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "Barrier barrierc",
+            "version": "2.4.0-release protocol 1.6"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py",
+            "version": "commit 6578b49"
+          },
+          {
+            "name": "evidence/e2e/M2-022/tools/make_punctuation_clipboard_fixture.py",
+            "version": "commit 6578b49"
+          },
+          {
+            "name": "Xvfb",
+            "version": "Ubuntu package xvfb 2:21.1.4-2ubuntu1.7~22.04.16 (installed 2026-09-01, before the captures)"
+          },
+          {
+            "name": "xdotool",
+            "version": "Ubuntu package xdotool 1:3.20160805.1-4 (installed 2026-10-05, before the captures)"
+          },
+          {
+            "name": "xclip",
+            "version": "Ubuntu package xclip 0.13-2 (installed 2026-10-05, before the captures)"
+          },
+          {
+            "name": "python3 on the peer",
+            "version": "3.10.16"
+          }
+        ]
+      },
+      "peer": {
+        "product": "Barrier",
+        "version": "2.4.0-release",
+        "role": "client-and-server",
+        "os": {
+          "name": "Ubuntu",
+          "version": "22.04",
+          "build": "not-reported"
+        }
+      },
+      "transport": {
+        "networkScope": "Loopback only on the test host through the byte-logging relay, as in BARRIER-EVID-0006. No address, port, host name or user name is retained.",
+        "tls": {
+          "enabled": false,
+          "protocolVersion": null,
+          "certificateIdentitySanitized": true
+        }
+      },
+      "provenance": {
+        "lawfulUseStatement": "Both endpoints were lawfully installed external Barrier programs operated by their owner on a host under that owner's control, used only as external black-box test peers as M1-003 permits. Only externally observable application payload bytes were recorded, and clipboard content was zero-filled before commit.",
+        "permittedUse": "Independent clean-room interoperability implementation inside the MacKVM Barrier compatibility adapter only: the plain and shifted punctuation key identifiers, the four-frame shifted-press sequence, and the DCLP header, mark, start-size and marshalled-structure layout in both directions for single-chunk transfers. It establishes no clipboard format semantics, no clipboard-id-1 semantics and no multi-chunk behavior.",
+        "producer": "M2-022 capture producer (the executing agent of the 2026-10-29 addendum, evidence/e2e/M2-022/punctuation-clipboard.md), who also decoded the frames and built the fixture",
+        "reviewer": {
+          "identity": "Independent reviewer agent, not the producer; review recorded in the M2-022 independent review report (filed as evidence/issues/M2-022/independent-review.md), including re-derivation of the fixture byte for byte from the producer's raw stream before its deletion",
+          "independentFromProducer": true,
+          "reviewedAt": "2026-10-29T03:41:32Z"
+        },
+        "disposition": "approved"
+      },
+      "sanitization": {
+        "procedure": "evidence/e2e/M2-022/tools/make_punctuation_clipboard_fixture.py reassembles complete frames per direction and retains sequence number, direction label and base64 of each frame; timestamps, markers, addresses and ports never enter the fixture. In every DCLP mark-2 frame the marshalled clipboard keeps its structure (format count, format ids, sizes) while each format's content bytes are replaced by zero bytes of the same length; the reviewer confirmed that every format content in frames 11 and 170 is all-zero (sizes 36/54/0 and 37/54/0) and that no probe, host, user, path, address or certificate bytes exist anywhere in the fixture. The retained key frames encode exactly the synthetic punctuation sweep listed in the committed driver, confirmed marker by marker against the raw stream.",
+        "status": "sanitized",
+        "containsSensitiveData": false,
+        "removedCategories": [
+          "clipboard-payload",
+          "ip-address",
+          "other-private-data"
+        ]
+      },
+      "fixture": {
+        "path": "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json",
+        "sha256": "3851b910daa68b30631418c4f26e3fc1f0569c28827c23f48304cf9ccbfcb41f",
+        "byteLength": 23530
+      },
+      "coverage": {
+        "direction": "bidirectional",
+        "behaviors": [
+          "181 complete frames: handshake (1-7); CINN sequence 1 (8); server clipboard id 0 sent as start 118, one 118-byte chunk and end, then id 1 as start 4, chunk 00000000 and end, all sequence 0, with one CALV interleaved inside each transfer (9-16); CNOP and CALV replies; 33 DKDN/DKUP pairs for the punctuation sweep (31-164); client CCLP id 0 sequence 1 after the client copy (166); server COUT (167); client DCLP start 119, one 119-byte chunk and end, all sequence 1 (169-171); second CINN sequence 3 (175) with no DCLP following; COUT (177).",
+          "Format 0's size equals the UTF-8 byte length of the probe set on the sending display (36 server, 37 client); format 1 was 54 bytes in both transfers despite the different probes, so its content is not a text-derived rendering of the probe; format 2 was 0 bytes in both. Content bytes are zero-filled and no format meaning is observable."
+        ],
+        "wireClaims": [
+          {
+            "claimId": "BARRIER-EVID-0008-CLAIM-001",
+            "assertion": "For the eleven US punctuation keys the server sent DKDN/DKUP with these key identifiers (plain, shifted) and buttons: minus 0x002D/0x005F 20; equal 0x003D/0x002B 21; bracketleft 0x005B/0x007B 34; bracketright 0x005D/0x007D 35; backslash 0x005C/0x007C 51; semicolon 0x003B/0x003A 47; apostrophe 0x0027/0x0022 48; grave 0x0060/0x007E 49; comma 0x002C/0x003C 59; period 0x002E/0x003E 60; slash 0x002F/0x003F 61. A shifted press is four frames: DKDN Shift 0xEFE1 mask 0 button 50; DKDN shifted id mask 0x0001; DKUP Shift mask 0x0001; DKUP plain id mask 0, same button as the down. Buttons are this server's X keycodes.",
+            "establishedFieldIds": [
+              "barrier-server-punctuation-key-identifiers",
+              "barrier-server-shifted-press-four-frame-sequence"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/30/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/34/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/36/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/38/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/40/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/48/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/60/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/72/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/84/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/96/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/108/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/123/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/135/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/147/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/159/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0008-CLAIM-002",
+            "assertion": "DCLP in both directions carries id (1 byte), a 4-byte big-endian sequence, mark (1 byte) and a 4-byte big-endian length followed by exactly that many data bytes. Marks were sent in the order 1, 2, 3 with no other frame of the transfer between them other than the server's interleaved CALV at enter; mark-1 data is the decimal ASCII byte length of the mark-2 data (118 for 118, 4 for 4, 119 for 119); mark-3 data is empty. The server's transfers carried sequence 0; the client's transfer carried sequence 1, the sequence of the CINN in force, as did its preceding CCLP.",
+            "establishedFieldIds": [
+              "barrier-dclp-header-layout-both-directions",
+              "barrier-dclp-start-chunk-end-marks",
+              "barrier-dclp-start-data-decimal-length",
+              "barrier-client-dclp-sequence-equals-enter-sequence"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/8/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/10/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/11/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/12/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/14/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/15/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/165/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/168/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/169/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/170/applicationPayloadBase64"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0008-CLAIM-003",
+            "assertion": "The mark-2 data of a non-empty transfer is a 4-byte big-endian format count followed, per format, by a 4-byte big-endian format id, a 4-byte big-endian size and that many content bytes, with no trailing bytes: count 3 with ids 0, 1, 2 and sizes 36, 54, 0 (server to client) and 37, 54, 0 (client to server); an empty clipboard is count 0. Format 0's size equals the UTF-8 byte length of the probe on the sending display in both transfers. No format's meaning is established: content is zero-filled, and format 1's identical 54-byte size for two probes of different length shows it is not a rendering of the probe text.",
+            "establishedFieldIds": [
+              "barrier-dclp-marshalled-clipboard-structure",
+              "barrier-dclp-format-0-size-equals-utf8-probe-length"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/10/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/14/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/169/applicationPayloadBase64",
+              "evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py"
+            ]
+          },
+          {
+            "claimId": "BARRIER-EVID-0008-CLAIM-004",
+            "assertion": "After the client had sent CCLP and its DCLP transfer, the second CINN (sequence 3) was followed directly by COUT with no DCLP from the server. The same absence occurs in BARRIER-EVID-0006 where no client copy happened, so this observation does not discriminate clipboard ownership from a no-resend-on-re-enter rule.",
+            "establishedFieldIds": [
+              "barrier-server-no-dclp-on-second-enter-observed"
+            ],
+            "evidenceLocations": [
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/174/applicationPayloadBase64",
+              "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json#/observations/176/applicationPayloadBase64"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "One session; exactly one non-empty transfer per direction, each a single chunk; no transfer larger than 119 bytes is retained. Chunking of large clipboards was measured by the producer (evidence/e2e/M2-022/punctuation-clipboard.md, 32 KiB chunks) but no artifact of that measurement is in the repository; it is not a claim of this entry.",
+        "Format and clipboard-id semantics are unknown. The producer's labels (format 0 UTF-8 text, 1 HTML, 2 bitmap; id 1 primary selection) are not supported by any observation and their source is not recorded; the first-party sources that repeat them must be corrected to cite nothing beyond this entry.",
+        "The UTC capture time was not recorded by the producer; only the date 2026-10-29 is known. This entry cannot be appended until the producer records it.",
+        "The raw stream (SHA-256 07c968ef836652e711edda57f3d19929072877ea668cffa1b39b5123041f2d65) was held by the producer outside the repository; the reviewer re-derived the fixture from it byte for byte with the committed builder before any deletion.",
+        "TLS disabled for observation only; no macOS or Windows peer; Xvfb, xdotool and xclip versions and the peer OS build not recorded; the fixture is not yet listed in evidence/e2e/M2-022/result.json; metadata reference exceeds the schema maxLength of 512 (deviation, no byte impact)."
+      ],
+      "ambiguousFields": [
+        {
+          "fieldId": "barrier-dclp-format-id-semantics",
+          "observation": "Content is zero-filled; only sizes are observed. Format 1 is 54 bytes for two different probes; format 2 is 0 bytes.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-clipboard-id-1-semantics",
+          "observation": "Id 1 was always empty.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-dclp-multi-chunk-transfers-and-size-limits",
+          "observation": "Only single-chunk transfers are retained; the producer's chunk measurement is not an artifact in the repository.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-dclp-sequence-values-other-than-zero",
+          "observation": "Server transfers carried sequence 0 only.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-server-cclp-to-client",
+          "observation": "Never captured in a retained fixture.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        },
+        {
+          "fieldId": "barrier-clipboard-ownership-on-re-enter",
+          "observation": "No DCLP after the second enter, but the same absence occurs without a client copy; ownership semantics are not discriminated.",
+          "status": "unknown",
+          "blockedClaimIds": []
+        }
+      ],
+      "prohibitedInferences": [
+        "Do not infer clipboard format meaning, encoding of formats 1 and 2, or the meaning of clipboard id 1 from this entry.",
+        "Do not infer chunk sizes, maximum sizes or multi-chunk reassembly from this entry.",
+        "Do not infer a clipboard-ownership rule from the absence of DCLP after the second enter.",
+        "Do not infer that the punctuation identifiers or buttons hold for other keymaps, servers or platforms.",
+        "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory; the producer's unobservable labels are not evidence.",
+        "Do not infer unobserved field or message code semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, Windows or TLS behavior, or full compatibility from this entry."
+      ],
+      "frozenContractRefs": [],
+      "consumingTests": []
     }
   ]
 }

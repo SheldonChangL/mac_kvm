@@ -4,7 +4,7 @@
   "protocol": "barrier",
   "provenance": {
     "sourceKind": "black-box-capture",
-    "reference": "Controlled black-box observation with evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py on the owner-approved Ubuntu 22.04 x86_64 host: external Barrier server barriers 2.4.0-release and client barrierc 2.4.0-release, protocol 1.6, each on its own virtual X display, through a byte-logging loopback relay. Input was synthetic (xdotool on the server display); clipboard text was set with xclip to fixed probe strings on each display. TLS disabled for this observation only. Session: handshake, server clipboard sent on enter, the eleven US punctuation keys plain and shifted, a client copy, the client clipboard sent on leave, a second enter and leave."
+    "reference": "Controlled black-box observation (evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py) on the owner-approved Ubuntu 22.04 x86_64 host: barriers and barrierc 2.4.0-release, protocol 1.6, on separate Xvfb displays through a byte-logging loopback relay, TLS disabled for the observation only. Synthetic xdotool and xclip input. Every clipboard format content is zero-filled. Details: evidence/e2e/M2-022/punctuation-clipboard.md; register entry BARRIER-EVID-0008."
   },
   "payload": {
     "path": "punctuation-clipboard-capture.json",

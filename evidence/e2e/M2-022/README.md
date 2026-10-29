@@ -1,6 +1,9 @@
 # M2-022 Barrier Server-side Fixtures — Evidence
 
-**Status: captured and sanitized; independent review pending.** Two controlled
+**Status: captured, sanitized and independently reviewed on 2026-10-29**
+(`evidence/issues/M2-022/independent-review.md`; register entries BARRIER-EVID-0006 to
+0008). Earlier status, kept for the record: **captured and sanitized; independent review
+pending.** Two controlled
 black-box sessions ran on 2026-10-28 between 06:26:52Z and 06:30:02Z on the
 owner-approved Ubuntu 22.04 x86_64 test host, per
 `Tests/SystemTests/Plans/M2-022-barrier-server-fixtures.md`. The executing
@@ -17,9 +20,10 @@ those values; the executing agent does not mark its own sanitization reviewed.
 - Peers: `barriers` and `barrierc` 2.4.0-release, protocol 1.6, each on its own
   virtual X display, through a byte-logging loopback relay; TLS disabled for the
   observation only.
-- The server is the Linux Barrier server. Frame layouts are server-platform
-  independent; the key `button` field carries that server's X keycodes. No
-  macOS-server capture and no Windows run (M2 is Linux-only by owner decision).
+- The server is the Linux Barrier server, the only server platform observed;
+  whether frame layouts depend on the server platform is not established. The key
+  `button` field carries that server's X keycodes. No macOS-server capture and no
+  Windows run (M2 is Linux-only by owner decision).
 - Input was synthetic: xdotool on the server display, and a fixed probe string
   copied with xclip on the client display. No user content.
 
@@ -35,16 +39,16 @@ fields. Each layout below held for every observed frame of that code.
 
 | Code | Direction | Fields after the code | Observed meaning |
 | --- | --- | --- | --- |
-| `CINN` | server→client | x u16, y u16, sequence u32, mask u16 | enter at a client point; sequence 1 for the first enter, 3 for the next (it also advances on leave) |
+| `CINN` | server→client | x u16, y u16, sequence u32, mask u16 | enter at a client point; sequence 1 for the first enter, 3 for the next; sequence 2 was never on the wire, so the increment rule is not established |
 | `COUT` | server→client | none | leave |
-| `CALV` | both | none | keepalive; server every 3.0 s (12 intervals 3.002–3.036 s); client answers within 1 ms |
+| `CALV` | both | none | keepalive; server every 3.0 s (12 intervals 3.002–3.036 s); client answers within about 1 ms (timing from raw streams, see below) |
 | `CNOP` | client→server | none | one per server frame after the handshake (279 for 279), each within 3.2 ms |
-| `DMMV` | server→client | x u16, y u16 | absolute pointer position in client pixels, clamped to the client screen |
+| `DMMV` | server→client | x u16, y u16 | absolute pointer position in client pixels; each value equals the previous position plus the relative move, and no clamping was observed |
 | `DMDN` / `DMUP` | server→client | button u8 | 1 left, 2 middle, 3 right, 4 and 5 for X buttons 8 and 9 |
 | `DMWM` | server→client | xDelta s16, yDelta s16 | ±120 per notch: up (0, +120), down (0, −120), left (−120, 0), right (+120, 0) |
 | `DKDN` / `DKUP` | server→client | key u16, mask u16, button u16 | key down / up |
 | `DKRP` | server→client | key u16, mask u16, count u16, button u16 | auto-repeat while held, count 1 each |
-| `DCLP` | both | id u8, sequence u32, mark u8, then a length-prefixed chunk | clipboard transfer in start/chunk/end parts; the server sent two empty clipboards on enter |
+| `DCLP` | both | id u8, sequence u32, mark u8, then a length-prefixed chunk | clipboard transfer in start/chunk/end parts; the server sent two empty clipboards on enter. The client-to-server layout rests on the punctuation fixture only: this session's fixture zero-fills the whole client `DCLP` body after the code |
 | `CCLP` | client→server | id u8, sequence u32 | client took clipboard ownership (sent at once on copy) |
 
 Key identifiers observed for the sweep (`button` omitted):
@@ -71,6 +75,10 @@ Key identifiers observed for the sweep (`button` omitted):
 
 - With the server paused, the client reported "server is dead" and closed
   9.02 s after the last server `CALV` (8.63 s after the last server frame).
+- Timing values in this README (the keepalive interval, reply delays and this close)
+  come from the producer's raw streams, which are not committed. The independent
+  reviewer re-measured them from those streams before deletion
+  (`evidence/issues/M2-022/independent-review.md`, F7); the fixtures carry no time.
 - Copying on the client display produced `CCLP` at once; leaving the client
   screen produced three client `DCLP` frames carrying the clipboard.
 
@@ -80,6 +88,9 @@ Key identifiers observed for the sweep (`button` omitted):
   `server-input-capture.json`)
 - `Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/`
   (`metadata.json`, `client-clipboard-keepalive-capture.json`)
+- `Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/` (`metadata.json`,
+  `punctuation-clipboard-capture.json`) and `chunks.json`, from the 2026-10-29 addendum
+  (`punctuation-clipboard.md`)
 - `tools/` — the two capture drivers, the decoder and the fixture builder;
   `Tests/SystemTests/Scripts/M2-022-barrier-server-fixtures.sh` replays both
   sessions and rebuilds the fixtures.
