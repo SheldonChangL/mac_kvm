@@ -101,12 +101,15 @@ package actor ServerSession {
 
   /// Consumes the peer event stream until it ends, then closes the session.
   ///
-  /// Inbound client events are not routed by the server MVP and are dropped
-  /// without inspection. Returns the disconnect reason that was applied.
-  package func monitorPeer() async -> DisconnectReason {
+  /// Each inbound client event is handed to `inbound` in arrival order,
+  /// without inspection; the owner decides what it means. Returns the
+  /// disconnect reason that was applied.
+  package func monitorPeer(
+    inbound: @Sendable (KVMEvent) -> Void = { _ in }
+  ) async -> DisconnectReason {
     let reason: DisconnectReason
     do {
-      for try await _ in protocolSession.events {}
+      for try await event in protocolSession.events { inbound(event) }
       reason = .transportClosed
     } catch let error as CoreError {
       reason = .failure(error)

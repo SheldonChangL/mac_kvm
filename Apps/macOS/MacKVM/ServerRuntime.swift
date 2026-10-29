@@ -6,7 +6,8 @@ import KVMCore
 import MacPlatform
 
 /// Composes one server run: the TLS listener, the admission gate, the single
-/// client session with its ordered outbox, and the coordinator.
+/// client session with its ordered outbox, the coordinator, and clipboard
+/// sharing.
 final class ServerRuntime: @unchecked Sendable {
   static let handshakeTimeout = Duration.seconds(5)
   static let connectTimeout = Duration.seconds(5)
@@ -22,6 +23,7 @@ final class ServerRuntime: @unchecked Sendable {
   let clients = ClientSlot()
   let effects: MacServerEffects
   let coordinator: ServerCoordinator
+  private let clipboard: any ClipboardSync
   private let identity: MacServerIdentity
   private let listener: MacTLSServerListener
   private let gate: BarrierListenerTransport
@@ -35,11 +37,12 @@ final class ServerRuntime: @unchecked Sendable {
   init?(
     configuration: ServerConfiguration, identity: MacServerIdentity, desktop: CGRect,
     suppressor: LocalEventSuppressor?, cursor: CursorRestorer?,
-    inputCapturable: @escaping @Sendable () -> Bool
+    clipboard: any ClipboardSync, inputCapturable: @escaping @Sendable () -> Bool
   ) {
     self.configuration = configuration
     self.identity = identity
     self.desktop = desktop
+    self.clipboard = clipboard
     effects = MacServerEffects(
       desktop: desktop, edge: configuration.edge, suppressor: suppressor, cursor: cursor,
       clients: clients)
@@ -162,10 +165,16 @@ final class ServerRuntime: @unchecked Sendable {
     }
     report("client ready (\(size.width)x\(size.height))")
 
-    let reason = await session.monitorPeer()
+    let reason = await session.monitorPeer { [clipboard, clientScreen] event in
+      guard case .clipboard(let payload) = event else { return }
+      if clipboard.inbound(payload, from: clientScreen) {
+        report("clipboard received from the client")
+      }
+    }
     outbox.close()
     clients.release(clientScreen)
     coordinator.clientGone(clientScreen)
+    clipboard.forget(clientScreen)
     await sender.value
     await gate.release(admission)
     report("client disconnected: \(Self.describe(reason))")
@@ -191,6 +200,15 @@ final class ServerRuntime: @unchecked Sendable {
           coordinator.enterCompleted(clientScreen, success: true)
         } catch {
           coordinator.enterCompleted(clientScreen, success: false)
+          continue
+        }
+        // Like Barrier, the clipboard follows the enter when it changed.
+        guard let payload = clipboard.outbound(to: clientScreen) else { continue }
+        do {
+          try await session.forward(.clipboard(payload))
+          report("clipboard sent to the client")
+        } catch {
+          coordinator.deliveryFailed(clientScreen)
         }
       case .leaveScreen:
         try? await session.leave()

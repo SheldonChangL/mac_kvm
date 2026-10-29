@@ -65,6 +65,7 @@ struct MacKVMApplication {
       let runtime = ServerRuntime(
         configuration: configuration, identity: identity, desktop: desktop,
         suppressor: suppressor, cursor: CursorRestorer(),
+        clipboard: ServerClipboard(MacPasteboardAdapter()),
         inputCapturable: { secureInput.allowsCapture() })
     else { exit(1) }
     let input = InputTap(coordinator: runtime.coordinator, suppressor: suppressor, mouse: mouse)

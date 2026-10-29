@@ -74,6 +74,10 @@ private final class FakeProtocolSession: KVMProtocolSession, @unchecked Sendable
     continuation.finish()
   }
 
+  func deliverFromPeer(_ event: KVMEvent) {
+    continuation.yield(event)
+  }
+
   func connect() async throws(CoreError) {
     if let connectError { throw connectError }
   }
@@ -101,6 +105,18 @@ private final class FakeProtocolSession: KVMProtocolSession, @unchecked Sendable
   func disconnect(reason: DisconnectReason) async {
     lock.withLock { disconnectReasons.append(reason) }
     continuation.finish()
+  }
+}
+
+/// Events handed to a `monitorPeer` handler.
+private final class InboundLog: @unchecked Sendable {
+  private let lock = NSLock()
+  private var received: [KVMEvent] = []
+
+  var events: [KVMEvent] { lock.withLock { received } }
+
+  func append(_ event: KVMEvent) {
+    lock.withLock { received.append(event) }
   }
 }
 
@@ -310,5 +326,23 @@ struct ServerSessionTests {
     #expect(await monitor.value == .transportClosed)
     #expect(await session.state == .closed)
     #expect(fake.disconnects == [.transportClosed])
+  }
+
+  @Test("peer events reach the inbound handler in arrival order before the end is reported")
+  func peerEventsDelivered() async throws {
+    let fake = FakeProtocolSession()
+    let session = try await readySession(fake)
+    let clipboard = KVMEvent.clipboard(
+      ClipboardPayload(
+        transactionID: ClipboardTransactionID(), origin: .remote(DeviceID()),
+        utf8Text: "m2-029-probe", contentHash: ""))
+    let scroll = KVMEvent.scroll(deltaX: 0, deltaY: 1)
+    fake.deliverFromPeer(clipboard)
+    fake.deliverFromPeer(scroll)
+    fake.finishFromPeer()
+    let log = InboundLog()
+    #expect(await session.monitorPeer { log.append($0) } == .transportClosed)
+    #expect(log.events == [clipboard, scroll])
+    #expect(await session.state == .closed)
   }
 }
