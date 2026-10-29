@@ -174,8 +174,9 @@ final class ServerRuntime: @unchecked Sendable {
     outbox.close()
     clients.release(clientScreen)
     coordinator.clientGone(clientScreen)
-    clipboard.forget(clientScreen)
     await sender.value
+    // After the sender: a late enter could otherwise record this client again.
+    clipboard.forget(clientScreen)
     await gate.release(admission)
     report("client disconnected: \(Self.describe(reason))")
   }

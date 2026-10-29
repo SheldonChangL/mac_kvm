@@ -8,7 +8,10 @@ import KVMContracts
 /// yet, so an unchanged clipboard is neither read nor sent again. Client to
 /// local: a client's clipboard is admitted and handed back for the caller to
 /// apply; the local generation that applying it produced is then recorded for
-/// that client, so the content never travels back to it.
+/// that client, so the content never travels back to it. What a client last
+/// synchronized only counts while the local clipboard is still at the
+/// generation recorded for it: once the local clipboard moved on, the same
+/// content from that client is a new copy, not an echo.
 ///
 /// Every client has its own `ClipboardLoopGuard` (M1-054). Content one client
 /// sent still reaches the others, while content a client already holds is
@@ -62,19 +65,24 @@ package struct ServerClipboardRouter<Generation: Hashable & Sendable>: Sendable 
     return payload
   }
 
-  /// Admits a clipboard received from `screen` and returns it with the
-  /// router's content hash, for the caller to apply locally; `nil` when it is
-  /// oversized, not of remote origin, a replayed transaction, or content this
-  /// client already holds. After applying it, the caller reports the
-  /// resulting local generation with `applied(generation:from:)`.
-  package mutating func inbound(_ payload: ClipboardPayload, from screen: ScreenID)
-    -> ClipboardPayload?
-  {
+  /// Admits a clipboard received from `screen` while the local clipboard is
+  /// at `generation`, and returns it with the router's content hash for the
+  /// caller to apply locally; `nil` when it is oversized, not of remote
+  /// origin, a replayed transaction, or content this client already holds
+  /// while the local clipboard has not moved on. After applying it, the
+  /// caller reports the resulting local generation with
+  /// `applied(generation:from:)`, or `applyFailed(from:)` when it could not.
+  package mutating func inbound(
+    _ payload: ClipboardPayload, from screen: ScreenID, generation: Generation
+  ) -> ClipboardPayload? {
     guard payload.utf8ByteCount <= limit.byteCount else { return nil }
     let hashed = ClipboardPayload(
       transactionID: payload.transactionID, origin: payload.origin, utf8Text: payload.utf8Text,
       contentHash: Self.contentHash(payload.utf8Text))
     var client = clients[screen] ?? Client()
+    if let recorded = client.generation, recorded != generation {
+      client.loopGuard.reset()
+    }
     do throws(CoreError) {
       try client.loopGuard.admitInbound(hashed, limit: limit)
     } catch {
@@ -87,6 +95,13 @@ package struct ServerClipboardRouter<Generation: Hashable & Sendable>: Sendable 
   /// Records that applying `screen`'s clipboard produced local `generation`.
   package mutating func applied(generation: Generation, from screen: ScreenID) {
     clients[screen, default: Client()].generation = generation
+  }
+
+  /// Forgets what `inbound(_:from:generation:)` last admitted from `screen`
+  /// because the caller could not apply it, so the same content can be
+  /// admitted again.
+  package mutating func applyFailed(from screen: ScreenID) {
+    clients[screen]?.loopGuard.reset()
   }
 
   /// Forgets `screen`, as when its client disconnects. Repeated calls are

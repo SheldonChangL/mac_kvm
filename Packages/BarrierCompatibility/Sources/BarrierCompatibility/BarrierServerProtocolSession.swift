@@ -29,8 +29,9 @@ package struct BarrierClientScreen: Equatable, Sendable {
 /// clipboard frames (`CCLP`, `DCLP`) are accepted. A complete client transfer
 /// of clipboard 0 with UTF-8 text becomes one `.clipboard` event on `events`
 /// (origin `.remote`, empty `contentHash`); a malformed or oversized transfer
-/// is dropped without ending the session. Any other client frame ends the
-/// session. `send(_:)` writes enter, leave, pointer, button, wheel, supported
+/// is dropped without ending the session, as long as each frame fits the
+/// 64 KiB frame limit (Barrier 2.4 sends 32 KiB chunks). A larger frame, like
+/// any other unexpected client frame, ends the session. `send(_:)` writes enter, leave, pointer, button, wheel, supported
 /// key and clipboard events; `canSend(_:)` says which events those are.
 /// `disconnect(reason:)` is idempotent and never waits for the peer.
 ///

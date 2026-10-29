@@ -16,8 +16,9 @@ The owner asked for clipboard sharing on 2026-10-29 ("剪貼簿跟標點符號�
 | --- | --- |
 | `init(limit:)` | caller-supplied UTF-8 byte limit for both directions |
 | `outbound(to:generation:read:)` | the payload to send to a client as it becomes active, or `nil` |
-| `inbound(_:from:)` | admits a client's payload and returns it, with the router's hash, for the caller to apply; or `nil` |
+| `inbound(_:from:generation:)` | admits a client's payload, given the current local generation, and returns it with the router's hash for the caller to apply; or `nil` |
 | `applied(generation:from:)` | records the local generation that applying a client's payload produced |
+| `applyFailed(from:)` | forgets what was just admitted from a client whose payload could not be applied |
 | `forget(_:)` | forgets a client that went away; idempotent |
 
 `Generation` is the caller's opaque local clipboard generation, such as the
@@ -34,7 +35,11 @@ pasteboard change count; only equality is used.
 - **Remote to local origin tracking.** A client's payload must have remote
   origin and pass that client's guard. After the caller applies it, the
   resulting local generation is recorded for that client, so the content never
-  goes back to it.
+  goes back to it. The guard's memory only counts while the local clipboard is
+  still at the generation recorded for that client: once it moved on, the
+  same content from the client is a new copy and is applied. A payload the
+  caller failed to write is forgotten (`applyFailed`), so it can be admitted
+  again.
 - **Several clients, no echo storm.** Each client has its own
   `ClipboardLoopGuard`. Content from one client still reaches the others once
   each, while the same content coming back from any client, under any
@@ -58,12 +63,13 @@ successful enter, as Barrier does, and applies `.clipboard` events from
 
 ## Tests
 
-`ServerClipboardRouterTests` (11): local change sent once, each client once,
+`ServerClipboardRouterTests` (13): local change sent once, each client once,
 client copy applied and not sent back but reaching the other client, no echo
-storm with two clients, inbound hash recomputed, same content not re-sent,
-size boundary both ways, empty local clipboard not re-read, local-origin and
-replayed inbound refused, forget and idempotent forget, no rendering contains
-text.
+storm with two clients, a client copy equal to the last sync applied once the
+local clipboard moved on, a copy whose write failed admitted again, inbound
+hash recomputed, same content not re-sent, size boundary both ways, empty
+local clipboard not re-read, local-origin and replayed inbound refused, forget
+and idempotent forget, no rendering contains text.
 
 The M2-035 smoke script checks the whole path against a real Barrier 2.4
 client: the local clipboard reaches the client on enter, the client's copy

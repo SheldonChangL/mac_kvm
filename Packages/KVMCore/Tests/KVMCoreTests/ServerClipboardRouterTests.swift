@@ -78,7 +78,7 @@ struct ServerClipboardRouterTests {
   @Test("a client's copy is applied locally, never sent back to it, and reaches other clients")
   func clientToLocal() throws {
     var router = try router()
-    let admitted = router.inbound(remote("gamma"), from: clientA)
+    let admitted = router.inbound(remote("gamma"), from: clientA, generation: 1)
     let applied = try #require(admitted)
     #expect(applied.utf8Text == "gamma")
     #expect(!applied.contentHash.isEmpty)
@@ -93,16 +93,41 @@ struct ServerClipboardRouterTests {
   @Test("no echo storm: content a client already holds is not applied again from it")
   func noEchoStorm() throws {
     var router = try router()
-    #expect(router.inbound(remote("gamma"), from: clientA) != nil)
+    #expect(router.inbound(remote("gamma"), from: clientA, generation: 1) != nil)
     router.applied(generation: 2, from: clientA)
     let local = LocalText("gamma")
     #expect(router.outbound(to: clientB, generation: 2, read: local.read) != nil)
 
     // Both clients send the same content back under new transactions.
-    #expect(router.inbound(remote("gamma"), from: clientB) == nil)
-    #expect(router.inbound(remote("gamma"), from: clientA) == nil)
+    #expect(router.inbound(remote("gamma"), from: clientB, generation: 2) == nil)
+    #expect(router.inbound(remote("gamma"), from: clientA, generation: 2) == nil)
     #expect(router.outbound(to: clientA, generation: 2, read: local.read) == nil)
     #expect(router.outbound(to: clientB, generation: 2, read: local.read) == nil)
+  }
+
+  @Test("a client copy equal to the last sync is applied once the local clipboard moved on")
+  func clientCopyAfterLocalChange() throws {
+    var router = try router()
+    let local = LocalText("alpha")
+    #expect(router.outbound(to: clientA, generation: 1, read: local.read) != nil)
+    // Unchanged local clipboard: the same content back is an echo.
+    #expect(router.inbound(remote("alpha"), from: clientA, generation: 1) == nil)
+    // The Mac copied something else that the client has not received yet; the
+    // client then copies "alpha" again while it is not the active screen.
+    let admitted = router.inbound(remote("alpha"), from: clientA, generation: 2)
+    #expect(admitted?.utf8Text == "alpha")
+    router.applied(generation: 3, from: clientA)
+    #expect(router.outbound(to: clientA, generation: 3, read: local.read) == nil)
+  }
+
+  @Test("a copy whose local write failed can be admitted again")
+  func failedApplyIsForgotten() throws {
+    var router = try router()
+    #expect(router.inbound(remote("beta"), from: clientA, generation: 1) != nil)
+    router.applyFailed(from: clientA)
+    #expect(router.inbound(remote("beta"), from: clientA, generation: 1) != nil)
+    router.applied(generation: 2, from: clientA)
+    #expect(router.inbound(remote("beta"), from: clientA, generation: 2) == nil)
   }
 
   @Test("the inbound hash is recomputed, so an echo with a different hash is still caught")
@@ -111,8 +136,10 @@ struct ServerClipboardRouterTests {
     let local = LocalText("alpha")
     let first = router.outbound(to: clientA, generation: 1, read: local.read)
     let sent = try #require(first)
-    #expect(router.inbound(remote("alpha", hash: "peer-supplied"), from: clientA) == nil)
-    let admitted = router.inbound(remote("delta", hash: sent.contentHash), from: clientA)
+    #expect(
+      router.inbound(remote("alpha", hash: "peer-supplied"), from: clientA, generation: 1) == nil)
+    let admitted = router.inbound(
+      remote("delta", hash: sent.contentHash), from: clientA, generation: 1)
     let other = try #require(admitted)
     #expect(other.contentHash != sent.contentHash)
   }
@@ -134,8 +161,8 @@ struct ServerClipboardRouterTests {
     #expect(router.outbound(to: clientA, generation: 1, read: local.read) != nil)
     local.set("abcdef")
     #expect(router.outbound(to: clientA, generation: 2, read: local.read) == nil)
-    #expect(router.inbound(remote("vwxyz!"), from: clientA) == nil)
-    #expect(router.inbound(remote("vwxyz"), from: clientA) != nil)
+    #expect(router.inbound(remote("vwxyz!"), from: clientA, generation: 2) == nil)
+    #expect(router.inbound(remote("vwxyz"), from: clientA, generation: 2) != nil)
   }
 
   @Test("an empty or unreadable local clipboard sends nothing and is not re-read")
@@ -152,13 +179,14 @@ struct ServerClipboardRouterTests {
     var router = try router()
     let local = ClipboardPayload(
       transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "alpha", contentHash: "")
-    #expect(router.inbound(local, from: clientA) == nil)
+    #expect(router.inbound(local, from: clientA, generation: 1) == nil)
 
     let first = remote("alpha")
-    #expect(router.inbound(first, from: clientA) != nil)
+    #expect(router.inbound(first, from: clientA, generation: 1) != nil)
+    router.applied(generation: 2, from: clientA)
     let replay = ClipboardPayload(
       transactionID: first.transactionID, origin: first.origin, utf8Text: "beta", contentHash: "")
-    #expect(router.inbound(replay, from: clientA) == nil)
+    #expect(router.inbound(replay, from: clientA, generation: 2) == nil)
   }
 
   @Test("cleanup: a forgotten client starts afresh, and forgetting twice is a no-op")
@@ -177,7 +205,7 @@ struct ServerClipboardRouterTests {
     var router = try router()
     let local = LocalText("m2-032-secret-probe")
     _ = router.outbound(to: clientA, generation: 1, read: local.read)
-    _ = router.inbound(remote("m2-032-other-probe"), from: clientB)
+    _ = router.inbound(remote("m2-032-other-probe"), from: clientB, generation: 1)
     var dumped = ""
     dump(router, to: &dumped)
     for rendering in [String(describing: router), String(reflecting: router), dumped] {
