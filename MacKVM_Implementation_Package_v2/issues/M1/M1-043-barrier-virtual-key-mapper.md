@@ -26,6 +26,8 @@ labels:
 
 # M1-043 — 實作 Barrier Key → VirtualKey Mapper
 
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：Exact Files 由 `KVMCore` 移到 `BarrierCompatibility`（Frozen Decision 4；M1-042 open question 由 Product Owner merge 本 ADR 決定）。
+
 ## Outcome
 
 實作 Barrier Key → VirtualKey Mapper
@@ -42,8 +44,8 @@ labels:
 
 ## Exact Files
 
-- `Packages/KVMCore/Sources/KVMCore/BarrierVirtualKeyMapper.swift`
-- `Packages/KVMCore/Tests/KVMCoreTests/BarrierVirtualKeyMapperTests.swift`
+- `Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift`
+- `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift`
 - `docs/components/M1-043-barrier-virtual-key-mapper.md`
 
 Exact Files 以外若必須修改，停止並提出 follow-up，不得偷偷擴大 PR。

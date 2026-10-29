@@ -10,8 +10,6 @@ execution_tier: "C/H"
 low_model_autonomous_merge: false
 depends_on:
   - "M4-020"
-  - "M1-039"
-  - "M2-019"
 contract_refs:
   []
 source_refs:
@@ -27,6 +25,8 @@ labels:
 ---
 
 # M4-027 — 實作 Linux Screen Enumeration／Scaling Backend
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M1-039、M2-019；Linux Client 角色不需要 Mac Retina 正規化，也不需要 Server 端 outbound 座標映射。
 
 ## Outcome
 

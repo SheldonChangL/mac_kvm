@@ -58,11 +58,11 @@ M2-019,實作 Outbound Coordinate Mapper,M2,E10,P1,M,critical,B/H,"M2-015,M2-016
 M1-047,實作 Caps Lock Synchronization Semantics,M1,E05,P1,M,high,B/H,M1-046,issues/M1/M1-047-caps-lock-synchronizer.md
 M1-048,實作 Key Repeat Semantics,M1,E05,P1,S,high,B,"M1-041,M1-046",issues/M1/M1-048-key-repeat-controller.md
 M1-049,實作 macOS KeyboardInjector,M1,E05,P1,M,critical,B/H,"M1-044,M1-046,M1-035",issues/M1/M1-049-mac-keyboard-injector.md
-M1-062,建立 Input State Ledger 與 Snapshot API,M1,E08,P1,S,critical,B,"M1-037,M1-046,M1-054",issues/M1/M1-062-input-state-ledger.md
+M1-062,建立 Input State Ledger 與 Snapshot API,M1,E08,P1,S,critical,B,"M1-046,M1-054",issues/M1/M1-062-input-state-ledger.md
 M1-056,實作 SHA-256 Certificate Fingerprint Formatter,M1,E07,P1,M,high,A/S,M1-055,issues/M1/M1-056-certificate-fingerprint.md
 M1-060,實作 Reconnect Backoff 與 Manual Disconnect Semantics,M1,E08,P1,S,high,B,"M1-018,M1-029,M1-055",issues/M1/M1-060-reconnect-manager.md
 M2-020,實作 Return-edge Coordinate Mapper,M2,E10,P1,M,critical,B/H,M2-019,issues/M2/M2-020-return-coordinate-mapper.md
-M1-050,實作 releaseAllKeys 與 Release Ordering,M1,E05,P1,M,critical,B/H,"M1-046,M1-049",issues/M1/M1-050-release-all-keys.md
+M1-050,實作 releaseAllKeys 與 Release Ordering,M1,E05,P1,M,critical,B/H,M1-046,issues/M1/M1-050-release-all-keys.md
 M1-057,實作 Trust Policy State Machine,M1,E07,P1,M,critical,C/S,"M1-056,M1-015",issues/M1/M1-057-trust-policy.md
 M1-061,實作 Network Change／Sleep-Wake Recovery,M1,E08,P1,M,critical,C/H,M1-060,issues/M1/M1-061-mac-recovery-coordinator.md
 M1-051,執行 Keyboard／Shortcut／IME Compatibility Matrix,M1,E05,P1,M,critical,H,"M1-045,M1-047,M1-048,M1-049,M1-050",issues/M1/M1-051-keyboard-compatibility-matrix.md
@@ -146,8 +146,8 @@ M3-030,執行 First-party Mac → Mac Keyboard E2E,M3,E12,P1,M,critical,H,M3-029
 M3-031,執行 First-party Mac ↔ Mac Clipboard E2E,M3,E12,P1,M,high,H,M3-030,issues/M3/M3-031-native-mac-clipboard-e2-e.md
 M3-038,執行 Barrier-disabled Install／E2E,M3,E12,P0,M,critical,H,"M3-031,M3-032,M3-037",issues/M3/M3-038-barrier-disabled-e2-e.md
 M3-039,完成 M3 Alpha Exit Review,M3,E00,P0,M,critical,C/S/H,"M3-033,M3-036,M3-038",issues/M3/M3-039-m3-exit-review.md
-M4-001,凍結 Cross-platform Toolchain／Language／FFI ADR,M4,E00,P0,M,critical,C/S/H,M3-039,issues/M4/M4-001-cross-platform-toolchain.md
-M4-002,定義 Language-neutral Platform Backend Contracts,M4,E02,P1,M,critical,C,"M4-001,M1-013,M3-034",issues/M4/M4-002-platform-backend-contracts.md
+M4-001,凍結 Cross-platform Toolchain／Language／FFI ADR,M4,E00,P0,M,critical,C/S/H,,issues/M4/M4-001-cross-platform-toolchain.md
+M4-002,定義 Language-neutral Platform Backend Contracts,M4,E02,P1,M,critical,C,"M4-001,M1-013",issues/M4/M4-002-platform-backend-contracts.md
 M4-003,建立 Cross-platform Conformance Runner Contract,M4,E11,P1,S,high,B,"M4-001,M3-035,M4-002",issues/M4/M4-003-cross-platform-conformance-runner.md
 M4-004,建立 Windows App／Build／Test Skeleton,M4,E13,P1,XS,medium,A,"M4-001,M4-002",issues/M4/M4-004-windows-skeleton.md
 M4-020,建立 Linux App／Build／Test Skeleton,M4,E14,P1,XS,medium,A,"M4-001,M4-002",issues/M4/M4-020-linux-skeleton.md
@@ -164,7 +164,7 @@ M4-022,實作 Linux Native Protocol Client Adapter,M4,E14,P1,S,critical,B,"M4-00
 M4-024,實作 Linux X11 Mouse／Keyboard Injection Backend,M4,E14,P1,M,critical,C/H,"M4-002,M4-020",issues/M4/M4-024-linux-x11-injector.md
 M4-025,實作 Linux X11 Mouse／Keyboard Capture Backend,M4,E14,P1,M,critical,C/H,"M4-002,M4-020",issues/M4/M4-025-linux-x11-capture.md
 M4-026,實作 Linux X11 Clipboard Adapter,M4,E14,P1,M,high,B/H,"M4-020,M1-052,M1-054",issues/M4/M4-026-linux-x11-clipboard.md
-M4-027,實作 Linux Screen Enumeration／Scaling Backend,M4,E14,P1,M,critical,C/H,"M4-020,M1-039,M2-019",issues/M4/M4-027-linux-screen-backend.md
+M4-027,實作 Linux Screen Enumeration／Scaling Backend,M4,E14,P1,M,critical,C/H,M4-020,issues/M4/M4-027-linux-screen-backend.md
 M4-028,蒐集 Wayland Environment／Capability Evidence Matrix,M4,E14,P0,M,critical,H,M4-020,issues/M4/M4-028-wayland-capability-evidence.md
 M4-007,實作 Windows Native Protocol Server Adapter,M4,E13,P1,S,critical,B,M4-006,issues/M4/M4-007-windows-native-server.md
 M4-012,實作 Windows Synthetic-event Filtering／Suppression Safety,M4,E13,P1,M,critical,C/S/H,"M4-008,M4-009,M4-010,M4-011",issues/M4/M4-012-windows-event-filter.md
@@ -173,7 +173,7 @@ M4-038,建立 Cross-platform VirtualKey Conformance Matrix,M4,E05,P1,M,critical,
 M4-029,凍結 Wayland Backend／Support Matrix ADR,M4,E14,P0,M,critical,C/S/H,"M4-028,M4-001",issues/M4/M4-029-wayland-backend-adr.md
 M4-015,實作 Windows Tray／Settings／Permission Status Shell,M4,E13,P1,M,high,B/H,"M4-005,M4-006,M4-007,M4-013,M4-014",issues/M4/M4-015-windows-app-shell.md
 M5-016,實作 Crash Recovery／Last Safe State,M5,E16,P1,M,critical,C/H,"M1-063,M2-033,M4-012",issues/M5/M5-016-crash-recovery.md
-M4-034,實作 Linux Autostart／Background Lifecycle,M4,E14,P1,M,high,B/H,"M4-021,M4-022,M4-023",issues/M4/M4-034-linux-lifecycle.md
+M4-034,實作 Linux Autostart／Background Lifecycle,M4,E14,P1,M,high,B/H,"M4-021,M4-022",issues/M4/M4-034-linux-lifecycle.md
 M4-030,完成 uinput Helper Privilege／Threat Model Review,M4,E14,P1,M,critical,C/S/H,"M4-029,M3-002",issues/M4/M4-030-uinput-helper-security.md
 M4-033,實作 Wayland Clipboard Adapter,M4,E14,P1,M,high,C/H,"M4-029,M4-020,M1-052",issues/M4/M4-033-wayland-clipboard.md
 M5-012,完成 Accessibility／Permission／Firewall Onboarding UX,M5,E15,P1,M,high,B/H,"M1-035,M2-002,M4-012,M4-029",issues/M5/M5-012-permission-onboarding.md
@@ -187,7 +187,7 @@ M5-010,實作 Launch-at-login／Autostart／Background Policy,M5,E15,P1,M,high,B
 M4-032,實作凍結 Wayland Input Backend,M4,E14,P1,M,critical,C/S/H,"M4-029,M4-031",issues/M4/M4-032-wayland-input-backend.md
 M5-014,執行 Privacy／Log Redaction Audit,M5,E16,P0,M,critical,C/S/H,"M5-013,M1-011",issues/M5/M5-014-privacy-audit.md
 M4-018,執行 Windows First-party Client E2E,M4,E13,P0,M,critical,H,"M4-005,M4-006,M4-008,M4-009,M4-013,M4-014,M4-017",issues/M4/M4-018-windows-client-e2-e.md
-M4-036,執行 Linux First-party Client E2E,M4,E14,P0,M,critical,H,"M4-022,M4-024,M4-026,M4-027,M4-032,M4-033,M4-035",issues/M4/M4-036-linux-client-e2-e.md
+M4-036,執行 Linux First-party Client E2E,M4,E14,P0,M,critical,H,"M4-022,M4-024,M4-026,M4-027,M4-035",issues/M4/M4-036-linux-client-e2-e.md
 M4-019,執行 Windows First-party Server E2E,M4,E13,P0,M,critical,H,"M4-007,M4-010,M4-011,M4-012,M4-018",issues/M4/M4-019-windows-server-e2-e.md
 M4-037,執行 Linux First-party Server E2E,M4,E14,P0,M,critical,H,"M4-023,M4-025,M4-032,M4-036",issues/M4/M4-037-linux-server-e2-e.md
 M4-040,執行 3-OS Server／Client Compatibility Matrix,M4,E16,P0,M,critical,H,"M4-019,M4-037,M4-038,M4-039",issues/M4/M4-040-three-oscompatibility-matrix.md

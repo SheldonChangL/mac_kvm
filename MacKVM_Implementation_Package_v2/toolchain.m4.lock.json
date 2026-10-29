@@ -1,0 +1,58 @@
+{
+  "status": "LINUX_LOCKED_WINDOWS_UNRESOLVED",
+  "lock_id": "M4-001-TOOLCHAIN",
+  "traceability": {
+    "github_issue": "#148",
+    "decision_issue": "#330",
+    "adr": "docs/adr/M4-001-cross-platform-toolchain.md",
+    "scope_adr": "docs/adr/M4-SCOPE-001-linux-client-first.md",
+    "template": "MacKVM_Implementation_Package_v2/toolchain.lock.example.json"
+  },
+  "windows": {
+    "status": "UNRESOLVED",
+    "owner": "Product Owner",
+    "blocks": ["M4-004"],
+    "source_root": "",
+    "test_root": "",
+    "source_ext": "",
+    "test_ext": "",
+    "verify_command": ""
+  },
+  "linux": {
+    "status": "LOCKED",
+    "language": "Swift 6.2.3",
+    "build_image": "swift:6.2.3-jammy@sha256:33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6",
+    "target": {
+      "os": "Ubuntu 22.04",
+      "architecture": "x86_64",
+      "display_server": "X11"
+    },
+    "source_root": "Packages/LinuxPlatform/Sources/LinuxPlatform",
+    "test_root": "Packages/LinuxPlatform/Tests/LinuxPlatformTests",
+    "source_ext": "swift",
+    "test_ext": "swift",
+    "file_name_rule": "kebab-case placeholder names become UpperCamelCase Swift file names",
+    "app_root": "Apps/Linux/MacKVMClient",
+    "verify_command": "make verify-linux",
+    "swift_dependencies": {
+      "swift-nio": "2.104.0",
+      "swift-nio-ssl": "2.37.5",
+      "swift-crypto": "3.15.1",
+      "swift-asn1": "1.7.3",
+      "swift-atomics": "1.3.1",
+      "swift-collections": "1.7.5",
+      "swift-system": "1.8.1"
+    },
+    "system_libraries": ["libX11", "libXtst", "libXrandr", "libXfixes"],
+    "tls": "swift-nio-ssl with statically linked BoringSSL; SHA-256 leaf pinning per C-009",
+    "user_interface": "headless command line with a systemd --user unit",
+    "packaging": "release binary with --static-swift-stdlib",
+    "ffi": "none"
+  },
+  "drift_policy": {
+    "rule": "FAIL_CLOSED",
+    "statement": "Any Linux language, image digest, dependency version, target OS, architecture or display server that differs from this lock stops Linux work until a Product Owner approved ADR changes this lock."
+  },
+  "approved_by": "Product Owner (language: 「Swift」, 2026-10-29, Issue #330); remaining Linux fields on merge of M4-001",
+  "approved_at": "2026-10-29"
+}

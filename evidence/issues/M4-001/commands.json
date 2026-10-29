@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-001",
+  "branch": "codex/m4-001-linux-toolchain",
+  "testedTreeParentCommit": "ef444bd9d7cf9976b4c95629ded387626f294298",
+  "note": "Run by the implementing agent (Claude Opus 5.5) on the uncommitted M4-001 tree whose parent is testedTreeParentCommit; the shared-package run read only Packages/*, which this branch does not change. A reviewer must rerun.",
+  "status": "author_run_pending_independent_review",
+  "commands": [
+    {
+      "command": "evidence/issues/M4-001/spikes/linux-shared-packages.sh",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T03:21:47Z",
+      "endedAt": "2026-10-29T03:24:15Z",
+      "summary": [
+        "Swift version 6.2.3 (swift-6.2.3-RELEASE)",
+        "x86_64",
+        "✔ Test run with 64 tests in 1 suite passed after 0.391 seconds.",
+        "✔ Test run with 245 tests in 8 suites passed after 1.177 seconds.",
+        "✔ Test run with 172 tests in 17 suites passed after 0.801 seconds."
+      ]
+    },
+    {
+      "command": "evidence/issues/M4-001/spikes/tls-pinning/run.sh",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T03:24:15Z",
+      "endedAt": "2026-10-29T03:29:52Z",
+      "summary": [
+        "Build complete! (330.36s)",
+        "tls handshake done; leaf sha256 hex length: 64",
+        "binary size: 106M",
+        "dynamic libraries: libm.so.6 libstdc++.so.6 libgcc_s.so.1 libc.so.6 /lib64/ld-linux-x86-64.so.2 "
+      ]
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T03:30:10Z",
+      "endedAt": "2026-10-29T03:30:10Z",
+      "summary": [
+        "docs check OK"
+      ]
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T03:30:10Z",
+      "endedAt": "2026-10-29T03:30:10Z",
+      "summary": [
+        "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+      ]
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T03:30:11Z",
+      "endedAt": "2026-10-29T03:30:11Z",
+      "summary": [
+        "architecture check OK"
+      ]
+    }
+  ]
+}
