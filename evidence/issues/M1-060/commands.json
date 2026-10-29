@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-060",
+  "branch": "codex/m1-060-reconnect-manager",
+  "testedTreeParentCommit": "b48bf5ce3d2d32c31369ddf107344251a1cd7424",
+  "note": "Run by the implementing agent (Claude Opus 5.5) on the uncommitted M1-060 tree whose parent is testedTreeParentCommit; reviewer must rerun. The Issue's `swift test --package-path Packages/KVMCore` cannot run because KVMCore has no package manifest; the root package filter is used, as M2-029 did.",
+  "status": "author_run_pending_independent_review",
+  "commands": [
+    {
+      "command": "swift test --filter ReconnectManager",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T05:14:32Z",
+      "endedAt": "2026-10-29T05:14:35Z",
+      "summary": [
+        "✔ Test run with 9 tests in 1 suite passed after 0.001 seconds."
+      ]
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T05:14:35Z",
+      "endedAt": "2026-10-29T05:14:45Z",
+      "summary": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T05:14:45Z",
+      "endedAt": "2026-10-29T05:14:45Z",
+      "summary": [
+        "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+      ]
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T05:14:45Z",
+      "endedAt": "2026-10-29T05:14:45Z",
+      "summary": [
+        "architecture check OK"
+      ]
+    },
+    {
+      "command": "make verify",
+      "exitCode": 0,
+      "startedAt": "2026-10-29T05:14:45Z",
+      "endedAt": "2026-10-29T05:16:43Z",
+      "summary": [
+        "24 of 24 gates passed"
+      ]
+    }
+  ]
+}
