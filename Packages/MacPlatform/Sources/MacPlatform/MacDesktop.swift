@@ -1,12 +1,13 @@
-// Local desktop geometry and cursor parking for the server role. The desktop is
+// Local desktop geometry and cursor visibility for the server role. The desktop is
 // the union of the active displays in global display coordinates (points, origin
 // at the top-left of the main display), which is the space CGEvent locations use.
-// While input is remote the cursor is parked: every swallowed motion warps it back
-// so its position never drifts and motion arrives as per-event deltas (M2-019
-// expects a re-anchored cursor). A warp makes the system hold back hardware
-// motion briefly; re-associating mouse and cursor right after it lifts that hold.
+// While input is remote the server hides the cursor and leaves it alone: with the
+// event tap at the HID level, swallowed motion never reaches the window server, so
+// motion arrives only as per-event deltas and no warp (which would hold back
+// hardware motion for a moment) is needed.
 
 import CoreGraphics
+import Darwin
 
 package enum MacDesktop {
   /// Upper bound on displays considered.
@@ -29,11 +30,35 @@ package enum MacDesktop {
     CGEvent(source: nil)?.location
   }
 
-  /// Moves the cursor without generating an event and re-associates mouse and
-  /// cursor so following hardware motion is not held back.
+  /// Lets this process hide the cursor while another app is frontmost.
+  ///
+  /// The window server honours `CGDisplayHideCursor` only for the frontmost
+  /// app unless the connection property `SetsCursorInBackground` is set. That
+  /// property is private CoreGraphics SPI; macOS KVM servers (Barrier,
+  /// Synergy, Input Leap) rely on it for the same reason. It is resolved at
+  /// run time, so a system without it only leaves the cursor visible.
+  /// Returns whether the property was set.
   @discardableResult
-  package static func warpCursor(to point: CGPoint) -> Bool {
-    guard CGWarpMouseCursorPosition(point) == .success else { return false }
-    return CGAssociateMouseAndMouseCursorPosition(1) == .success
+  package static func allowCursorHidingInBackground() -> Bool {
+    typealias DefaultConnection = @convention(c) () -> UInt32
+    typealias SetProperty = @convention(c) (UInt32, UInt32, CFString, CFTypeRef) -> Int32
+    let handle = dlopen(nil, RTLD_NOW)
+    guard let connectionSymbol = dlsym(handle, "_CGSDefaultConnection"),
+      let setSymbol = dlsym(handle, "CGSSetConnectionProperty")
+    else { return false }
+    let connection = unsafeBitCast(connectionSymbol, to: DefaultConnection.self)()
+    let setProperty = unsafeBitCast(setSymbol, to: SetProperty.self)
+    return setProperty(
+      connection, connection, "SetsCursorInBackground" as CFString, kCFBooleanTrue) == 0
   }
+
+  /// Hides or shows the cursor. The window server keeps a hide count per
+  /// process and drops it when the process exits, so a crash cannot leave the
+  /// cursor hidden; callers keep their own calls balanced.
+  @discardableResult
+  package static func hideCursor(_ hidden: Bool) -> Bool {
+    let display = CGMainDisplayID()
+    return (hidden ? CGDisplayHideCursor(display) : CGDisplayShowCursor(display)) == .success
+  }
+
 }

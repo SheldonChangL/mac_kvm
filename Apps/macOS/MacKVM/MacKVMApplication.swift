@@ -54,6 +54,9 @@ struct MacKVMApplication {
     }
     let identity = loadIdentity(store)
     reportFingerprint(identity)
+    if !MacDesktop.allowCursorHidingInBackground() {
+      report("the cursor cannot be hidden while another app is frontmost; it stays visible")
+    }
 
     let suppressor = LocalEventSuppressor(
       filter: .live(), isEmergencyEscape: { EmergencyEscape.isChordKey($0) })
@@ -64,10 +67,10 @@ struct MacKVMApplication {
         suppressor: suppressor, cursor: CursorRestorer(),
         inputCapturable: { secureInput.allowsCapture() })
     else { exit(1) }
-    let input = InputTap(
-      coordinator: runtime.coordinator, effects: runtime.effects, suppressor: suppressor,
-      mouse: mouse)
-    let tap = MacEventTap { type, event in input.handle(type, event) }
+    let input = InputTap(coordinator: runtime.coordinator, suppressor: suppressor, mouse: mouse)
+    // At the HID level a swallowed motion never reaches the window server, and
+    // the emergency chord's Delete release still arrives (owner run).
+    let tap = MacEventTap(location: .cghidEventTap) { type, event in input.handle(type, event) }
     guard
       let lifecycle = EventTapLifecycle(
         control: MacEventTapControl(tap: tap), restartBudget: 10)
@@ -76,6 +79,11 @@ struct MacKVMApplication {
     // drains; local input never depends on the network.
     let stop: @Sendable (InputLifecycleTrigger) -> Void = { trigger in
       lifecycle.terminate()
+      if Thread.isMainThread {
+        runtime.effects.showCursor()
+      } else {
+        DispatchQueue.main.sync { runtime.effects.showCursor() }
+      }
       Task {
         await runtime.shutdown(trigger)
         report("stopped; input is local")
@@ -108,7 +116,7 @@ struct MacKVMApplication {
         try await runtime.start()
         report(
           "move the pointer across the \(configuration.edge.rawValue) edge to control the client")
-        report("Control+Option+Command+Delete returns input to this Mac at any time")
+        report("Control+Option+Command+Return returns input to this Mac at any time")
       } catch {
         lifecycle.terminate()
         report("could not listen: \(error.code)")

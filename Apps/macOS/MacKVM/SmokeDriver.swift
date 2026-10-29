@@ -64,6 +64,15 @@
         coordinator.observeLocal(.mouseMove(position: position), at: uptime())
         Thread.sleep(forTimeInterval: 0.08)
         coordinator.observeLocal(.mouseMove(position: position), at: uptime())
+      case "sweep" where words.count == 5:
+        // sweep <count> <interval ms> <dx> <dy>: steady motion for timing tests.
+        guard let count = Int(words[1]), let interval = Double(words[2]),
+          let dx = Double(words[3]), let dy = Double(words[4])
+        else { break }
+        for _ in 0..<max(count, 0) {
+          _ = coordinator.moveRemote(deltaX: dx, deltaY: dy)
+          Thread.sleep(forTimeInterval: interval / 1000)
+        }
       case "move" where words.count == 3:
         guard let dx = Double(words[1]), let dy = Double(words[2]) else { break }
         if !coordinator.moveRemote(deltaX: dx, deltaY: dy) { report("smoke: not remote") }

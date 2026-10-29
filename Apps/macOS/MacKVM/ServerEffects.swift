@@ -61,8 +61,8 @@ final class ClientSlot: @unchecked Sendable {
 }
 
 /// Whether the next fail-safe recovery must put the cursor back, and where.
-/// The park point sits inside the linked edge, so a recovered cursor does not
-/// rest on the edge and re-enter the client on the next sample.
+/// The return point sits inside the linked edge, so a recovered cursor does
+/// not rest on the edge and re-enter the client on the next sample.
 final class RecoveryCursorFlag: @unchecked Sendable {
   private let lock = NSLock()
   private var restore = false
@@ -109,9 +109,16 @@ struct LocalInputSafety: ServerLocalInputSafety {
 /// Executes the coordinator's effects on this Mac. Called with the coordinator
 /// lock held, so nothing here waits or calls back into the coordinator; cursor
 /// and window-server work is queued on the main queue in effect order.
+///
+/// While input is remote the cursor is hidden and left alone. The event tap
+/// sits at the HID level, so swallowed motion never reaches the window server:
+/// the logical cursor stays where input left (no hot corner or Dock reacts),
+/// and no warp is needed, since every warp would hold back hardware motion for
+/// a moment. The cursor image still follows the hand, which is why it is
+/// hidden (owner run, 2026-10-29).
 final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
-  /// Local points the parked cursor keeps away from the linked edge.
-  static let parkInset: Double = 4
+  /// Local points the return point keeps away from the linked edge.
+  static let returnInset: Double = 4
   static let enterTimeout = Duration.seconds(1)
 
   private let desktop: CGRect
@@ -122,7 +129,11 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   private let recoveryFlag: RecoveryCursorFlag
   private let clients: ClientSlot
   private let lock = NSLock()
-  private var parkPoint: CGPoint?
+  /// Where a forced recovery puts the cursor: where input left, moved inside
+  /// the linked edge.
+  private var returnPoint: CGPoint?
+  /// Whether this server hid the cursor (main queue only).
+  private var cursorHidden = false
   private var timeouts: [ScreenID: Task<Void, Never>] = [:]
   private var onEnterTimeout: (@Sendable (ScreenID) -> Void)?
 
@@ -147,9 +158,9 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
     lock.withLock { onEnterTimeout = handler }
   }
 
-  /// Warps the cursor back to its park point after a swallowed motion.
-  func repark() {
-    if let point = lock.withLock({ parkPoint }) { MacDesktop.warpCursor(to: point) }
+  /// Shows the cursor again if this server hid it. Main queue only.
+  func showCursor() {
+    if cursorHidden, MacDesktop.hideCursor(false) { cursorHidden = false }
   }
 
   // MARK: ServerCoordinatorEffects
@@ -159,12 +170,16 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
     DispatchQueue.main.async { [self] in
       cursor.saveCurrent()
       let location = MacDesktop.cursorLocation()
-      lock.withLock { parkPoint = location.map(parked) }
+      lock.withLock { returnPoint = location.map(inside) }
     }
   }
 
   func enableSuppression() {
-    if cursor != nil { DispatchQueue.main.async { [self] in repark() } }
+    if cursor != nil {
+      DispatchQueue.main.async { [self] in
+        if !cursorHidden { cursorHidden = MacDesktop.hideCursor(true) }
+      }
+    }
     suppressor?.enableSuppression()
     report("input is now remote")
   }
@@ -174,26 +189,28 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   }
 
   func restoreLocalCursor(at position: NormalizedPoint) {
-    lock.withLock { parkPoint = nil }
+    lock.withLock { returnPoint = nil }
     report("input is local again")
     guard let cursor else { return }
     let point = CGPoint(
       x: desktop.minX + position.x * (desktop.width - 1),
       y: desktop.minY + position.y * (desktop.height - 1))
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [self] in
       if case .failed = cursor.restore(preferred: point) {
         report("cursor restore failed")
       }
+      showCursor()
     }
   }
 
   func recoverLocal(cursorWasParked: Bool) {
-    let park = lock.withLock {
-      defer { parkPoint = nil }
-      return parkPoint
+    let point = lock.withLock {
+      defer { returnPoint = nil }
+      return returnPoint
     }
-    recoveryFlag.set(restore: cursorWasParked && cursor != nil, preferred: park)
+    recoveryFlag.set(restore: cursorWasParked && cursor != nil, preferred: point)
     let disposition = failSafe.recoverLocal()
+    if cursor != nil { DispatchQueue.main.async { [self] in showCursor() } }
     report("local recovery: \(disposition)")
   }
 
@@ -226,9 +243,9 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
     lock.withLock { timeouts.removeValue(forKey: screen) }?.cancel()
   }
 
-  /// `location` moved `parkInset` away from the linked edge.
-  private func parked(_ location: CGPoint) -> CGPoint {
-    let inset = Self.parkInset
+  /// `location` moved `returnInset` away from the linked edge.
+  private func inside(_ location: CGPoint) -> CGPoint {
+    let inset = Self.returnInset
     switch edge {
     case .right: return CGPoint(x: min(location.x, desktop.maxX - 1 - inset), y: location.y)
     case .left: return CGPoint(x: max(location.x, desktop.minX + inset), y: location.y)

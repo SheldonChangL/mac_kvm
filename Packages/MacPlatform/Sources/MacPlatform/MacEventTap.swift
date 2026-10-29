@@ -29,11 +29,16 @@ package final class MacEventTap: @unchecked Sendable {
   }()
 
   private let handler: Handler
+  private let location: CGEventTapLocation
   private let lock = NSLock()
   private var port: CFMachPort?
   private var source: CFRunLoopSource?
 
-  package init(handler: @escaping Handler) {
+  /// `location` is where the tap sits: at `.cghidEventTap` it sees input
+  /// before the window server applies it, so a swallowed motion never moves
+  /// the cursor; at `.cgSessionEventTap` the cursor has already moved.
+  package init(location: CGEventTapLocation = .cgSessionEventTap, handler: @escaping Handler) {
+    self.location = location
     self.handler = handler
   }
 
@@ -44,7 +49,7 @@ package final class MacEventTap: @unchecked Sendable {
     if installed { return }
     guard
       let port = CGEvent.tapCreate(
-        tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
+        tap: location, place: .headInsertEventTap, options: .defaultTap,
         eventsOfInterest: Self.eventMask, callback: macEventTapCallback,
         userInfo: Unmanaged.passUnretained(self).toOpaque()),
       let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0)

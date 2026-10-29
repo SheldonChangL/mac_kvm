@@ -7,23 +7,17 @@ import MacPlatform
 ///
 /// The suppressor decides first, so the emergency chord and a disabled tap are
 /// handled before anything else. Swallowed pointer motion becomes a relative
-/// delta for the coordinator and the cursor is parked again; other swallowed
-/// input is routed by the coordinator, which may give it back to the local
-/// system.
+/// delta for the coordinator; other swallowed input is routed by the
+/// coordinator, which may give it back to the local system.
 final class InputTap: @unchecked Sendable {
   private let coordinator: ServerCoordinator
-  private let effects: MacServerEffects
   private let suppressor: LocalEventSuppressor
   private let mouse: MacMouseCapture
   private var lifecycle: EventTapLifecycle?
   private var onFailure: (@Sendable (String) -> Void)?
 
-  init(
-    coordinator: ServerCoordinator, effects: MacServerEffects, suppressor: LocalEventSuppressor,
-    mouse: MacMouseCapture
-  ) {
+  init(coordinator: ServerCoordinator, suppressor: LocalEventSuppressor, mouse: MacMouseCapture) {
     self.coordinator = coordinator
-    self.effects = effects
     self.suppressor = suppressor
     self.mouse = mouse
   }
@@ -49,7 +43,8 @@ final class InputTap: @unchecked Sendable {
     case .emergencyEscape:
       // The suppressor has already stopped suppressing for any phase of the
       // chord key, so every phase must return input to local, or a chord
-      // completed by a release or a repeat would leave the state remote.
+      // completed by a release or a repeat would leave the state remote. On
+      // the owner's Mac only the release of Delete reaches the tap.
       let wasLocal = coordinator.state == .local
       coordinator.dispatch(LeaveRemoteFlow.escapeAction)
       if !wasLocal { report("emergency escape: input is local") }
@@ -62,10 +57,7 @@ final class InputTap: @unchecked Sendable {
         let moved = coordinator.moveRemote(
           deltaX: event.getDoubleValueField(.mouseEventDeltaX),
           deltaY: event.getDoubleValueField(.mouseEventDeltaY))
-        if moved {
-          effects.repark()
-          return nil
-        }
+        if moved { return nil }
         observeLocal(type, event)
         return event
       }
