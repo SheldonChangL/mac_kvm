@@ -62,10 +62,10 @@ Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[
 | 57 | [M1-047](issues/M1/M1-047-caps-lock-synchronizer.md) | B/H | high | 實作 Caps Lock Synchronization Semantics | M1-046 |
 | 58 | [M1-048](issues/M1/M1-048-key-repeat-controller.md) | B | high | 實作 Key Repeat Semantics | M1-041, M1-046 |
 | 59 | [M1-049](issues/M1/M1-049-mac-keyboard-injector.md) | B/H | critical | 實作 macOS KeyboardInjector | M1-044, M1-046, M1-035 |
-| 60 | [M1-062](issues/M1/M1-062-input-state-ledger.md) | B | critical | 建立 Input State Ledger 與 Snapshot API | M1-037, M1-046, M1-054 |
+| 60 | [M1-062](issues/M1/M1-062-input-state-ledger.md) | B | critical | 建立 Input State Ledger 與 Snapshot API | M1-046, M1-054 |
 | 61 | [M1-056](issues/M1/M1-056-certificate-fingerprint.md) | A/S | high | 實作 SHA-256 Certificate Fingerprint Formatter | M1-055 |
 | 62 | [M1-060](issues/M1/M1-060-reconnect-manager.md) | B | high | 實作 Reconnect Backoff 與 Manual Disconnect Semantics | M1-018, M1-029, M1-055 |
-| 64 | [M1-050](issues/M1/M1-050-release-all-keys.md) | B/H | critical | 實作 releaseAllKeys 與 Release Ordering | M1-046, M1-049 |
+| 64 | [M1-050](issues/M1/M1-050-release-all-keys.md) | B/H | critical | 實作 releaseAllKeys 與 Release Ordering | M1-046 |
 | 65 | [M1-057](issues/M1/M1-057-trust-policy.md) | C/S | critical | 實作 Trust Policy State Machine | M1-056, M1-015 |
 | 66 | [M1-061](issues/M1/M1-061-mac-recovery-coordinator.md) | C/H | critical | 實作 Network Change／Sleep-Wake Recovery | M1-060 |
 | 67 | [M1-051](issues/M1/M1-051-keyboard-compatibility-matrix.md) | H | critical | 執行 Keyboard／Shortcut／IME Compatibility Matrix | M1-045, M1-047, M1-048, M1-049, M1-050 |
@@ -188,7 +188,7 @@ Barrier wire contract 順序為 M1-WIRE-001 → M1-025 → M1-021 → M1-022（[
 | 163 | [M4-024](issues/M4/M4-024-linux-x11-injector.md) | C/H | critical | 實作 Linux X11 Mouse／Keyboard Injection Backend | M4-002, M4-020 |
 | 164 | [M4-025](issues/M4/M4-025-linux-x11-capture.md) | C/H | critical | 實作 Linux X11 Mouse／Keyboard Capture Backend | M4-002, M4-020 |
 | 165 | [M4-026](issues/M4/M4-026-linux-x11-clipboard.md) | B/H | high | 實作 Linux X11 Clipboard Adapter | M4-020, M1-052, M1-054 |
-| 166 | [M4-027](issues/M4/M4-027-linux-screen-backend.md) | C/H | critical | 實作 Linux Screen Enumeration／Scaling Backend | M4-020, M1-039, M2-019 |
+| 166 | [M4-027](issues/M4/M4-027-linux-screen-backend.md) | C/H | critical | 實作 Linux Screen Enumeration／Scaling Backend | M4-020 |
 | 167 | [M4-028](issues/M4/M4-028-wayland-capability-evidence.md) | H | critical | 蒐集 Wayland Environment／Capability Evidence Matrix | M4-020 |
 | 168 | [M4-007](issues/M4/M4-007-windows-native-server.md) | B | critical | 實作 Windows Native Protocol Server Adapter | M4-006 |
 | 169 | [M4-012](issues/M4/M4-012-windows-event-filter.md) | C/S/H | critical | 實作 Windows Synthetic-event Filtering／Suppression Safety | M4-008, M4-009, M4-010, M4-011 |

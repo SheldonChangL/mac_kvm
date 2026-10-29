@@ -9,7 +9,6 @@ risk: "critical"
 execution_tier: "B"
 low_model_autonomous_merge: false
 depends_on:
-  - "M1-037"
   - "M1-046"
   - "M1-054"
 contract_refs:
@@ -26,6 +25,8 @@ labels:
 ---
 
 # M1-062 — 建立 Input State Ledger 與 Snapshot API
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M1-037；ledger 在 `KVMCore`，與平台無關，macOS injector 之後在延後的 Mac Client 路線上使用它。
 
 ## Outcome
 

@@ -58,11 +58,11 @@ M2-019,實作 Outbound Coordinate Mapper,M2,E10,P1,M,critical,B/H,"M2-015,M2-016
 M1-047,實作 Caps Lock Synchronization Semantics,M1,E05,P1,M,high,B/H,M1-046,issues/M1/M1-047-caps-lock-synchronizer.md
 M1-048,實作 Key Repeat Semantics,M1,E05,P1,S,high,B,"M1-041,M1-046",issues/M1/M1-048-key-repeat-controller.md
 M1-049,實作 macOS KeyboardInjector,M1,E05,P1,M,critical,B/H,"M1-044,M1-046,M1-035",issues/M1/M1-049-mac-keyboard-injector.md
-M1-062,建立 Input State Ledger 與 Snapshot API,M1,E08,P1,S,critical,B,"M1-037,M1-046,M1-054",issues/M1/M1-062-input-state-ledger.md
+M1-062,建立 Input State Ledger 與 Snapshot API,M1,E08,P1,S,critical,B,"M1-046,M1-054",issues/M1/M1-062-input-state-ledger.md
 M1-056,實作 SHA-256 Certificate Fingerprint Formatter,M1,E07,P1,M,high,A/S,M1-055,issues/M1/M1-056-certificate-fingerprint.md
 M1-060,實作 Reconnect Backoff 與 Manual Disconnect Semantics,M1,E08,P1,S,high,B,"M1-018,M1-029,M1-055",issues/M1/M1-060-reconnect-manager.md
 M2-020,實作 Return-edge Coordinate Mapper,M2,E10,P1,M,critical,B/H,M2-019,issues/M2/M2-020-return-coordinate-mapper.md
-M1-050,實作 releaseAllKeys 與 Release Ordering,M1,E05,P1,M,critical,B/H,"M1-046,M1-049",issues/M1/M1-050-release-all-keys.md
+M1-050,實作 releaseAllKeys 與 Release Ordering,M1,E05,P1,M,critical,B/H,M1-046,issues/M1/M1-050-release-all-keys.md
 M1-057,實作 Trust Policy State Machine,M1,E07,P1,M,critical,C/S,"M1-056,M1-015",issues/M1/M1-057-trust-policy.md
 M1-061,實作 Network Change／Sleep-Wake Recovery,M1,E08,P1,M,critical,C/H,M1-060,issues/M1/M1-061-mac-recovery-coordinator.md
 M1-051,執行 Keyboard／Shortcut／IME Compatibility Matrix,M1,E05,P1,M,critical,H,"M1-045,M1-047,M1-048,M1-049,M1-050",issues/M1/M1-051-keyboard-compatibility-matrix.md
@@ -164,7 +164,7 @@ M4-022,實作 Linux Native Protocol Client Adapter,M4,E14,P1,S,critical,B,"M4-00
 M4-024,實作 Linux X11 Mouse／Keyboard Injection Backend,M4,E14,P1,M,critical,C/H,"M4-002,M4-020",issues/M4/M4-024-linux-x11-injector.md
 M4-025,實作 Linux X11 Mouse／Keyboard Capture Backend,M4,E14,P1,M,critical,C/H,"M4-002,M4-020",issues/M4/M4-025-linux-x11-capture.md
 M4-026,實作 Linux X11 Clipboard Adapter,M4,E14,P1,M,high,B/H,"M4-020,M1-052,M1-054",issues/M4/M4-026-linux-x11-clipboard.md
-M4-027,實作 Linux Screen Enumeration／Scaling Backend,M4,E14,P1,M,critical,C/H,"M4-020,M1-039,M2-019",issues/M4/M4-027-linux-screen-backend.md
+M4-027,實作 Linux Screen Enumeration／Scaling Backend,M4,E14,P1,M,critical,C/H,M4-020,issues/M4/M4-027-linux-screen-backend.md
 M4-028,蒐集 Wayland Environment／Capability Evidence Matrix,M4,E14,P0,M,critical,H,M4-020,issues/M4/M4-028-wayland-capability-evidence.md
 M4-007,實作 Windows Native Protocol Server Adapter,M4,E13,P1,S,critical,B,M4-006,issues/M4/M4-007-windows-native-server.md
 M4-012,實作 Windows Synthetic-event Filtering／Suppression Safety,M4,E13,P1,M,critical,C/S/H,"M4-008,M4-009,M4-010,M4-011",issues/M4/M4-012-windows-event-filter.md

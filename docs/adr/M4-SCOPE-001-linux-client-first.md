@@ -72,7 +72,15 @@ This ADR supersedes exactly these clauses and nothing else:
    Linux lifecycle no longer waits for the Linux server adapter.
 4. **M4-036 depends on M4-032 and M4-033.** The Linux Beta is X11 only (decision 4), so the
    Linux client E2E no longer waits for the Wayland input and clipboard backends.
-5. **M1-043 Exact Files.** They move from `Packages/KVMCore/...` to
+5. **M1-062 depends on M1-037.** The input state ledger lives in `KVMCore` and has no
+   platform code. The macOS mouse button injector uses it later, on the deferred Mac
+   client track.
+6. **M1-050 depends on M1-049.** Release ordering lives in `KVMCore` and has no platform
+   code. Each platform's injector uses it: M4-024 on Linux, M1-049 on macOS later.
+7. **M4-027 depends on M1-039 and M2-019.** The Linux client role needs neither macOS
+   Retina normalization (M1-039) nor the server-side outbound coordinate mapping (M2-019,
+   which itself waits for the macOS screen inventory M2-015).
+8. **M1-043 Exact Files.** They move from `Packages/KVMCore/...` to
    `Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift`
    and `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift`.
    Frozen Decision 4 keeps Barrier key identifiers out of `KVMCore`, and

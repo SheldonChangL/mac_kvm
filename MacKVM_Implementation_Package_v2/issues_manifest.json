@@ -2542,7 +2542,6 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M1-037",
         "M1-046",
         "M1-054"
       ],
@@ -2702,8 +2701,7 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M1-046",
-        "M1-049"
+        "M1-046"
       ],
       "goal": "實作 releaseAllKeys 與 Release Ordering",
       "focus": [
@@ -6802,9 +6800,7 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M4-020",
-        "M1-039",
-        "M2-019"
+        "M4-020"
       ],
       "goal": "實作 Linux Screen Enumeration／Scaling Backend",
       "focus": [
