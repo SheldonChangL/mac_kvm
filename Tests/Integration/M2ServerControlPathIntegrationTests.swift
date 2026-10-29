@@ -103,10 +103,8 @@ struct M2ServerControlPathIntegrationTests {
     #expect(Array(pipe.sent.suffix(8).prefix(4)) == [0x44, 0x4D, 0x4D, 0x56])
 
     let written = pipe.sent.count
-    let clipboard = ClipboardPayload(
-      transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "m2-probe",
-      contentHash: "hash")
-    await #expect(throws: CoreError.self) { try await session.forward(.clipboard(clipboard)) }
+    let unsupported = KVMEvent.key(key: .unknown(42), phase: .down, modifiers: ModifierState())
+    await #expect(throws: CoreError.self) { try await session.forward(unsupported) }
     #expect(pipe.sent.count == written)
     #expect(await session.state == .closed)
 

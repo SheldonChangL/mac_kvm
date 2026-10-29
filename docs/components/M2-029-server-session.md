@@ -17,7 +17,7 @@
 | `forward(_:)` | active | sends the event |
 | `leave()` | active / entering | active: `ready`, then sends `leaveScreen`; entering: closes the session (superseded) so the peer is never left entered |
 | `close(reason:)` | any | disconnects once; idempotent |
-| `monitorPeer()` | any | drains the peer stream; closes with `transportClosed` or the failure |
+| `monitorPeer(inbound:)` | any | hands each peer event to `inbound` in order; closes with `transportClosed` or the failure |
 
 ## Rules
 
@@ -28,14 +28,17 @@
   `sessionLost` to `InputStateReducer`.
 - Wrong-state calls fail with `internal.preconditionFailed` and no side
   effect; calls after close fail with `lifecycle.subsystemUnavailable`.
-- Inbound client events are not routed in the MVP and are dropped without
-  inspection. The session never logs or inspects event content.
+- Inbound client events go to the owner's `inbound` handler without
+  inspection (by default they are dropped); the app routes `.clipboard`
+  through M2-032. The session never logs or inspects event content.
 
 ## Tests
 
 `ServerSessionTests` (8): lifecycle, connect failure, send failure,
 enter failure, wrong-state calls, single-writer ordering under suspension,
-idempotent close, peer end. Six repeated runs passed.
+idempotent close, peer end. Six repeated runs passed. Later additions include
+`peerEventsDelivered` (2026-10-29): peer events reach the handler in arrival
+order before the end is reported.
 
 ## Rollback
 

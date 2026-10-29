@@ -47,6 +47,7 @@ struct MacKeyboardCaptureTests {
       .enter, .escape, .tab, .space, .backspace, .delete, .left, .right, .up, .down, .home, .end,
       .pageUp, .pageDown, .volumeUp, .volumeDown, .mute,
     ]
+    keys += PunctuationKey.allCases.map { .punctuation($0) }
     for virtualKey in keys {
       let code = try MacKeyCodeMapper.keyCode(for: virtualKey).get()
       let captured = MacKeyboardCapture.map(try key(Int(code), down: true))

@@ -7,20 +7,24 @@
 
   /// DEBUG-only server run without an event tap. Commands on standard input
   /// stand in for captured input and go through the same coordinator, outbox
-  /// and session path as real input; the local cursor and local input are
-  /// never touched. Release builds do not contain it.
+  /// and session path as real input; the local cursor, local input and the
+  /// local pasteboard are never touched. Release builds do not contain it.
   ///
   ///   edge | move <dx> <dy> | key <name> down|up|repeat
   ///   button left|right|middle down|up | scroll <dx> <dy> | escape | state
-  ///   pause <ms> | quit
+  ///   copy <text> | clipboard-is <text> | pause <ms> | quit
+  ///
+  /// `copy` sets the stand-in clipboard; `clipboard-is` reports only whether
+  /// it holds exactly that text.
   enum SmokeDriver {
     static func run(_ configuration: ServerConfiguration, identity: MacServerIdentity) -> Never {
       let desktop = MacDesktop.bounds() ?? CGRect(x: 0, y: 0, width: 1440, height: 900)
       MacKVMApplication.reportFingerprint(identity)
+      let clipboard = SmokeClipboard()
       guard
         let runtime = ServerRuntime(
           configuration: configuration, identity: identity, desktop: desktop, suppressor: nil,
-          cursor: nil, inputCapturable: { true })
+          cursor: nil, clipboard: ServerClipboard(clipboard), inputCapturable: { true })
       else { exit(1) }
       Task {
         do throws(CoreError) {
@@ -36,7 +40,9 @@
           let words = line.split(separator: " ").map(String.init)
           guard !words.isEmpty else { continue }
           if words == ["quit"] { break }
-          execute(words, runtime: runtime, edge: configuration.edge, modifiers: &modifiers)
+          execute(
+            words, runtime: runtime, clipboard: clipboard, edge: configuration.edge,
+            modifiers: &modifiers)
         }
         Task {
           await runtime.shutdown(.termination)
@@ -51,7 +57,8 @@
     }
 
     private static func execute(
-      _ words: [String], runtime: ServerRuntime, edge: ScreenEdge, modifiers: inout ModifierState
+      _ words: [String], runtime: ServerRuntime, clipboard: SmokeClipboard, edge: ScreenEdge,
+      modifiers: inout ModifierState
     ) {
       let coordinator = runtime.coordinator
       switch words[0] {
@@ -90,6 +97,11 @@
         coordinator.dispatch(.emergencyEscape)
       case "state":
         report("smoke: state \(coordinator.state)")
+      case "copy" where words.count > 1:
+        clipboard.copy(words.dropFirst().joined(separator: " "))
+      case "clipboard-is" where words.count > 1:
+        let matches = clipboard.holds(words.dropFirst().joined(separator: " "))
+        report("smoke: clipboard " + (matches ? "matches" : "differs"))
       case "pause" where words.count == 2:
         if let milliseconds = Double(words[1]) {
           Thread.sleep(forTimeInterval: milliseconds / 1000)
@@ -134,7 +146,12 @@
         "backspace": .backspace, "delete": .delete, "left": .left, "right": .right, "up": .up,
         "down": .down, "home": .home, "end": .end, "pageup": .pageUp, "pagedown": .pageDown,
         "shift": .shift, "control": .control, "option": .option, "command": .command,
-        "capslock": .capsLock,
+        "capslock": .capsLock, "minus": .punctuation(.minus), "equal": .punctuation(.equal),
+        "bracketleft": .punctuation(.leftBracket), "bracketright": .punctuation(.rightBracket),
+        "backslash": .punctuation(.backslash), "semicolon": .punctuation(.semicolon),
+        "apostrophe": .punctuation(.quote), "grave": .punctuation(.grave),
+        "comma": .punctuation(.comma), "period": .punctuation(.period),
+        "slash": .punctuation(.slash),
       ]
       return named[name]
     }
@@ -149,6 +166,44 @@
 
     private static func buttonPhase(_ name: String) -> ButtonPhase? {
       ["down": .down, "up": .up][name]
+    }
+  }
+
+  /// In-memory stand-in for the pasteboard, so a smoke run never reads or
+  /// replaces the owner's clipboard.
+  final class SmokeClipboard: LocalClipboard, @unchecked Sendable {
+    private let lock = NSLock()
+    private var content: String?
+    private var count = 0
+
+    func generation() -> Int {
+      lock.withLock { count }
+    }
+
+    func text(limit: ClipboardByteLimit) -> String? {
+      lock.withLock { content.flatMap { $0.utf8.count <= limit.byteCount ? $0 : nil } }
+    }
+
+    func write(_ text: String, limit: ClipboardByteLimit) -> Int? {
+      lock.withLock {
+        guard text.utf8.count <= limit.byteCount else { return nil }
+        content = text
+        count += 1
+        return count
+      }
+    }
+
+    /// Stands in for a local copy.
+    func copy(_ text: String) {
+      lock.withLock {
+        content = text
+        count += 1
+      }
+    }
+
+    /// Whether the clipboard holds exactly `text`, byte for byte.
+    func holds(_ text: String) -> Bool {
+      lock.withLock { content.map { $0.utf8.elementsEqual(text.utf8) } ?? false }
     }
   }
 #endif

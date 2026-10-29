@@ -67,6 +67,23 @@ public struct ModifierState: Codable, Equatable, Sendable {
   }
 }
 
+/// The eleven US ANSI punctuation key positions added in C-005 catalog v2,
+/// in a fixed positional order. Like letters, each names a key position on
+/// the US ANSI reference layout, not a produced character.
+public enum PunctuationKey: UInt8, Codable, CaseIterable, Equatable, Sendable {
+  case minus
+  case equal
+  case leftBracket
+  case rightBracket
+  case backslash
+  case semicolon
+  case quote
+  case grave
+  case comma
+  case period
+  case slash
+}
+
 public enum VirtualKey: Codable, Equatable, Sendable {
   case letter(UInt8)
   case digit(UInt8)
@@ -93,6 +110,7 @@ public enum VirtualKey: Codable, Equatable, Sendable {
   case volumeUp
   case volumeDown
   case mute
+  case punctuation(PunctuationKey)
   case unknown(UInt32)
 }
 

@@ -44,7 +44,14 @@ enum MacKeyCodeMappingFailure: String, Error, CaseIterable, Codable, Hashable, S
 /// in this module and consumes the result directly.
 enum MacKeyCodeMapper {
   /// The C-005 `VirtualKey` catalog version this table covers.
-  static let catalogVersion = 1
+  static let catalogVersion = 2
+
+  /// US ANSI punctuation key codes in `PunctuationKey` order (catalog v2):
+  /// kVK_ANSI_Minus, Equal, LeftBracket, RightBracket, Backslash, Semicolon,
+  /// Quote, Grave, Comma, Period and Slash.
+  private static let punctuationCodes: [CGKeyCode] = [
+    0x1B, 0x18, 0x21, 0x1E, 0x2A, 0x29, 0x27, 0x32, 0x2B, 0x2F, 0x2C,
+  ]
 
   /// Returns the macOS key code for `key`, or the reason it has none.
   ///
@@ -92,6 +99,7 @@ enum MacKeyCodeMapper {
     case .volumeUp: return .success(0x48)  // kVK_VolumeUp
     case .volumeDown: return .success(0x49)  // kVK_VolumeDown
     case .mute: return .success(0x4A)  // kVK_Mute
+    case .punctuation(let key): return .success(punctuationCodes[Int(key.rawValue)])
     case .unknown:
       return .failure(.unknownKey)
     }
