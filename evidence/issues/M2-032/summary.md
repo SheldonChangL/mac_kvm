@@ -22,10 +22,17 @@ sharing on 2026-10-29 ("剪貼簿跟標點符號都做").
 
 - `swift test --filter "ServerClipboardRouter|ServerSession"`: 24 tests in 2
   suites passed (11 router, 13 session).
-- Full gates at `cba4ca8` in `commands.json`: `make verify` 24/24, xcodebuild
+- Full gates at `482472c` in `commands.json`: `make verify` 24/24, xcodebuild
   build succeeded, and the M2-035 smoke against a real Barrier 2.4 client
   passed every case, including `clipboard-to-client`, `clipboard-from-client`,
-  `clipboard-not-echoed` and `clipboard-on-reconnect`.
+  `clipboard-not-echoed`, `clipboard-large-to-client`,
+  `clipboard-large-from-client` and `clipboard-on-reconnect`.
+- Found after the owner run (author's own check before merge): the session's
+  4 KiB inbound frame limit ended the session on any client copy over about
+  1.6 KB, because Barrier sends 32 KiB chunks (measured, M2-022 addendum).
+  RED: `largeClipboardReceives` and `oversizedClipboardDropped` failed with
+  `protocolViolation(malformed)`, and the smoke with the old limit failed
+  `clipboard-large-from-client` and `client-loss`. Fixed in `482472c`.
 
 ## Acceptance mapping
 

@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "issue": "M2-032",
   "branch": "codex/m2-punctuation-clipboard",
-  "testedCommit": "cba4ca864d817dc39ca9dba43e029d94797f7802",
+  "testedCommit": "482472c0b9f21c3b410086d367008b7c866aeaca",
   "note": "Run by the implementing agent (Claude Opus 5.5) on testedCommit; reviewer must rerun.",
   "status": "author_run_pending_independent_review",
   "commands": [
     {
       "command": "make verify",
       "exitCode": 0,
-      "startedAt": "2026-10-29T01:06:29.298+00:00",
-      "endedAt": "2026-10-29T01:08:40.597+00:00",
+      "startedAt": "2026-10-29T01:39:45.330+00:00",
+      "endedAt": "2026-10-29T01:41:45.899+00:00",
       "summary": [
         "24 gates passed, including code-quality (swift test -Xswiftc -warnings-as-errors), architecture-check, docs-check, swift-package-test:KVMContracts, swift-package-test:MacPlatform, swift-package-test:BarrierCompatibility and repository-contract-tests"
       ]
@@ -18,8 +18,8 @@
     {
       "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
       "exitCode": 0,
-      "startedAt": "2026-10-29T01:08:48Z",
-      "endedAt": "2026-10-29T01:08:59Z",
+      "startedAt": "2026-10-29T01:41:45Z",
+      "endedAt": "2026-10-29T01:41:51Z",
       "summary": [
         "** BUILD SUCCEEDED **"
       ]
@@ -27,8 +27,8 @@
     {
       "command": "MACKVM_SMOKE_HOST=<ssh-alias> Tests/SystemTests/Scripts/M2-035-linux-smoke.sh",
       "exitCode": 0,
-      "startedAt": "2026-10-29T01:09:03Z",
-      "endedAt": "2026-10-29T01:10:16Z",
+      "startedAt": "2026-10-29T01:41:55Z",
+      "endedAt": "2026-10-29T01:43:17Z",
       "summary": [
         "M2-035 smoke: identity=pass",
         "M2-035 smoke: handshake=pass",
@@ -42,6 +42,8 @@
         "M2-035 smoke: clipboard-from-client=pass",
         "M2-035 smoke: escape=pass",
         "M2-035 smoke: clipboard-not-echoed=pass",
+        "M2-035 smoke: clipboard-large-to-client=pass",
+        "M2-035 smoke: clipboard-large-from-client=pass",
         "M2-035 smoke: client-loss=pass",
         "M2-035 smoke: wrong-name-rejected=pass",
         "M2-035 smoke: reconnect=pass",
