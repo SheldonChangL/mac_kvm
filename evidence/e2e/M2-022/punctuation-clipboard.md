@@ -91,3 +91,23 @@ and end, always with sequence 0.
   The formats were text (37 bytes, the probe), HTML (54) and bitmap (0).
 - **On the second enter:** the server did not send the clipboard back to the client that
   owned it.
+
+### Chunk sizes (measured 2026-10-29)
+
+`tools/measure_clipboard_chunks.py` ran the same topology on the same host. Synthetic
+ASCII text of several sizes was copied with xclip, first on the client while it was not
+the active screen, then on the server before an enter. The relay parsed the frames and
+kept only codes, DCLP ids, marks and lengths; no payload byte was stored.
+
+| Direction | Text | Transfer | Chunks | Largest chunk | Peer clipboard |
+|---|---|---|---|---|---|
+| client → server | 100,000 B | 250,028 B | 8 | 32,768 B | matched |
+| server → client | 600,000 B | 1,500,028 B | 46 | 32,768 B | matched |
+
+- Both peers split a transfer into chunks of at most 32 KiB, so the largest `DCLP` frame
+  payload was 32,782 bytes. The transfer was about 2.5 times the text because other
+  formats were sent along with it.
+- A client copy sent while the client is not the active screen is transferred at once.
+- Larger copies did not transfer, for reasons inside Barrier or xclip: the client never
+  announced copies of 600,000 and 3,000,000 bytes, and the server's 3,000,000-byte copy
+  failed with `ICCCM violation by clipboard owner` in the `barriers` log.
