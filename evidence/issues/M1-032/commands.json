@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "issue": "M1-032",
   "baseCommit": "76f4045415d298612384a4348c4046e7ff0b88d7",
-  "note": "Run on the staged change that adds this file; outputs are verbatim apart from masked local paths, except the record that carries a `reduced` field. The recorded `make verify` ran with its report written outside the repository.",
+  "note": "Run on the staged change that adds this file; outputs are verbatim apart from masked local paths, except the record that carries a `reduced` field. The recorded `make verify` ran with its report written outside the repository. Per-command start and end times were not recorded, although the issue's Expected Evidence asks for them; they are not reconstructed after the fact.",
   "commands": [
     {
       "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierMouseMoveDecoderTests",

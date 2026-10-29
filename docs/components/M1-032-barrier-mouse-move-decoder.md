@@ -103,7 +103,9 @@ rule to a token seen in a direction the contract does not list it in, as M1-031 
 for its tokens; that is a first-party choice. Steps 4 and 5 are the contract's "drop
 and continue" cases: a value outside `0x0000...0x7FFF` or outside the client's `DINF`
 rectangle is dropped, a diagnostic is emitted and the session continues. A value is
-never clamped, because clamping was never observed.
+never clamped, because clamping was never observed. The issue's "invalid
+coordinate typed error" is this typed drop: the contract's "Rejection semantics"
+make an invalid coordinate drop-and-continue, so only the fail-closed cases throw.
 
 - The raw bound is checked before the rectangle, so a raw value above `0x7FFF` is
   reported as `coordinateOutOfRange` even where the rectangle would also reject it.
