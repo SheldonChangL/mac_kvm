@@ -248,7 +248,7 @@ struct BarrierServerProtocolSessionTests {
     #expect(Array(pipe.sent.suffix(6)) == [0, 0, 0, 3, 0, 0])
   }
 
-  @Test("input events are written as the encoder's frames; clipboard and unknown keys fail closed")
+  @Test("input events are written as the encoder's frames; unknown keys fail closed")
   func inputEncodes() async throws {
     let pipe = PipeTransport()
     let session = try await connected(pipe, screenInfo: dinf1600)
@@ -275,11 +275,7 @@ struct BarrierServerProtocolSessionTests {
     #expect(pipe.sent == quiet)
 
     let unsupported: [KVMEvent] = [
-      .key(key: .unknown(42), phase: .down, modifiers: ModifierState()),
-      .clipboard(
-        ClipboardPayload(
-          transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "probe",
-          contentHash: "h")),
+      .key(key: .unknown(42), phase: .down, modifiers: ModifierState())
     ]
     for event in unsupported {
       #expect(!BarrierServerProtocolSession.canSend(event))
@@ -294,7 +290,46 @@ struct BarrierServerProtocolSessionTests {
     for (event, _) in cases { #expect(BarrierServerProtocolSession.canSend(event)) }
   }
 
-  @Test("client clipboard frames are ignored and the session stays usable")
+  @Test("the local clipboard is sent as clipboard 0 with sequence 0, as captured")
+  func clipboardSends() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    let text = "probe \u{2713}"
+    let payload = ClipboardPayload(
+      transactionID: ClipboardTransactionID(), origin: .local, utf8Text: text, contentHash: "h")
+    #expect(BarrierServerProtocolSession.canSend(.clipboard(payload)))
+    let before = pipe.sent.count
+    try await session.send(.clipboard(payload))
+    let expected = BarrierClipboard.frames(
+      id: 0, sequence: 0, data: BarrierClipboard.marshal(text: text))
+    #expect(Array(pipe.sent[before...]) == expected.flatMap { $0 })
+  }
+
+  @Test("a client clipboard transfer becomes one inbound clipboard event")
+  func clipboardReceives() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    var events = session.events.makeAsyncIterator()
+    let text = "client \u{65E5}\u{672C}"
+    let cclp: [UInt8] = [0, 0, 0, 9] + Array("CCLP".utf8) + [0, 0, 0, 0, 1]
+    let transfer = BarrierClipboard.frames(
+      id: 0, sequence: 1, data: BarrierClipboard.marshal(text: text))
+    pipe.feed(cclp + transfer.flatMap { $0 })
+    let event = try await events.next()
+    guard case .clipboard(let payload)? = event else {
+      Issue.record("no clipboard event")
+      return
+    }
+    #expect(payload.utf8Text == text)
+    guard case .remote = payload.origin else {
+      Issue.record("an inbound clipboard must be remote")
+      return
+    }
+    try await session.send(.leaveScreen(screen: screen))
+    #expect(Array(pipe.sent.suffix(cout.count)) == cout)
+  }
+
+  @Test("client clipboard frames without usable text are dropped and the session stays usable")
   func clientClipboardIgnored() async throws {
     let pipe = PipeTransport()
     let session = try await connected(pipe)

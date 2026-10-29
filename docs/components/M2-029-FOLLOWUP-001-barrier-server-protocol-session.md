@@ -42,6 +42,20 @@ acceptance or a backlog Issue.
 The session cannot deliver input until M2-026/M2-027 wire contracts are
 frozen; the first forwarded input event ends the session by design.
 
+## Clipboard (2026-10-29)
+
+- `send(.clipboard)` writes the M2-028 `DCLP` transfer of clipboard 0;
+  `canSend` refuses text over `clipboardByteLimit` (1 MiB).
+- Client `CCLP` is accepted and ignored: the data follows on leave. Client
+  `DCLP` frames go to a `BarrierClipboardAssembler`; a complete transfer of
+  clipboard 0 with text becomes one `.clipboard` event on `events` (origin
+  `.remote` with a per-session device ID, empty `contentHash`). Malformed or
+  oversized transfers, clipboard 1 and transfers without text are dropped and
+  the session stays up.
+- Tests in `BarrierServerProtocolSessionTests`: `clipboardSends`,
+  `clipboardReceives`, and the renamed client-clipboard test (frames without
+  usable text are dropped and the session stays usable).
+
 ## Rollback
 
 Revert this file, the adapter, its unit tests and the integration test.

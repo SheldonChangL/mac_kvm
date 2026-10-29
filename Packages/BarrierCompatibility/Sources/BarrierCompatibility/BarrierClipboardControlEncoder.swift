@@ -3,8 +3,8 @@
 // follows the M2-022 server-role capture (evidence/e2e/M2-022/README.md): a client
 // can be entered any number of times, the sequence advances on every enter and every
 // leave (1, then 3 after one leave), and the mask is 0 because lock state is not
-// synchronized. Clipboard has no frozen wire encoding and always fails closed without
-// emitting bytes.
+// synchronized. Clipboard text is sent as the M2-022 punctuation and clipboard
+// addendum captured it: clipboard 0, sequence 0 (evidence/e2e/M2-022/punctuation-clipboard.md).
 
 import KVMContracts
 
@@ -16,8 +16,6 @@ enum BarrierClipboardControlEncoderError: Error, Equatable, Sendable {
   case coordinateOutsideScreen
   /// The clipboard payload exceeds the caller's byte limit.
   case clipboardOversized
-  /// No clipboard wire encoding is frozen (M2-023); nothing is emitted.
-  case clipboardWireContractNotFrozen
 }
 
 /// Encodes server-to-client control frames for one client session.
@@ -72,12 +70,14 @@ struct BarrierClipboardControlEncoder: Sendable {
     Self.frame(BarrierControlToken.calv.bytes)
   }
 
-  /// Always fails: size is checked first, then the unfrozen wire contract.
+  /// Encodes the `DCLP` transfer of `payload` as the client's clipboard 0.
+  /// Oversized text fails before any byte is produced.
   func clipboard(_ payload: ClipboardPayload, limit: ClipboardByteLimit)
-    throws(BarrierClipboardControlEncoderError)
+    throws(BarrierClipboardControlEncoderError) -> [UInt8]
   {
-    guard payload.utf8Text.utf8.count <= limit.byteCount else { throw .clipboardOversized }
-    throw .clipboardWireContractNotFrozen
+    guard payload.utf8ByteCount <= limit.byteCount else { throw .clipboardOversized }
+    let data = BarrierClipboard.marshal(text: payload.utf8Text)
+    return BarrierClipboard.frames(id: 0, sequence: 0, data: data).flatMap { $0 }
   }
 
   private static func bigEndian(_ value: UInt16) -> [UInt8] {

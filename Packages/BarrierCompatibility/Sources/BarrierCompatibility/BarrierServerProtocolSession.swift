@@ -3,8 +3,8 @@
 // encoder to an already admitted `Transport` (M2-024) behind the protocol-neutral
 // `KVMProtocolSession` contract (C-003), so KVMCore's `ServerSession` (M2-029) never sees
 // Barrier tokens. Pointer, button, wheel, key, enter and leave frames, the keepalive
-// cadence and the client clipboard frames it tolerates all follow the M2-022 capture
-// (evidence/e2e/M2-022/README.md). Clipboard has no frozen encoding and fails closed.
+// cadence follow the M2-022 capture (evidence/e2e/M2-022/README.md); the clipboard
+// transfer follows the M2-022 punctuation and clipboard addendum.
 
 import Foundation
 import KVMContracts
@@ -26,10 +26,12 @@ package struct BarrierClientScreen: Equatable, Sendable {
 /// fails within `handshakeTimeout`. After setup the session sends `CALV` every
 /// three seconds and drops a client that sends nothing for three intervals in a
 /// row as `timeout.keepalive`. Client `CALV`, `CNOP`, screen-info updates and
-/// clipboard frames (`CCLP`, `DCLP`) are accepted; clipboard frames are
-/// ignored because clipboard sharing is not supported. Any other client frame
-/// ends the session. `send(_:)` writes enter, leave, pointer, button, wheel and
-/// supported key events; `canSend(_:)` says which events those are.
+/// clipboard frames (`CCLP`, `DCLP`) are accepted. A complete client transfer
+/// of clipboard 0 with UTF-8 text becomes one `.clipboard` event on `events`
+/// (origin `.remote`, empty `contentHash`); a malformed or oversized transfer
+/// is dropped without ending the session. Any other client frame ends the
+/// session. `send(_:)` writes enter, leave, pointer, button, wheel, supported
+/// key and clipboard events; `canSend(_:)` says which events those are.
 /// `disconnect(reason:)` is idempotent and never waits for the peer.
 ///
 /// State lives behind one `NSLock`, hence `@unchecked Sendable`. Nothing is
@@ -41,6 +43,10 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     case ready
     case closed
   }
+
+  /// Largest clipboard text, in UTF-8 bytes, sent or accepted.
+  package static let clipboardByteLimit = 1 << 20
+  private static let clipboardLimit = ClipboardByteLimit(byteCount: clipboardByteLimit)!
 
   package let events: AsyncThrowingStream<KVMEvent, any Error>
   private let eventContinuation: AsyncThrowingStream<KVMEvent, any Error>.Continuation
@@ -54,6 +60,8 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
   private var decoder: BarrierControlDecoder
   private var encoder: BarrierClipboardControlEncoder?
   private var input: BarrierServerInputEncoder?
+  private var clipboard = BarrierClipboardAssembler(limit: clipboardByteLimit + 256)
+  private let clientDevice = DeviceID()
   private var readyWaiter: CheckedContinuation<Result<Void, CoreError>, Never>?
   private var readyResult: Result<Void, CoreError>?
   private var reader: Task<Void, Never>?
@@ -82,13 +90,13 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     (events, eventContinuation) = AsyncThrowingStream.makeStream()
   }
 
-  /// Whether `send(_:)` can write `event`: everything but clipboard and keys
-  /// without an evidence-backed Barrier identifier.
+  /// Whether `send(_:)` can write `event`: everything but keys without an
+  /// evidence-backed Barrier identifier and clipboard text over the limit.
   package static func canSend(_ event: KVMEvent) -> Bool {
     switch event {
     case .enterScreen, .leaveScreen, .mouseMove, .mouseButton, .scroll: true
     case .key(let key, _, _): BarrierServerInputEncoder.canEncode(key)
-    case .clipboard: false
+    case .clipboard(let payload): payload.utf8ByteCount <= clipboardByteLimit
     }
   }
 
@@ -165,9 +173,12 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
         } catch {
           return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
         }
-      case .clipboard:
-        // M2-023: no frozen server encoding; fail closed without bytes.
-        return .failure(Self.error(.protocolViolation(.unsupportedMessage)))
+      case .clipboard(let payload):
+        do throws(BarrierClipboardControlEncoderError) {
+          return .success(try control.clipboard(payload, limit: Self.clipboardLimit))
+        } catch {
+          return .failure(Self.error(.clipboard(.oversized)))
+        }
       }
     }
     guard !frames.isEmpty else { return }
@@ -313,7 +324,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
 
   private enum Step {
     case reply([UInt8], ready: Bool)
-    case received([CheckedContinuation<Void, Never>])
+    case received([CheckedContinuation<Void, Never>], inbound: KVMEvent?)
     case ignore
   }
 
@@ -333,7 +344,10 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
           return .failure(Self.map(error))
         }
       case .ready:
-        if !Self.isClientClipboard(payload) {
+        var inbound: KVMEvent?
+        if Self.code(of: payload, is: "DCLP") {
+          inbound = receiveClipboard(payload)
+        } else if !Self.code(of: payload, is: "CCLP") {
           let outcome: BarrierControlOutcome
           do throws(BarrierControlMessageError) {
             outcome = try decoder.decode(payload: payload, direction: .clientToServer)
@@ -353,7 +367,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
         receivedFrames += 1
         let due = frameWaiters.filter { receivedFrames >= $0.count }.map(\.continuation)
         frameWaiters.removeAll { receivedFrames >= $0.count }
-        return .success(.received(due))
+        return .success(.received(due, inbound: inbound))
       case .idle, .closed:
         return .success(.ignore)
       }
@@ -361,7 +375,8 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     switch step {
     case .ignore:
       return
-    case .received(let due):
+    case .received(let due, let inbound):
+      if let inbound { eventContinuation.yield(inbound) }
       for waiter in due { waiter.resume() }
     case .reply(let frames, let ready):
       if !frames.isEmpty { try await transport.send(Data(frames)) }
@@ -377,12 +392,27 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     }
   }
 
-  /// Client clipboard frames: `CCLP` announces ownership and `DCLP` carries
-  /// data (M2-022). Clipboard sharing is not supported, so both are ignored
-  /// before decoding instead of ending the session.
-  private static func isClientClipboard(_ payload: [UInt8]) -> Bool {
-    let code = payload.prefix(4)
-    return code.elementsEqual("CCLP".utf8) || code.elementsEqual("DCLP".utf8)
+  private static func code(of payload: [UInt8], is code: String) -> Bool {
+    payload.prefix(4).elementsEqual(code.utf8)
+  }
+
+  /// Feeds a client `DCLP` frame to the assembler (lock held). Returns the
+  /// clipboard event a completed transfer of clipboard 0 carries; a broken
+  /// transfer is dropped. `CCLP` (ownership) needs no action: the data
+  /// follows on leave.
+  private func receiveClipboard(_ payload: [UInt8]) -> KVMEvent? {
+    do throws(BarrierClipboardError) {
+      guard let transfer = try clipboard.receive(payload: payload), transfer.id == 0,
+        let text = try BarrierClipboard.text(fromMarshalled: transfer.data),
+        text.utf8.count <= Self.clipboardByteLimit
+      else { return nil }
+      return .clipboard(
+        ClipboardPayload(
+          transactionID: ClipboardTransactionID(), origin: .remote(clientDevice), utf8Text: text,
+          contentHash: ""))
+    } catch {
+      return nil
+    }
   }
 
   /// Runs `body` under the lock and unwraps its typed result.

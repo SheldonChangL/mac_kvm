@@ -81,22 +81,27 @@ struct BarrierClipboardControlEncoderTests {
     #expect(try failed.enter(x: 0, y: 0).count == goldenFirstCINN.count)
   }
 
-  @Test("clipboard is unsupported and emits no bytes, even within the size limit")
-  func clipboardUnsupported() throws {
+  @Test("clipboard text is sent as clipboard 0, sequence 0: start, one chunk, end")
+  func clipboardTransfer() throws {
     let encoder = BarrierClipboardControlEncoder(screen: screen)
     let payload = ClipboardPayload(
       transactionID: ClipboardTransactionID(), origin: .local, utf8Text: "m2-028-probe",
       contentHash: "hash")
-    let limit = try #require(ClipboardByteLimit(byteCount: 1024))
-    #expect(throws: EncoderError.clipboardWireContractNotFrozen) {
-      try encoder.clipboard(payload, limit: limit)
-    }
-    let small = try #require(ClipboardByteLimit(byteCount: 2))
+    // DCLP, clipboard id 0, sequence 0 (M2-022 punctuation and clipboard addendum).
+    let header: [UInt8] = [0x44, 0x43, 0x4C, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00]
+    let marshalled: [UInt8] = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12] + Array("m2-028-probe".utf8)
+    let start: [UInt8] = [0, 0, 0, 16] + header + [1, 0, 0, 0, 2] + Array("24".utf8)
+    let chunk: [UInt8] = [0, 0, 0, 38] + header + [2, 0, 0, 0, 24] + marshalled
+    let end: [UInt8] = [0, 0, 0, 14] + header + [3, 0, 0, 0, 0]
+    let exact = try #require(ClipboardByteLimit(byteCount: 12))
+    #expect(try encoder.clipboard(payload, limit: exact) == start + chunk + end)
+
+    let small = try #require(ClipboardByteLimit(byteCount: 11))
     #expect(throws: EncoderError.clipboardOversized) {
       try encoder.clipboard(payload, limit: small)
     }
     do {
-      try encoder.clipboard(payload, limit: limit)
+      _ = try encoder.clipboard(payload, limit: small)
     } catch {
       #expect(!String(describing: error).contains("m2-028-probe"))
     }
