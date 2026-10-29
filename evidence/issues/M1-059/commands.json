@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-059",
+  "githubIssue": 71,
+  "githubIssueUrl": "https://github.com/SheldonChangL/mac_kvm/issues/71",
+  "branch": "codex/m1-059-fingerprint-change-flow",
+  "baseCommit": "963638036cfbea39933a7c611afbeddf14ec0bfc",
+  "baseCommitNote": "main when the work started: merge commit of PR #325 (M1-058). Parent of the implementation commit.",
+  "implementationCommit": {
+    "commit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+    "subject": "feat(mac-platform): add fingerprint change flow",
+    "diffStat": {
+      "files": 3,
+      "insertions": 2443,
+      "deletions": 0
+    }
+  },
+  "implementationFiles": [
+    {
+      "path": "Packages/MacPlatform/Sources/MacPlatform/FingerprintChangeFlow.swift",
+      "sha256": "0f0c854855dff6ef09cb22f9d253528c3774de2d260b74bb5644ea2fba2da4c2",
+      "lines": 276
+    },
+    {
+      "path": "Packages/MacPlatform/Tests/MacPlatformTests/FingerprintChangeFlowTests.swift",
+      "sha256": "278e7c050cd8337c5aa5e7df3b3faa5c7e7a55e575bb3ccea99f16e07fb7dadd",
+      "lines": 1799
+    },
+    {
+      "path": "docs/components/M1-059-fingerprint-change-flow.md",
+      "sha256": "801356156bb57c32e3f1a2eb93e0cf366cce8ed8c38633e1581a6a41285dfa98",
+      "lines": 368
+    }
+  ],
+  "implementationFilesNote": "The Issue's three Exact Files; with this evidence package they are the full scope.",
+  "evidenceCommitNote": "This package is committed after the implementation commit. A file cannot hold the hash of the commit that adds it, so the evidence commit hash and the final-head re-verification are reported in the pull request.",
+  "authorship": {
+    "author": "Claude Opus",
+    "commandExecutor": "Claude Opus",
+    "detail": "Claude Opus authored the source, tests, component document and this evidence, and ran every command recorded here in this session. A fresh-context Claude Opus subagent reviewed the change read-only (not an independent review). The independent security review, the Tier-H manual verification by a non-executing reviewer, GitHub CI, PR review and merge are pending and belong to others."
+  },
+  "commandsCommit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+  "executionContext": "Clean working tree at the implementation commit, normal macOS execution permissions. The one evidence file that already existed (manual.md, untracked) was moved outside the repository for the run and restored afterwards, so every command saw exactly the committed tree.",
+  "timestampNote": "UTC at second resolution, taken immediately before and after each command; make verify also records its report's own millisecond timestamps.",
+  "requiredCommands": [
+    {
+      "id": 1,
+      "command": "swift test --package-path Packages/MacPlatform",
+      "form": "exact",
+      "startedAt": "2026-10-28T05:07:00Z",
+      "endedAt": "2026-10-28T05:07:02Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "framework": "Swift Testing",
+        "summaryLine": "Test run with 269 tests in 0 suites passed after 0.036 seconds.",
+        "skipped": 5,
+        "skippedNote": "Five opt-in Tier-H probes, the M1-059 probe included; XCTest ran 0 tests.",
+        "warnings": 0,
+        "report": "tests/results.json"
+      }
+    },
+    {
+      "id": 2,
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination 'platform=macOS' build",
+      "form": "exact",
+      "startedAt": "2026-10-28T05:07:02Z",
+      "endedAt": "2026-10-28T05:07:06Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "** BUILD SUCCEEDED **; 0 warning and 0 error lines; FingerprintChangeFlow.swift compiled for arm64"
+    },
+    {
+      "id": 3,
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "form": "exact",
+      "startedAt": "2026-10-28T05:07:06Z",
+      "endedAt": "2026-10-28T05:07:06Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+    },
+    {
+      "id": 4,
+      "command": "make architecture-check",
+      "form": "exact",
+      "startedAt": "2026-10-28T05:07:06Z",
+      "endedAt": "2026-10-28T05:07:07Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "architecture check OK"
+    }
+  ],
+  "repositoryGates": [
+    {
+      "id": 5,
+      "command": "make docs-check",
+      "startedAt": "2026-10-28T05:07:07Z",
+      "endedAt": "2026-10-28T05:07:07Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "docs check OK"
+    },
+    {
+      "id": 6,
+      "command": "make code-quality-check",
+      "startedAt": "2026-10-28T05:07:07Z",
+      "endedAt": "2026-10-28T05:07:12Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "subSteps": [
+          {
+            "name": "swift-format-version",
+            "exitCode": 0,
+            "version": "6.2.3"
+          },
+          {
+            "name": "swift-format-lint (strict)",
+            "exitCode": 0,
+            "stdoutLines": 0
+          },
+          {
+            "name": "swift-test-warnings-as-errors",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "command": "git diff --check HEAD^ HEAD",
+      "startedAt": "2026-10-28T05:07:12Z",
+      "endedAt": "2026-10-28T05:07:12Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "no output",
+      "commandNote": "HEAD was 59f83da (implementation commit) and HEAD^ was 9636380 (base)."
+    },
+    {
+      "id": 8,
+      "command": "make verify",
+      "startedAt": "2026-10-28T05:07:21Z",
+      "endedAt": "2026-10-28T05:08:51Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "status": "passed",
+        "gatesTotal": 24,
+        "gatesPassed": 24,
+        "gatesFailed": 0,
+        "gatesNotRun": 0
+      },
+      "report": {
+        "path": "artifacts/ci/m1-008-report.json",
+        "commit": "59f83da8535255aee174e1c508724fcec6c4a09c",
+        "status": "passed",
+        "startedAt": "2026-10-28T05:07:21.501+00:00",
+        "endedAt": "2026-10-28T05:08:51.599+00:00",
+        "sha256": "7ff39d1505a8763bde106f62dcca8d56df6132bb6959be960308296bfe29f7b9",
+        "gatesPassedNamed": [
+          "manifest-validation",
+          "docs-check",
+          "architecture-check",
+          "code-quality",
+          "tool-test-discovery",
+          "evidence-test-discovery",
+          "tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py",
+          "tool-test:Evidence/tests/test_run_e2e.py",
+          "tool-test:Evidence/tests/test_validate_evidence.py",
+          "tool-test:architecture-check/tests/test_architecture_check.py",
+          "tool-test:async-harness/tests/test_async_harness.py",
+          "tool-test:cigates/tests/test_cigates.py",
+          "tool-test:code-quality/tests/test_code_quality.py",
+          "tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py",
+          "tool-test:docs-check/tests/test_docs_check.py",
+          "evidence-test:M1-023/tests/test_register.py",
+          "evidence-test:M1-EVIDENCE-001/tests/test_registration.py",
+          "evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py",
+          "swift-package-test:KVMContracts",
+          "swift-package-test:MacPlatform",
+          "swift-package-test:BarrierCompatibility",
+          "repository-contract-tests",
+          "swift-test-targets",
+          "native-arm64-build"
+        ],
+        "note": "The report is git-ignored output of make verify; its hash identifies the run, the file is not committed."
+      }
+    }
+  ],
+  "supplementaryCommands": [
+    {
+      "id": 9,
+      "command": "swift build --package-path Packages/MacPlatform -c release",
+      "startedAt": "2026-10-28T05:07:12Z",
+      "endedAt": "2026-10-28T05:07:20Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": "Build complete! (6.97s); 0 warning lines"
+    },
+    {
+      "id": 10,
+      "command": "swift test --package-path Packages/MacPlatform --xunit-output <evidence>/tests/full-xunit.xml",
+      "startedAt": "2026-10-28T05:07:20Z",
+      "endedAt": "2026-10-28T05:07:20Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "summaryLine": "Test run with 269 tests in 0 suites passed after 0.027 seconds.",
+        "report": "tests/full-swift-testing.xml"
+      }
+    },
+    {
+      "id": 11,
+      "command": "swift test --package-path Packages/MacPlatform --filter '<the 41 M1-059 test names>' --xunit-output <evidence>/tests/focused-xunit.xml",
+      "startedAt": "2026-10-28T05:07:20Z",
+      "endedAt": "2026-10-28T05:07:21Z",
+      "exitCode": 0,
+      "status": "passed",
+      "result": {
+        "summaryLine": "Test run with 41 tests in 0 suites passed after 0.019 seconds.",
+        "report": "tests/focused-swift-testing.xml"
+      }
+    }
+  ],
+  "tddHistory": [
+    {
+      "phase": "RED",
+      "command": "swift test --package-path Packages/MacPlatform",
+      "startedAt": "2026-10-28T04:34:45Z",
+      "endedAt": "2026-10-28T04:35:04Z",
+      "exitCode": 1,
+      "state": "base 963638036cfbea39933a7c611afbeddf14ec0bfc plus the new test file only",
+      "cause": "131 compile errors, all in FingerprintChangeFlowTests.swift: FingerprintChangeFlow, FingerprintChangeWarning, FingerprintChangeOutcome and FingerprintChangeOwnerDecision did not exist; the remaining errors were inference cascades"
+    },
+    {
+      "phase": "first GREEN",
+      "command": "swift test --package-path Packages/MacPlatform --filter '<the 39 M1-059 test names>'",
+      "startedAt": "2026-10-28T04:37:35Z",
+      "endedAt": "2026-10-28T04:37:36Z",
+      "exitCode": 1,
+      "cause": "1 of 39 failed: the static source audit's print( token matched inside loadFingerprint(; the audit, not the implementation, was wrong (author finding A1)"
+    },
+    {
+      "phase": "GREEN",
+      "startedAt": "2026-10-28T04:38:10Z",
+      "endedAt": "2026-10-28T04:38:23Z",
+      "exitCode": 0,
+      "result": "39 tests: 38 passed, 1 opt-in probe skipped"
+    },
+    {
+      "phase": "RED for review finding L3",
+      "startedAt": "2026-10-28T05:01:36Z",
+      "endedAt": "2026-10-28T05:01:46Z",
+      "exitCode": 1,
+      "cause": "tests updated first; against the previous unshielded insert, exactly repairCancelledDuringRemovalStillStoresTheApprovedFingerprint failed (4 issues)",
+      "detail": "tests/mutation.json reviewFixRed"
+    },
+    {
+      "phase": "GREEN after review fixes",
+      "startedAt": "2026-10-28T05:01:52Z",
+      "endedAt": "2026-10-28T05:02:02Z",
+      "exitCode": 0,
+      "result": "41 tests: 40 passed, 1 opt-in probe skipped"
+    }
+  ],
+  "tddHistoryNote": "Runs before the implementation commit, in time order; superseded by the commands above. Details in tests/results.json.",
+  "stressRuns": [
+    {
+      "tests": [
+        "concurrentRepairsOfOneWarningConvergeOnThePresentedFingerprint",
+        "concurrentChangeEvaluationsAgreeAndNeverWrite"
+      ],
+      "repetitions": 20000,
+      "repeatUntil": "fail",
+      "startedAt": "2026-10-28T05:02:27Z",
+      "endedAt": "2026-10-28T05:02:38Z",
+      "exitCode": 0,
+      "result": "Test run with 40000 tests in 0 suites passed"
+    },
+    {
+      "tests": "all 41 M1-059 tests",
+      "repetitions": 2000,
+      "repeatUntil": "fail",
+      "startedAt": "2026-10-28T05:02:48Z",
+      "endedAt": "2026-10-28T05:03:23Z",
+      "exitCode": 0,
+      "result": "Test run with 82000 tests in 0 suites passed"
+    }
+  ],
+  "mutationCheck": {
+    "detail": "tests/mutation.json",
+    "killed": 9,
+    "total": 9,
+    "sourceSha256": "0f0c854855dff6ef09cb22f9d253528c3774de2d260b74bb5644ea2fba2da4c2"
+  },
+  "preliminaryRunsNote": "Before the implementation commit the author also ran these gates on the uncommitted working tree (xcodebuild, validate_package, architecture-check, docs-check, code-quality-check, release build and make verify, which passed 24 of 24). They are superseded by the runs above and are not acceptance evidence.",
+  "completed": [
+    {
+      "item": "RED then GREEN, including a test-first fix for review finding L3",
+      "status": "done"
+    },
+    {
+      "item": "required commands 1-4 and repository gates 5-8 at the implementation commit",
+      "status": "passed",
+      "commit": "59f83da8535255aee174e1c508724fcec6c4a09c"
+    },
+    {
+      "item": "fresh-context adversarial review (not independent)",
+      "status": "done",
+      "disposition": "C0/H0/M1/L4/N4, all addressed"
+    },
+    {
+      "item": "mutation check",
+      "status": "9 of 9 killed"
+    }
+  ],
+  "pending": [
+    {
+      "item": "independent security review (Acceptance Criterion 6)",
+      "status": "pending"
+    },
+    {
+      "item": "Tier-H manual real-Keychain probe, run or verified by a non-executing reviewer (Acceptance Criterion 7)",
+      "status": "pending",
+      "detail": "manual.md"
+    },
+    {
+      "item": "make verify at the final head after the evidence commit",
+      "status": "reported in the pull request"
+    },
+    {
+      "item": "GitHub CI at the pushed head",
+      "status": "pending"
+    },
+    {
+      "item": "pull request review and merge by an authorized reviewer",
+      "status": "pending"
+    }
+  ],
+  "manualVerification": {
+    "required": true,
+    "performed": false,
+    "status": "pending",
+    "detail": "manual.md"
+  },
+  "protectedArtifacts": {
+    "paths": [
+      "MacKVM_M1-001_unblock.zip",
+      "mackvm-unblock/"
+    ],
+    "readModifiedStagedOrCommitted": false,
+    "note": "They exist only in the primary checkout, which this work never wrote to; their modification times (Sep 14) predate this session."
+  },
+  "reviewHistory": "tests/review-findings.json"
+}

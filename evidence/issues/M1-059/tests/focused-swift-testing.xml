@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="40" failures="0" skipped="1" time="0.019150208">
+    <testcase classname="MacPlatformTests" name="manualFingerprintChangeProbeOutputIsClosedVocabularyOnly()" time="0.005528084" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeTypesAreClosedEquatableAndSendable()" time="0.005334291" />
+    <testcase classname="MacPlatformTests" name="staleWarningRepairChangesNothingAndJudgesTheRecordAsRead()" time="0.005301792" />
+    <testcase classname="MacPlatformTests" name="manualFingerprintChangeProbeProducesTheExpectedClosedResultOnAFake()" time="0.006100583" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeFlowSourceNeverLogsOrBypassesTheStore()" time="0.005880875" />
+    <testcase classname="MacPlatformTests" name="changeWarningRefusesAFingerprintOfAnyOtherLength(length:)" time="0.0053785" />
+    <testcase classname="MacPlatformTests" name="concurrentRepairsOfOneWarningConvergeOnThePresentedFingerprint()" time="0.006307" />
+    <testcase classname="MacPlatformTests" name="repairAcceptsThePresentedFingerprintAnotherWriterStoresInTheGap()" time="0.005949875" />
+    <testcase classname="MacPlatformTests" name="repairNeverReplacesARecordAnotherWriterStoresInTheGap()" time="0.006139958" />
+    <testcase classname="MacPlatformTests" name="wrongLengthPresentedFingerprintIsRejectedBeforeAnyKeychainRead(length:)" time="0.005158875" />
+    <testcase classname="MacPlatformTests" name="changeWarningShowsBothFingerprintsOnlyAsCanonicalDisplayText()" time="0.00518475" />
+    <testcase classname="MacPlatformTests" name="concurrentChangeEvaluationsAgreeAndNeverWrite()" time="0.006187458" />
+    <testcase classname="MacPlatformTests" name="repairCancelledDuringRemovalStillStoresTheApprovedFingerprint()" time="0.006214042" />
+    <testcase classname="MacPlatformTests" name="manualFingerprintChangeProbeSelectionFailsClosedAndIsSkippedByDefault()" time="0.004138" />
+    <testcase classname="MacPlatformTests" name="changeEvaluationStorageFailureFailsClosed(status:)" time="0.005303042" />
+    <testcase classname="MacPlatformTests" name="manualFingerprintChangeProbeRunsTheRealRepairRoundTrip()" >
+      <skipped>manual Tier-H probe: set MACKVM_M1_059_MANUAL_PROBE to fingerprint-change-repair-round-trip</skipped>
+    </testcase>
+    <testcase classname="MacPlatformTests" name="repairRemovalSupersedesARecordReplacedAfterTheCheck()" time="0.006323083" />
+    <testcase classname="MacPlatformTests" name="changedFingerprintRejectsImmediatelyWithAWarningAndNeverWrites()" time="0.005178417" />
+    <testcase classname="MacPlatformTests" name="repairFailsClosedWhenTheRecordCannotBeRead(status:)" time="0.005175792" />
+    <testcase classname="MacPlatformTests" name="manualFingerprintChangeProbeCleansUpOnEveryFailurePath()" time="0.006427875" />
+    <testcase classname="MacPlatformTests" name="ownerRejectKeepsTheTrustedRecordWithoutKeychainIO()" time="0.005557708" />
+    <testcase classname="MacPlatformTests" name="changeWarningIsRedactedInEveryRenderingButItsDisplayFields()" time="0.00549575" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeEvaluationTable()" time="0.00540125" />
+    <testcase classname="MacPlatformTests" name="repairIsIdempotentOnceThePresentedFingerprintIsStored()" time="0.005951" />
+    <testcase classname="MacPlatformTests" name="onlyTheTierHRegionNamesTheProductionSeamForTheChangeProbe()" time="0.018675417" />
+    <testcase classname="MacPlatformTests" name="malformedStoredFingerprintRejectsWithoutAWarningOrAWrite(length:)" time="0.005470334" />
+    <testcase classname="MacPlatformTests" name="repairCancelledDuringInsertionReportsCancellationNotSuccess()" time="0.005200334" />
+    <testcase classname="MacPlatformTests" name="changeWarningRefusesIdenticalFingerprints()" time="0.003865416" />
+    <testcase classname="MacPlatformTests" name="repairSucceedsOnlyWhenTheFinalReadAllowsThePresentedFingerprint()" time="0.006438458" />
+    <testcase classname="MacPlatformTests" name="repairInsertFailureAfterRemovalLeavesNoRecordAndNeverRestores(status:)" time="0.005877833" />
+    <testcase classname="MacPlatformTests" name="repairRemovalFailureNeverInsertsAndKeepsTheTrustedRecord(status:)" time="0.005369792" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeFailuresCarryNoDeviceOrFingerprintPayload()" time="0.00894525" />
+    <testcase classname="MacPlatformTests" name="repairCancelledBeforeStartPerformsNoKeychainIO()" time="0.0058105" />
+    <testcase classname="MacPlatformTests" name="repairReplacesTheRecordInAFixedOrderAndVerifiesBeforeAllowing()" time="0.006045584" />
+    <testcase classname="MacPlatformTests" name="repairCancelledAfterTheCheckLeavesTheTrustedRecord()" time="0.006027292" />
+    <testcase classname="MacPlatformTests" name="repairFailsClosedWhenItsDuplicateVanishesBeforeItIsRead()" time="0.005132417" />
+    <testcase classname="MacPlatformTests" name="repairGapBetweenRemovalAndInsertionNeverAllowsEitherFingerprint()" time="0.006235833" />
+    <testcase classname="MacPlatformTests" name="repairOnlyEverAddressesTheWarningsDevice()" time="0.00618525" />
+    <testcase classname="MacPlatformTests" name="everySingleBitChangeOfThePresentedFingerprintCarriesAWarning()" time="0.013866708" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeFlowRunsKeychainCallsOffTheCallersMainActor()" time="0.006034666" />
+    <testcase classname="MacPlatformTests" name="fingerprintChangeInputsAreNotMutatedAndSlicesAreCopiedByContent()" time="0.00579475" />
+  </testsuite>
+</testsuites>
