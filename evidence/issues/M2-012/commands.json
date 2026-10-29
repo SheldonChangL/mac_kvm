@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "issue": "M2-012",
+  "branch": "codex/m2-mac-server-mvp",
+  "testedTreeParentCommit": "6fb5caac6c377be765a8671966e905f72b412f8f",
+  "note": "Run by the implementing agent (Claude Opus 5.5) on the uncommitted slice tree whose parent is testedTreeParentCommit; reviewer must rerun.",
+  "status": "author_run_pending_independent_review",
+  "commands": [
+    {
+      "command": "swift test --filter LeaveRemoteFlow",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:53:54+00:00",
+      "endedAt": "2026-10-27T08:54:00+00:00",
+      "summary": [
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "✔ Test run with 3 tests in 1 suite passed after 0.001 seconds."
+      ]
+    },
+    {
+      "command": "make code-quality-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:54:00+00:00",
+      "endedAt": "2026-10-27T08:54:07+00:00",
+      "summary": [
+        "[swift-format-lint] exit=0 stdoutLines=0 stdoutSha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 stderrLines=0 stderrSha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "[swift-test-warnings-as-errors] exit=0 stdoutLines=288 stdoutSha256=e487c02d323fb3ec544d04e3ddb429aaf00cc6c3015c89f002bd53c81f1a0ff9 stderrLines=95 stderrSha256=fd5f6e1ad0c963424efbea8dcc2e479b287c62a6e5426e234e23ac294aeca601"
+      ]
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:54:07+00:00",
+      "endedAt": "2026-10-27T08:54:07+00:00",
+      "summary": [
+        "architecture check OK"
+      ]
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:54:07+00:00",
+      "endedAt": "2026-10-27T08:54:07+00:00",
+      "summary": [
+        "docs check OK"
+      ]
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:54:07+00:00",
+      "endedAt": "2026-10-27T08:54:07+00:00",
+      "summary": [
+        "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
+      ]
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build -quiet",
+      "exitCode": 0,
+      "startedAt": "2026-10-27T08:54:07+00:00",
+      "endedAt": "2026-10-27T08:54:10+00:00",
+      "summary": []
+    }
+  ]
+}

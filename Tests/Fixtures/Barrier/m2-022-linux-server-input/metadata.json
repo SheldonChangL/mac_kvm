@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "m2-022-linux-server-input",
+  "protocol": "barrier",
+  "provenance": {
+    "sourceKind": "black-box-capture",
+    "reference": "Controlled black-box observation per Tests/SystemTests/Plans/M2-022-barrier-server-fixtures.md on the owner-approved Ubuntu 22.04 x86_64 host: external Barrier server barriers 2.4.0-release protocol 1.6 and external Barrier client barrierc 2.4.0-release protocol 1.6, each on its own virtual X display, through a byte-logging loopback relay. Input was synthetic (xdotool on the server display). TLS disabled for this observation only; product TLS default stays enabled. Server is the Linux Barrier server, not a macOS one; Windows not executed (M2 validation is Linux-only by owner decision, 2026-10-28). Session: handshake, enter, pointer moves, buttons 1-5, drag, wheel in four directions, a key sweep with modifiers and auto-repeat, leave, second enter and leave, and idle keepalive."
+  },
+  "payload": {
+    "path": "server-input-capture.json",
+    "sha256": "506535a774f257dc8f004105c8d6333e2da4727aef9c6f4073533cb5e81dcb9b",
+    "byteLength": 73941
+  },
+  "sanitization": {
+    "status": "sanitized",
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "ip-address"
+    ]
+  }
+}

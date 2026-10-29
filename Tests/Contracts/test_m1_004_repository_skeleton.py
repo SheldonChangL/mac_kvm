@@ -45,14 +45,17 @@ class M1004RepositorySkeletonTests(unittest.TestCase):
         self.assertEqual(result.returncode, 64)
         self.assertIn("usage:", result.stderr)
 
-    def test_application_shell_has_no_feature_or_dependency(self):
-        source = APP_SHELL.read_text()
-
-        self.assertEqual(
-            source,
-            "@main\nstruct MacKVMApplication {\n  static func main() {}\n}\n",
-        )
-        self.assertNotIn("import ", source)
+    def test_application_shell_composes_without_sockets_or_wire_codes(self):
+        # M1-004 shipped a zero-behavior shell. The M2-035 composition root (plan
+        # precondition P6) now lives here, as ADR M1-002 allows: the shell may
+        # construct Core, protocol sessions and platform backends, while sockets
+        # and wire codes stay in their own modules.
+        self.assertIn("@main\nstruct MacKVMApplication {", APP_SHELL.read_text())
+        for path in sorted(APP_SHELL.parent.glob("*.swift")):
+            source = path.read_text()
+            self.assertNotIn("import Network", source, path.name)
+            for token in ("NWListener", "NWConnection", "CINN", "COUT", "DKDN", "DMMV"):
+                self.assertNotIn(token, source, f"{path.name} contains {token}")
 
 
 if __name__ == "__main__":

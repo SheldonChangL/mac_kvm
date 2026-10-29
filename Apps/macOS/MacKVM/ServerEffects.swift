@@ -1,0 +1,256 @@
+import CoreGraphics
+import Foundation
+import KVMContracts
+import KVMCore
+import MacPlatform
+
+/// Status lines are written on their own queue, so a slow standard output can
+/// never stall the event tap callback or a caller holding a lock.
+private let reportQueue = DispatchQueue(label: "MacKVM.report")
+
+/// One status line on standard output. Callers never pass typed text, key
+/// identities, screen names, addresses, ports or key material (ADR M2-001).
+func report(_ message: String) {
+  let stamp = Date().formatted(.iso8601.time(includingFractionalSeconds: true))
+  reportQueue.async {
+    print("[\(stamp)] \(message)")
+    fflush(stdout)
+  }
+}
+
+/// Waits until every queued status line is written.
+func flushReports() {
+  reportQueue.sync {}
+}
+
+/// Monotonic time for edge dwell, independent of event timestamps.
+func uptime() -> Duration {
+  .nanoseconds(Int64(clamping: clock_gettime_nsec_np(CLOCK_UPTIME_RAW)))
+}
+
+/// The single client the M2 server serves, and its ordered outbox.
+final class ClientSlot: @unchecked Sendable {
+  private struct Client {
+    let screen: ScreenID
+    let session: ServerSession
+    let outbox: CaptureQueue
+  }
+
+  private let lock = NSLock()
+  private var client: Client?
+
+  /// Claims the slot; `false` when another client holds it.
+  func claim(screen: ScreenID, session: ServerSession, outbox: CaptureQueue) -> Bool {
+    lock.withLock {
+      guard client == nil else { return false }
+      client = Client(screen: screen, session: session, outbox: outbox)
+      return true
+    }
+  }
+
+  func release(_ screen: ScreenID) {
+    lock.withLock { if client?.screen == screen { client = nil } }
+  }
+
+  func outbox(for screen: ScreenID) -> CaptureQueue? {
+    lock.withLock { client?.screen == screen ? client?.outbox : nil }
+  }
+
+  var session: ServerSession? { lock.withLock { client?.session } }
+  var outbox: CaptureQueue? { lock.withLock { client?.outbox } }
+}
+
+/// Whether the next fail-safe recovery must put the cursor back, and where.
+/// The return point sits inside the linked edge, so a recovered cursor does
+/// not rest on the edge and re-enter the client on the next sample.
+final class RecoveryCursorFlag: @unchecked Sendable {
+  private let lock = NSLock()
+  private var restore = false
+  private var point: CGPoint?
+
+  func set(restore: Bool, preferred: CGPoint?) {
+    lock.withLock {
+      self.restore = restore
+      point = preferred
+    }
+  }
+  var target: (restore: Bool, preferred: CGPoint?) { lock.withLock { (restore, point) } }
+}
+
+/// The local half of the fail-safe (ServerFailSafe).
+///
+/// Local key and button releases need no synthetic events: a release whose
+/// down went to the local system is always given back to it
+/// (`ServerCoordinator.handleSuppressed`), so no local key or button is left
+/// held by suppression. The coordinator clears its own transient state.
+struct LocalInputSafety: ServerLocalInputSafety {
+  let suppressor: LocalEventSuppressor?
+  let cursor: CursorRestorer?
+  let flag: RecoveryCursorFlag
+
+  func stopSuppression() throws(CoreError) { suppressor?.disableSuppression() }
+  func releaseAllKeys() throws(CoreError) {}
+  func releaseAllMouseButtons() throws(CoreError) {}
+  /// Window-server calls run on the main queue, the event tap's thread, so a
+  /// caller holding the coordinator lock never waits on the window server
+  /// while the tap callback waits on that lock. A failure is reported there.
+  func restoreLocalCursor() throws(CoreError) {
+    let target = flag.target
+    guard target.restore, let cursor else { return }
+    DispatchQueue.main.async {
+      if case .failed = cursor.restore(preferred: target.preferred) {
+        report("cursor restore failed")
+      }
+    }
+  }
+  func clearTransientState() throws(CoreError) {}
+}
+
+/// Executes the coordinator's effects on this Mac. Called with the coordinator
+/// lock held, so nothing here waits or calls back into the coordinator; cursor
+/// and window-server work is queued on the main queue in effect order.
+///
+/// While input is remote the cursor is hidden and left alone. The event tap
+/// sits at the HID level, so swallowed motion never reaches the window server:
+/// the logical cursor stays where input left (no hot corner or Dock reacts),
+/// and no warp is needed, since every warp would hold back hardware motion for
+/// a moment. The cursor image still follows the hand, which is why it is
+/// hidden (owner run, 2026-10-29).
+final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
+  /// Local points the return point keeps away from the linked edge.
+  static let returnInset: Double = 4
+  static let enterTimeout = Duration.seconds(1)
+
+  private let desktop: CGRect
+  private let edge: ScreenEdge
+  private let suppressor: LocalEventSuppressor?
+  private let cursor: CursorRestorer?
+  private let failSafe: ServerFailSafe
+  private let recoveryFlag: RecoveryCursorFlag
+  private let clients: ClientSlot
+  private let lock = NSLock()
+  /// Where a forced recovery puts the cursor: where input left, moved inside
+  /// the linked edge.
+  private var returnPoint: CGPoint?
+  /// Whether this server hid the cursor (main queue only).
+  private var cursorHidden = false
+  private var timeouts: [ScreenID: Task<Void, Never>] = [:]
+  private var onEnterTimeout: (@Sendable (ScreenID) -> Void)?
+
+  /// `suppressor` and `cursor` are `nil` when the run must not touch local
+  /// input (the DEBUG smoke driver).
+  init(
+    desktop: CGRect, edge: ScreenEdge, suppressor: LocalEventSuppressor?, cursor: CursorRestorer?,
+    clients: ClientSlot
+  ) {
+    self.desktop = desktop
+    self.edge = edge
+    self.suppressor = suppressor
+    self.cursor = cursor
+    self.clients = clients
+    recoveryFlag = RecoveryCursorFlag()
+    failSafe = ServerFailSafe(
+      local: LocalInputSafety(suppressor: suppressor, cursor: cursor, flag: recoveryFlag))
+  }
+
+  /// Wires the enter timeout back to the coordinator once it exists.
+  func onEnterTimeout(_ handler: @escaping @Sendable (ScreenID) -> Void) {
+    lock.withLock { onEnterTimeout = handler }
+  }
+
+  /// Shows the cursor again if this server hid it. Main queue only.
+  func showCursor() {
+    if cursorHidden, MacDesktop.hideCursor(false) { cursorHidden = false }
+  }
+
+  // MARK: ServerCoordinatorEffects
+
+  func saveLocalCursor() {
+    guard let cursor else { return }
+    DispatchQueue.main.async { [self] in
+      cursor.saveCurrent()
+      let location = MacDesktop.cursorLocation()
+      lock.withLock { returnPoint = location.map(inside) }
+    }
+  }
+
+  func enableSuppression() {
+    if cursor != nil {
+      DispatchQueue.main.async { [self] in
+        if !cursorHidden { cursorHidden = MacDesktop.hideCursor(true) }
+      }
+    }
+    suppressor?.enableSuppression()
+    report("input is now remote")
+  }
+
+  func disableSuppression() {
+    suppressor?.disableSuppression()
+  }
+
+  func restoreLocalCursor(at position: NormalizedPoint) {
+    lock.withLock { returnPoint = nil }
+    report("input is local again")
+    guard let cursor else { return }
+    let point = CGPoint(
+      x: desktop.minX + position.x * (desktop.width - 1),
+      y: desktop.minY + position.y * (desktop.height - 1))
+    DispatchQueue.main.async { [self] in
+      if case .failed = cursor.restore(preferred: point) {
+        report("cursor restore failed")
+      }
+      showCursor()
+    }
+  }
+
+  func recoverLocal(cursorWasParked: Bool) {
+    let point = lock.withLock {
+      defer { returnPoint = nil }
+      return returnPoint
+    }
+    recoveryFlag.set(restore: cursorWasParked && cursor != nil, preferred: point)
+    let disposition = failSafe.recoverLocal()
+    if cursor != nil { DispatchQueue.main.async { [self] in showCursor() } }
+    report("local recovery: \(disposition)")
+  }
+
+  func deliver(_ event: KVMEvent, to screen: ScreenID) -> Bool {
+    guard let outbox = clients.outbox(for: screen) else { return false }
+    switch outbox.enqueue(event) {
+    case .enqueued, .coalesced, .droppedMove:
+      return true
+    case .overflow:
+      // Drop the backlog so the releases and the leave of the fail-open that
+      // follows can still be queued.
+      outbox.reset()
+      return false
+    case .closed:
+      return false
+    }
+  }
+
+  func startEnterTimeout(for screen: ScreenID) {
+    let handler = lock.withLock { onEnterTimeout }
+    let task = Task {
+      try? await Task.sleep(for: Self.enterTimeout)
+      if !Task.isCancelled { handler?(screen) }
+    }
+    let previous = lock.withLock { timeouts.updateValue(task, forKey: screen) }
+    previous?.cancel()
+  }
+
+  func cancelEnterTimeout(for screen: ScreenID) {
+    lock.withLock { timeouts.removeValue(forKey: screen) }?.cancel()
+  }
+
+  /// `location` moved `returnInset` away from the linked edge.
+  private func inside(_ location: CGPoint) -> CGPoint {
+    let inset = Self.returnInset
+    switch edge {
+    case .right: return CGPoint(x: min(location.x, desktop.maxX - 1 - inset), y: location.y)
+    case .left: return CGPoint(x: max(location.x, desktop.minX + inset), y: location.y)
+    case .bottom: return CGPoint(x: location.x, y: min(location.y, desktop.maxY - 1 - inset))
+    case .top: return CGPoint(x: location.x, y: max(location.y, desktop.minY + inset))
+    }
+  }
+}
