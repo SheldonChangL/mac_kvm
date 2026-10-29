@@ -123,6 +123,14 @@ struct BarrierServerInputEncoder: Sendable {
     0x29, 0x21, 0x40, 0x23, 0x24, 0x25, 0x5E, 0x26, 0x2A, 0x28,
   ]
   private static let functionButtons: [UInt16] = [67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 95, 96]
+  /// Punctuation in `PunctuationKey` order (catalog v2): the produced character
+  /// without and with Shift on the US ANSI layout, and the captured button
+  /// (M2-022 punctuation and clipboard addendum).
+  private static let punctuation: [(plain: UInt16, shifted: UInt16, button: UInt16)] = [
+    (0x2D, 0x5F, 20), (0x3D, 0x2B, 21), (0x5B, 0x7B, 34), (0x5D, 0x7D, 35), (0x5C, 0x7C, 51),
+    (0x3B, 0x3A, 47), (0x27, 0x22, 48), (0x60, 0x7E, 49), (0x2C, 0x3C, 59), (0x2E, 0x3E, 60),
+    (0x2F, 0x3F, 61),
+  ]
 
   private static func entry(for key: VirtualKey) -> KeyEntry? {
     switch key {
@@ -162,6 +170,10 @@ struct BarrierServerInputEncoder: Sendable {
     case .option: return modifier(0xEFE9, 64, bit: 0x0004)
     case .command: return modifier(0xEFEB, 133, bit: 0x0010)
     case .capsLock: return plain(0xEFE5, 66)
+    case .punctuation(let key):
+      let entry = punctuation[Int(key.rawValue)]
+      return KeyEntry(
+        identifier: entry.plain, shifted: entry.shifted, button: entry.button, modifierBit: 0)
     case .unknown: return nil
     }
   }

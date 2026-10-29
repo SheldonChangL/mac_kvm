@@ -134,7 +134,12 @@
         "backspace": .backspace, "delete": .delete, "left": .left, "right": .right, "up": .up,
         "down": .down, "home": .home, "end": .end, "pageup": .pageUp, "pagedown": .pageDown,
         "shift": .shift, "control": .control, "option": .option, "command": .command,
-        "capslock": .capsLock,
+        "capslock": .capsLock, "minus": .punctuation(.minus), "equal": .punctuation(.equal),
+        "bracketleft": .punctuation(.leftBracket), "bracketright": .punctuation(.rightBracket),
+        "backslash": .punctuation(.backslash), "semicolon": .punctuation(.semicolon),
+        "apostrophe": .punctuation(.quote), "grave": .punctuation(.grave),
+        "comma": .punctuation(.comma), "period": .punctuation(.period),
+        "slash": .punctuation(.slash),
       ]
       return named[name]
     }

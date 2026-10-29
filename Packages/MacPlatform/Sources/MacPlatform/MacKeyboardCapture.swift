@@ -93,6 +93,7 @@ package enum MacKeyboardCapture {
       .pageUp, .pageDown, .shift, .control, .option, .command, .capsLock, .volumeUp, .volumeDown,
       .mute,
     ]
+    members += PunctuationKey.allCases.map { .punctuation($0) }
     var table = rightSideModifiers
     for member in members {
       if case .success(let code) = MacKeyCodeMapper.keyCode(for: member) {

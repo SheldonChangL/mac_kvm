@@ -7,8 +7,11 @@
 macOS code is rejected explicitly with a closed, typed reason.
 
 The mapper covers **C-005 VirtualKey catalog v1** exactly as frozen by
-[`M1-042-virtual-key-catalog.md`](../adr/M1-042-virtual-key-catalog.md).
-`MacKeyCodeMapper.catalogVersion` is `1`.
+[`M1-042-virtual-key-catalog.md`](../adr/M1-042-virtual-key-catalog.md), plus
+the catalog v2 punctuation members, so `MacKeyCodeMapper.catalogVersion` is `2`.
+Each `punctuation` key maps to its `kVK_ANSI_*` constant (Minus `0x1B`, Equal
+`0x18`, LeftBracket `0x21`, RightBracket `0x1E`, Backslash `0x2A`, Semicolon
+`0x29`, Quote `0x27`, Grave `0x32`, Comma `0x2B`, Period `0x2F`, Slash `0x2C`).
 
 No public or package contract is added. `MacKeyCodeMapper` and
 `MacKeyCodeMappingFailure` are `internal`, so `CGKeyCode` never reaches the

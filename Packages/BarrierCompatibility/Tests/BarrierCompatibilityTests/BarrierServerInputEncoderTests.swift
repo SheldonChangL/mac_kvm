@@ -18,10 +18,11 @@ private func repositoryRoot() -> URL {
     .deletingLastPathComponent()
 }
 
-/// Every complete server-to-client frame of the M2-022 server-input capture.
-private func capturedServerFrames() throws -> Set<[UInt8]> {
-  let url = repositoryRoot().appendingPathComponent(
-    "Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json")
+/// Every complete server-to-client frame of an M2-022 capture fixture.
+private func capturedServerFrames(
+  _ fixture: String = "m2-022-linux-server-input/server-input-capture.json"
+) throws -> Set<[UInt8]> {
+  let url = repositoryRoot().appendingPathComponent("Tests/Fixtures/Barrier/\(fixture)")
   let json = try #require(
     try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
   let observations = try #require(json["observations"] as? [[String: Any]])
@@ -176,6 +177,26 @@ struct BarrierServerKeyboardEncoderTests {
     let repeated = try encoder().key(.letter(0), phase: .repeatKey, modifiers: none)
     expectCaptured(repeated, in: captured)
     #expect(repeated.first?[4...7] == Array("DKRP".utf8)[...])
+  }
+
+  @Test("punctuation keys, plain and shifted, equal the captured frames (catalog v2)")
+  func punctuation() throws {
+    let captured = try capturedServerFrames(
+      "m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json")
+    for key in PunctuationKey.allCases {
+      let virtualKey = VirtualKey.punctuation(key)
+      #expect(BarrierServerInputEncoder.canEncode(virtualKey), "\(key)")
+      let down = try encoder().key(virtualKey, phase: .down, modifiers: none)
+      let up = try encoder().key(virtualKey, phase: .up, modifiers: none)
+      let shiftedDown = try encoder().key(virtualKey, phase: .down, modifiers: shift)
+      expectCaptured(down + up + shiftedDown, in: captured, "\(key)")
+    }
+    let underscore = try encoder().key(.punctuation(.minus), phase: .down, modifiers: shift)
+    #expect(
+      underscore == [[0, 0, 0, 10] + Array("DKDN".utf8) + [0x00, 0x5F, 0x00, 0x01, 0x00, 20]])
+    // Caps Lock does not shift punctuation; the mask still reports it.
+    let capsMinus = try encoder().key(.punctuation(.minus), phase: .down, modifiers: caps)
+    #expect(capsMinus.first?[8...11] == [0x00, 0x2D, 0x10, 0x00])
   }
 
   @Test("keys without an evidence-backed identifier are rejected and never encoded")

@@ -4,7 +4,8 @@
 
 Accepted. This ADR freezes the C-005 `VirtualKey` catalog version 1 and the
 unknown-key policy because all signoffs listed under "Signoff record" are
-recorded.
+recorded. Catalog version 2 (additive, Product Owner approval 2026-10-29) is
+recorded under "Catalog v2".
 
 ## Binding sources
 
@@ -145,6 +146,28 @@ previous), brightness and IME/language keys, are represented as
 - The synthesized Swift `Codable` form of `VirtualKey` is not a wire format.
   Any persisted or Native Protocol representation of `VirtualKey` must carry
   the catalog version; its encoding is owned by M3-004.
+
+### Catalog v2
+
+- Approval: the Product Owner approved adding punctuation on 2026-10-29
+  ("剪貼簿跟標點符號都做"). This is an additive change under "Catalog
+  versioning", so the version becomes `2`.
+- New member: `punctuation(PunctuationKey)`. `PunctuationKey` names the eleven
+  US ANSI punctuation key positions in a fixed order, raw values `0...10`:
+  `minus`, `equal`, `leftBracket`, `rightBracket`, `backslash`, `semicolon`,
+  `quote`, `grave`, `comma`, `period`, `slash`. Like letters, each value is a
+  key position on the US ANSI reference layout, not a produced character.
+- Evidence: the macOS key codes are the SDK `kVK_ANSI_*` constants. The Barrier
+  server identifiers and buttons, plain and shifted, come from the M2-022
+  punctuation and clipboard capture
+  (`evidence/e2e/M2-022/punctuation-clipboard.md`).
+- Exhaustive mappers updated in the same change set:
+  - `MacKeyCodeMapper` (catalog version 2);
+  - the `MacKeyboardCapture` inverse table;
+  - `BarrierServerInputEncoder`.
+- Not covered: the Barrier client-role inbound mapping (M1-043) still turns
+  punctuation identifiers into `unknown`. That needs its own evidence-backed
+  change.
 
 ## Selected versus rejected alternatives
 
