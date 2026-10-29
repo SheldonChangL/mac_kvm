@@ -32,7 +32,7 @@ acceptance or a backlog Issue.
   handshake timeout, identity rejection, idempotent disconnect. Five repeated
   runs passed.
 - `Tests/Integration/M2ServerControlPathIntegrationTests` (1): reducer edge
-  activation → `ServerSession.enter` → `CINN` bytes; an unsupported mouse move
+  activation → `ServerSession.enter` → `CINN` bytes; an unencodable key
   fails closed, the session closes, the reducer returns to `local` with
   suppression disabled first, and `ServerFailSafe.recoverAll` restores local
   input before closing sessions.
