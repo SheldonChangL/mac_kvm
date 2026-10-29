@@ -81,7 +81,7 @@ issue's Exact Files are hard limits; the session may unify them later.
 The client session, which does not exist yet, is expected to route payloads by
 their 4-byte token before it offers anything to `BarrierControlDecoder`, which
 fails closed on every token it does not know, `DMWM` included. Per the ADR's
-"Rejection semantics", a drop is counted and the session continues, and a thrown
+"Rejection semantics", a drop emits a diagnostic and the session continues, and a thrown
 error is a protocol violation that ends the session. The decoder neither logs
 nor disconnects.
 
@@ -257,12 +257,13 @@ or clean up; cancellation tests do not apply. Idempotency is covered instead by
 
 ## Limitations
 
-- Multi-notch magnitudes and the remainder rule are first-party conventions,
-  validated only for the vertical axis by M2-035. No fixture holds a body other
-  than one notch.
+- Multi-notch magnitudes and the remainder rule are first-party conventions.
+  M2-035 validated only the server's vertical multi-notch frame against a real
+  `barrierc`; no run has validated this decoder's remainder rule. No fixture
+  holds a body other than one notch.
 - The decoder drops the remainder of each frame and keeps no state across
   frames, so a peer that sends wheel steps below 120 units would produce only
-  drop counts. The first-party server never sends them.
+  drop diagnostics. The first-party server never sends them.
 - At most 273 notches per axis per frame (above).
 - The token, error, diagnostic and outcome types, and the test helpers, are
   per-file copies of a template shared by the client-direction decoders.
