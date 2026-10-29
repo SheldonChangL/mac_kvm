@@ -124,9 +124,10 @@ What each column rests on:
   frames byte for byte (`BarrierServerPointerEncoderTests`, `buttons`), and
   `everyMouseButtonAndPhaseRoundTripsThroughTheServerEncoder` runs this decoder
   against the encoder for all four buttons and both phases.
-- The M2-035 smoke, first-party server to a real `barrierc`, sent left, right and
-  middle, and the real client produced X raw buttons 1, 3 and 2. That smoke did not
-  send the auxiliary button.
+- Smoke evidence, not a contract claim: the M2-035 automated smoke
+  (`evidence/issues/M2-035/automated-smoke/README.md` and `x-events.txt`), first-party
+  server to a real `barrierc`, sent left, right and middle, and the real client
+  produced X raw buttons 1, 3 and 2. That smoke did not send the auxiliary button.
 
 **Raw-value warning.** `MouseButton`'s raw values are left 1, right 2, middle 3,
 auxiliary 4. They are not the wire values. `MouseButton(rawValue:)` applied to a
@@ -137,7 +138,7 @@ the table.
 
 ## Button 5
 
-Wire value 5 is inside the contract's 1 to 5, but `MouseButton` has four cases, so
+**Decoder policy (first-party, not a capture claim).** Wire value 5 is inside the contract's 1 to 5, but `MouseButton` has four cases, so
 no `KVMEvent` can carry it. Both `DMDN` 5 and `DMUP` 5 are dropped with
 `unrepresentableButton`.
 
@@ -165,7 +166,8 @@ depends only on its own bytes.
   invariant for all 256 values. The guarantee is for pairs with equal values, the
   only pairs the contract observed; see "Limitations" for a pair whose values
   differ.
-- A `DMUP` of a representable button is emitted even when no `DMDN` preceded it.
+- Decoder policy (first-party, not a capture claim): a `DMUP` of a representable
+  button is emitted even when no `DMDN` preceded it.
   A release is never dropped for lack of a press
   (`releaseWithoutAPressIsStillEmitted`). What an unpaired release means is the
   decision of the client's pressed-input ledger (M1-063-FOLLOWUP-001), not of the
@@ -215,7 +217,8 @@ depends only on its own bytes.
 - No Barrier meaning is claimed for the button numbers beyond the contract's
   observed table. The `MouseButton` names are the first-party encoder's.
 - Wire 4 was captured (the driver's X button 8), but the first-party server's
-  auxiliary button was not exercised against a real `barrierc` in the M2-035 smoke.
+  auxiliary button was not exercised against a real `barrierc` in the M2-035 smoke
+  (`evidence/issues/M2-035/automated-smoke/x-events.txt`).
 - Nothing is claimed about the wire values 0 and 6 to 255 except that they are
   dropped.
 - No click count, pointer position, modifier or other input is decoded here.

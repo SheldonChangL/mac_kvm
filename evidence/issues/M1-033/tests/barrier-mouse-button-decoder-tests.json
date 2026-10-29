@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-033",
+  "framework": "swift-testing",
+  "author": "Claude Code (implementation: --model sonnet; evidence finishing pass: --model opus)",
+  "baseCommit": "76f4045415d298612384a4348c4046e7ff0b88d7",
+  "date": "2026-10-29",
+  "toolchain": {
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6",
+    "os": "macOS 26.6.2 arm64"
+  },
+  "testFirstOutcome": "red-then-green",
+  "testFirstNote": "BarrierMouseButtonDecoderTests.swift was written first and run against a compiling stub: \"Test run with 20 tests in 1 suite failed after 1.791 seconds with 51 issues\"; 16 of 20 failed, and the 4 that passed do not need the decoder. The implementation then made the focused run pass (20 tests).",
+  "rawReport": "evidence/issues/M1-033/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Written by `swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-033/tests/swift-testing-xunit.xml` at 6737177; Swift Testing names the file with the -swift-testing suffix. It records 267 tests, 0 failures.",
+  "tests": [
+    {
+      "name": "dropDiagnosticsAndErrorsCarryOnlyAllowlistedMetadata",
+      "status": "passed"
+    },
+    {
+      "name": "wireValuesOutsideOneToFiveAreDroppedForDownAndUp",
+      "status": "passed"
+    },
+    {
+      "name": "wireValuesFollowTheEncodersTableNotMouseButtonRawValues",
+      "status": "passed"
+    },
+    {
+      "name": "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "status": "passed"
+    },
+    {
+      "name": "heldButtonSpansPointerMovesInTheFixtureStream",
+      "status": "passed"
+    },
+    {
+      "name": "outcomeEventsAreAlwaysMouseButton",
+      "status": "passed"
+    },
+    {
+      "name": "unknownAndShortTokensFailClosedWithOnlyAByteCount",
+      "status": "passed"
+    },
+    {
+      "name": "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "status": "passed"
+    },
+    {
+      "name": "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "status": "passed"
+    },
+    {
+      "name": "clientToServerDirectionFailsClosedBeforeTheBody",
+      "status": "passed"
+    },
+    {
+      "name": "aPressAndItsReleaseAreEmittedOrDroppedTogetherForEveryValue",
+      "status": "passed"
+    },
+    {
+      "name": "tokenBytesAreTheFrozenAsciiTokensAndPhases",
+      "status": "passed"
+    },
+    {
+      "name": "releaseWithoutAPressIsStillEmitted",
+      "status": "passed"
+    },
+    {
+      "name": "decoderIsStatelessAndDeterministic",
+      "status": "passed"
+    },
+    {
+      "name": "bodyMustBeExactlyOneByte",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceImportsOnlyKVMContracts",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceDeclaresNothingPublic",
+      "status": "passed"
+    },
+    {
+      "name": "wireValueFiveIsDroppedAsUnrepresentableForDownAndUp",
+      "status": "passed"
+    },
+    {
+      "name": "goldenButtonFramesEqualTheBarrierEvid0006FixtureBytesExactly",
+      "status": "passed"
+    },
+    {
+      "name": "everyMouseButtonAndPhaseRoundTripsThroughTheServerEncoder",
+      "status": "passed"
+    }
+  ],
+  "testsStatusNote": "Per-test status for the 20 M1-033 tests is read from the raw xUnit file; the full package passed (267 tests in 9 suites).",
+  "mutationRuns": {
+    "runner": "evidence/issues/M1-033/mutations/run-mutations.py",
+    "results": "evidence/issues/M1-033/mutations/mutations.json",
+    "note": "A baseline run (M0, exit 0) and 13 mutants (R1-R4c required, X1-X7 extra); each mutant exited 1 with at least one named test failing, and the source was restored from the backup after each."
+  }
+}
