@@ -3,8 +3,9 @@
 ## Outcome
 
 `KVMCore` now has `EmergencyEscape`, the pure detector for the fixed gesture
-proposed in M2-001: **Control + Option + Command + Delete (Backspace)**.
-Declarations are `package`.
+proposed in M2-001: **Control + Option + Command + Delete (Backspace)**, and,
+since the M2-035 owner run, the same modifiers with **Return**. Declarations are
+`package`.
 
 | Call | Result |
 | --- | --- |
@@ -28,8 +29,15 @@ chord never forwarded.
 
 ## Known limitations
 
-Real-hardware verification that macOS delivers this chord to the event tap is
-pending (manual E2E plan).
+Hardware check (M2-035 owner run, macOS 26.6.2, Apple keyboard, 2026-10-28/29):
+
+- With Control, Option and Command held, the system never delivers the Delete
+  key down to an event tap. A session-level tap sees neither phase; the
+  HID-level tap the server now uses sees only the release, which still
+  triggers the escape because the server escapes on every phase of the chord
+  key.
+- Return with the same modifiers arrives in both phases, so it is accepted as
+  the second chord key and is the gesture the server announces.
 
 ## Rollback
 

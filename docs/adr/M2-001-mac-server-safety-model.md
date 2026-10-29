@@ -69,7 +69,10 @@ rule; the filter does not inspect key identity or text.
 - The fixed, documented escape gesture is the chord
   Control + Option + Command + Delete (Backspace) pressed while any input state
   is active. It is detected in the capture callback before suppression is
-  applied.
+  applied. Amendment from the M2-035 owner run (2026-10-29): macOS withholds the
+  Delete key down with these modifiers from event taps, so Return with the same
+  modifiers is accepted as well and is the announced gesture; every phase of
+  the chord key escapes (see `docs/components/M2-014-emergency-escape.md`).
 - Escape restores `local` without waiting for any remote acknowledgement,
   network operation, UI response or other thread.
 - Fail open: when the system disables the tap, permission is revoked, the
