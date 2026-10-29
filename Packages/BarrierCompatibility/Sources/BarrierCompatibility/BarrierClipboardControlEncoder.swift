@@ -1,9 +1,10 @@
 // Server-role control and clipboard encoder for the Barrier protocol adapter (M2-028).
 // Token-only COUT and CALV come from the accepted BARRIER-EVID-0005 contract. CINN
 // follows the M2-022 server-role capture (evidence/e2e/M2-022/README.md): a client
-// can be entered any number of times, the sequence advances on every enter and every
-// leave (1, then 3 after one leave), and the mask is 0 because lock state is not
-// synchronized. Clipboard text is sent as the M2-022 punctuation and clipboard
+// can be entered any number of times; the observed sequences were 1, then 3 for the
+// enter after one leave, which the encoder reproduces by advancing on every enter and
+// every leave (the rule itself is not established); and the mask is 0 because lock
+// state is not synchronized. Clipboard text is sent as the M2-022 punctuation and clipboard
 // addendum captured it: clipboard 0, sequence 0 (evidence/e2e/M2-022/punctuation-clipboard.md).
 
 import KVMContracts

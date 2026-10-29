@@ -57,7 +57,7 @@ def describe(payload):
                 f"seq={int.from_bytes(body[4:8], 'big')} mask=0x{u16(body[8:10]):04X}")
     if code == "DINF" and n == 14:
         v = [s16(body[i : i + 2]) for i in range(0, 14, 2)]
-        return f"{code} x={v[0]} y={v[1]} w={v[2]} h={v[3]} warp={v[4]} mx={v[5]} my={v[6]}"
+        return f"{code} x={v[0]} y={v[1]} w={v[2]} h={v[3]} f5={v[4]} mx={v[5]} my={v[6]}"
     if code == "DCLP":
         return f"{code} len={n} head={body[:12].hex()}"
     return f"{code} len={n} body={body[:24].hex()}"

@@ -399,7 +399,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
 
   /// Feeds a client `DCLP` frame for clipboard 0 to the assembler (lock
   /// held) and returns the clipboard event a completed transfer carries; a
-  /// broken transfer is dropped. Clipboard 1, the primary selection, is not
+  /// broken transfer is dropped. Clipboard 1 is not
   /// shared, so its frames are ignored unparsed. `CCLP` (ownership) needs no
   /// action: the data follows.
   private func receiveClipboard(_ payload: [UInt8]) -> KVMEvent? {

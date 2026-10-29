@@ -29,7 +29,8 @@ sharing on 2026-10-29 ("剪貼簿跟標點符號都做").
   `clipboard-large-from-client` and `clipboard-on-reconnect`.
 - Found after the owner run (author's own check before merge): the session's
   4 KiB inbound frame limit ended the session on any client copy over about
-  1.6 KB, because Barrier sends 32 KiB chunks (measured, M2-022 addendum).
+  1.6 KB, because Barrier sends 32 KiB chunks (measured, M2-022 addendum;
+  `evidence/e2e/M2-022/chunks.json`).
   RED: `largeClipboardReceives` and `oversizedClipboardDropped` failed with
   `protocolViolation(malformed)`, and the smoke with the old limit failed
   `clipboard-large-from-client` and `client-loss`. Fixed in `482472c`.

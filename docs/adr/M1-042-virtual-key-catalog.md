@@ -160,7 +160,8 @@ previous), brightness and IME/language keys, are represented as
 - Evidence: the macOS key codes are the SDK `kVK_ANSI_*` constants. The Barrier
   server identifiers and buttons, plain and shifted, come from the M2-022
   punctuation and clipboard capture
-  (`evidence/e2e/M2-022/punctuation-clipboard.md`).
+  (`evidence/e2e/M2-022/punctuation-clipboard.md`), registered as BARRIER-EVID-0008
+  after an independent review on 2026-10-29.
 - Exhaustive mappers updated in the same change set:
   - `MacKeyCodeMapper` (catalog version 2);
   - the `MacKeyboardCapture` inverse table;

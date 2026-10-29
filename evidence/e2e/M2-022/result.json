@@ -3,7 +3,7 @@
   "issueId": "M2-022",
   "status": "passed",
   "startedAt": "2026-10-28T06:26:52Z",
-  "endedAt": "2026-10-28T06:30:02Z",
+  "endedAt": "2026-10-29T01:31:05Z",
   "commit": "2ca7878807a09f1c9496972b7a405236d6a5707b",
   "toolchain": {
     "pythonVersion": "3.9.6",
@@ -55,8 +55,29 @@
       "status": "passed",
       "exitCode": 0,
       "evidence": [
-        "both metadata.json files use exactly the fixture metadata schema keys",
+        "all three metadata.json files use exactly the fixture metadata schema keys, and provenance.reference is at most 512 characters after the 2026-10-29 revision",
         "recorded payload SHA-256 and byte length match each capture file"
+      ]
+    },
+    {
+      "id": "punctuation-clipboard-session",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "captured 2026-10-29T00:38:05Z to 00:38:17Z (barriers log of the run, +0800 converted to UTC); raw stream SHA-256 prefix 07c968ef836652e7 (full value in punctuation-clipboard.md), not committed",
+        "181 complete frames in both directions with no leftover bytes; eleven punctuation keys plain and shifted",
+        "clipboard both ways: the client clipboard matched the server probe after the enter and the server clipboard matched the client probe after the leave",
+        "capture tool committed in 6578b49, byte-identical to the copy that ran (independent review)"
+      ]
+    },
+    {
+      "id": "clipboard-chunk-measurement",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "chunks.json keeps only codes, ids, marks and lengths per frame; tool committed in 2b8f14e",
+        "client to server 100,000 B of text: 8 chunks of at most 32,768 B, 250,028 B in total; server to client 600,000 B: 46 chunks, 1,500,028 B",
+        "the client did not send copies of 600,000 and 3,000,000 B; the server 3,000,000 B copy failed with an ICCCM warning in the barriers log; last log line 2026-10-29T01:31:05Z"
       ]
     }
   ],
@@ -66,28 +87,49 @@
       "sha256": "506535a774f257dc8f004105c8d6333e2da4727aef9c6f4073533cb5e81dcb9b",
       "byteLength": 73941,
       "kind": "sanitized-fixture",
-      "reviewStatus": "pending-review"
+      "reviewStatus": "reviewed"
     },
     {
       "path": "Tests/Fixtures/Barrier/m2-022-linux-server-input/metadata.json",
-      "sha256": "e10afd68927f8d7c5224aac271c331c950547c0383777922a64fe3a9a7ec1a08",
-      "byteLength": 1269,
+      "sha256": "c8ab61858d449a5cb9a701d59384b2e888f0d2ef7571d42e84f73a10da3026cc",
+      "byteLength": 899,
       "kind": "sanitized-fixture",
-      "reviewStatus": "pending-review"
+      "reviewStatus": "reviewed"
     },
     {
       "path": "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json",
       "sha256": "72417873132f738a9e256ee73365d09a36c681a59175e010f7be46989d615bb7",
       "byteLength": 4878,
       "kind": "sanitized-fixture",
-      "reviewStatus": "pending-review"
+      "reviewStatus": "reviewed"
     },
     {
       "path": "Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/metadata.json",
-      "sha256": "501fad706ea4772690fe5787474094b837adcadebb0e14ab9c8f104bdd927fe3",
-      "byteLength": 1363,
+      "sha256": "567eb5f41f533a5bab7f43f724b04e06c4e70a3491672db14fd3e53159d712b5",
+      "byteLength": 1039,
       "kind": "sanitized-fixture",
-      "reviewStatus": "pending-review"
+      "reviewStatus": "reviewed"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json",
+      "sha256": "3851b910daa68b30631418c4f26e3fc1f0569c28827c23f48304cf9ccbfcb41f",
+      "byteLength": 23530,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "path": "Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/metadata.json",
+      "sha256": "8d71a87b24f33053a9fd63a0cb3c45f98bc68fe1417b3222e085c23b2e448fc4",
+      "byteLength": 995,
+      "kind": "sanitized-fixture",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "path": "evidence/e2e/M2-022/chunks.json",
+      "sha256": "4144d20e3d59f10a81fde0cd7e8129946eedbd86dd0312cc4c40715da9e6406c",
+      "byteLength": 31049,
+      "kind": "sanitized-log",
+      "reviewStatus": "reviewed"
     }
   ],
   "privacy": {
@@ -99,7 +141,7 @@
     "containsHostnames": false,
     "containsIPAddresses": false,
     "rawCaptureCommitted": false,
-    "sanitizationReviewed": false
+    "sanitizationReviewed": true
   },
   "approvedDecisionRef": null
 }

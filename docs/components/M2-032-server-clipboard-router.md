@@ -79,8 +79,8 @@ gets the clipboard again.
 
 ## Known limitations
 
-- Plain text only. The primary selection, HTML and bitmap formats are not
-  shared.
+- Plain text only: format 0 of clipboard id 0. Clipboard id 1 and the other
+  formats are not shared.
 - A clipboard moves only with a screen change: the local one on enter, the
   client's on leave.
 - The app has one client; several clients are covered by the router tests
