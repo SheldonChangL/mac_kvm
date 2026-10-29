@@ -38,7 +38,7 @@ The `DCLP` layout comes from the M2-022 evidence
 (`evidence/e2e/M2-022/punctuation-clipboard.md`, fixture
 `Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/`), registered as
 BARRIER-EVID-0006 to 0008 after an independent review on 2026-10-29. It becomes a
-frozen contract once the M2-023 amendment is accepted. The fail-closed clipboard
+frozen contract once `M1-PROTOCOL-003` is accepted. The fail-closed clipboard
 path and `clipboardWireContractNotFrozen` are gone.
 The owner asked for clipboard sharing on 2026-10-29 ("剪貼簿跟標點符號都做").
 

@@ -52,4 +52,4 @@ The format and clipboard-id semantics stay "not observed" in the register entrie
 
 The disposition is recorded, and the remediation is the neutral wording in this change.
 Work that consumes this evidence may resume under the normal gates; for the client
-decoders that is the M2-023 amendment.
+decoders that is `M1-PROTOCOL-003`.

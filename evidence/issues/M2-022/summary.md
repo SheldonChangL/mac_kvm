@@ -30,6 +30,6 @@ meets the conditions:
 ## Still open
 
 - Before any client decoder consumes these layouts, a contract entry must freeze them:
-  the M2-023 amendment. `frozenContractRefs` and `consumingTests` in the register entries
+  `M1-PROTOCOL-003` (proposed 2026-10-29). `frozenContractRefs` and `consumingTests` in the register entries
   stay empty until then.
 - Gaps the evidence does not cover: section 5 of the review.
