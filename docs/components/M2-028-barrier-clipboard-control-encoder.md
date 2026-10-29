@@ -54,6 +54,13 @@ The server sends clipboard 0 only, always with sequence 0, as the capture
 shows. The primary selection (id 1) is neither sent nor applied, and HTML and
 bitmap formats are ignored.
 
+Barrier 2.4 sends clipboards in 32 KiB chunks, and a client's transfer carries
+other formats besides the text (measured in the addendum's chunk table). So the
+session accepts inbound frames of up to 64 KiB (control frames other than
+`DCLP` still go through the 4 KiB decoder limit) and transfers of up to 4 MiB,
+of which the text may use 1 MiB. Before 2026-10-29 the frame limit was 4 KiB,
+which ended the session on any client copy over about 1.6 KB.
+
 Tests: `BarrierClipboardTests` (7) compare the framing with both captured
 server transfers, rebuild the captured client transfer, round-trip chunked
 text, keep a byte order mark, and reject malformed data and transfers.

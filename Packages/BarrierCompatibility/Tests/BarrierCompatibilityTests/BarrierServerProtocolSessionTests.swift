@@ -179,6 +179,19 @@ private func capturedClientClipboardFrames() throws -> [[UInt8]] {
   return frames
 }
 /// `DMMV` at (1599, 899): the far corner of a 1600 x 900 client.
+/// A marshalled clipboard with `text` and an HTML format of `html` bytes.
+private func marshalled(text: String, html: Int) -> [UInt8] {
+  func bigEndian(_ value: Int) -> [UInt8] {
+    [
+      UInt8(value >> 24 & 0xFF), UInt8(value >> 16 & 0xFF), UInt8(value >> 8 & 0xFF),
+      UInt8(value & 0xFF),
+    ]
+  }
+  let bytes = Array(text.utf8)
+  return bigEndian(2) + bigEndian(0) + bigEndian(bytes.count) + bytes + bigEndian(1)
+    + bigEndian(html) + [UInt8](repeating: 0x68, count: html)
+}
+
 private let cornerMove: [UInt8] = [
   0x00, 0x00, 0x00, 0x08, 0x44, 0x4D, 0x4D, 0x56, 0x06, 0x3F, 0x03, 0x83,
 ]
@@ -327,6 +340,50 @@ struct BarrierServerProtocolSessionTests {
     }
     try await session.send(.leaveScreen(screen: screen))
     #expect(Array(pipe.sent.suffix(cout.count)) == cout)
+  }
+
+  @Test("a large client clipboard in 32 KiB chunks arrives; clipboard 1 is ignored")
+  func largeClipboardReceives() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    var events = session.events.makeAsyncIterator()
+    // As Barrier 2.4 sends it (M2-022 chunk measurement): 32 KiB chunks, and a
+    // transfer about 2.5 times the text because another format rides along.
+    let text = String(repeating: "mackvm-chunk-probe-", count: 31_579)
+    let data = marshalled(text: text, html: 900_000)
+    #expect(data.count > 1 << 20)
+    let selection = BarrierClipboard.frames(
+      id: 1, sequence: 1, data: BarrierClipboard.marshal(text: "selection"))
+    let clipboard = BarrierClipboard.frames(id: 0, sequence: 1, data: data)
+    pipe.feed((selection + clipboard).flatMap { $0 })
+    let event = try await events.next()
+    guard case .clipboard(let payload)? = event else {
+      Issue.record("no clipboard event")
+      return
+    }
+    #expect(payload.utf8Text == text)
+    try await session.send(.leaveScreen(screen: screen))
+    #expect(Array(pipe.sent.suffix(cout.count)) == cout)
+    #expect(pipe.disconnectCount == 0)
+  }
+
+  @Test("a client clipboard over the transfer limit is dropped and the session stays up")
+  func oversizedClipboardDropped() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    var events = session.events.makeAsyncIterator()
+    let huge = BarrierClipboard.frames(
+      id: 0, sequence: 1, data: [UInt8](repeating: 0, count: (4 << 20) + 1))
+    let small = BarrierClipboard.frames(
+      id: 0, sequence: 1, data: BarrierClipboard.marshal(text: "after"))
+    pipe.feed((huge + small).flatMap { $0 })
+    let event = try await events.next()
+    guard case .clipboard(let payload)? = event else {
+      Issue.record("no clipboard event")
+      return
+    }
+    #expect(payload.utf8Text == "after")
+    #expect(pipe.disconnectCount == 0)
   }
 
   @Test("client clipboard frames without usable text are dropped and the session stays usable")

@@ -60,7 +60,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
   private var decoder: BarrierControlDecoder
   private var encoder: BarrierClipboardControlEncoder?
   private var input: BarrierServerInputEncoder?
-  private var clipboard = BarrierClipboardAssembler(limit: clipboardByteLimit + 256)
+  private var clipboard = BarrierClipboardAssembler(limit: clipboardTransferLimit)
   private let clientDevice = DeviceID()
   private var readyWaiter: CheckedContinuation<Result<Void, CoreError>, Never>?
   private var readyResult: Result<Void, CoreError>?
@@ -79,7 +79,7 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
       let handshake = try? BarrierServerHandshake(
         expectedScreenNames: expectedScreenNames, maximumScreenNameByteCount: 64),
       let reassembler = try? BarrierFrameReassembler(maximumPayloadLength: Self.frameLimit),
-      let decoder = try? BarrierControlDecoder(maximumPayloadLength: Self.frameLimit)
+      let decoder = try? BarrierControlDecoder(maximumPayloadLength: Self.controlFrameLimit)
     else { return nil }
     self.transport = transport
     self.clock = clock
@@ -396,13 +396,15 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
     payload.prefix(4).elementsEqual(code.utf8)
   }
 
-  /// Feeds a client `DCLP` frame to the assembler (lock held). Returns the
-  /// clipboard event a completed transfer of clipboard 0 carries; a broken
-  /// transfer is dropped. `CCLP` (ownership) needs no action: the data
-  /// follows on leave.
+  /// Feeds a client `DCLP` frame for clipboard 0 to the assembler (lock
+  /// held) and returns the clipboard event a completed transfer carries; a
+  /// broken transfer is dropped. Clipboard 1, the primary selection, is not
+  /// shared, so its frames are ignored unparsed. `CCLP` (ownership) needs no
+  /// action: the data follows.
   private func receiveClipboard(_ payload: [UInt8]) -> KVMEvent? {
+    guard payload.count > 4, payload[4] == 0 else { return nil }
     do throws(BarrierClipboardError) {
-      guard let transfer = try clipboard.receive(payload: payload), transfer.id == 0,
+      guard let transfer = try clipboard.receive(payload: payload),
         let text = try BarrierClipboard.text(fromMarshalled: transfer.data),
         text.utf8.count <= Self.clipboardByteLimit
       else { return nil }
@@ -439,7 +441,14 @@ package final class BarrierServerProtocolSession: KVMProtocolSession, @unchecked
 
   // MARK: - Constants and errors
 
-  private static let frameLimit = 4096
+  /// Largest inbound frame: a 32 KiB clipboard chunk, as Barrier 2.4 sends it
+  /// (M2-022 chunk measurement), plus its `DCLP` header, with headroom.
+  private static let frameLimit = 64 * 1024
+  /// Largest frame the control decoder accepts; clipboard frames bypass it.
+  private static let controlFrameLimit = 4096
+  /// Largest marshalled client transfer: the text limit plus the formats
+  /// Barrier sends along (about 2.5 times the text in the measurement).
+  private static let clipboardTransferLimit = 4 << 20
   /// M2-022: the server sent `CALV` every 3.0 s.
   private static let keepaliveInterval = Duration.seconds(3)
   private static let silentIntervalsBeforeTimeout = 3

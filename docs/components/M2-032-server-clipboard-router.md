@@ -67,8 +67,9 @@ text.
 
 The M2-035 smoke script checks the whole path against a real Barrier 2.4
 client: the local clipboard reaches the client on enter, the client's copy
-comes back on leave, it is not echoed on the next enter, and a reconnected
-client gets it again.
+comes back on leave, it is not echoed on the next enter, large clipboards go
+both ways (600 KB out, 100 KB back in 32 KiB chunks), and a reconnected client
+gets the clipboard again.
 
 ## Known limitations
 

@@ -46,15 +46,20 @@ frozen; the first forwarded input event ends the session by design.
 
 - `send(.clipboard)` writes the M2-028 `DCLP` transfer of clipboard 0;
   `canSend` refuses text over `clipboardByteLimit` (1 MiB).
-- Client `CCLP` is accepted and ignored: the data follows on leave. Client
-  `DCLP` frames go to a `BarrierClipboardAssembler`; a complete transfer of
-  clipboard 0 with text becomes one `.clipboard` event on `events` (origin
-  `.remote` with a per-session device ID, empty `contentHash`). Malformed or
-  oversized transfers, clipboard 1 and transfers without text are dropped and
-  the session stays up.
+- Client `CCLP` is accepted and ignored: the data follows. Client `DCLP`
+  frames for clipboard 0 go to a `BarrierClipboardAssembler` (transfers up to
+  4 MiB); a complete transfer with text of at most 1 MiB becomes one
+  `.clipboard` event on `events` (origin `.remote` with a per-session device
+  ID, empty `contentHash`). Malformed or oversized transfers and transfers
+  without text are dropped, clipboard 1 frames are ignored, and the session
+  stays up.
+- Inbound frames may be up to 64 KiB for Barrier's 32 KiB clipboard chunks;
+  every other client frame still meets the 4 KiB decoder limit.
 - Tests in `BarrierServerProtocolSessionTests`: `clipboardSends`,
-  `clipboardReceives`, and the renamed client-clipboard test (frames without
-  usable text are dropped and the session stays usable).
+  `clipboardReceives`, `largeClipboardReceives` (a 600,001-byte text with a
+  900,000-byte second format in 32 KiB chunks, after a clipboard 1 transfer),
+  `oversizedClipboardDropped`, and the renamed client-clipboard test (frames
+  without usable text are dropped and the session stays usable).
 
 ## Rollback
 

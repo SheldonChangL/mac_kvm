@@ -45,6 +45,7 @@ run and removed afterwards.
 | Clipboard to the client (run 4) | — | the smoke clipboard's fixed probe, read back on the client display with xclip after the enter | pass |
 | Clipboard from the client (run 4) | — | a second fixed probe set with xclip while entered arrived on the leave and matched exactly | pass |
 | No clipboard echo (run 4) | — | the next enter sent nothing back; reconnecting sent it to the new session once | pass |
+| Large clipboards (run 5) | — | 600 KB to the client, matched by SHA-256 on the client display; a 100 KB client copy (Barrier sent about 250 KB in 32 KiB chunks) matched on the server | pass |
 
 The full X raw event sequence on the client display is in `x-events.txt`
 (32 events, all from the fixed probe input above).
@@ -67,6 +68,10 @@ The full X raw event sequence on the client display is in `x-events.txt`
    the smoke driver's in-memory clipboard, never the Mac pasteboard. Both
    machines were checked clean afterwards: no smoke directory, xclip process or
    Keychain item remained.
+5. After the large-clipboard fix (2026-10-29), with the two large cases added:
+   every case passed (`script-output.txt`). The same script with the old 4 KiB
+   inbound frame limit failed `clipboard-large-from-client` and `client-loss`,
+   because the client's 32 KiB chunk ended the session.
 
 ```sh
 MACKVM_SMOKE_HOST=<ssh-alias> Tests/SystemTests/Scripts/M2-035-linux-smoke.sh

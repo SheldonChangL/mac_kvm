@@ -28,6 +28,9 @@ remote=""
 failures=0
 to_client="mackvm smoke to-client ✓ café 中文"
 from_client="mackvm smoke from-client ✓ naïve 日本"
+large_to_client=$(python3 -c 'print("mackvm-smoke-large-" * 31579, end="")')
+large_from_client_code='import sys; sys.stdout.write("mackvm-smoke-from-large-" * 4167)'
+large_from_client=$(python3 -c "$large_from_client_code")
 
 rssh() { timeout 40 ssh -o BatchMode=yes "$host" "$@"; }
 say() { printf 'M2-035 smoke: %s\n' "$1"; }
@@ -106,6 +109,20 @@ send edge; sleep 0.3; send "key control down"; send escape; sleep 0.5; send "key
 check escape "$(grep -c 'local recovery: completed' "$work/server.log")" 1
 check clipboard-not-echoed "$(count 'clipboard sent to the client')" 1
 
+# Large clipboards: 600 KB goes out in 19 chunks; Barrier sends the 100 KB copy
+# back as about 250 KB in 32 KiB chunks.
+send "copy $large_to_client"
+send edge; sleep 2
+check clipboard-large-to-client \
+  "$(rssh "DISPLAY=$display xclip -selection clipboard -o | sha256sum | cut -c1-64")" \
+  "$(printf '%s' "$large_to_client" | shasum -a 256 | cut -c1-64)"
+rssh "cd $remote; (python3 -c '$large_from_client_code' | DISPLAY=$display xclip -quiet \
+  -selection clipboard -i >/dev/null 2>&1 & echo \$! > xclip.pid)"
+sleep 1; send "move -500 0"; sleep 2
+send "clipboard-is $large_from_client"
+check clipboard-large-from-client \
+  "$(count 'clipboard received from the client') $(count 'smoke: clipboard matches')" "2 2"
+
 send edge; sleep 0.3; send "key shift down"
 rssh "kill \$(cat $remote/barrierc.pid)"; sleep 2; send "key shift up"
 check client-loss "$(grep -c 'client disconnected' "$work/server.log")" 1
@@ -119,7 +136,7 @@ rssh "barrierc -f --no-tray --debug INFO --name $name --profile-dir $remote/prof
   --display $display 127.0.0.1:$port > $remote/barrierc.log 2>&1 & echo \$! > $remote/barrierc.pid"
 sleep 5; send edge; sleep 0.3; send "move 20 20"
 check reconnect "$(pointer)" "X=21Y=470"
-check clipboard-on-reconnect "$(count 'clipboard sent to the client')" 2
+check clipboard-on-reconnect "$(count 'clipboard sent to the client')" 3
 sleep 13; send "move 30 0"
 check keepalive "$(pointer)" "X=51Y=470"
 send "key shift down"; send quit; sleep 2
