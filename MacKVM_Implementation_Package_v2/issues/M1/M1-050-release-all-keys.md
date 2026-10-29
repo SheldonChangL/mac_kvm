@@ -10,7 +10,6 @@ execution_tier: "B/H"
 low_model_autonomous_merge: false
 depends_on:
   - "M1-046"
-  - "M1-049"
 contract_refs:
   []
 source_refs:
@@ -26,6 +25,8 @@ labels:
 ---
 
 # M1-050 — 實作 releaseAllKeys 與 Release Ordering
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M1-049；release 順序在 `KVMCore`，與平台無關，各平台 injector 使用它。
 
 ## Outcome
 

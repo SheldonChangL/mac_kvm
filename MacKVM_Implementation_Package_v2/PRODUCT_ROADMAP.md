@@ -42,6 +42,8 @@ M5 Production 1.0; Barrier optional only
 
 建立第一方 Native Protocol，完成第一方 Mac Server 與第一方 Mac Client 在完全不啟動 Barrier 的情況下工作。
 
+> 範圍與順序依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../docs/adr/M4-SCOPE-001-linux-client-first.md)（Accepted 2026-10-29，Issue #330）：先以 Barrier wire 完成第一方 Linux Client（Mac Server → Linux Client，X11），再進行 Native Protocol；M3 E2E 改以 Mac Server ↔ 第一方 Linux Client 驗證，正式修訂於 M3-001 開始時。
+
 ### Exit Criteria
 
 - [ ] Native framing、版本/能力協商、identity、pairing、trust、session、keepalive、reconnect 均有凍結規格。
@@ -52,6 +54,8 @@ M5 Production 1.0; Barrier optional only
 ## M4 — Cross-platform Beta（macOS / Windows / Linux）
 
 完成第一方 Windows 與 Linux 應用，使主要 Server/Client 組合都使用第一方 App 與 Native Protocol。
+
+> 範圍與順序依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../docs/adr/M4-SCOPE-001-linux-client-first.md)（Accepted 2026-10-29，Issue #330）：先以 Barrier wire 完成第一方 Linux Client（Mac Server → Linux Client，X11），再進行 Native Protocol；M3 E2E 改以 Mac Server ↔ 第一方 Linux Client 驗證，正式修訂於 M3-001 開始時。
 
 ### Exit Criteria
 

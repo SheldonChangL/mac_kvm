@@ -13,8 +13,6 @@ depends_on:
   - "M4-024"
   - "M4-026"
   - "M4-027"
-  - "M4-032"
-  - "M4-033"
   - "M4-035"
 contract_refs:
   []
@@ -30,6 +28,8 @@ labels:
 ---
 
 # M4-036 — 執行 Linux First-party Client E2E
+
+> 依 [`docs/adr/M4-SCOPE-001-linux-client-first.md`](../../../docs/adr/M4-SCOPE-001-linux-client-first.md)（Issue #330）：不再相依 M4-032、M4-033；Linux Beta 先只支援 X11，Wayland 延後。
 
 ## Outcome
 

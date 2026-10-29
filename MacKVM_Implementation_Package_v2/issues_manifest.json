@@ -2196,8 +2196,8 @@
       "epic_name": "Keyboard Mapping、Modifier 與 IME",
       "size": "S",
       "exact_files": [
-        "Packages/KVMCore/Sources/KVMCore/BarrierVirtualKeyMapper.swift",
-        "Packages/KVMCore/Tests/KVMCoreTests/BarrierVirtualKeyMapperTests.swift",
+        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift",
         "docs/components/M1-043-barrier-virtual-key-mapper.md"
       ],
       "commands": [
@@ -2542,7 +2542,6 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M1-037",
         "M1-046",
         "M1-054"
       ],
@@ -2702,8 +2701,7 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M1-046",
-        "M1-049"
+        "M1-046"
       ],
       "goal": "實作 releaseAllKeys 與 Release Ordering",
       "focus": [
@@ -6092,9 +6090,7 @@
       "tier": "C/S/H",
       "risk": "critical",
       "priority": "P0",
-      "depends_on": [
-        "M3-039"
-      ],
+      "depends_on": [],
       "goal": "凍結 Cross-platform Toolchain／Language／FFI ADR",
       "focus": [
         "決定 Windows/Linux implementation language 與 UI shell",
@@ -6130,8 +6126,7 @@
       "priority": "P1",
       "depends_on": [
         "M4-001",
-        "M1-013",
-        "M3-034"
+        "M1-013"
       ],
       "goal": "定義 Language-neutral Platform Backend Contracts",
       "focus": [
@@ -6805,9 +6800,7 @@
       "risk": "critical",
       "priority": "P1",
       "depends_on": [
-        "M4-020",
-        "M1-039",
-        "M2-019"
+        "M4-020"
       ],
       "goal": "實作 Linux Screen Enumeration／Scaling Backend",
       "focus": [
@@ -7164,8 +7157,7 @@
       "priority": "P1",
       "depends_on": [
         "M4-021",
-        "M4-022",
-        "M4-023"
+        "M4-022"
       ],
       "goal": "實作 Linux Autostart／Background Lifecycle",
       "focus": [
@@ -7722,8 +7714,6 @@
         "M4-024",
         "M4-026",
         "M4-027",
-        "M4-032",
-        "M4-033",
         "M4-035"
       ],
       "goal": "執行 Linux First-party Client E2E",
