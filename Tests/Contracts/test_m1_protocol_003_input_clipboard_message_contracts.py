@@ -98,7 +98,7 @@ class M1Protocol003InputClipboardContractTests(unittest.TestCase):
             for _, _, _, raw in frames(evidence_id):
                 self.assertEqual(u32(raw, 0), len(raw) - 4)
 
-    def test_dmmv_is_two_unsigned_big_endian_client_coordinates(self):
+    def test_dmmv_is_two_big_endian_client_coordinates_below_0x8000(self):
         observed = frames("BARRIER-EVID-0006")
         values = [(u16(observed[i][2], 0), u16(observed[i][2], 2)) for i in (27, 29, 31, 33, 38, 40, 64)]
         self.assertEqual(

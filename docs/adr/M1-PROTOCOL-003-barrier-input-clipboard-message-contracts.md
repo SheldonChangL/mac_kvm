@@ -220,7 +220,8 @@ continues:
 
 - `DMMV` outside `0x0000…0x7FFF` or outside the client's `DINF` rectangle;
 - `DMDN` or `DMUP` outside 1–5;
-- a `DCLP` transfer that breaks the start, chunk and end rules.
+- a `DCLP` transfer that breaks the start, chunk and end rules, including a `DCLP` whose
+  inner data length does not match the rest of its body.
 
 The diagnostic carries the token, the direction, the body length and the reason, never
 body bytes (M1-011).
@@ -282,7 +283,8 @@ relay with TLS disabled for the observation. Input was synthetic. Details are in
 ## Compatibility impact
 
 - First-party Mac server → Barrier 2.4 Linux client: validated by M2-035, including the
-  first-party conventions.
+  wheel, clipboard and text conventions. Of the shifted identifiers, only Shift+B was
+  validated.
 - First-party Linux client → first-party Mac server: to be validated by
   M4-036-FOLLOWUP-001.
 - Nothing about Barrier servers on other platforms is claimed.
@@ -296,7 +298,8 @@ Names may come only from observation.
 
 ### Promote the first-party conventions to Barrier wire claims
 
-Rejected: neither multi-notch wheel values nor multi-chunk transfers were captured.
+Rejected: none of multi-notch wheel values, multi-chunk transfers or the 34 uncaptured
+shifted identifiers was captured.
 They stay marked as conventions validated by interoperability runs.
 
 ## Open questions
@@ -322,6 +325,11 @@ findings:
 | M3 | Medium | The start value is the transfer total, and the multi-chunk rules are stated. |
 | M4 | Medium | The contract test pins the modifier bits, the key order, Caps Lock, `CINN` and the held button. |
 | L1–L6 | Low | Wording and labelling, and the register narrative section for 0006–0008. |
+
+The same reviewer re-reviewed the revision on 2026-10-29. The verdict was accept. Its
+five wording nits (the `DCLP` inner-length case, the M2-035 wording, the rejected
+alternative, a test name and the register narrative) were fixed afterwards. Both
+reports are in `evidence/issues/M1-PROTOCOL-003/independent-review.md`.
 
 ## Rollback
 

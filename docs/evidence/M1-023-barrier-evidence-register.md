@@ -425,9 +425,9 @@ independent reviewer approved them on 2026-10-29
 - **Consumer links.**
   - `frozenContractRefs` holds M1-PROTOCOL-003 and M1-025.
   - `consumingTests` holds `Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py`
-    and the Swift tests that read these fixtures: `BarrierServerInputEncoderTests.swift`,
-    `BarrierClipboardControlEncoderTests.swift`, `BarrierServerProtocolSessionTests.swift`
-    and `BarrierClipboardTests.swift`.
+    and the Swift tests that read these fixtures (`BarrierServerInputEncoderTests.swift`,
+    `BarrierServerProtocolSessionTests.swift`, `BarrierClipboardTests.swift`) or use golden
+    bytes copied from them (`BarrierClipboardControlEncoderTests.swift`).
 - **Sanitization.**
   - Raw streams are not committed.
   - Every clipboard format's content is zero-filled; the client-clipboard fixture
