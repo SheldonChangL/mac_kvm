@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "captureId": "m2-022-linux-client-clipboard-keepalive",
+  "encoding": "base64",
+  "observations": [
+    {
+      "sequence": 1,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAC0JhcnJpZXIAAQAG"
+    },
+    {
+      "sequence": 2,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAGEJhcnJpZXIAAQAGAAAACWNhcGNsaWVudA=="
+    },
+    {
+      "sequence": 3,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABFFJTkY="
+    },
+    {
+      "sequence": 4,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAEkRJTkYAAAAABkADhAAAAyABwg=="
+    },
+    {
+      "sequence": 5,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENJQUs="
+    },
+    {
+      "sequence": 6,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENST1A="
+    },
+    {
+      "sequence": 7,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAACERTT1AAAAAA"
+    },
+    {
+      "sequence": 8,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAADkNJTk4AAAHCAAAAAQAA"
+    },
+    {
+      "sequence": 9,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAD0RDTFAAAAAAAAEAAAABNA=="
+    },
+    {
+      "sequence": 10,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 11,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAEkRDTFAAAAAAAAIAAAAEAAAAAA=="
+    },
+    {
+      "sequence": 12,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAADkRDTFAAAAAAAAMAAAAA"
+    },
+    {
+      "sequence": 13,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAD0RDTFABAAAAAAEAAAABNA=="
+    },
+    {
+      "sequence": 14,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 15,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAAEkRDTFABAAAAAAIAAAAEAAAAAA=="
+    },
+    {
+      "sequence": 16,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAADkRDTFABAAAAAAMAAAAA"
+    },
+    {
+      "sequence": 17,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 18,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 19,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 20,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 21,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 22,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 23,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 24,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 25,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 26,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 27,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 28,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAACUNDTFAAAAAAAQ=="
+    },
+    {
+      "sequence": 29,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 30,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENBTFY="
+    },
+    {
+      "sequence": 31,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 32,
+      "direction": "server-to-client",
+      "applicationPayloadBase64": "AAAABENPVVQ="
+    },
+    {
+      "sequence": 33,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAABENOT1A="
+    },
+    {
+      "sequence": 34,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAEERDTFAAAAAAAAAAAAAAAAA="
+    },
+    {
+      "sequence": 35,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAAYURDTFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    {
+      "sequence": 36,
+      "direction": "client-to-server",
+      "applicationPayloadBase64": "AAAADkRDTFAAAAAAAAAAAAAA"
+    }
+  ]
+}

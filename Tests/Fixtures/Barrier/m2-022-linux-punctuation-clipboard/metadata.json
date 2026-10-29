@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "m2-022-linux-punctuation-clipboard",
+  "protocol": "barrier",
+  "provenance": {
+    "sourceKind": "black-box-capture",
+    "reference": "Controlled black-box observation with evidence/e2e/M2-022/tools/capture_punctuation_clipboard.py on the owner-approved Ubuntu 22.04 x86_64 host: external Barrier server barriers 2.4.0-release and client barrierc 2.4.0-release, protocol 1.6, each on its own virtual X display, through a byte-logging loopback relay. Input was synthetic (xdotool on the server display); clipboard text was set with xclip to fixed probe strings on each display. TLS disabled for this observation only. Session: handshake, server clipboard sent on enter, the eleven US punctuation keys plain and shifted, a client copy, the client clipboard sent on leave, a second enter and leave."
+  },
+  "payload": {
+    "path": "punctuation-clipboard-capture.json",
+    "sha256": "3851b910daa68b30631418c4f26e3fc1f0569c28827c23f48304cf9ccbfcb41f",
+    "byteLength": 23530
+  },
+  "sanitization": {
+    "status": "sanitized",
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "ip-address",
+      "clipboard-payload"
+    ]
+  }
+}

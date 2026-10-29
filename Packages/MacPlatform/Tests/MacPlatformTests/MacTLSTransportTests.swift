@@ -1172,3 +1172,50 @@ func tlsTransportSendFailureMapsToTheTypedErrorAndIsTerminal(
     }
   }
 }
+
+// MARK: - Accepted server connections (M2)
+
+/// The server role does not request a client certificate: the accepted
+/// connection becomes ready without a peer chain and the evaluator is never
+/// consulted.
+@Test func acceptedServerConnectsWithoutAPeerChainAndMovesBytes() async throws {
+  let backend = FakeTLSBackend(start: .readyWithoutVerification)
+  let transport = MacTLSTransport.acceptedServer(backendFactory: backend.factory)
+  var iterator = transport.incomingBytes.makeAsyncIterator()
+
+  try await transport.connect()
+  try await transport.send(chunk(1))
+  backend.deliver(.success(.bytes(chunk(2))))
+
+  #expect(try await iterator.next() == chunk(2))
+  #expect(backend.sentPayloads == [chunk(1)])
+  #expect(backend.evaluations.isEmpty)
+  #expect(
+    backend.requests == [
+      MacTLSTransportConnectionRequest(host: "", port: 0, security: .acceptedServer)
+    ])
+  await transport.disconnect()
+  #expect(await drain(&iterator).end == .finished)
+}
+
+/// A client chain presented anyway is never trusted by default.
+@Test func acceptedServerRejectsAnyPresentedChain() async {
+  let backend = FakeTLSBackend(start: .presentChain(presentedChain))
+  let transport = MacTLSTransport.acceptedServer(backendFactory: backend.factory)
+
+  let error = await connectFailure(transport)
+
+  #expect(error == securityFailure(.trustRejected))
+  #expect(!backend.events.contains(.ready))
+  #expect(backend.cancelCount == 1)
+}
+
+/// An accepted connection is single-use like every other transport.
+@Test func acceptedServerCannotConnectTwice() async throws {
+  let backend = FakeTLSBackend(start: .readyWithoutVerification)
+  let transport = MacTLSTransport.acceptedServer(backendFactory: backend.factory)
+  try await transport.connect()
+
+  #expect(await connectFailure(transport) == misuseFailure)
+  await transport.disconnect()
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "m2-022-linux-client-clipboard-keepalive",
+  "protocol": "barrier",
+  "provenance": {
+    "sourceKind": "black-box-capture",
+    "reference": "Controlled black-box observation per Tests/SystemTests/Plans/M2-022-barrier-server-fixtures.md on the owner-approved Ubuntu 22.04 x86_64 host: external Barrier server barriers 2.4.0-release protocol 1.6 and external Barrier client barrierc 2.4.0-release protocol 1.6, each on its own virtual X display, through a byte-logging loopback relay. Input was synthetic (xdotool on the server display). TLS disabled for this observation only; product TLS default stays enabled. Server is the Linux Barrier server, not a macOS one; Windows not executed (M2 validation is Linux-only by owner decision, 2026-10-28). Session: handshake, enter, a synthetic clipboard change on the client display, leave, then the server process paused until the client gave up on keepalive. Client-to-server DCLP data is zero-filled at its original length."
+  },
+  "payload": {
+    "path": "client-clipboard-keepalive-capture.json",
+    "sha256": "72417873132f738a9e256ee73365d09a36c681a59175e010f7be46989d615bb7",
+    "byteLength": 4878
+  },
+  "sanitization": {
+    "status": "sanitized",
+    "containsSensitiveData": false,
+    "removedCategories": [
+      "ip-address",
+      "clipboard-payload"
+    ]
+  }
+}

@@ -1,4 +1,186 @@
+import AppKit
+import BarrierCompatibility
+import CoreGraphics
+import Foundation
+import KVMContracts
+import KVMCore
+import MacPlatform
+
 @main
 struct MacKVMApplication {
-  static func main() {}
+  static func main() {
+    guard let configuration = ServerConfiguration.parse(Array(CommandLine.arguments.dropFirst()))
+    else {
+      print(ServerConfiguration.usage)
+      exit(64)
+    }
+    let store = MacServerIdentityStore(label: configuration.identityLabel)
+    switch configuration.command {
+    case .forgetIdentity:
+      do {
+        try store.remove()
+        report("server identity removed; clients must trust the next one")
+        exit(0)
+      } catch {
+        report("could not remove the server identity: \(error)")
+        exit(1)
+      }
+    case .fingerprint:
+      reportFingerprint(loadIdentity(store))
+      exit(0)
+    case .serve:
+      serve(configuration, store: store)
+    #if DEBUG
+      case .smoke:
+        SmokeDriver.run(configuration, identity: loadIdentity(store))
+    #endif
+    }
+  }
+
+  private static func serve(_ configuration: ServerConfiguration, store: MacServerIdentityStore)
+    -> Never
+  {
+    let permissions = EventTapPermissionService()
+    guard permissions.preflight() == .ready else {
+      _ = permissions.requestMissingAccess()
+      report(
+        "Input Monitoring and Accessibility are required for the event tap;"
+          + " grant them and retry")
+      exit(77)
+    }
+    guard let desktop = MacDesktop.bounds(), let mouse = MacMouseCapture(bounds: desktop) else {
+      report("no usable display")
+      exit(1)
+    }
+    let identity = loadIdentity(store)
+    reportFingerprint(identity)
+    if !MacDesktop.allowCursorHidingInBackground() {
+      report("the cursor cannot be hidden while another app is frontmost; it stays visible")
+    }
+
+    let suppressor = LocalEventSuppressor(
+      filter: .live(), isEmergencyEscape: { EmergencyEscape.isChordKey($0) })
+    let secureInput = SecureInputWatch()
+    guard
+      let runtime = ServerRuntime(
+        configuration: configuration, identity: identity, desktop: desktop,
+        suppressor: suppressor, cursor: CursorRestorer(),
+        clipboard: ServerClipboard(MacPasteboardAdapter()),
+        inputCapturable: { secureInput.allowsCapture() })
+    else { exit(1) }
+    let input = InputTap(coordinator: runtime.coordinator, suppressor: suppressor, mouse: mouse)
+    // At the HID level a swallowed motion never reaches the window server, and
+    // the emergency chord's Delete release still arrives (owner run).
+    let tap = MacEventTap(location: .cghidEventTap) { type, event in input.handle(type, event) }
+    guard
+      let lifecycle = EventTapLifecycle(
+        control: MacEventTapControl(tap: tap), restartBudget: 10)
+    else { exit(1) }
+    // The tap goes first, so nothing new is captured while the session
+    // drains; local input never depends on the network.
+    let stop: @Sendable (InputLifecycleTrigger) -> Void = { trigger in
+      lifecycle.terminate()
+      if Thread.isMainThread {
+        runtime.effects.showCursor()
+      } else {
+        DispatchQueue.main.sync { runtime.effects.showCursor() }
+      }
+      Task {
+        await runtime.shutdown(trigger)
+        report("stopped; input is local")
+        flushReports()
+        exit(0)
+      }
+    }
+    let fail: @Sendable (String) -> Void = { reason in
+      report("stopping: \(reason)")
+      stop(.termination)
+    }
+    input.attach(lifecycle, onFailure: fail)
+    runtime.onFailure(fail)
+    do {
+      try lifecycle.start()
+    } catch {
+      report("the event tap could not be created: \(error.code)")
+      flushReports()
+      exit(77)
+    }
+    let signals = installSignalHandlers(stop)
+    let sleepObserver = NSWorkspace.shared.notificationCenter.addObserver(
+      forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
+    ) { _ in
+      runtime.coordinator.dispatch(.lifecycle(.sleep))
+      report("system sleep: input is local")
+    }
+    Task {
+      do throws(CoreError) {
+        try await runtime.start()
+        report(
+          "move the pointer across the \(configuration.edge.rawValue) edge to control the client")
+        report("Control+Option+Command+Return returns input to this Mac at any time")
+      } catch {
+        lifecycle.terminate()
+        report("could not listen: \(error.code)")
+        flushReports()
+        exit(69)
+      }
+    }
+    withExtendedLifetime((signals, sleepObserver, tap, input, runtime, lifecycle)) {
+      CFRunLoopRun()
+    }
+    exit(0)
+  }
+
+  /// Reports when secure keyboard entry starts or stops blocking input capture.
+  final class SecureInputWatch: @unchecked Sendable {
+    private let lock = NSLock()
+    private var secure: Bool?
+
+    func allowsCapture() -> Bool {
+      let now = MacSecureInput.isEnabled
+      let previous = lock.withLock {
+        defer { secure = now }
+        return secure
+      }
+      if previous != now, now || previous != nil {
+        report(
+          now
+            ? "secure keyboard entry is on in an app on this Mac; input stays here"
+            : "secure keyboard entry is off again")
+      }
+      return !now
+    }
+  }
+
+  static func loadIdentity(_ store: MacServerIdentityStore) -> MacServerIdentity {
+    do {
+      return try store.loadOrCreate()
+    } catch {
+      report("the server identity is unavailable: \(error)")
+      exit(1)
+    }
+  }
+
+  static func reportFingerprint(_ identity: MacServerIdentity) {
+    let digest = [UInt8](identity.certificateSHA256)
+    report(
+      "server certificate SHA-256: "
+        + digest.map { String(format: "%02X", $0) }.joined(separator: ":"))
+    if let line = BarrierTrustedServerEntry.line(sha256: digest) {
+      report("Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): \(line)")
+    }
+  }
+
+  /// SIGINT and SIGTERM stop the server through the lifecycle path.
+  static func installSignalHandlers(_ stop: @escaping @Sendable (InputLifecycleTrigger) -> Void)
+    -> [any DispatchSourceSignal]
+  {
+    [SIGINT, SIGTERM].map { number in
+      signal(number, SIG_IGN)
+      let source = DispatchSource.makeSignalSource(signal: number, queue: .main)
+      source.setEventHandler { stop(.termination) }
+      source.resume()
+      return source
+    }
+  }
 }

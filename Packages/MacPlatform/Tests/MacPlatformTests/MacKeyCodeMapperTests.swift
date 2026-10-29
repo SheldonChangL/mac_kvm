@@ -66,6 +66,21 @@ private let sdkFixedMembers: [(VirtualKey, CGKeyCode)] = [
   (.mute, sdkCode(kVK_Mute)),
 ]
 
+/// The catalog v2 punctuation members and their SDK baseline.
+private let sdkPunctuation: [(PunctuationKey, CGKeyCode)] = [
+  (.minus, sdkCode(kVK_ANSI_Minus)),
+  (.equal, sdkCode(kVK_ANSI_Equal)),
+  (.leftBracket, sdkCode(kVK_ANSI_LeftBracket)),
+  (.rightBracket, sdkCode(kVK_ANSI_RightBracket)),
+  (.backslash, sdkCode(kVK_ANSI_Backslash)),
+  (.semicolon, sdkCode(kVK_ANSI_Semicolon)),
+  (.quote, sdkCode(kVK_ANSI_Quote)),
+  (.grave, sdkCode(kVK_ANSI_Grave)),
+  (.comma, sdkCode(kVK_ANSI_Comma)),
+  (.period, sdkCode(kVK_ANSI_Period)),
+  (.slash, sdkCode(kVK_ANSI_Slash)),
+]
+
 /// Every C-005 catalog v1 member, built from the ADR's domains rather than
 /// from the mapper: 26 letters, 10 digits, F1...F24 and 22 payload-free keys.
 private let catalogV1Members: [VirtualKey] =
@@ -73,6 +88,10 @@ private let catalogV1Members: [VirtualKey] =
   + (0...9).map { VirtualKey.digit($0) }
   + (1...24).map { VirtualKey.function($0) }
   + sdkFixedMembers.map(\.0)
+
+/// Catalog v2 adds the eleven US ANSI punctuation keys.
+private let catalogV2Members: [VirtualKey] =
+  catalogV1Members + sdkPunctuation.map { VirtualKey.punctuation($0.0) }
 
 private func mapped(_ key: VirtualKey) -> CGKeyCode? {
   try? MacKeyCodeMapper.keyCode(for: key).get()
@@ -85,8 +104,14 @@ private func failure(_ key: VirtualKey) -> MacKeyCodeMappingFailure? {
 
 // MARK: - Happy path
 
-@Test func coversCatalogVersionOne() {
-  #expect(MacKeyCodeMapper.catalogVersion == 1)
+@Test func coversCatalogVersionTwo() {
+  #expect(MacKeyCodeMapper.catalogVersion == 2)
+}
+
+@Test func everyPunctuationKeyMatchesTheSDKANSIConstant() {
+  for (key, code) in sdkPunctuation {
+    #expect(mapped(.punctuation(key)) == code)
+  }
 }
 
 @Test func mapsRepresentativeKeysToTheirUSANSIBaseline() {
@@ -185,8 +210,8 @@ func unknownKeysAreRejectedWhateverTheirRawValue(rawCode: UInt32) {
 // MARK: - Exhaustive catalog expectations
 
 @Test func everyCatalogMemberIsMappedOrRejectedAsAGap() {
-  #expect(catalogV1Members.count == 82)
-  let gaps = catalogV1Members.filter { mapped($0) == nil }
+  #expect(catalogV2Members.count == 93)
+  let gaps = catalogV2Members.filter { mapped($0) == nil }
   #expect(gaps == (21...24).map { VirtualKey.function($0) })
   for gap in gaps {
     #expect(failure(gap) == .noMacOSBaseline)
@@ -194,8 +219,8 @@ func unknownKeysAreRejectedWhateverTheirRawValue(rawCode: UInt32) {
 }
 
 @Test func mappedCodesAreDistinctAndInsideTheSDKKeyCodeRange() {
-  let codes = catalogV1Members.compactMap(mapped)
-  #expect(codes.count == 78)
+  let codes = catalogV2Members.compactMap(mapped)
+  #expect(codes.count == 89)
   #expect(Set(codes).count == codes.count)
   // The highest code the SDK declares is kVK_UpArrow.
   #expect(codes.allSatisfy { $0 <= sdkCode(kVK_UpArrow) })
@@ -211,7 +236,7 @@ func unknownKeysAreRejectedWhateverTheirRawValue(rawCode: UInt32) {
       kVK_ContextualMenu, kVK_ISO_Section, kVK_JIS_Eisu, kVK_JIS_Kana,
     ].map(sdkCode)
   )
-  let codes = Set(catalogV1Members.compactMap(mapped))
+  let codes = Set(catalogV2Members.compactMap(mapped))
   #expect(codes.isDisjoint(with: excluded))
 }
 

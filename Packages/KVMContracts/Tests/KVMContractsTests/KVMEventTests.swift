@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import KVMContracts
 
 private func requireSendableAndEquatable<T: Sendable & Equatable>(_: T) {}
@@ -72,4 +73,19 @@ private func requireSendableAndEquatable<T: Sendable & Equatable>(_: T) {}
   #expect(point == NormalizedPoint(x: 0, y: 0.5))
   let encoded = try JSONEncoder().encode(point)
   #expect(try JSONDecoder().decode(NormalizedPoint.self, from: encoded) == point)
+}
+
+@Test func catalogVersionTwoPunctuationKeysRoundTripInPositionalOrder() throws {
+  #expect(
+    PunctuationKey.allCases == [
+      .minus, .equal, .leftBracket, .rightBracket, .backslash, .semicolon, .quote, .grave,
+      .comma, .period, .slash,
+    ])
+  #expect(PunctuationKey.allCases.map(\.rawValue) == Array(0...10))
+  for key in PunctuationKey.allCases {
+    let event = KVMEvent.key(key: .punctuation(key), phase: .down, modifiers: ModifierState())
+    requireSendableAndEquatable(event)
+    let decoded = try JSONDecoder().decode(KVMEvent.self, from: JSONEncoder().encode(event))
+    #expect(decoded == event)
+  }
 }

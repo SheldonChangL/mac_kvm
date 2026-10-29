@@ -1,0 +1,21 @@
+NOTE: started client
+NOTE: connecting to '127.0.0.1': 127.0.0.1:24810
+INFO: OpenSSL 3.0.2 15 Mar 2022
+NOTE: peer fingerprint (SHA1): D1:27:14:E0:74:36:B5:26:4A:29:68:A3:8C:79:60:61:3D:6F:01:30 (SHA256): 25:D9:10:4F:C3:38:B5:C1:54:06:E6:A7:C2:CC:8A:D8:08:EF:07:C6:E5:A8:0F:B3:70:40:29:E1:D2:40:60:20
+NOTE: fingerprint_db_path: /tmp/<smoke-dir>/profile/SSL/Fingerprints/TrustedServers.txt
+NOTE: Read 1 fingerprints from: /tmp/<smoke-dir>/profile/SSL/Fingerprints/TrustedServers.txt
+NOTE: Fingerprint matches trusted fingerprint
+INFO: connected to secure socket
+INFO: peer ssl certificate info: /CN=MacKVM Barrier Server
+INFO: TLS_AES_256_GCM_SHA384         TLSv1.3 Kx=any      Au=any   Enc=AESGCM(256)            Mac=AEAD
+
+connected to server
+INFO: entering screen
+INFO: leaving screen
+NOTE: disconnected from server
+NOTE: connecting to '127.0.0.1': 127.0.0.1:24810
+INFO: OpenSSL 3.0.2 15 Mar 2022
+ERROR: ssl error occurred (generic failure)
+ERROR: error:0A000126:SSL routines::unexpected eof while reading
+ERROR: failed to connect secure socket
+FATAL: X display has unexpectedly disconnected
