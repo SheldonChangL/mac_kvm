@@ -1417,8 +1417,15 @@
         "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory; the unobservable labels in the producer's write-ups are not evidence.",
         "Do not infer unobserved message code semantics, additional endian behavior beyond the big-endian reads stated in the claims, framing beyond complete top-level frames, or stream boundary behavior from this entry."
       ],
-      "frozenContractRefs": [],
-      "consumingTests": []
+      "frozenContractRefs": [
+        "docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierServerInputEncoderTests.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClipboardControlEncoderTests.swift"
+      ]
     },
     {
       "evidenceId": "BARRIER-EVID-0007",
@@ -1584,8 +1591,14 @@
         "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory.",
         "Do not infer unobserved message code semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, or full compatibility from this entry."
       ],
-      "frozenContractRefs": [],
-      "consumingTests": []
+      "frozenContractRefs": [
+        "docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierServerProtocolSessionTests.swift"
+      ]
     },
     {
       "evidenceId": "BARRIER-EVID-0008",
@@ -1809,8 +1822,15 @@
         "Do not fill unknown bytes from model output, Barrier or Deskflow source, analogy or memory; the producer's unobservable labels are not evidence.",
         "Do not infer unobserved field or message code semantics, additional endian behavior, framing beyond complete top-level frames, stream boundary behavior, Windows or TLS behavior, or full compatibility from this entry."
       ],
-      "frozenContractRefs": [],
-      "consumingTests": []
+      "frozenContractRefs": [
+        "docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md",
+        "docs/adr/M1-025-barrier-client-wire-contract.md"
+      ],
+      "consumingTests": [
+        "Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierServerInputEncoderTests.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClipboardTests.swift"
+      ]
     }
   ]
 }

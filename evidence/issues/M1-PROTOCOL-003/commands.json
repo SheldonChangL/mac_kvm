@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-PROTOCOL-003",
+  "baseCommit": "b48bf5ce3d2d32c31369ddf107344251a1cd7424",
+  "parentCommit": "fd32feea876fa3fd4cc3f8c7ffb0d6dd59e87341",
+  "note": "Run on the staged change that adds this file; outputs are verbatim apart from masked local paths.",
+  "commands": [
+    {
+      "command": "python3 Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "................\n----------------------------------------------------------------------\nRan 16 tests in 0.012s\n\nOK\n"
+    },
+    {
+      "command": "python3 evidence/issues/M1-023/tests/test_register.py",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.006s\n\nOK\n"
+    },
+    {
+      "command": "python3 evidence/issues/M1-EVIDENCE-001/tests/test_registration.py",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "..................\n----------------------------------------------------------------------\nRan 18 tests in 0.013s\n\nOK\n"
+    },
+    {
+      "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierServerPointerEncoder",
+      "exitCode": 0,
+      "stdout": "Test Suite 'Selected tests' started at 2026-10-29 14:10:18.958.\nTest Suite 'BarrierCompatibilityPackageTests.xctest' started at 2026-10-29 14:10:18.959.\nTest Suite 'BarrierCompatibilityPackageTests.xctest' passed at 2026-10-29 14:10:18.959.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds\nTest Suite 'Selected tests' passed at 2026-10-29 14:10:18.959.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n◇ Test run started.\n↳ Testing Library Version: 1501\n↳ Target Platform: arm64e-apple-macos14.0\n◇ Suite \"M2-026 Barrier pointer encoder\" started.\n◇ Test \"pointer moves are absolute client pixels equal to the captured DMMV frames\" started.\n◇ Test \"pointer positions clamp to the client screen\" started.\n◇ Test \"scroll uses 120 units per line, matching the captured DMWM frames\" started.\n◇ Test \"scroll round-trips through the M1-PROTOCOL-003 client rule, horizontal axis inverted\" started.\n◇ Test \"buttons use the captured Barrier identifiers\" started.\n✔ Test \"pointer positions clamp to the client screen\" passed after 0.001 seconds.\n✔ Test \"scroll round-trips through the M1-PROTOCOL-003 client rule, horizontal axis inverted\" passed after 0.001 seconds.\n✔ Test \"scroll uses 120 units per line, matching the captured DMWM frames\" passed after 0.004 seconds.\n✔ Test \"pointer moves are absolute client pixels equal to the captured DMMV frames\" passed after 0.004 seconds.\n✔ Test \"buttons use the captured Barrier identifiers\" passed after 0.004 seconds.\n✔ Suite \"M2-026 Barrier pointer encoder\" passed after 0.005 seconds.\n✔ Test run with 5 tests in 1 suite passed after 0.005 seconds.\n",
+      "stderr": "[0/1] Planning build\nBuilding for debugging...\n[0/4] Write sources\n[1/4] Write swift-version--58304C5D6DBC2206.txt\n[3/14] Compiling KVMContracts CoreErrors.swift\n[4/14] Compiling KVMContracts Transport.swift\n[5/14] Compiling KVMContracts ClipboardPayload.swift\n[6/14] Compiling KVMContracts KVMEvent.swift\n[7/14] Compiling KVMContracts DomainIdentifiers.swift\n[8/14] Compiling KVMContracts ScreenTopology.swift\n[9/14] Compiling KVMContracts KVMClock.swift\n[10/14] Compiling KVMContracts KVMContracts.swift\n[11/14] Compiling KVMContracts KVMProtocolSession.swift\n[12/14] Emitting module KVMContracts\n[13/29] Compiling BarrierCompatibility BarrierServerProtocolSession.swift\n[14/29] Compiling BarrierCompatibility BarrierListenerTransport.swift\n[15/29] Compiling BarrierCompatibility BarrierFrameReassembler.swift\n[16/29] Compiling BarrierCompatibility BarrierMessageRegistry.swift\n[17/29] Compiling BarrierCompatibility BarrierServerHandshake.swift\n[18/29] Compiling BarrierCompatibility BarrierServerInputEncoder.swift\n[19/29] Compiling BarrierCompatibility BarrierServerHello.swift\n[20/29] Compiling BarrierCompatibility BarrierClientHelloBack.swift\n[21/30] Compiling BarrierCompatibility BarrierTrustedServerEntry.swift\n[22/30] Compiling BarrierCompatibility BarrierClipboardControlEncoder.swift\n[23/30] Compiling BarrierCompatibility BarrierControlMessages.swift\n[24/30] Compiling BarrierCompatibility BarrierCompatibility.swift\n[25/30] Compiling BarrierCompatibility BarrierBinaryCodec.swift\n[26/30] Compiling BarrierCompatibility BarrierClientHandshake.swift\n[27/30] Emitting module BarrierCompatibility\n[28/30] Compiling BarrierCompatibility BarrierClipboard.swift\n[29/46] Compiling BarrierCompatibilityTests BarrierServerProtocolSessionTests.swift\n[30/47] Compiling BarrierCompatibilityTests PackageOwnershipTests.swift\n[31/47] Compiling BarrierCompatibilityTests BarrierTrustedServerEntryTests.swift\n[32/47] Compiling BarrierCompatibilityTests BarrierServerHelloTests.swift\n[33/47] Compiling BarrierCompatibilityTests BarrierHandshakeTestsTests.swift\n[34/47] Compiling BarrierCompatibilityTests BarrierServerHandshakeTests.swift\n[35/47] Compiling BarrierCompatibilityTests BarrierListenerTransportTests.swift\n[36/47] Compiling BarrierCompatibilityTests BarrierClientHelloBackTests.swift\n[37/47] Compiling BarrierCompatibilityTests BarrierClipboardControlEncoderTests.swift\n[38/47] Compiling BarrierCompatibilityTests BarrierClipboardTests.swift\n[39/47] Compiling BarrierCompatibilityTests BarrierMessageRegistryTests.swift\n[40/47] Compiling BarrierCompatibilityTests BarrierControlMessagesTests.swift\n[41/47] Compiling BarrierCompatibilityTests BarrierBinaryCodecTests.swift\n[42/47] Compiling BarrierCompatibilityTests BarrierClientHandshakeTests.swift\n[43/47] Emitting module BarrierCompatibilityTests\n[44/47] Compiling BarrierCompatibilityTests BarrierFrameReassemblerTests.swift\n[45/47] Compiling BarrierCompatibilityTests BarrierServerInputEncoderTests.swift\n[46/49] Compiling BarrierCompatibilityPackageTests runner.swift\n[47/49] Emitting module BarrierCompatibilityPackageTests\n[47/49] Write Objects.LinkFileList\n[48/49] Linking BarrierCompatibilityPackageTests\nBuild complete! (21.53s)\n"
+    },
+    {
+      "command": "make docs-check",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
+      "stderr": ""
+    },
+    {
+      "command": "make architecture-check",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "git diff --cached --check",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "make verify REPORT=<producer-scratch>/m1_protocol_003_verify.json",
+      "exitCode": 0,
+      "stdout": "python3 Tools/cigates/cigates.py --repository-root . --report \"<producer-scratch>/m1_protocol_003_verify.json\"\nCI context: commit=fd32feea876fa3fd4cc3f8c7ffb0d6dd59e87341 machine=arm64 python=3.9.6 swift=Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)\n[PASSED] manifest-validation exit=0 durationMs=53\n[PASSED] docs-check exit=0 durationMs=136\n[PASSED] architecture-check exit=0 durationMs=473\n[PASSED] code-quality exit=0 durationMs=11765\n[PASSED] tool-test-discovery exit=0 durationMs=85\n[PASSED] evidence-test-discovery exit=0 durationMs=73\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=206\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4651\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=291\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=1084\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=479\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=462\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=93\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=375\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=259\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=68\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=76\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=58\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=618\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=682\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=1171\n[PASSED] repository-contract-tests exit=0 durationMs=83310\n[PASSED] swift-test-targets exit=0 durationMs=1075\n[PASSED] native-arm64-build exit=0 durationMs=1233\nCI report: <producer-scratch>/m1_protocol_003_verify.json\n",
+      "stderr": ""
+    }
+  ]
+}

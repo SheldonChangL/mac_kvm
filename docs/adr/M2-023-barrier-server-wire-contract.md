@@ -11,6 +11,15 @@ server role may write and read the exact byte sequences already accepted in
 (M1-PROTOCOL-002), whose consumption was scoped to M1-028 and M1-031. Reusing
 them for the server role is the decision under review here.
 
+**Update, 2026-10-29.** M2-022 has since been executed and independently reviewed, and
+it is registered as `BARRIER-EVID-0006` to `0008` (`evidence/issues/M2-022/`). The
+pointer, button, wheel, key and clipboard frames are frozen by
+[`M1-PROTOCOL-003`](M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md) once
+that ADR is accepted, so the corresponding rows of "Unsupported behavior" below are
+superseded by it. The sentence above about M2-022 not having been executed is kept for
+the record. The first-party server also enters a client any number of times; see
+M1-PROTOCOL-003 for what is and is not frozen about the `CINN` sequence.
+
 ## Binding sources
 
 - `docs/adr/M1-025-barrier-client-wire-contract.md` (4-byte big-endian frame
@@ -61,9 +70,9 @@ and are not compatibility claims.
 
 | Behavior | Reason | Unblocking condition |
 |---|---|---|
-| Pointer move, button, wheel (M2-026) | No frozen encoding in any accepted evidence | Approved server-side capture (M2-022) and an accepted contract entry |
-| Key down/up/repeat, modifier mapping (M2-027) | `DKDN`/`DKUP` bodies explicitly excluded by EVID-0005 | Same as above, plus M1-041/M1-043 key mapping |
-| Clipboard (M2-028 clipboard part) | `DCLP` body excluded by EVID-0005 | Same as above |
+| Pointer move, button, wheel (M2-026) | Superseded on 2026-10-29: frozen by M1-PROTOCOL-003 when accepted | — |
+| Key down/up/repeat, modifier mapping (M2-027) | Superseded on 2026-10-29: frozen by M1-PROTOCOL-003 when accepted | — |
+| Clipboard (M2-028 clipboard part) | Superseded on 2026-10-29: frozen by M1-PROTOCOL-003 when accepted | — |
 | Second and later `CINN` per session; non-observed mask | Sequence and mask semantics not frozen | Discriminating evidence |
 | Server TLS listener | No server identity provisioning decision; TLS must stay default on | Security decision on server certificate identity and a TLS listener issue |
 | Any token outside the subset from the client | Unknown | Fails closed except the M1-031 excluded-token skip rule does not apply to the server direction |
@@ -85,7 +94,9 @@ must never emit bytes. Core code never sees any of these tokens.
 With only this subset the Mac server can complete setup with a Barrier 2.4.0
 protocol 1.6 client, enter once and leave, and keep the session alive. It
 cannot deliver pointer, keyboard or clipboard input. No full interoperability
-or Windows claim is made.
+or Windows claim is made. (Superseded on 2026-10-29: with M1-PROTOCOL-003 the
+server delivers pointer, keyboard and clipboard input; M2-035 validates it against
+a real Linux client.)
 
 ## Rejected alternatives
 

@@ -403,3 +403,51 @@ append-only register.
   CINN sequence semantics, screen-info width/height signedness beyond positive
   non-zero bounded size handling, excluded-token body semantics or complete
   control-message ordering/state-machine behavior is established.
+
+## BARRIER-EVID-0006 to 0008 — M2-022 server-side captures and M1-PROTOCOL-003
+
+`BARRIER-EVID-0006`, `0007` and `0008` are the M2-022 server-side captures. They were
+observed between external Linux `barriers` and `barrierc` 2.4.0-release on throwaway
+Xvfb displays, through a byte-logging loopback relay, with synthetic input. An
+independent reviewer approved them on 2026-10-29
+(`evidence/issues/M2-022/independent-review.md`).
+
+| Entry | Fixture |
+| --- | --- |
+| 0006 | `Tests/Fixtures/Barrier/m2-022-linux-server-input/server-input-capture.json` (server input, enter/leave, empty clipboards on enter) |
+| 0007 | `Tests/Fixtures/Barrier/m2-022-linux-client-clipboard-keepalive/client-clipboard-keepalive-capture.json` (client `CCLP`, the count and lengths of client `DCLP`) |
+| 0008 | `Tests/Fixtures/Barrier/m2-022-linux-punctuation-clipboard/punctuation-clipboard-capture.json` (punctuation keys, `DCLP` both ways) |
+
+- **Approved contract effect.** The pointer, button, wheel, key, repeat and clipboard
+  frames are frozen in `docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md`
+  once that ADR is accepted. M1-032, M1-033, M1-034, M1-041, M1-043 and
+  M1-029-FOLLOWUP-001 may then consume them.
+- **Consumer links.**
+  - `frozenContractRefs` holds M1-PROTOCOL-003 and M1-025.
+  - `consumingTests` holds `Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py`
+    and the Swift tests that read these fixtures (`BarrierServerInputEncoderTests.swift`,
+    `BarrierServerProtocolSessionTests.swift`, `BarrierClipboardTests.swift`) or use golden
+    bytes copied from them (`BarrierClipboardControlEncoderTests.swift`).
+- **Sanitization.**
+  - Raw streams are not committed.
+  - Every clipboard format's content is zero-filled; the client-clipboard fixture
+    zero-fills the whole client `DCLP` body.
+  - No address, host or user name is retained.
+- **Incident.** Labels for clipboard formats, clipboard id 1 and a screen-info field were
+  withdrawn because no observation supports them
+  (`evidence/issues/M2-022/incident-001-unobserved-labels.md`).
+- **Non-claims.** None of the following is established:
+  - the meaning of any clipboard format id or of clipboard id 1;
+  - multi-chunk transfers;
+  - pointer values at or above `0x8000`;
+  - `DMMV` relative to a non-zero screen-info origin;
+  - wheel magnitudes beyond one notch;
+  - `DKRP` counts other than 1;
+  - key identifiers outside the observed set;
+  - mask bits other than the five observed;
+  - the `CINN` increment rule;
+  - server-to-client `CCLP`;
+  - keepalive timing;
+  - no TLS, Windows or macOS Barrier server behavior.
+
+  The first-party conventions in M1-PROTOCOL-003 are not capture claims.
