@@ -1,6 +1,7 @@
 # M1-PROTOCOL-003 Independent Protocol Review
 
-> Filed by the implementing agent from the independent reviewer's two reports of 2026-10-29.
+> Filed by the implementing agent from the independent reviewer's two reports of 2026-10-29,
+> followed by a Codex finding the Product Owner relayed the same day.
 > Each report's title line is replaced by its section heading and its other headings are
 > nested one level down; local absolute paths are replaced by `<repository>` and
 > `<producer-scratch>`. Nothing else is changed.
@@ -490,3 +491,26 @@ Checked every new sentence against the register and the code:
    two implementers to different decoders for the first-party pair.
 2. Verdict: **accept**. The ADR may be consumed by M1-032, M1-033, M1-034, M1-041, M1-043
    and M1-029-FOLLOWUP-001 once the Product Owner merges it.
+
+## Codex finding relayed by the Product Owner (fd32fee)
+
+Received 2026-10-29, verbatim:
+
+> - [P2] 上次的水平捲動方向問題尚未修正：契約第 96 行 仍要求兩軸直接除以 120。現有編碼器將向左的 deltaX = +1 編成 −120，照契約解碼會得到 −1，方向相反。應明定水平軸取反：deltaX = −wireX / 120，垂直軸維持 deltaY = wireY / 120，並補往返測試。
+> 本次更新已釐清 DCLP 長度錯誤的處理及相容性描述，未發現新增問題。
+
+Verification by the implementing agent: the finding holds.
+
+- `BARRIER-EVID-0006-CLAIM-003`: the left notch is `(−120, 0)` on the wire.
+- `BarrierServerInputEncoder.scroll` sends `−deltaX × 120`, documented as "positive
+  `deltaX` scrolls left", and its existing test matches the captured left frame.
+- The ADR's rule, both axes divided by 120, therefore decoded the left notch as
+  `deltaX = −1`, a right scroll.
+- The M2-035 smoke's X events contain buttons 1–5 only, so no horizontal scroll was ever
+  exercised end to end.
+
+Resolution: the ADR states the per-axis rule (`deltaX = −wireX / 120`,
+`deltaY = wireY / 120`). `test_wheel_rule_inverts_the_horizontal_axis` failed before the
+ADR change and passes after it. The Swift test `scrollRoundTrip` round-trips 80 delta
+pairs through the encoder and the rule; an encoder without the inversion, and the old rule,
+each fail it with 72 issues.

@@ -122,6 +122,26 @@ class M1Protocol003InputClipboardContractTests(unittest.TestCase):
         wheel = [(u16(body, 0, True), u16(body, 2, True)) for _, code, body, _ in frames("BARRIER-EVID-0006") if code == "DMWM"]
         self.assertEqual(wheel, [(0, 120), (0, -120), (-120, 0), (120, 0)])
 
+    def test_wheel_rule_inverts_the_horizontal_axis(self):
+        # Driver order up, down, left, right (BARRIER-EVID-0006-CLAIM-003). In KVMEvent.scroll a
+        # positive deltaY scrolls up and a positive deltaX scrolls left, so the left notch, -120 on
+        # the wire, must decode to deltaX = +1.
+        wheel = [(u16(body, 0, True), u16(body, 2, True)) for _, code, body, _ in frames("BARRIER-EVID-0006") if code == "DMWM"]
+
+        def toward_zero(value):
+            return -(-value // 120) if value < 0 else value // 120
+
+        self.assertEqual([(-toward_zero(x), toward_zero(y)) for x, y in wheel], [(0, 1), (0, -1), (1, 0), (-1, 0)])
+        text = " ".join((REPOSITORY_ROOT / ADR).read_text(encoding="utf-8").split())
+        for phrase in (
+            "positive `deltaX` scrolls left",
+            "wireX = −deltaX × 120",
+            "deltaX = −wireX / 120",
+            "deltaY = wireY / 120",
+        ):
+            self.assertIn(phrase, text)
+        self.assertNotIn("converts each axis by integer division by 120", text)
+
     def test_key_frames_layout_identifiers_masks_and_pairing(self):
         identifiers = set()
         for evidence_id in ("BARRIER-EVID-0006", "BARRIER-EVID-0008"):

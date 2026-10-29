@@ -104,6 +104,23 @@ struct BarrierServerPointerEncoderTests {
     let huge = try #require(encoder().scroll(deltaX: 0, deltaY: Int32.max))
     #expect(huge.suffix(2) == [0x7F, 0xFF])
   }
+
+  @Test("scroll round-trips through the M1-PROTOCOL-003 client rule, horizontal axis inverted")
+  func scrollRoundTrip() throws {
+    // The client rule: deltaX = −wireX / 120 and deltaY = wireY / 120, toward zero.
+    let largest = Int32(Int16.max) / 120
+    let deltas: [Int32] = [-largest, -3, -2, -1, 0, 1, 2, 3, largest]
+    for deltaX in deltas {
+      for deltaY in deltas where deltaX != 0 || deltaY != 0 {
+        let frame = try #require(encoder().scroll(deltaX: deltaX, deltaY: deltaY))
+        let body = Array(frame.suffix(4))
+        let wireX = Int32(Int16(bitPattern: UInt16(body[0]) << 8 | UInt16(body[1])))
+        let wireY = Int32(Int16(bitPattern: UInt16(body[2]) << 8 | UInt16(body[3])))
+        #expect(-wireX / 120 == deltaX, "deltaX \(deltaX), deltaY \(deltaY)")
+        #expect(wireY / 120 == deltaY, "deltaX \(deltaX), deltaY \(deltaY)")
+      }
+    }
+  }
 }
 
 @Suite("M2-027 Barrier keyboard encoder")

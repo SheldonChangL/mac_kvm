@@ -91,11 +91,20 @@ One notch was observed per direction:
 
 Evidence: `BARRIER-EVID-0006-CLAIM-003`.
 
-**First-party convention, not a capture claim.** The first-party Mac server sends
-multiples of 120 for several notches, saturated to 16 bits. A first-party client
-converts each axis by integer division by 120, toward zero, and drops the remainder.
-The M2-035 smoke against a real `barrierc` validates the multiple-notch case: a scroll
-of −2 produced two X button-5 events.
+**First-party convention, not a capture claim.** In the first-party code, a positive
+`deltaY` of `KVMEvent.scroll` scrolls up and a positive `deltaX` scrolls left; the
+first-party Mac server encodes them with the up and left notch signs. A left notch is
+−120 on the wire, so the horizontal axis is inverted in both directions:
+
+- the first-party Mac server sends `wireX = −deltaX × 120` and `wireY = deltaY × 120`,
+  each saturated to 16 bits, for one or more notches;
+- a first-party client converts `deltaX = −wireX / 120` and `deltaY = wireY / 120`, by
+  integer division toward zero, and drops the remainder.
+
+A left notch therefore decodes to `deltaX = +1`, and an up notch to `deltaY = +1`.
+`BarrierServerInputEncoderTests` checks the round trip. The M2-035 smoke against a real
+`barrierc` validates the vertical multiple-notch case: a scroll of −2 produced two X
+button-5 events. It exercised no horizontal scroll.
 
 ### Keys: `DKDN`, `DKUP` and `DKRP` (server to client)
 
@@ -283,10 +292,10 @@ relay with TLS disabled for the observation. Input was synthetic. Details are in
 ## Compatibility impact
 
 - First-party Mac server → Barrier 2.4 Linux client: validated by M2-035, including the
-  wheel, clipboard and text conventions. Of the shifted identifiers, only Shift+B was
-  validated.
+  vertical wheel, clipboard and text conventions. Of the shifted identifiers, only Shift+B
+  was validated, and no horizontal scroll was exercised.
 - First-party Linux client → first-party Mac server: to be validated by
-  M4-036-FOLLOWUP-001.
+  M4-036-FOLLOWUP-001, which must include a horizontal scroll.
 - Nothing about Barrier servers on other platforms is claimed.
 
 ## Rejected alternatives
@@ -310,6 +319,7 @@ They stay marked as conventions validated by interoperability runs.
 | A captured multi-chunk transfer (or registering `chunks.json`) | Protocol owner | Blocks a Barrier multi-chunk compatibility claim; does not block the first-party convention |
 | Pointer values at or above 0x8000, negative origins, and `DMMV` relative to a non-zero `DINF` origin | Protocol owner | Blocks multi-monitor client layouts |
 | Non-US key identifiers | M1-045 owner | Blocks any non-US layout claim |
+| The sign convention of `KVMEvent.scroll` is stated only in first-party code and here, not in C-001 | KVMContracts owner | Blocks any capture or injection backend that does not follow this ADR |
 
 ## Review record
 
@@ -330,6 +340,12 @@ The same reviewer re-reviewed the revision on 2026-10-29. The verdict was accept
 five wording nits (the `DCLP` inner-length case, the M2-035 wording, the rejected
 alternative, a test name and the register narrative) were fixed afterwards. Both
 reports are in `evidence/issues/M1-PROTOCOL-003/independent-review.md`.
+
+A Codex review of `fd32fee`, relayed by the Product Owner on 2026-10-29, found (P2) that
+the client rule divided both axes by 120 without inverting the horizontal one, so a
+first-party client would scroll horizontally the opposite way from the first-party
+server. The rule now inverts the horizontal axis. The contract test and a Swift
+round-trip test pin it, and the finding is recorded in the same evidence file.
 
 ## Rollback
 
