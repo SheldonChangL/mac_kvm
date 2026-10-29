@@ -41,7 +41,11 @@ sharing on 2026-10-29 ("剪貼簿跟標點符號都做").
 
 ## Manual
 
-Pending: the owner run on the real pasteboard and the owner's Linux desktop.
+Owner run on 2026-10-29 with the build of `cba4ca8`, the real Mac pasteboard and
+the owner's Linux desktop: the owner reported "驗證功能ok" for punctuation keys
+and clipboard both ways. The server log shows one send on an enter, one receive
+on a return, and no re-send on the next two enters. Details:
+`evidence/issues/M2-035/owner-run/README.md` (Punctuation keys and clipboard).
 The smoke used the in-memory stand-in on the Mac side by design.
 
 ## Review

@@ -74,8 +74,43 @@ Linux machine (both temporary, by the owner):
 Processes started from the agent's background session ran at nice 5; the final
 owner runs used the owner's Terminal at normal priority.
 
+## Punctuation keys and clipboard (2026-10-29)
+
+The server was relaunched in the owner's Terminal with the build of `cba4ca8`
+(branch `codex/m2-punctuation-clipboard`), same environment as above, with the
+Mac pasteboard as the server clipboard. The agent asked the owner to:
+
+1. type `- = [ ] \ ; ' ` , . /` and, with Shift, `_ + { } | : " ~ < > ?` in a
+   Linux text editor;
+2. copy text on the Mac, cross to Linux and paste it there;
+3. copy text on Linux, return to the Mac and paste it there.
+
+The owner reported: "驗證功能ok". The agent did not see the screens, so the
+punctuation result rests on that report alone. The server log (event names
+only, no content, size or hash) supports the clipboard part:
+
+| Time (UTC) | Server event |
+|---|---|
+| 01:21:31.258 | input is now remote |
+| 01:21:31.278 | clipboard sent to the client |
+| 01:21:31.589 | input is local again |
+| 01:22:13.722 | input is now remote |
+| 01:22:20.586 | input is local again |
+| 01:22:20.742 | clipboard received from the client |
+| 01:22:25.056 | input is now remote (nothing re-sent) |
+| 01:22:25.325 | input is local again |
+| 01:24:43.301 | input is now remote (nothing re-sent) |
+| 01:25:15.039 | input is local again |
+
+- The pasteboard read and the send finished 20 ms after the enter, so no
+  pasteboard permission prompt blocked the read on this macOS version. The
+  owner did not report seeing a prompt.
+- The client's copy arrived 156 ms after the return. The next two enters sent
+  nothing back, which is the no-echo rule.
+- No error or disconnect was logged; the server kept running.
+
 ## Sanitization
 
-No addresses, host names, screen names of the owner's machines, typed text or
-key material are recorded; the timing statistics carry counts and durations
-only.
+No addresses, host names, screen names of the owner's machines, typed text,
+clipboard text or key material are recorded; the timing statistics carry
+counts and durations only.

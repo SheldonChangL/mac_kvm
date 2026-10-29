@@ -81,8 +81,9 @@ client gets it again.
 - The local generation is read after the write. If another app changes the
   pasteboard in between, that change is not sent to that client (M1-053
   documents the same window).
-- Reading the pasteboard on a macOS version with pasteboard privacy prompts
-  is not verified yet; it needs the owner run.
+- Pasteboard privacy prompts: on macOS 26.6.2 the owner run read the
+  pasteboard without a blocking prompt. Other macOS versions are not
+  verified.
 
 ## Rollback
 
