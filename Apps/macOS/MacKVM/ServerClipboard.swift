@@ -62,9 +62,12 @@ final class ServerClipboard<Store: LocalClipboard>: ClipboardSync, @unchecked Se
 
   func inbound(_ payload: ClipboardPayload, from screen: ScreenID) -> Bool {
     lock.withLock {
-      guard let admitted = router.inbound(payload, from: screen),
-        let generation = store.write(admitted.utf8Text, limit: limit)
+      guard let admitted = router.inbound(payload, from: screen, generation: store.generation())
       else { return false }
+      guard let generation = store.write(admitted.utf8Text, limit: limit) else {
+        router.applyFailed(from: screen)
+        return false
+      }
       router.applied(generation: generation, from: screen)
       return true
     }

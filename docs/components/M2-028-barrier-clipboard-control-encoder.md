@@ -58,8 +58,10 @@ Barrier 2.4 sends clipboards in 32 KiB chunks, and a client's transfer carries
 other formats besides the text (measured in the addendum's chunk table). So the
 session accepts inbound frames of up to 64 KiB (control frames other than
 `DCLP` still go through the 4 KiB decoder limit) and transfers of up to 4 MiB,
-of which the text may use 1 MiB. Before 2026-10-29 the frame limit was 4 KiB,
-which ended the session on any client copy over about 1.6 KB.
+of which the text may use 1 MiB. A single frame over 64 KiB still ends the
+session; the bound rests on the Barrier 2.4.0 measurement. Before 2026-10-29
+the frame limit was 4 KiB, which ended the session on any client copy over
+about 1.6 KB.
 
 Tests: `BarrierClipboardTests` (7) compare the framing with both captured
 server transfers, rebuild the captured client transfer, round-trip chunked

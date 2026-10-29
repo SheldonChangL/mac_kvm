@@ -178,7 +178,10 @@ private func capturedClientClipboardFrames() throws -> [[UInt8]] {
   }
   return frames
 }
-/// `DMMV` at (1599, 899): the far corner of a 1600 x 900 client.
+/// A small client transfer whose event proves that nothing came before it.
+private let marker = BarrierClipboard.frames(
+  id: 0, sequence: 1, data: BarrierClipboard.marshal(text: "marker"))
+
 /// A marshalled clipboard with `text` and an HTML format of `html` bytes.
 private func marshalled(text: String, html: Int) -> [UInt8] {
   func bigEndian(_ value: Int) -> [UInt8] {
@@ -192,6 +195,7 @@ private func marshalled(text: String, html: Int) -> [UInt8] {
     + bigEndian(html) + [UInt8](repeating: 0x68, count: html)
 }
 
+/// `DMMV` at (1599, 899): the far corner of a 1600 x 900 client.
 private let cornerMove: [UInt8] = [
   0x00, 0x00, 0x00, 0x08, 0x44, 0x4D, 0x4D, 0x56, 0x06, 0x3F, 0x03, 0x83,
 ]
@@ -386,14 +390,37 @@ struct BarrierServerProtocolSessionTests {
     #expect(pipe.disconnectCount == 0)
   }
 
+  @Test("client text over 1 MiB is dropped even inside a transfer under 4 MiB")
+  func clipboardTextLimit() async throws {
+    let pipe = PipeTransport()
+    let session = try await connected(pipe)
+    var events = session.events.makeAsyncIterator()
+    let text = String(repeating: "x", count: (1 << 20) + 1)
+    let large = BarrierClipboard.frames(
+      id: 0, sequence: 1, data: BarrierClipboard.marshal(text: text))
+    pipe.feed((large + marker).flatMap { $0 })
+    guard case .clipboard(let payload)? = try await events.next() else {
+      Issue.record("no clipboard event")
+      return
+    }
+    #expect(payload.utf8Text == "marker")
+    #expect(pipe.disconnectCount == 0)
+  }
+
   @Test("client clipboard frames without usable text are dropped and the session stays usable")
   func clientClipboardIgnored() async throws {
     let pipe = PipeTransport()
     let session = try await connected(pipe)
+    var events = session.events.makeAsyncIterator()
     let clipboard = try capturedClientClipboardFrames()
     #expect(clipboard.count == 4)
-    pipe.feed(clipboard.flatMap { $0 } + cnop)
-    await session.waitForReceivedFrames(atLeast: clipboard.count + 1)
+    pipe.feed(clipboard.flatMap { $0 } + cnop + marker.flatMap { $0 })
+    // The marker is the first event, so the captured frames yielded none.
+    guard case .clipboard(let payload)? = try await events.next() else {
+      Issue.record("no clipboard event")
+      return
+    }
+    #expect(payload.utf8Text == "marker")
     try await session.send(.leaveScreen(screen: screen))
     #expect(Array(pipe.sent.suffix(cout.count)) == cout)
     #expect(pipe.disconnectCount == 0)

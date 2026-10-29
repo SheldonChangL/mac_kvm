@@ -54,7 +54,9 @@ frozen; the first forwarded input event ends the session by design.
   without text are dropped, clipboard 1 frames are ignored, and the session
   stays up.
 - Inbound frames may be up to 64 KiB for Barrier's 32 KiB clipboard chunks;
-  every other client frame still meets the 4 KiB decoder limit.
+  every other client frame still meets the 4 KiB decoder limit. A single
+  frame over 64 KiB still ends the session: the bound rests on the Barrier
+  2.4.0 measurement, and a client that chunks differently is not supported.
 - Tests in `BarrierServerProtocolSessionTests`: `clipboardSends`,
   `clipboardReceives`, `largeClipboardReceives` (a 600,001-byte text with a
   900,000-byte second format in 32 KiB chunks, after a clipboard 1 transfer),

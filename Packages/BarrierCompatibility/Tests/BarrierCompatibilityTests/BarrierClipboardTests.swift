@@ -150,4 +150,55 @@ struct BarrierClipboardTests {
     // After a rejection the next complete transfer still assembles.
     #expect(try assemble(frames, into: &long)?.data == data)
   }
+
+  @Test("sequence, mark, length and size-string violations are rejected; a new start replaces")
+  func malformedFrames() throws {
+    let data = BarrierClipboard.marshal(text: "probe")
+    let frames = BarrierClipboard.frames(id: 0, sequence: 1, data: data).map {
+      Array($0.dropFirst(4))
+    }
+    let other = BarrierClipboard.frames(id: 0, sequence: 2, data: data).map {
+      Array($0.dropFirst(4))
+    }
+
+    var chunkSequence = BarrierClipboardAssembler(limit: 1 << 20)
+    _ = try chunkSequence.receive(payload: frames[0])
+    #expect(throws: BarrierClipboardError.malformed) {
+      try chunkSequence.receive(payload: other[1])
+    }
+
+    var endSequence = BarrierClipboardAssembler(limit: 1 << 20)
+    _ = try endSequence.receive(payload: frames[0])
+    _ = try endSequence.receive(payload: frames[1])
+    #expect(throws: BarrierClipboardError.malformed) { try endSequence.receive(payload: other[2]) }
+
+    for mark: UInt8 in [0, 4] {
+      var badMark = BarrierClipboardAssembler(limit: 1 << 20)
+      var frame = frames[0]
+      frame[9] = mark
+      #expect(throws: BarrierClipboardError.malformed) { try badMark.receive(payload: frame) }
+    }
+
+    var badLength = BarrierClipboardAssembler(limit: 1 << 20)
+    #expect(throws: BarrierClipboardError.malformed) {
+      try badLength.receive(payload: frames[1] + [0])
+    }
+
+    let header = Array(frames[0].prefix(10))
+    for size in ["12a", "12345678901", ""] {
+      var badSize = BarrierClipboardAssembler(limit: 1 << 20)
+      let string = Array(size.utf8)
+      let start = header + [0, 0, 0, UInt8(string.count)] + string
+      #expect(throws: BarrierClipboardError.malformed) { try badSize.receive(payload: start) }
+    }
+
+    var restart = BarrierClipboardAssembler(limit: 1 << 20)
+    _ = try restart.receive(payload: frames[0])
+    _ = try restart.receive(payload: frames[1])
+    _ = try restart.receive(payload: other[0])
+    _ = try restart.receive(payload: other[1])
+    let transfer = try #require(try restart.receive(payload: other[2]))
+    #expect(transfer.sequence == 2)
+    #expect(transfer.data == data)
+  }
 }
