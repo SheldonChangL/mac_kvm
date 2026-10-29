@@ -11,7 +11,8 @@ Linux client that speaks the Barrier wire to the first-party Mac server
 
 `BarrierKeyboardDecoder` pairs every release and repeat with its press by the
 opaque button field, so a release carries its press's identifier even when the
-frame's own identifier differs. It never drops a release, ignores mask bits
+frame's own identifier differs, and a held button keeps its first press's
+identity until it is released. It never drops a release, ignores mask bits
 outside the five frozen ones, treats any repeat count as one repeat, passes
 every identifier through unchanged, and fails closed with a sticky, typed
 `BarrierKeyboardDecoderError` that leaves the held keys readable for the
@@ -82,8 +83,9 @@ production file imports only `KVMContracts`, for `KeyPhase` and
     and `capsLockBit` 0x1000.
 - `BarrierKeyEvent`: `phase` (`KeyPhase`: `down`, `up`, `repeatKey`),
   `identifier`, `modifiers` (`ModifierState`), `button` and `pairing`.
-- `BarrierKeyPairing`: `press` (`DKDN`), `paired` (a release or repeat of a held
-  button, carrying the press's identifier) and `unpaired` (a release or repeat
+- `BarrierKeyPairing`: `press` (`DKDN` of a button that is not held), `paired`
+  (a press, release or repeat of a held button, carrying the press's
+  identifier) and `unpaired` (a release or repeat
   of a button that is not held, carrying its own identifier).
 - `BarrierHeldKey`: `button` and `identifier`, the identity its release will
   carry.
@@ -128,7 +130,7 @@ wrong direction.
 | Frame | Button held? | Event | Held set |
 |---|---|---|---|
 | `DKDN` | no | `down`, own identifier, `press` | the button is held with this identifier |
-| `DKDN` | yes | `down`, own identifier, `press` | the identity is replaced: the latest press wins |
+| `DKDN` | yes | `down`, the press's identifier, `paired` | unchanged: the first identity stays for the whole press |
 | `DKUP` | yes | `up`, the press's identifier, `paired` | the button is freed |
 | `DKUP` | no | `up`, own identifier, `unpaired` | unchanged |
 | `DKRP` | yes | `repeatKey`, the press's identifier, `paired` | unchanged |
@@ -151,8 +153,17 @@ button.
   a key that this view lost be released on the injector side; what an unpaired
   release means is decided downstream by the pressed-input ledger
   (M1-063-FOLLOWUP-001).
-- First-party policy, not a Barrier claim: a second `DKDN` for a held button
-  was never observed. The latest press wins and is emitted as another `down`.
+- First-party fail-safe policy, not a Barrier claim: a second `DKDN` for a
+  held button was never observed. While the button is held, the first press's
+  identity stays for the whole press: the second `DKDN` is emitted as `down`
+  with the held identifier, its own mask and the same button (`paired`), and
+  the held entry is unchanged. Every emitted press is therefore matched by a
+  release of the same identity. Replacing the identity instead could leave the
+  first key pressed if M1-043 maps the two identifiers to different keys, which
+  the contract's decoder policy rules out: "no unknown identifier, button, mask
+  bit or count may cause a decoder to drop a key or button release" (Frozen
+  Decision 7: fail-safe outweighs completeness). The cost is a duplicate
+  `down` of a key that is already pressed.
 - First-party policy, not a Barrier claim: a paired repeat carries the press's
   identity. All 14 captured repeats carry the press identifier, so no
   observation distinguishes this from using the repeat's own.
@@ -258,8 +269,9 @@ into a press would need a matching release.
 - No `DKRP` count semantics beyond "one repeat"; counts other than 1 were never
   captured.
 - No mask bit other than the five, and no lock-state semantics.
-- No Barrier claim for the first-party policies above: unpaired emission, the
-  latest press winning, and the repeat taking the press identity.
+- No Barrier claim for the first-party policies above: unpaired emission, a
+  held button keeping its first identity, and the repeat taking the press
+  identity.
 - No key injection, pressed-input ledger, client session, `KVMEvent` mapping or
   TLS behavior.
 - No Barrier/Deskflow source, header, generated constant or decompiled output
@@ -280,7 +292,8 @@ into a press would need a matching release.
   under the other Shift state; Caps Lock as two frames per toggle with no
   repeat; one stable button per key and no two keys sharing a button;
 - pairing and policy: unpaired releases and repeats, a second release, a
-  second press of a held button, identifiers outside the frozen set with
+  second press of a held button keeping the first identity until its release,
+  identifiers outside the frozen set with
   extreme buttons, masks and counts, every one of the 65,536 button values held
   at once and each released with another identifier, repeat counts 0 to
   0xFFFF, the five mask bits in all 32 combinations with every other bit
@@ -304,10 +317,6 @@ into a press would need a matching release.
 
 - A second press of a held button and an unpaired release or repeat were never
   observed; their handling is first-party policy pinned by tests.
-- Because the latest press wins, a second press of a held button with another
-  identifier displaces the first identity. If M1-043 maps the two identifiers
-  to different keys, the first key's downstream press is released only by the
-  session's terminal cleanup, not by a decoded event.
 - The decoder trusts the caller to pass the correct direction; it cannot verify
   the transport direction itself.
 - The held set holds at most one entry per button value, so at most 65,536

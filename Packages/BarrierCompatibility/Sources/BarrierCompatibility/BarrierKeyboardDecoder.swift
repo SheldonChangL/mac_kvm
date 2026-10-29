@@ -75,9 +75,9 @@ struct BarrierKeyButton: Hashable, Comparable, Sendable {
 
 /// Where an event's identifier came from.
 enum BarrierKeyPairing: Equatable, Sendable {
-  /// `DKDN`: this frame's identifier; the button is now held.
+  /// `DKDN` of a button that is not held: this frame's identifier; the button is now held.
   case press
-  /// `DKUP` or `DKRP` of a held button: the press's identifier.
+  /// `DKDN`, `DKUP` or `DKRP` of a held button: the press's identifier.
   case paired
   /// `DKUP` or `DKRP` of a button that is not held: this frame's own identifier.
   case unpaired
@@ -104,8 +104,10 @@ struct BarrierHeldKey: Equatable, Sendable {
 /// Decodes the key frames of one Barrier client session and pairs each release and repeat
 /// with its press by button.
 ///
-/// - `DKDN` holds the button with this frame's identifier. A press of a button that is
-///   already held replaces the identity: the latest press wins.
+/// - `DKDN` of a button that is not held holds it with this frame's identifier. `DKDN` of a
+///   held button keeps the first identity for the whole press: it is emitted with the held
+///   identifier and its own mask, and the held entry is unchanged, so every emitted press is
+///   matched by a release of the same identity.
 /// - `DKUP` of a held button frees it and carries the press's identifier, which may differ
 ///   from the frame's own (0x0041 down, 0x0061 up). `DKUP` of a button that is not held is
 ///   still emitted, with its own identifier: a release is never dropped.
@@ -181,18 +183,23 @@ struct BarrierKeyboardDecoder: Sendable {
     let press: BarrierKeyIdentifier?
     switch token {
     case .dkdn:
-      held[button] = identifier
-      return BarrierKeyEvent(
-        phase: .down, identifier: identifier, modifiers: modifiers, button: button,
-        pairing: .press)
+      // While the button is held, the first press's identity stays for the whole press.
+      press = held[button]
+      if press == nil { held[button] = identifier }
     case .dkup:
       press = held.removeValue(forKey: button)
     case .dkrp:
       press = held[button]
     }
+    let pairing: BarrierKeyPairing
+    if press != nil {
+      pairing = .paired
+    } else {
+      pairing = token == .dkdn ? .press : .unpaired
+    }
     return BarrierKeyEvent(
       phase: token.phase, identifier: press ?? identifier, modifiers: modifiers, button: button,
-      pairing: press == nil ? .unpaired : .paired)
+      pairing: pairing)
   }
 
   /// Big-endian 16-bit read; the caller has already checked the exact body length.

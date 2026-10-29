@@ -210,8 +210,10 @@ private func contractEvents(
     let press = pressed[button]
     let pairing: BarrierKeyPairing = press == nil ? .unpaired : .paired
     if token == dkdnToken {
-      pressed[button] = identifier
-      events.append(event(.down, identifier, modifiers, button: button, .press))
+      // A press of a held button keeps the first identity for the whole press.
+      pressed[button] = press ?? identifier
+      let pressPairing: BarrierKeyPairing = press == nil ? .press : .paired
+      events.append(event(.down, press ?? identifier, modifiers, button: button, pressPairing))
     } else if token == dkupToken {
       pressed[button] = nil
       events.append(event(.up, press ?? identifier, modifiers, button: button, pairing))
@@ -648,26 +650,42 @@ struct BarrierKeyboardDecoderTests {
     #expect(decoder.failure == nil)
   }
 
-  @Test func secondPressOnAHeldButtonReplacesTheIdentity() throws {
+  @Test func secondPressOnAHeldButtonKeepsTheFirstIdentity() throws {
     var decoder = BarrierKeyboardDecoder()
     #expect(
       try decoder.decode(payload: dkdn(0x61, button: 38), direction: .serverToClient)
         == event(.down, 0x61, button: 38, .press))
+    // While the button is held, another press keeps the first identity for the whole press: it
+    // is emitted with the held identity, its own mask and the same button, and the held entry
+    // is unchanged.
+    #expect(
+      try decoder.decode(payload: dkdn(0x41, mask: 0x0001, button: 38), direction: .serverToClient)
+        == event(.down, 0x61, shiftOnly, button: 38, .paired))
+    #expect(decoder.heldKeys == held([(38, 0x61)]))
+    #expect(
+      try decoder.decode(payload: dkdn(0xEFE1, button: 38), direction: .serverToClient)
+        == event(.down, 0x61, button: 38, .paired))
+    #expect(decoder.heldKeys == held([(38, 0x61)]))
+    #expect(
+      try decoder.decode(payload: dkrp(0x41, mask: 0x0001, button: 38), direction: .serverToClient)
+        == event(.repeatKey, 0x61, shiftOnly, button: 38, .paired))
+    // Every emitted press is matched by a release of the same identity.
+    #expect(
+      try decoder.decode(payload: dkup(0x41, button: 38), direction: .serverToClient)
+        == event(.up, 0x61, button: 38, .paired))
+    #expect(decoder.heldKeys.isEmpty)
+    // Once released, the button takes a fresh press with that frame's own identity.
     #expect(
       try decoder.decode(payload: dkdn(0x41, mask: 0x0001, button: 38), direction: .serverToClient)
         == event(.down, 0x41, shiftOnly, button: 38, .press))
-    // Latest press wins, and a button is held once.
     #expect(decoder.heldKeys == held([(38, 0x41)]))
-    #expect(
-      try decoder.decode(payload: dkrp(0x61, button: 38), direction: .serverToClient)
-        == event(.repeatKey, 0x41, button: 38, .paired))
     #expect(
       try decoder.decode(payload: dkup(0x61, button: 38), direction: .serverToClient)
         == event(.up, 0x41, button: 38, .paired))
-    #expect(decoder.heldKeys.isEmpty)
     #expect(
       try decoder.decode(payload: dkup(0x61, button: 38), direction: .serverToClient)
         == event(.up, 0x61, button: 38, .unpaired))
+    #expect(decoder.heldKeys.isEmpty)
   }
 
   @Test func unknownIdentifiersAreRecordedAndReleasedCleanly() throws {
