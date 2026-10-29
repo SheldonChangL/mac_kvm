@@ -71,5 +71,12 @@
       "stdout": "python3 Tools/cigates/cigates.py --repository-root . --report \"<producer-scratch>/verify.json\"\nCI context: commit=76f4045415d298612384a4348c4046e7ff0b88d7 machine=arm64 python=3.9.6 swift=Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)\n[PASSED] manifest-validation exit=0 durationMs=53\n[PASSED] docs-check exit=0 durationMs=140\n[PASSED] architecture-check exit=0 durationMs=228\n[PASSED] code-quality exit=0 durationMs=26048\n[PASSED] tool-test-discovery exit=0 durationMs=77\n[PASSED] evidence-test-discovery exit=0 durationMs=77\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=230\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4573\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=488\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=1288\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=614\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=582\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=94\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=315\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=346\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=71\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=79\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=55\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=17243\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=42748\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=47590\n[PASSED] repository-contract-tests exit=0 durationMs=137618\n[PASSED] swift-test-targets exit=0 durationMs=2120\n[PASSED] native-arm64-build exit=0 durationMs=1974\nCI report: <producer-scratch>/verify.json\n",
       "stderr": ""
     }
-  ]
+  ],
+  "date": "2026-10-29",
+  "toolchain": {
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6",
+    "os": "macOS 26.6.2 arm64"
+  }
 }
