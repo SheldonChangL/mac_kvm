@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-001",
+  "recordedAt": "2026-10-29",
+  "buildHost": {
+    "os": "macOS 26.6.2 (25G83)",
+    "architecture": "arm64",
+    "container": "Docker 29.4.0, platform linux/amd64 (emulated)"
+  },
+  "linuxImage": {
+    "reference": "swift:6.2.3-jammy",
+    "digest": "sha256:33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6",
+    "swift": "Swift version 6.2.3 (swift-6.2.3-RELEASE)",
+    "os": "Ubuntu 22.04",
+    "architecture": "x86_64"
+  },
+  "targetLinuxPC": {
+    "os": "Ubuntu 22.04.5 LTS",
+    "architecture": "x86_64",
+    "session": "x11",
+    "swiftInstalled": false,
+    "packagesPresent": ["libx11-dev", "libxtst-dev", "libxrandr-dev", "libxfixes-dev", "libxtst6"],
+    "packagesAbsent": ["libssl-dev"]
+  },
+  "network": "The TLS spike connects to github.com:443; no peer of this project was contacted."
+}
