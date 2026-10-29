@@ -36,6 +36,21 @@ FROZEN_KEY_IDENTIFIERS = (
     | {0xEFE1, 0xEFE2, 0xEFE3, 0xEFE4, 0xEFE9, 0xEFEA, 0xEFEB, 0xEFEC, 0xEFE5}
 )
 FROZEN_MASK_BITS = 0x0001 | 0x0002 | 0x0004 | 0x0010 | 0x1000
+# First-party convention: shifted identifiers the first-party server sends beyond the capture.
+CONVENTION_IDENTIFIERS = set(range(0x42, 0x5B)) | {0x29, 0x40, 0x23, 0x24, 0x25, 0x5E, 0x26, 0x2A, 0x28}
+# The capture driver's key order (evidence/e2e/M2-022/tools/capture_server_input.py).
+DRIVER_ORDER = (
+    [(chr(c), c) for c in range(ord("a"), ord("z") + 1)]
+    + [(str(d), 0x30 + d) for d in range(10)]
+    + [("Return", 0xEF0D), ("Escape", 0xEF1B), ("Tab", 0xEF09), ("space", 0x20), ("BackSpace", 0xEF08),
+       ("Delete", 0xEFFF), ("Left", 0xEF51), ("Right", 0xEF53), ("Up", 0xEF52), ("Down", 0xEF54),
+       ("Home", 0xEF50), ("End", 0xEF57), ("Prior", 0xEF55), ("Next", 0xEF56), ("Insert", 0xEF63)]
+    + [(f"F{n}", 0xEFBD + n) for n in range(1, 13)]
+    + list(zip(("minus", "equal", "bracketleft", "bracketright", "backslash", "semicolon",
+                "apostrophe", "grave", "comma", "period", "slash"), PLAIN_PUNCTUATION))
+    + [("KP_Enter", 0xEF8D), ("XF86AudioRaiseVolume", 0xE0AF), ("XF86AudioLowerVolume", 0xE0AE),
+       ("XF86AudioMute", 0xE0AD)]
+)
 WITHDRAWN_LABELS = ("HTML", "bitmap", "primary selection", "warp")
 
 
@@ -181,12 +196,60 @@ class M1Protocol003InputClipboardContractTests(unittest.TestCase):
             self.assertIn(ADR, entry["frozenContractRefs"])
             self.assertIn(THIS_TEST, entry["consumingTests"])
 
+    def test_key_identifiers_follow_the_capture_driver_order(self):
+        downs = [u16(body, 0) for direction, code, body, _ in frames("BARRIER-EVID-0006") if code == "DKDN"]
+        self.assertEqual(len(DRIVER_ORDER), 78)
+        for (name, expected), actual in zip(DRIVER_ORDER, downs):
+            self.assertEqual(actual, expected, name)
+
+    def test_modifier_bits_and_caps_lock_by_observation(self):
+        observed = frames("BARRIER-EVID-0006")
+
+        def key(index):
+            _, code, body, _ = observed[index]
+            return code, u16(body, 0), u16(body, 2)
+
+        self.assertEqual([key(i) for i in (403, 405)], [("DKDN", 0xEFE1, 0), ("DKDN", 0x41, 0x0001)])
+        self.assertEqual([key(i) for i in (430, 432)], [("DKDN", 0xEFE3, 0), ("DKDN", 0x63, 0x0002)])
+        self.assertEqual([key(i) for i in (438, 440)], [("DKDN", 0xEFE9, 0), ("DKDN", 0x61, 0x0004)])
+        self.assertEqual([key(i) for i in (446, 448)], [("DKDN", 0xEFEB, 0), ("DKDN", 0x61, 0x0010)])
+        self.assertEqual(
+            [key(i) for i in (454, 456, 458)],
+            [("DKDN", 0xEFE3, 0), ("DKDN", 0xEFE1, 0x0002), ("DKDN", 0xEF1B, 0x0003)],
+        )
+        self.assertEqual(
+            [key(i) for i in (514, 516, 518, 522, 524)],
+            [("DKDN", 0xEFE5, 0), ("DKUP", 0xEFE5, 0x1000), ("DKDN", 0x41, 0x1000),
+             ("DKDN", 0xEFE5, 0x1000), ("DKUP", 0xEFE5, 0x1000)],
+        )
+
+    def test_cinn_sequences_and_held_button(self):
+        observed = frames("BARRIER-EVID-0006")
+        for index, sequence in ((7, 1), (563, 3)):
+            _, code, body, _ = observed[index]
+            self.assertEqual((code, u16(body, 0), u16(body, 2), u32(body, 4), u16(body, 8)), ("CINN", 0, 450, sequence, 0))
+        held = [(code, body) for _, code, body, _ in observed[62:70] if code in ("DMDN", "DMUP", "DMMV")]
+        self.assertEqual([code for code, _ in held], ["DMDN", "DMMV", "DMUP"])
+        self.assertEqual((held[0][1], held[2][1]), (bytes([1]), bytes([1])))
+
+    def test_convention_identifiers_are_declared_and_outside_the_capture(self):
+        self.assertEqual(len(CONVENTION_IDENTIFIERS), 34)
+        self.assertFalse(CONVENTION_IDENTIFIERS & FROZEN_KEY_IDENTIFIERS)
+        text = (REPOSITORY_ROOT / ADR).read_text(encoding="utf-8")
+        self.assertIn("0x0042–0x005A", text)
+        for value in (0x29, 0x40, 0x23, 0x24, 0x25, 0x5E, 0x26, 0x2A, 0x28):
+            self.assertIn(f"0x{value:04X}", text)
+
     def test_adr_keeps_semantics_unfrozen_and_labels_withdrawn(self):
         text = " ".join((REPOSITORY_ROOT / ADR).read_text(encoding="utf-8").split())
         for phrase in (
             "No format's meaning is frozen",
             "First-party convention, not a capture claim",
             "First-party conventions, not capture claims",
+            "Decoder policy (first-party, not a capture claim)",
+            "Rejection semantics",
+            "signedness not frozen",
+            "total byte length",
             "fails closed",
             "Non-claims",
         ):

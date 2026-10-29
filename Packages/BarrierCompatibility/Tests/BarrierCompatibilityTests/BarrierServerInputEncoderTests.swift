@@ -199,6 +199,48 @@ struct BarrierServerKeyboardEncoderTests {
     #expect(capsMinus.first?[8...11] == [0x00, 0x2D, 0x10, 0x00])
   }
 
+  /// M1-PROTOCOL-003: what the first-party server can emit stays inside the contract.
+  @Test("every emitted key identifier is frozen by M1-PROTOCOL-003 or one of its conventions")
+  func identifiersStayInContract() throws {
+    var frozen = Set<UInt16>(0x61...0x7A)
+    frozen.formUnion(0x30...0x39)
+    frozen.formUnion(0xEF51...0xEF54)
+    frozen.formUnion(0xEFBE...0xEFC9)
+    let listed: [UInt16] = [
+      0x20, 0x41, 0x21, 0x2D, 0x3D, 0x5B, 0x5D, 0x5C, 0x3B, 0x27, 0x60, 0x2C, 0x2E, 0x2F, 0x5F,
+      0x2B, 0x7B, 0x7D, 0x7C, 0x3A, 0x22, 0x7E, 0x3C, 0x3E, 0x3F, 0xEF0D, 0xEF1B, 0xEF09, 0xEF08,
+      0xEFFF, 0xEF63, 0xEF50, 0xEF57, 0xEF55, 0xEF56, 0xEF8D, 0xE0AF, 0xE0AE, 0xE0AD, 0xEFE1,
+      0xEFE2, 0xEFE3, 0xEFE4, 0xEFE9, 0xEFEA, 0xEFEB, 0xEFEC, 0xEFE5,
+    ]
+    frozen.formUnion(listed)
+    #expect(frozen.count == 100)
+    var convention = Set<UInt16>(0x42...0x5A)
+    convention.formUnion([0x29, 0x40, 0x23, 0x24, 0x25, 0x5E, 0x26, 0x2A, 0x28] as [UInt16])
+    #expect(convention.count == 34)
+    #expect(convention.isDisjoint(with: frozen))
+    var keys: [VirtualKey] = (0..<26).map { VirtualKey.letter(UInt8($0)) }
+    keys += (0..<10).map { VirtualKey.digit(UInt8($0)) }
+    keys += (1...12).map { VirtualKey.function(UInt8($0)) }
+    keys += PunctuationKey.allCases.map { VirtualKey.punctuation($0) }
+    keys += [
+      .enter, .escape, .tab, .space, .backspace, .delete, .left, .right, .up, .down, .home, .end,
+      .pageUp, .pageDown, .shift, .control, .option, .command, .capsLock, .volumeUp, .volumeDown,
+      .mute,
+    ]
+    var emitted = Set<UInt16>()
+    for key in keys where BarrierServerInputEncoder.canEncode(key) {
+      for modifiers in [none, shift, caps, ModifierState(shift: true, capsLock: true)] {
+        for phase in [KeyPhase.down, .up, .repeatKey] {
+          for frame in try encoder().key(key, phase: phase, modifiers: modifiers) {
+            emitted.insert(UInt16(frame[8]) << 8 | UInt16(frame[9]))
+          }
+        }
+      }
+    }
+    #expect(emitted.subtracting(frozen.union(convention)).isEmpty)
+    #expect(convention.isSubset(of: emitted))
+  }
+
   @Test("keys without an evidence-backed identifier are rejected and never encoded")
   func unsupportedKeys() {
     let unsupported: [VirtualKey] = [

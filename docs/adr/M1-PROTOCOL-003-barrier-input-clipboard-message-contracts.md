@@ -12,7 +12,8 @@ Once accepted, these contracts may be consumed by:
 - the client session M1-029-FOLLOWUP-001 ([`M4-SCOPE-001`](M4-SCOPE-001-linux-client-first.md)).
 
 The first-party Mac server's existing encoders, which were implemented from the same
-evidence before review, also become formally backed by these contracts.
+evidence before review, also become formally backed by these contracts. Revised on
+2026-10-29 after an independent protocol review; see "Review record".
 
 ## Context
 
@@ -44,13 +45,15 @@ Every multi-byte field below is big-endian.
 
 | Field | Width | Frozen rule |
 | --- | ---: | --- |
-| x | 2 bytes | unsigned; the absolute pointer x in the client's `DINF` coordinate space |
-| y | 2 bytes | unsigned; the absolute pointer y in the same space |
+| x | 2 bytes | big-endian; signedness not frozen; accepted only in `0x0000…0x7FFF` |
+| y | 2 bytes | big-endian; signedness not frozen; accepted only in `0x0000…0x7FFF` |
 
-Each observed value equals the previous client position plus the server's relative
-move, starting from the `CINN` point. Only values below `0x8000` were observed. Values
-at or above `0x8000` are outside this contract, and a decoder rejects such a frame
-without moving the pointer. Evidence: `BARRIER-EVID-0006-CLAIM-001`.
+The values are absolute pointer positions in client pixels. Each observed value equals
+the previous position plus the server's relative move, starting from the `CINN` point
+(`BARRIER-EVID-0006-CLAIM-001`). A value outside `0x0000…0x7FFF`, or outside the client's
+own `DINF` rectangle, is dropped (see "Rejection semantics"). It is not clamped, because
+clamping was never observed. The `DINF` origin was (0, 0) in every capture, so how
+`DMMV` relates to a non-zero origin is an open question.
 
 ### Buttons: `DMDN` and `DMUP` (server to client)
 
@@ -65,9 +68,10 @@ The body is 1 byte, a button number. The observed pairs were:
 | 9 | 5 |
 
 Each press is a `DMDN`/`DMUP` pair with equal values, and a held button can span pointer
-moves. Values other than 1 to 5 are outside this contract: a decoder rejects a `DMDN`
-with such a value. A `DMUP` with such a value still releases any matching pressed
-button, so a release is never lost. Evidence: `BARRIER-EVID-0006-CLAIM-002`.
+moves: in the capture, `DMDN` 1, a `DMMV`, then `DMUP` 1. Values other than 1 to 5 are
+outside this contract, and such a `DMDN` is dropped. A `DMUP` with such a value is
+dropped too: its `DMDN` was dropped, so nothing is held. Evidence:
+`BARRIER-EVID-0006-CLAIM-002`.
 
 ### Wheel: `DMWM` (server to client)
 
@@ -100,34 +104,58 @@ of −2 produced two X button-5 events.
 | `DKDN`, `DKUP` | 6 bytes | key identifier u16, modifier mask u16, button u16 |
 | `DKRP` | 8 bytes | key identifier u16, modifier mask u16, count u16, button u16 |
 
-Rules:
+Frozen from evidence:
 
 - **The button field is an opaque pairing token** (the server's key code). A decoder
   pairs each up with its down by button. The key identifier of an up may differ from
   its down: 0x0041 down and 0x0061 up after Shift was released, and likewise
   0x0021/0x0031 and 0x005F/0x002D. Evidence: `BARRIER-EVID-0006-CLAIM-004`.
-- **Repeats:** `DKRP` was observed only with count 1. A count other than 1 is outside
-  this contract and is treated as one repeat.
 - **Key identifiers:** the frozen set is exactly the values in
   `BARRIER-EVID-0006-CLAIM-005` (letters, digits, space, the US punctuation keys,
   Return, Escape, Tab, BackSpace, Delete, Insert, arrows, Home, End, Page Up and Down,
   keypad Enter, F1–F12, volume up, down and mute, left and right Shift, Control, Alt and
   Super, Caps Lock, and the shifted letter, exclamation and underscore values) and
-  `BARRIER-EVID-0008-CLAIM-001` (the eleven punctuation keys, plain and shifted). Any
-  other identifier is outside this contract: the decoder does not inject it, but it
-  still records the button, so the matching up releases cleanly.
-- **Shifted press:** a shifted press is four frames: `DKDN` Shift, `DKDN` with the
+  `BARRIER-EVID-0008-CLAIM-001` (the eleven punctuation keys, plain and shifted). The
+  driver's key order fixes which identifier belongs to which key, and the contract
+  test pins that order.
+- **Modifier mask:** 0x0001 Shift, 0x0002 Control, 0x0004 Alt, 0x0010 Super and 0x1000
+  Caps Lock; Control with Shift gave 0x0003. A modifier's own `DKDN` carries the mask
+  before the modifier took effect, and its `DKUP` carries the mask including it. A Caps
+  Lock toggle-on was `DKDN` 0x0000 then `DKUP` 0x1000; a toggle-off carried 0x1000 on both
+  frames. Evidence: `BARRIER-EVID-0006-CLAIM-006`.
+- **Observed shifted-press sequence (driver order):** `DKDN` Shift, `DKDN` with the
   shifted identifier and mask 0x0001, `DKUP` Shift, then `DKUP` with the plain
-  identifier and mask 0. Evidence: `BARRIER-EVID-0008-CLAIM-001`.
-- **Modifier mask:** the frozen bits are 0x0001 Shift, 0x0002 Control, 0x0004 Alt,
-  0x0010 Super and 0x1000 Caps Lock. A modifier's own `DKDN` carries the mask before
-  the modifier took effect, and its `DKUP` carries the mask including it. Both frames
-  of a Caps Lock toggle-off carry 0x1000. Other bits are outside this contract: a
-  decoder ignores them and still decodes the event. Evidence:
-  `BARRIER-EVID-0006-CLAIM-006`.
+  identifier and mask 0 (`BARRIER-EVID-0008-CLAIM-001`). This is the input tool's order.
+  A decoder must not depend on it; it pairs by button only.
+
+**Decoder policy (first-party, not a capture claim).** These cover fields the register
+marks unknown and infer no meaning from them:
+
+- `DKRP` was observed only with count 1. Another count is treated as one repeat.
+- An identifier outside the frozen set and the convention below is not injected, but
+  its button is recorded, so the matching up releases cleanly.
+- Mask bits other than the five are ignored, and the event still decodes.
+- A decoder does not derive lock state from the mask and does not synthesize modifier
+  presses from it. The modifiers' own `DKDN`/`DKUP` frames carry that. The first-party
+  server's Caps Lock toggle (`DKDN` without the bit, `DKUP` with it) differs from the
+  captured toggle-off, which this rule makes harmless.
 
 Failing safe outweighs completeness (Frozen Decision 7): no unknown identifier, button,
 mask bit or count may cause a decoder to drop a key or button release.
+
+**First-party convention, not a capture claim: shifted identifiers.** The first-party
+server sends the produced character for a shifted key. That includes 34 identifiers
+that were never captured:
+
+- 0x0042–0x005A: B–Z with Shift or Caps Lock. 0x0041 is captured.
+- The US shifted digits 0x0029 `)`, 0x0040 `@`, 0x0023 `#`, 0x0024 `$`, 0x0025 `%`,
+  0x005E `^`, 0x0026 `&`, 0x002A `*` and 0x0028 `(` for 0 and 2–9. 0x0021 `!` for 1 is
+  captured.
+
+A first-party client injects them like their captured counterparts. Only Shift+B was
+validated against a real `barrierc`, in the M2-035 smoke. A test enumerates every
+identifier the first-party encoder can emit and requires it to be in the frozen set or
+in this list.
 
 ### Enter, leave and keepalive
 
@@ -147,7 +175,7 @@ mask bit or count may cause a decoder to drop a key or button release.
 | id | 1 byte | 0 or 1 observed |
 | sequence | 4 bytes | server transfers: 0; client transfers: the sequence of the `CINN` in force |
 | mark | 1 byte | 1 start, 2 chunk, 3 end, sent in that order |
-| data | 4-byte length, then that many bytes | start: decimal ASCII byte length of the chunk data; chunk: the marshalled clipboard; end: empty |
+| data | 4-byte length, then that many bytes | start: decimal ASCII total byte length of the transfer's mark-2 data (one chunk was observed, so it equaled that chunk's length); chunk: the marshalled clipboard, or the next part of it; end: empty |
 
 Evidence: `BARRIER-EVID-0006-CLAIM-008`, `BARRIER-EVID-0008-CLAIM-002`.
 
@@ -160,12 +188,16 @@ Evidence: `BARRIER-EVID-0006-CLAIM-008`, `BARRIER-EVID-0008-CLAIM-002`.
 An empty clipboard is count 0. Format ids 0, 1 and 2 were observed. **No format's
 meaning is frozen.**
 
-**Interleaving:** a server `CALV` may arrive between the frames of one transfer, as
-observed at enter. A decoder must accept it.
+**Interleaving:** a server `CALV` arrived between the frames of each transfer at enter.
+A decoder keeps transfer state per clipboard id and processes frames of other tokens
+normally in between.
 
 **`CCLP` (client to server):** a 5-byte body, an id byte and a 4-byte sequence equal to
-the `CINN` in force, sent at once on a client copy (`BARRIER-EVID-0007-CLAIM-001`). A
-server-to-client `CCLP` was never captured, so a first-party client fails closed on one.
+the `CINN` in force. It was sent after the copy and before the next `COUT`
+(`BARRIER-EVID-0007-CLAIM-001`). A server-to-client `CCLP` was never captured in a
+retained fixture. The chunk log recorded one before an enter (code and length only, a
+5-byte body), so its body is unobserved. A first-party client fails closed on one; the
+first-party server never sends it.
 
 **First-party conventions, not capture claims:**
 
@@ -174,8 +206,34 @@ server-to-client `CCLP` was never captured, so a first-party client fails closed
   - format 0's size equaled the UTF-8 length of the probe in both captured transfers;
   - the M2-035 smoke runs against a real `barrierc` moved text both ways that way.
 - Transfers may span several chunks of at most 32 KiB, as the first-party server sends
-  them. The chunk measurement (`evidence/e2e/M2-022/chunks.json`) and the M2-035 smoke
-  (600 KB out, 100 KB in) validate this, but no fixture captures it.
+  them. The chunks add up to exactly the start value: a chunk never exceeds the
+  remaining size, and the end completes the transfer exactly. The chunk measurement
+  (`evidence/e2e/M2-022/chunks.json`) and the M2-035 smoke (600 KB out, 100 KB in)
+  validate this, but no fixture captures it.
+- A first-party client accepts transfers of at least 1 MiB of text, which is the
+  first-party server's limit.
+
+### Rejection semantics
+
+**Drop and continue.** These cases are dropped, a diagnostic is emitted and the session
+continues:
+
+- `DMMV` outside `0x0000…0x7FFF` or outside the client's `DINF` rectangle;
+- `DMDN` or `DMUP` outside 1–5;
+- a `DCLP` transfer that breaks the start, chunk and end rules.
+
+The diagnostic carries the token, the direction, the body length and the reason, never
+body bytes (M1-011).
+
+**Fail closed.** These cases end the session with a typed protocol-violation error:
+
+- a known token whose body length does not match its layout, for example a 5-byte
+  `DMMV`;
+- a server-to-client `CCLP`;
+- any token not listed here or in M1-PROTOCOL-002.
+
+On that terminal path the client's cleanup (M1-063-FOLLOWUP-001) releases every pressed
+key and button before the session closes.
 
 ### Observed but not frozen
 
@@ -247,8 +305,23 @@ They stay marked as conventions validated by interoperability runs.
 | --- | --- | --- |
 | Meaning of clipboard format ids and of id 1 | Protocol owner | Blocks any non-text clipboard support |
 | A captured multi-chunk transfer (or registering `chunks.json`) | Protocol owner | Blocks a Barrier multi-chunk compatibility claim; does not block the first-party convention |
-| Pointer values at or above 0x8000 and negative origins | Protocol owner | Blocks multi-monitor client layouts |
+| Pointer values at or above 0x8000, negative origins, and `DMMV` relative to a non-zero `DINF` origin | Protocol owner | Blocks multi-monitor client layouts |
 | Non-US key identifiers | M1-045 owner | Blocks any non-US layout claim |
+
+## Review record
+
+An independent protocol reviewer, not the implementing agent, reviewed the first draft
+on 2026-10-29. The verdict was accept with conditions. This revision addresses the
+findings:
+
+| Finding | Severity | Resolution |
+| --- | --- | --- |
+| H1 | High | The first-party server's 34 shifted identifiers are declared as a convention and pinned by a test. |
+| M1 | Medium | "Rejection semantics" defines dropping versus failing closed. |
+| M2 | Medium | `DMMV` signedness is no longer frozen, and the rectangle rule is stated. |
+| M3 | Medium | The start value is the transfer total, and the multi-chunk rules are stated. |
+| M4 | Medium | The contract test pins the modifier bits, the key order, Caps Lock, `CINN` and the held button. |
+| L1–L6 | Low | Wording and labelling, and the register narrative section for 0006–0008. |
 
 ## Rollback
 
