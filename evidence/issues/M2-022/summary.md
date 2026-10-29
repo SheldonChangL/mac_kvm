@@ -11,7 +11,7 @@
 | Capture, sanitization and decode tools | `evidence/e2e/M2-022/tools/` |
 | Independent review (2026-10-29) | `independent-review.md` |
 | Register entries | BARRIER-EVID-0006, 0007 and 0008 in `evidence/registers/M1-023.json` |
-| Incident: labels without an observed source | `incident-001-unobserved-labels.md` (Product Owner decision pending) |
+| Incident: labels without an observed source | `incident-001-unobserved-labels.md` (disposition decided by the Product Owner on 2026-10-29) |
 
 ## Review outcome
 
@@ -32,5 +32,4 @@ meets the conditions:
 - Before any client decoder consumes these layouts, a contract entry must freeze them:
   the M2-023 amendment. `frozenContractRefs` and `consumingTests` in the register entries
   stay empty until then.
-- The Product Owner's disposition of incident 001.
 - Gaps the evidence does not cover: section 5 of the review.

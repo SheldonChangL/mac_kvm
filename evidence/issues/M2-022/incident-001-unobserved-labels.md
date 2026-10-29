@@ -41,9 +41,15 @@ producer proposes:
 - keep the behavior, which is supported by black-box observation;
 - rewrite no history.
 
-Until the Product Owner records a decision, the format and clipboard-id semantics stay
-"not observed" in the register entries (BARRIER-EVID-0008).
+The format and clipboard-id semantics stay "not observed" in the register entries
+(BARRIER-EVID-0008).
 
 | Decision | Owner | Status |
 | --- | --- | --- |
-| Disposition of the withdrawn labels | Product Owner with the licensing reviewer | pending |
+| Disposition of the withdrawn labels | Product Owner with the licensing reviewer | decided 2026-10-29: the Product Owner accepted the proposal above, verbatim 「同意建議處置」; no separate licensing reviewer was designated |
+
+## Resumption (step 6)
+
+The disposition is recorded, and the remediation is the neutral wording in this change.
+Work that consumes this evidence may resume under the normal gates; for the client
+decoders that is the M2-023 amendment.
