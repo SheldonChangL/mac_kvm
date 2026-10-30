@@ -2,10 +2,10 @@
 
 ## Status
 
-Proposed on 2026-10-29. Acceptance requires review by a protocol reviewer who is not the
-implementing agent, and the Product Owner's merge.
+Accepted on 2026-10-29. A protocol reviewer who is not the implementing agent accepted it
+(`evidence/issues/M1-PROTOCOL-003/independent-review.md`), and the Product Owner merged PR #334.
 
-Once accepted, these contracts may be consumed by:
+These contracts may be consumed by:
 
 - the Barrier client decoders M1-032, M1-033, M1-034 and M1-041;
 - the key mapper M1-043;
@@ -146,8 +146,10 @@ marks unknown and infer no meaning from them:
 - Mask bits other than the five are ignored, and the event still decodes.
 - A decoder does not derive lock state from the mask and does not synthesize modifier
   presses from it. The modifiers' own `DKDN`/`DKUP` frames carry that. The first-party
-  server's Caps Lock toggle (`DKDN` without the bit, `DKUP` with it) differs from the
-  captured toggle-off, which this rule makes harmless.
+  server sends both captured Caps Lock patterns: a toggle-on as `DKDN` without the bit and
+  `DKUP` with it, a toggle-off with the bit on both frames (`BarrierServerInputEncoder.key`;
+  the Mac capture reports a toggle-on as a press and a toggle-off as a release). This rule
+  keeps a decoder independent of either pattern.
 
 Failing safe outweighs completeness (Frozen Decision 7): no unknown identifier, button,
 mask bit or count may cause a decoder to drop a key or button release.
