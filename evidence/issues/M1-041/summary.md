@@ -4,54 +4,64 @@
 
 Files: `Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierKeyboardDecoder.swift`,
 `Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierKeyboardDecoderTests.swift`,
-`docs/components/M1-041-barrier-keyboard-decoder.md`, and this directory's `summary.md` and
-`commands.json`.
+`docs/components/M1-041-barrier-keyboard-decoder.md`, and this directory.
 
-The issue sits under "M1 - Mac Client MVP", but the consumer is the first-party Linux client that
-speaks the Barrier wire to the first-party Mac server
-(`docs/adr/M4-SCOPE-001-linux-client-first.md`). The contract is
-`docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md`. The key mapper M1-043
-stacks on this branch and uses `BarrierKeyIdentifier`, `BarrierKeyEvent` and
-`BarrierKeyboardDecoder`.
+The decoder turns Barrier `DKDN`, `DKUP` and `DKRP` frames into `BarrierKeyEvent`s and pairs each
+release and repeat with its press by the button field. It holds the pressed keys so the
+terminal-path cleanup can release them. The contract is
+`docs/adr/M1-PROTOCOL-003-barrier-input-clipboard-message-contracts.md`. The consumer is the
+first-party Linux client (`docs/adr/M4-SCOPE-001-linux-client-first.md`), although the issue sits
+under "M1 - Mac Client MVP". The key mapper M1-043 stacks on this branch.
 
 ## RED
 
-The first 19 tests were written before the implementation and run against a compiling stub with
-the design's API and no behavior: `✘ Test run with 19 tests in 1 suite failed after 0.018 seconds with 75 issues.` 18 of the 19 failed.
-`productionSourceImportsOnlyKVMContracts` passed, because it only checks the file's imports.
-
-The fresh-context review below added a 20th test, `everyButtonValueIsHeldAndReleasedWithItsPressIdentity`,
-and two checks in existing tests. Mutants R1 and R2 show that they fail when the behavior they
-pin is broken.
+- Original implementation: the first 19 tests were run against a compiling stub with the design's
+  API and no behavior: `✘ Test run with 19 tests in 1 suite failed after 0.018 seconds with 75 issues.`
+  18 of the 19 failed; `productionSourceImportsOnlyKVMContracts` only checks imports.
+- First-identity change (the lead's decision, below): the renamed test against the previous
+  latest-press-wins code: `✘ Test run with 20 tests in 1 suite failed after 5.151 seconds with 6 issues.`
+  Only `secondPressOnAHeldButtonKeepsTheFirstIdentity` failed.
 
 ## GREEN
 
-`timeout 900 swift test --package-path Packages/BarrierCompatibility --filter BarrierKeyboardDecoderTests`: `✔ Test run with 20 tests in 1 suite passed after 5.187 seconds.`
+At `e189692`:
 
-The full package, `timeout 900 swift test --package-path Packages/BarrierCompatibility`: `✔ Test run with 267 tests in 9 suites passed after 5.503 seconds.` With `-Xswiftc -warnings-as-errors`: `✔ Test run with 267 tests in 9 suites passed after 6.280 seconds.`
+- Focused: `✔ Test run with 21 tests in 1 suite passed after 5.156 seconds.`
+- Full package: `✔ Test run with 268 tests in 9 suites passed after 5.345 seconds.`, also with
+  `-Xswiftc -warnings-as-errors`.
+- `make verify`: 24 of 24 gates passed.
+
+## Lead decision: the first press identity is kept while a button is held
+
+The design (c.13) let a second `DKDN` on a held button replace the held identity. If M1-043 maps the
+two identifiers to different keys, the first key would then stay pressed until the terminal
+cleanup. That breaks the contract's decoder policy: "no unknown identifier, button, mask bit or
+count may cause a decoder to drop a key or button release" (Frozen Decision 7). The decoder now
+keeps the first identity for the whole press lifetime. It emits a second `DKDN` as `.down` with the
+held identity, the frame's own mask and the same button, and leaves the held entry unchanged.
 
 ## Mutation checks
 
-Each mutant edited the source, ran the M1-041 suite, and was restored from a backup copy. After
-every restore the source was byte-for-byte the original and `git diff --exit-code` against the
-staged file returned 0. Mutants 1 to 6 are the required checks; R1 and R2 come from the review.
+14 mutants, each killed. The source was restored byte for byte after each (`git diff --exit-code`
+0). The runner is `mutations/mutate.py`, which takes the repository path as an argument; its
+output with the full failing-test lists is `mutations/mutations.json`.
 
-| # | Mutation | Result | Failing tests |
-| --- | --- | --- | --- |
-| 1 | A release uses its own identifier instead of the press's | killed: exit 1, 8 tests failed | `capturedKeyFramesDecodeInOrderAndLeaveNothingHeld`, `everyButtonValueIsHeldAndReleasedWithItsPressIdentity`, `fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated`, `releaseUsesThePressIdentityByButton`, `repeatsUseThePressIdentityAndKeepTheHeldSet`, `roundTripThroughTheServerEncoderForEveryEncodableKey`, `secondPressOnAHeldButtonReplacesTheIdentity`, `unknownIdentifiersAreRecordedAndReleasedCleanly` |
-| 2 | An unpaired release is dropped instead of emitted (no event: `decode` throws) | killed: exit 1, 4 tests failed | `bodyLengthsAreExact`, `goldenKeyFramesReEncodeByteForByte`, `secondPressOnAHeldButtonReplacesTheIdentity`, `unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier` |
-| 3a | Mask bits beyond the five are kept: 0x2000, 0x4000, 0x8000 read as Caps Lock | killed: exit 1, 2 tests failed | `modifierMaskDecodesExactlyTheFiveFrozenBits`, `unknownIdentifiersAreRecordedAndReleasedCleanly` |
-| 3b | Mask bits beyond the five are kept: 0x0008 read as Alt | killed: exit 1, 2 tests failed | `modifierMaskDecodesExactlyTheFiveFrozenBits`, `unknownIdentifiersAreRecordedAndReleasedCleanly` |
-| 4 | A `DKRP` with count N > 1 yields N repeats (the extra ones on the next `decode` calls) | killed: exit 1, 3 tests failed | `repeatsUseThePressIdentityAndKeepTheHeldSet`, `unknownIdentifiersAreRecordedAndReleasedCleanly`, `unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier` |
-| 5a | `heldKeys` is cleared after a fail-closed error | killed: exit 1, 2 tests failed | `failureIsStickyAndHeldKeysSurviveIt`, `heldKeysAreSortedByButtonAndFreshDecodersAreIndependent` |
-| 5b | The failure is not latched after a fail-closed error | killed: exit 1, 6 tests failed | `bodyLengthsAreExact`, `clientToServerDirectionFailsClosed`, `errorsCarryOnlyAllowlistedMetadata`, `failureIsStickyAndHeldKeysSurviveIt`, `heldKeysAreSortedByButtonAndFreshDecodersAreIndependent`, `unknownAndShortTokensFailClosed` |
-| 6 | A second `DKDN` on a held button keeps the first identity (first press wins) | killed: exit 1, 1 test failed | `secondPressOnAHeldButtonReplacesTheIdentity` |
-| R1 | Review: the token is checked before the latch, so an unknown token after a failure reports itself instead of the latched error | killed: exit 1, 1 test failed | `failureIsStickyAndHeldKeysSurviveIt` |
-| R2 | Review: the held set evicts its lowest button beyond 8 entries | killed: exit 1, 1 test failed | `everyButtonValueIsHeldAndReleasedWithItsPressIdentity` |
-
-`decode` returns exactly one event per frame, so mutants 2 and 4 take the only shapes that
-signature allows: a dropped release can only be a throw, and extra repeats can only come back
-from the following `decode` calls.
+| Id | Mutation | Killing test |
+| --- | --- | --- |
+| 1 | a release uses its own identifier | `releaseUsesThePressIdentityByButton` and 7 others |
+| 2 | an unpaired release is dropped (`decode` throws) | `unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier` and 4 others |
+| 3a | bits 0x2000, 0x4000 and 0x8000 read as Caps Lock | `modifierMaskDecodesExactlyTheFiveFrozenBits` and 1 other |
+| 3b | bit 0x0008 read as Alt | `modifierMaskDecodesExactlyTheFiveFrozenBits` and 1 other |
+| 4 | a `DKRP` count N > 1 yields N repeats | `repeatsUseThePressIdentityAndKeepTheHeldSet` and 2 others |
+| 5a | `heldKeys` cleared on failure | `failureIsStickyAndHeldKeysSurviveIt` and 1 other |
+| 5b | the failure is not latched | `failureIsStickyAndHeldKeysSurviveIt` and 5 others |
+| 6 | a second `DKDN` replaces the held identity | `secondPressOnAHeldButtonKeepsTheFirstIdentity` only |
+| R1 | the token is checked before the latch | `failureIsStickyAndHeldKeysSurviveIt` only |
+| R2 | the held set evicts beyond 8 entries | `everyButtonValueIsHeldAndReleasedWithItsPressIdentity` only |
+| F1 | identifier fallback on an unpaired `DKUP` | `releasePairsByButtonOnlyNeverByIdentifier` only |
+| F2 | identifier first | `releasePairsByButtonOnlyNeverByIdentifier`, `everyButtonValueIsHeldAndReleasedWithItsPressIdentity` |
+| G1 | the identifier is byte-swapped | `goldenKeyFramesReEncodeByteForByte` and 14 others |
+| G2 | the button is byte-swapped | `goldenKeyFramesReEncodeByteForByte` and 14 others |
 
 ## Acceptance mapping
 
@@ -62,49 +72,39 @@ from the following `decode` calls.
 | Boundary | `bodyLengthsAreExact`, `repeatsUseThePressIdentityAndKeepTheHeldSet` (counts 0 to 0xFFFF), `unknownIdentifiersAreRecordedAndReleasedCleanly` (identifiers 0x0000 and 0xFFFF, buttons 0 and 0xFFFF), `everyButtonValueIsHeldAndReleasedWithItsPressIdentity` (all 65,536 buttons held at once), `modifierMaskDecodesExactlyTheFiveFrozenBits` (all 32 combinations, every other bit) |
 | Invalid input | `bodyLengthsAreExact`, `clientToServerDirectionFailsClosed`, `unknownAndShortTokensFailClosed` |
 | Error, cancel and cleanup | `failureIsStickyAndHeldKeysSurviveIt` (the latch, and the held set kept for cleanup), `heldKeysAreSortedByButtonAndFreshDecodersAreIndependent` (reset by a new decoder); there is no I/O, task or resource to cancel |
-| Pairing by button; no release dropped | `releaseUsesThePressIdentityByButton`, `unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier`, `secondPressOnAHeldButtonReplacesTheIdentity` |
-| Golden bytes equal exactly | `goldenKeyFramesReEncodeByteForByte` (fixture bytes, then decode and re-encode whole frames) |
+| Pairing by button; no release dropped | `releaseUsesThePressIdentityByButton`, `releasePairsByButtonOnlyNeverByIdentifier`, `unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier`, `secondPressOnAHeldButtonKeepsTheFirstIdentity` |
+| Golden bytes equal exactly | `goldenKeyFramesReEncodeByteForByte` (fixture bytes; each decoded identifier and button against the frame bytes at offsets 8 and 12, or 14 in `DKRP`; then decode and re-encode whole frames) |
 | Fragmentation, coalescing and truncation | `fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated` |
 | Round trip through `BarrierServerInputEncoder` | `roundTripThroughTheServerEncoderForEveryEncodableKey`: all 81 encodable keys in all 32 modifier states |
 | Behavior matches the frozen ADR; no new implicit API | module-internal declarations only, with the names and shapes of design a.6 and b.4; the tests above |
 | Checker, lint, build and unit tests pass with no new warning | `commands.json`: both `swift format lint --strict` runs (the two files, and the repository command) exited 0 with no finding; `make docs-check` (`docs check OK`); `make architecture-check` (`architecture check OK`); `python3 Tools/Backlog/validate_package.py` (`PACKAGE OK: 217 issues, 5 milestones, 17 epics`); `git diff --cached --check` (exit 0); the issue's `xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build` (`** BUILD SUCCEEDED **`); the package tests with `-warnings-as-errors` (exit 0); `make verify` (24 of 24 gates passed, status passed) |
 | Production logs hold no typed text or recoverable content | `productionSourceImportsOnlyKVMContracts` (no logger, `print` or `Foundation`), `errorsCarryOnlyAllowlistedMetadata` |
 
+## Independent review
+
+- Before the PR, a fresh-context Claude Opus reviewer found no divergence from the contract or the
+  design. Its Low items were fixed in the tests and the doc (mutants R1 and R2 come from it). Its
+  one Medium, latest-press-wins, led to the lead decision above.
+- After the PR, a fresh-context Fable reviewer (`independent-review.md`) found no Critical or High
+  issue. Its Medium (an unpaired repeat could stick a key if a consumer injected it as a press) and
+  its three Low items are resolved at `e189692`:
+  - the doc's "Fail-safe requirement for consumers" says the session MUST NOT inject an unpaired
+    repeat, and may inject a paired repeat only as a repeat of the held key;
+  - `releasePairsByButtonOnlyNeverByIdentifier` is added;
+  - the golden test checks the decoded identifier and button;
+  - the `DKRP` count rule is labelled first-party.
+
 ## Known limitations
 
 - An unpaired release or repeat and a second press of a held button were never observed. Emitting
-  the unpaired frame with its own identifier and letting the latest press win are first-party
-  policy (design c.12 and c.13), pinned by tests.
-- Because the latest press wins, a second press of a held button with another identifier
-  displaces the first identity. If M1-043 maps the two identifiers to different keys, the first
-  key's downstream press is released only by the session's terminal cleanup.
-- The issue lists `evidence/issues/M1-041/tests/` as expected evidence. This PR's file list allows
-  only `summary.md` and `commands.json`, so `commands.json` carries the test output instead.
-- The register's `consumingTests` for `BARRIER-EVID-0006` and `0008` do not list these tests.
-  `evidence/registers/M1-023.json` is outside this issue's files (M1-031 precedent); this is a
-  follow-up for the register owner.
+  the unpaired frame with its own identifier and keeping the first identity are first-party
+  policy, pinned by tests.
+- The fail-safe requirement for consumers is enforced by the client session
+  (M1-029-FOLLOWUP-001) and the injector (M4-024), not by this decoder.
+- The register's `consumingTests` for `BARRIER-EVID-0006` and `0008` do not list these tests;
+  `evidence/registers/M1-023.json` is outside this issue's files. This is a follow-up.
 - The full-stream fragmentation and truncation test decodes the capture's server stream once per
   cut, which takes about 5 seconds of the package test run.
 
-Full gates are in `commands.json`.
-
-## Review
-
-Before the PR, a fresh-context reviewer (Claude Opus, read-only, given the code and the sources
-but not the author's reasoning) found no divergence from the contract or the design and no way
-around the failure latch. It reported one Medium and nine Low items:
-
-- Medium: the latest press wins, so a displaced identity is released only by cleanup. Kept,
-  because it is design decision c.13 and a required mutation check; recorded above and in the
-  component doc for the lead's decision.
-- Low, fixed in the tests: an unknown or empty payload after a failure (mutant R1); no test held
-  more than six buttons (mutant R2); the error-kind exhaustiveness check counted a literal.
-- Low, fixed in the doc: the pairing label (contract versus first-party policy), the
-  shifted-identifier convention in the unknown-identifier rule, the Caps Lock wording, routing key
-  frames instead of `BarrierControlDecoder` (which fails closed on `DKRP`), unpaired repeats, the
-  value-type latch, and the 65,536-entry bound.
-- Low, documented only: default `description` and reflection are not redacted. Redacting
-  conformances would add API beyond design a.6 and b.4, so the doc states the logging rule.
-
-Tier B: a full review by a stronger model or an engineer is still required, then the Product
-Owner's merge.
+Full gates are in `commands.json` (toolchain Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)); the machine-readable
+test report is in `tests/`.
