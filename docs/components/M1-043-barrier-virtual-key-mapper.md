@@ -129,8 +129,9 @@ The implementation is one private `[UInt16: VirtualKey]` table built once from
 named lists: ranges for the letters, digits and function keys; the shifted
 digits and the punctuation pairs in the encoder's order, each pair naming its
 `PunctuationKey`; the other named keys; and the two frozen non-members. Every
-hexadecimal literal sits in one of those lists, and there is no `switch`
-(`productionSourceImportsOnlyKVMContracts` checks both).
+numeric literal sits in one of those lists, apart from 0, 1 and the two declared
+constants, and there is no `switch`
+(`productionSourceKeepsEveryNumericLiteralInsideTheNamedLists` checks both).
 
 ## Unknown and invalid keys
 
@@ -180,13 +181,21 @@ modifier state after the event:
   both.
 
 On the Mac capture side, `modifiers` is the state after the event, so the two
-sides disagree on a modifier key's own events. First-party guidance, not a
-Barrier claim: a consumer that tracks modifier or lock state (M1-046, the
-pressed-input ledger of M1-063-FOLLOWUP-001, the Linux injector M4-024) must
-derive it from the modifier keys' own press and release events, as the ADR's
-decoder policy does for the decoder, and must never rebuild it from
-`modifiers`. Rebuilding it would leave Shift held after a Shift tap, and Caps
-Lock on after a toggle-off.
+sides disagree on a modifier key's own events. First-party guidance from this
+mapper, not a Barrier claim and not a rule for other issues: do not take the
+state after a modifier key's own event from that event's `modifiers`, whose own
+bit is inverted. Doing so would leave Shift held after a Shift tap, and Caps
+Lock on after a toggle-off. A regular key's `modifiers` stays a per-event signal
+of the modifiers in effect while that key is pressed, repeated or released.
+
+Open questions, for M1-046 (modifier tracking) and M4-024 (the Linux injector):
+
+- Modifiers held at enter: a modifier already held on the Mac when the pointer
+  enters the client produces no modifier key event on the client. Only the
+  `modifiers` of the next regular key show it, and the `CINN` mask bits are not
+  frozen.
+- Caps Lock state at enter: no key event carries it either, and whether the
+  client treats Caps Lock as a toggle per press or as a held state is open.
 
 ### Round trip with the first-party server
 
@@ -212,8 +221,8 @@ original's in every case except these:
   including it (`BARRIER-EVID-0006-CLAIM-006`), and the encoder follows that
   rule. The decoder and the mapper pass the wire mask through unchanged and never
   re-derive modifier state, so the key's own bit comes back inverted on its own
-  press and release. "The `modifiers` field, for consumers" above says what a
-  consumer must do about it.
+  press and release. "The `modifiers` field, for consumers" above says what this
+  means for a consumer.
 - Caps Lock: macOS reports Caps Lock once per toggle, `down` when it turns on
   and `up` when it turns off, so the encoder sends each toggle as a whole press
   (`DKDN`, then `DKUP`) and nothing for a repeat. The client therefore receives a
@@ -230,14 +239,11 @@ original.
 
 The table is the capture's "Xvfb default US keymap" (CLAIM-005): it reads every
 identifier as a character on the US ANSI layout and maps it to the US key
-position that types it. A Barrier server with another layout sends the
-characters of its own layout. A character that also exists on the US layout
-lands on the US position of that character, which can be another physical key:
-a German server sends 0x007A, z, from the key in the US Y position, and it maps
-to the US Z key. A character that does not exist on the US layout maps to
-`unknown`. The first-party server sends the US ANSI character of each key
-position whatever the Mac's layout, so it is unaffected. The ADR makes no non-US
-claim, and layouts belong to M1-045.
+position that types it. Identifiers for non-US layouts are not frozen (ADR
+"Non-claims"), and how a Barrier server with another layout behaves is unknown.
+Any identifier outside the table maps to `unknown`. The first-party encoder sends
+the US ANSI character of each key position, so a first-party server is
+unaffected. Layouts belong to M1-045.
 
 ## Purity, cancellation and cleanup
 
@@ -265,7 +271,7 @@ same answer.
 
 ## Validation coverage
 
-`BarrierVirtualKeyMapperTests` (14 Swift Testing tests):
+`BarrierVirtualKeyMapperTests` (15 Swift Testing tests):
 
 - table shape: catalog version 2; exactly 134 contract identifiers, equal to the
   frozen set rebuilt as the encoder test does plus the convention list, with the
@@ -290,15 +296,19 @@ same answer.
   zero-extended value; identifiers equal to catalog payloads, the ASCII
   neighbours of the letter and digit ranges and the edges of the function-key
   page; each punctuation key is reached only from its own two identifiers;
-  every value stays inside its catalog domain; and, in the source, every
-  hexadecimal literal sits in a named list, with no `switch` and no
-  `init(rawValue:)`;
+  every value stays inside its catalog domain;
+- the source, read with `//` and nested `/* */` comments and string contents
+  removed: every hexadecimal literal, and every decimal literal other than 0
+  and 1, sits in a named list or one of the two declared constants; there is no
+  `switch` and no `init(rawValue:)`;
 - purity, determinism, concurrency and cancellation; the production file's
   imports, and no logging, trap or mutable shared state in it.
 
 Mutation checks and the full gate run are recorded in
-`evidence/issues/M1-043/commands.json` and `evidence/issues/M1-043/mutations/`
-(`run_mutations.py` and its output `mutations.json`).
+`evidence/issues/M1-043/commands.json` and `evidence/issues/M1-043/mutations/`:
+`run_mutations.py`, its output `mutations.json`, and
+`mutations-previous-suite.json`, which runs mutant 8 (a behavior-neutral decimal
+literal) against the suite of the first M1-043 commit, which missed it.
 
 The issue's Required Commands run `swift test --package-path Packages/KVMCore`.
 `Packages/KVMCore` has no `Package.swift` and M4-SCOPE-001 moved the Exact Files,
@@ -314,8 +324,8 @@ unchanged.
   mapper as `unknown` and are rejected, so typing them on the Mac server does
   nothing on the client until a later catalog version adds members (M1-042 open
   question).
-- US ANSI only: a Barrier server with another layout can land on another
-  physical key ("US-only limit").
+- US ANSI only: identifiers for non-US layouts are not frozen, and their
+  behavior is unknown ("US-only limit").
 - The mapper maps positions, not characters: the case of a typed letter, and
   whether a digit or punctuation key types its shifted character, come from the
   Shift and Caps Lock state on the client when the key is injected. Lock state
@@ -324,9 +334,9 @@ unchanged.
   the Mac and the client when the pointer enters, letters come out in the
   opposite case.
 - `modifiers` is the wire mask, which differs from the Mac capture side on a
-  modifier key's own events and on Caps Lock; consumers must track modifier and
-  lock state from the modifier keys' own events ("The `modifiers` field, for
-  consumers").
+  modifier key's own events and on Caps Lock. Modifiers held at enter and the
+  Caps Lock state at enter produce no key event on the client; both are open
+  questions ("The `modifiers` field, for consumers").
 - Modifiers are side-agnostic. When both sides of one modifier are held, the
   first release on either side may release the injected modifier early (M1-042
   costs); this favours release over stuck input.
@@ -364,8 +374,8 @@ migration, and no production code calls it yet.
   `BARRIER-EVID-0006` and `0008`.
 - M1-029-FOLLOWUP-001 composes `BarrierKeyboardDecoder` and `kvmEvent(for:)` in
   the client session.
-- M1-046, M1-063-FOLLOWUP-001 and M4-024 track modifier and lock state from the
-  modifier keys' own events, never from `modifiers`.
+- M1-046 and M4-024 settle the two open questions in "The `modifiers` field, for
+  consumers": modifiers held at enter, and the Caps Lock state at enter.
 - Amend M1-042's "Catalog v2" "Not covered" sentence to record that
   M1-PROTOCOL-003 and M1-043 now map the punctuation identifiers; that ADR is
   outside this issue's files.

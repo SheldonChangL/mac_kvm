@@ -2,6 +2,7 @@
 
 Usage (from anywhere):
   python3 -I evidence/issues/M1-043/mutations/run_mutations.py <repository> [--out <json>]
+      [--only <id> ...] [--test-revision <git revision>]
 
 For each mutant the runner edits the production source by exact text replacement, runs the
 M1-043 suite, records which tests failed, and restores the source from a backup copy. A mutant
@@ -9,6 +10,10 @@ is killed when the suite exits non-zero with at least one named failing test and
 error. Before the mutants it runs the suite once unmodified (the baseline, which must pass).
 After every restore it checks that the source is byte-for-byte the original and that
 `git diff --exit-code` on it returns 0, so stage the source before running.
+
+`--only` runs the listed mutants. `--test-revision` runs them against the test file as of that
+git revision instead of the current one, which shows whether an older suite caught a mutant;
+the current test file is restored from a backup copy and checked like the source.
 
 The JSON report holds repository-relative paths only. It defaults to
 evidence/issues/M1-043/mutations/mutations.json inside the repository. The exit code is 0 only
@@ -28,6 +33,10 @@ import tempfile
 import time
 
 SOURCE = "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift"
+TESTS = (
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/"
+    "BarrierVirtualKeyMapperTests.swift"
+)
 COMMAND = [
     "swift", "test", "--package-path", "Packages/BarrierCompatibility",
     "--filter", "BarrierVirtualKeyMapperTests",
@@ -134,6 +143,18 @@ MUTANTS = [
             ".key(key: virtualKey(for: BarrierKeyIdentifier(rawValue: event.button.rawValue)),",
         )],
     },
+    {
+        "id": "8",
+        "requirement": "review: a decimal literal outside the named lists",
+        "description": "virtualKey(for:) answers 97 (0x0061) with .letter(0) before the table "
+                       "lookup; the behavior is unchanged, so only the source check can catch "
+                       "it",
+        "replacements": [(
+            "    table[identifier.rawValue] ?? .unknown(UInt32(identifier.rawValue))\n",
+            "    if identifier.rawValue == 97 { return .letter(0) }\n"
+            "    return table[identifier.rawValue] ?? .unknown(UInt32(identifier.rawValue))\n",
+        )],
+    },
 ]
 
 FAILED_TEST = re.compile(r"Test (\w+)\(\) failed")
@@ -165,34 +186,57 @@ def run_suite(repository: pathlib.Path) -> dict:
     }
 
 
-def git_diff_exit_code(repository: pathlib.Path) -> int:
-    return subprocess.run(["git", "diff", "--exit-code", "--quiet", "--", SOURCE],
+def git_diff_exit_code(repository: pathlib.Path, path: str) -> int:
+    return subprocess.run(["git", "diff", "--exit-code", "--quiet", "--", path],
                           cwd=repository).returncode
+
+
+def is_tracked(repository: pathlib.Path, path: str) -> bool:
+    return subprocess.run(["git", "ls-files", "--error-unmatch", "--", path], cwd=repository,
+                          capture_output=True).returncode == 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("repository")
     parser.add_argument("--out", default="evidence/issues/M1-043/mutations/mutations.json")
+    parser.add_argument("--only", action="append", default=[],
+                        help="run only the mutant with this id; repeat for more")
+    parser.add_argument("--test-revision",
+                        help="run against the test file as of this git revision")
     arguments = parser.parse_args()
     repository = pathlib.Path(arguments.repository).resolve()
+    selected = [mutant for mutant in MUTANTS
+                if not arguments.only or mutant["id"] in arguments.only]
+    if arguments.only and len(selected) != len(set(arguments.only)):
+        raise SystemExit("--only names a mutant that does not exist")
     source_path = repository / SOURCE
-    tracked = subprocess.run(["git", "ls-files", "--error-unmatch", "--", SOURCE], cwd=repository,
-                             capture_output=True).returncode == 0
-    if not tracked:
-        raise SystemExit("stage the source first: the git diff restore check needs it tracked")
+    tests_path = repository / TESTS
+    for path in (SOURCE, TESTS):
+        if not is_tracked(repository, path):
+            raise SystemExit("stage the source and the tests first: the git diff restore "
+                             "check needs them tracked")
     original = source_path.read_bytes()
     original_hash = sha256(original)
+    tests_original_hash = sha256(tests_path.read_bytes())
     backup_directory = pathlib.Path(tempfile.mkdtemp(prefix="m1-043-mutations-"))
     backup = backup_directory / "BarrierVirtualKeyMapper.swift.backup"
+    tests_backup = backup_directory / "BarrierVirtualKeyMapperTests.swift.backup"
     shutil.copyfile(source_path, backup)
+    shutil.copyfile(tests_path, tests_backup)
+    tests_hash = tests_original_hash
+    if arguments.test_revision:
+        older = subprocess.run(["git", "show", f"{arguments.test_revision}:{TESTS}"],
+                               cwd=repository, capture_output=True, check=True).stdout
+        tests_path.write_bytes(older)
+        tests_hash = sha256(older)
 
-    baseline = run_suite(repository)
-    print(f"baseline: exit {baseline['exitCode']}, {baseline['summary']}", flush=True)
     results = []
     clean = True
     try:
-        for mutant in MUTANTS:
+        baseline = run_suite(repository)
+        print(f"baseline: exit {baseline['exitCode']}, {baseline['summary']}", flush=True)
+        for mutant in selected:
             if sha256(source_path.read_bytes()) != original_hash:
                 raise SystemExit("the source changed before a mutant was applied")
             text = original.decode("utf-8")
@@ -206,7 +250,7 @@ def main() -> int:
             finally:
                 shutil.copyfile(backup, source_path)
             restored = sha256(source_path.read_bytes()) == original_hash
-            diff_exit = git_diff_exit_code(repository)
+            diff_exit = git_diff_exit_code(repository, SOURCE)
             clean = clean and restored and diff_exit == 0
             killed = (outcome["exitCode"] not in (0, "timeout") and bool(outcome["failingTests"])
                       and not outcome["compileError"])
@@ -225,7 +269,11 @@ def main() -> int:
                   f"diff={diff_exit}", flush=True)
     finally:
         shutil.copyfile(backup, source_path)
+        shutil.copyfile(tests_backup, tests_path)
         shutil.rmtree(backup_directory, ignore_errors=True)
+    tests_restored = (sha256(tests_path.read_bytes()) == tests_original_hash
+                      and git_diff_exit_code(repository, TESTS) == 0)
+    clean = clean and tests_restored
 
     baseline_ok = baseline["exitCode"] == 0 and not baseline["failingTests"]
     all_killed = all(result["killed"] for result in results)
@@ -235,12 +283,16 @@ def main() -> int:
         "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": SOURCE,
         "sourceSha256": original_hash,
+        "tests": TESTS,
+        "testRevision": arguments.test_revision,
+        "testsSha256": tests_hash,
         "command": " ".join(COMMAND),
         "timeoutSeconds": TIMEOUT_SECONDS,
         "baseline": baseline,
         "mutants": results,
         "baselinePassed": baseline_ok,
         "allKilled": all_killed,
+        "testsRestored": tests_restored,
         "allRestored": clean,
         "killedCount": sum(result["killed"] for result in results),
         "mutantCount": len(results),

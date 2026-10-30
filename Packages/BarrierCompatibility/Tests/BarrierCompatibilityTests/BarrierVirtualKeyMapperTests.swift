@@ -349,6 +349,67 @@ private func expectFixture(
   #expect(decoder.failure == nil)
 }
 
+/// The code lines of a Swift source: `//` comments, nested `/* */` comments and the contents of
+/// single-line string literals removed, each line trimmed, empty lines dropped.
+private func codeLines(_ source: String) -> [String] {
+  var code = ""
+  var characters = Array(source)[...]
+  var blockDepth = 0
+  var inString = false
+  while let character = characters.popFirst() {
+    let next = characters.first
+    if blockDepth > 0 {
+      if character == "/" && next == "*" {
+        blockDepth += 1
+        _ = characters.popFirst()
+      } else if character == "*" && next == "/" {
+        blockDepth -= 1
+        _ = characters.popFirst()
+      } else if character == "\n" {
+        code.append(character)
+      }
+    } else if inString {
+      if character == "\\" {
+        _ = characters.popFirst()
+      } else if character == "\"" || character == "\n" {
+        inString = false
+        code.append(character)
+      }
+    } else if character == "/" && next == "/" {
+      while let skipped = characters.first, skipped != "\n" { _ = characters.popFirst() }
+    } else if character == "/" && next == "*" {
+      blockDepth = 1
+      _ = characters.popFirst()
+    } else {
+      if character == "\"" { inString = true }
+      code.append(character)
+    }
+  }
+  return code.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+    .filter { !$0.isEmpty }
+}
+
+/// The production file's code lines.
+private func productionCode() throws -> [String] {
+  let url = repositoryRoot().appendingPathComponent(
+    "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift")
+  return codeLines(try String(contentsOf: url, encoding: .utf8))
+}
+
+/// The integer literals of one code line, in order: hexadecimal ones, and decimal ones that are
+/// not part of a name (`UInt16`) or of a hexadecimal literal. Range operators separate
+/// literals, so `0...25` holds two.
+private func integerLiterals(in line: String) throws -> [String] {
+  let spaced = line.replacingOccurrences(of: "...", with: " ")
+    .replacingOccurrences(of: "..<", with: " ")
+  let pattern = try NSRegularExpression(
+    pattern: #"(?<![\w$.])(?:0[xX][0-9A-Fa-f_]+|[0-9][0-9_]*)(?![\w.])"#)
+  let range = NSRange(spaced.startIndex..., in: spaced)
+  return pattern.matches(in: spaced, range: range).compactMap { match in
+    Range(match.range, in: spaced).map { String(spaced[$0]) }
+  }
+}
+
 // MARK: - Tests
 
 @Suite("M1-043 Barrier virtual key mapper")
@@ -740,13 +801,8 @@ struct BarrierVirtualKeyMapperTests {
   }
 
   @Test func productionSourceImportsOnlyKVMContracts() throws {
-    let source = try String(
-      contentsOf: repositoryRoot().appendingPathComponent(
-        "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift"),
-      encoding: .utf8)
-    // Comments may name types across the boundary to document it; code lines may not.
-    let code = source.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
-      .filter { !$0.hasPrefix("//") }
+    // Comments may name types across the boundary to document it; code may not.
+    let code = try productionCode()
     #expect(!code.isEmpty)
     #expect(code.filter { $0.hasPrefix("import ") } == ["import KVMContracts"])
     #expect(!code.contains { $0.contains(" import ") })
@@ -760,16 +816,31 @@ struct BarrierVirtualKeyMapperTests {
     for word in forbidden {
       #expect(!code.contains { $0.contains(word) }, "production code mentions \(word)")
     }
-    // Table-driven (the issue's scope): no switch, and no value built from a raw value by an
-    // initializer.
+  }
+
+  /// Table-driven, the issue's scope: no magic number decides a key outside the named lists.
+  @Test func productionSourceKeepsEveryNumericLiteralInsideTheNamedLists() throws {
+    // The scanner drops `//` comments, nested `/* */` comments and string contents, and finds
+    // the integer literals of a line, not the digits of a name or of a hexadecimal literal.
+    let sample = "let a = 2 // 0x61\n/* 0x62 /* 97 */ */ let b = 3\nlet c = \"0x63\" + d0x1"
+    #expect(codeLines(sample) == ["let a = 2", "let b = 3", "let c = \"\" + d0x1"])
+    #expect(
+      try integerLiterals(in: "x[0x0061...0x007A] = .f(UInt8(i + 1)) + 0...25")
+        == ["0x0061", "0x007A", "1", "0", "25"])
+    #expect(try integerLiterals(in: "let c = \"\" + d0x1").isEmpty)
+
+    let code = try productionCode()
+    // No switch, and no value built from a raw value by an initializer.
     #expect(!code.contains { $0.hasPrefix("switch ") || $0.contains("case 0x") })
     #expect(!code.contains { $0.contains("(rawValue:") })
-    // Every hexadecimal literal sits inside one of the named lists, so no key is decided by a
-    // literal anywhere else (an if-chain or arithmetic over raw values).
+    // Every integer literal sits in one of the named lists. Outside them only 0, 1 and the
+    // values of the two declared constants may appear, so no if-chain or arithmetic over raw
+    // values can decide a key, in hexadecimal or in decimal.
     let lists = [
       "lowercaseLetters", "uppercaseLetters", "digits", "shiftedDigits", "functionKeys",
       "punctuation", "namedKeys", "frozenNonMembers",
     ]
+    let constants = ["static let catalogVersion = ", "static let contractIdentifierCount = "]
     var declared = Set<String>()
     var insideList = false
     var strayLiterals: [String] = []
@@ -784,9 +855,13 @@ struct BarrierVirtualKeyMapperTests {
         if line == "]" { insideList = false }
         continue
       }
-      if line.contains("0x") { strayLiterals.append(line) }
+      if constants.contains(where: { line.hasPrefix($0) }) { continue }
+      if try integerLiterals(in: line).contains(where: { $0 != "0" && $0 != "1" }) {
+        strayLiterals.append(line)
+      }
     }
     #expect(declared == Set(lists))
+    #expect(constants.allSatisfy { constant in code.contains { $0.hasPrefix(constant) } })
     #expect(!insideList)
     #expect(strayLiterals.isEmpty, "literals outside the named lists: \(strayLiterals)")
   }
