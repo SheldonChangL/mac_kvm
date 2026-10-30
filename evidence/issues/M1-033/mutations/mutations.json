@@ -1,0 +1,229 @@
+[
+  {
+    "exitCode": 0,
+    "built": true,
+    "failedTests": [],
+    "summary": "✔ Test run with 20 tests in 1 suite passed after 4.511 seconds.",
+    "id": "M0",
+    "description": "no mutation (baseline)"
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "everyMouseButtonAndPhaseRoundTripsThroughTheServerEncoder",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "releaseWithoutAPressIsStillEmitted",
+      "wireValuesFollowTheEncodersTableNotMouseButtonRawValues"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.524 seconds with 28 issues.",
+    "id": "R1",
+    "required": true,
+    "description": "map the wire value with MouseButton(rawValue:)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "outcomeEventsAreAlwaysMouseButton",
+      "wireValueFiveIsDroppedAsUnrepresentableForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.550 seconds with 13 issues.",
+    "id": "R2",
+    "required": true,
+    "description": "decode wire 5 as .auxiliary instead of dropping it",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "aPressAndItsReleaseAreEmittedOrDroppedTogetherForEveryValue",
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "everyMouseButtonAndPhaseRoundTripsThroughTheServerEncoder",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "heldButtonSpansPointerMovesInTheFixtureStream",
+      "outcomeEventsAreAlwaysMouseButton",
+      "releaseWithoutAPressIsStillEmitted",
+      "tokenBytesAreTheFrozenAsciiTokensAndPhases",
+      "wireValuesFollowTheEncodersTableNotMouseButtonRawValues"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.545 seconds with 35 issues.",
+    "id": "R3",
+    "required": true,
+    "description": "decode DMUP as a press (.down)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "outcomeEventsAreAlwaysMouseButton",
+      "wireValuesOutsideOneToFiveAreDroppedForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.477 seconds with 6 issues.",
+    "id": "R4a",
+    "required": true,
+    "description": "accept wire 0 (as .left)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "outcomeEventsAreAlwaysMouseButton",
+      "wireValuesOutsideOneToFiveAreDroppedForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.549 seconds with 6 issues.",
+    "id": "R4b",
+    "required": true,
+    "description": "accept wire 6 (as .auxiliary)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "outcomeEventsAreAlwaysMouseButton",
+      "wireValuesOutsideOneToFiveAreDroppedForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.535 seconds with 11 issues.",
+    "id": "R4c",
+    "required": true,
+    "description": "accept wires 0 and 6 together (as .left)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "wireValuesOutsideOneToFiveAreDroppedForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.505 seconds with 8 issues.",
+    "id": "X1",
+    "required": false,
+    "description": "treat 0...6 as the contract range (0 and 6 reported unrepresentable)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "aPressAndItsReleaseAreEmittedOrDroppedTogetherForEveryValue",
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "everyMouseButtonAndPhaseRoundTripsThroughTheServerEncoder",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "heldButtonSpansPointerMovesInTheFixtureStream",
+      "outcomeEventsAreAlwaysMouseButton",
+      "releaseWithoutAPressIsStillEmitted",
+      "wireValueFiveIsDroppedAsUnrepresentableForDownAndUp",
+      "wireValuesFollowTheEncodersTableNotMouseButtonRawValues"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.528 seconds with 38 issues.",
+    "id": "X2",
+    "required": false,
+    "description": "drop every DMUP (judged as value 0)",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "clientToServerDirectionFailsClosedBeforeTheBody",
+      "decoderIsStatelessAndDeterministic"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.593 seconds with 11 issues.",
+    "id": "X3",
+    "required": false,
+    "description": "skip the direction check",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "bodyMustBeExactlyOneByte"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 5.041 seconds with 12 issues.",
+    "id": "X4",
+    "required": false,
+    "description": "accept a body of one byte or more",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "clientToServerDirectionFailsClosedBeforeTheBody"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 7.024 seconds with 4 issues.",
+    "id": "X5",
+    "required": false,
+    "description": "judge the body length before the direction",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "wireValueFiveIsDroppedAsUnrepresentableForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 7.306 seconds with 10 issues.",
+    "id": "X6",
+    "required": false,
+    "description": "report wire 5 as out of contract",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  },
+  {
+    "exitCode": 1,
+    "built": true,
+    "failedTests": [
+      "aPressAndItsReleaseAreEmittedOrDroppedTogetherForEveryValue",
+      "capturedButtonFramesDecodeInOrderWithButtonFiveDropped",
+      "decoderIsStatelessAndDeterministic",
+      "dropDiagnosticsAndErrorsCarryOnlyAllowlistedMetadata",
+      "everyPossibleBodyByteIsEmittedOrDroppedAndNeverThrows",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "outcomeEventsAreAlwaysMouseButton",
+      "wireValueFiveIsDroppedAsUnrepresentableForDownAndUp"
+    ],
+    "summary": "✘ Test run with 20 tests in 1 suite failed after 4.692 seconds with 11 issues.",
+    "id": "X7",
+    "required": false,
+    "description": "emit DMDN 5 as an auxiliary press while DMUP 5 stays dropped",
+    "restoredIdentical": true,
+    "gitDiffClean": true
+  }
+]
