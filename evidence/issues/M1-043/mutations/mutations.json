@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-043",
+  "date": "2026-10-30T01:12:15Z",
+  "source": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift",
+  "sourceSha256": "c41b01c03c39f23059534b2e973ff06a3cb45e901ccb578a8389432fd0de38cb",
+  "tests": "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift",
+  "testRevision": null,
+  "testsSha256": "86d802b2a628a400c536a8bc8f21dac2ee8e0c77dbc8b9f866f25ec866c2aaef",
+  "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierVirtualKeyMapperTests",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 21.7,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 15 tests in 1 suite passed after 0.657 seconds."
+  },
+  "mutants": [
+    {
+      "id": "1",
+      "requirement": "swap two punctuation entries",
+      "description": "bracketleft (0x005B/0x007B) and bracketright (0x005D/0x007D) map to each other's key",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.7,
+      "failingTests": [
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+        "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.687 seconds with 37 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "2",
+      "requirement": "map an unknown identifier to a default key instead of unknown(raw)",
+      "description": "an identifier without a table row maps to .space",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.5,
+      "failingTests": [
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.563 seconds with 64 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3",
+      "requirement": "remove the 34 convention identifiers",
+      "description": "0x0042-0x005A and the nine shifted digits other than 0x0021 are removed from the table, so they fall back to unknown(raw)",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.7,
+      "failingTests": [
+        "catalogVersionIsTwoAndTheTableHas134Identifiers",
+        "contractIdentifiersEqualTheFrozenSetUnionTheConventionList",
+        "conventionIdentifiersMapToTheirLettersAndDigits",
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.630 seconds with 81 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "4a",
+      "requirement": "map a shifted identifier to a different physical key from its unshifted pair",
+      "description": "the captured underscore 0x005F maps to the equal key; its plain pair 0x002D stays minus",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.4,
+      "failingTests": [
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.648 seconds with 18 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "4b",
+      "requirement": "map a shifted identifier to a different physical key from its unshifted pair",
+      "description": "the convention identifier 0x0040 (@) maps to the 3 key; its plain pair 0x0032 stays the 2 key",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.7,
+      "failingTests": [
+        "conventionIdentifiersMapToTheirLettersAndDigits",
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.655 seconds with 9 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5a",
+      "requirement": "map Insert or keypad Enter to a catalog member",
+      "description": "keypad Enter 0xEF8D maps to .enter",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.4,
+      "failingTests": [
+        "catalogVersionIsTwoAndTheTableHas134Identifiers",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.624 seconds with 12 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5b",
+      "requirement": "map Insert or keypad Enter to a catalog member",
+      "description": "Insert 0xEF63 maps to .delete",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.5,
+      "failingTests": [
+        "catalogVersionIsTwoAndTheTableHas134Identifiers",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.629 seconds with 10 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "6a",
+      "requirement": "make kvmEvent(for:) drop the modifiers or change the phase",
+      "description": "kvmEvent(for:) drops the modifiers",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.5,
+      "failingTests": [
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.573 seconds with 66 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "6b",
+      "requirement": "make kvmEvent(for:) drop the modifiers or change the phase",
+      "description": "kvmEvent(for:) turns a repeat into a press",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.2,
+      "failingTests": [
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.646 seconds with 18 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "7a",
+      "requirement": "extra: a raw-value shortcut",
+      "description": "letters computed by arithmetic over 0x0041-0x007A, which turns 0x005B-0x0060 into out-of-domain letters",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.1,
+      "failingTests": [
+        "conventionIdentifiersMapToTheirLettersAndDigits",
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "everyTableValueStaysInsideItsCatalogDomain",
+        "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.672 seconds with 69 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "7b",
+      "requirement": "extra: a raw-value shortcut",
+      "description": "kvmEvent(for:) maps the button (the server's key code) instead of the identifier",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.1,
+      "failingTests": [
+        "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+        "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+        "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+        "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+        "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.621 seconds with 306 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "8",
+      "requirement": "review: a decimal literal outside the named lists",
+      "description": "virtualKey(for:) answers 97 (0x0061) with .letter(0) before the table lookup; the behavior is unchanged, so only the source check can catch it",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.1,
+      "failingTests": [
+        "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists"
+      ],
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.599 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsRestored": true,
+  "allRestored": true,
+  "killedCount": 12,
+  "mutantCount": 12
+}
