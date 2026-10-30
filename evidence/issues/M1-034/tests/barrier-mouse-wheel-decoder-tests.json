@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-034",
+  "framework": "swift-testing",
+  "author": "Claude Code (implementation: --model sonnet; evidence finishing pass: --model opus)",
+  "baseCommit": "76f4045415d298612384a4348c4046e7ff0b88d7",
+  "testFirstOutcome": "red-then-green",
+  "testFirstNote": "BarrierMouseWheelDecoderTests.swift was written first and run against a stub that compiled and always dropped: \"Test run with 17 tests in 1 suite failed after 6.372 seconds with 8926 issues\"; 15 of 17 failed, and the two that passed (tokenBytesAreTheFrozenAsciiToken, productionSourceImportsOnlyKVMContracts) do not exercise decode behavior. The implementation then made the focused run pass: \"Test run with 17 tests in 1 suite passed after 2.233 seconds\".",
+  "rawReport": "evidence/issues/M1-034/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Written by `swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-034/tests/swift-testing-xunit.xml` at e5b5465; Swift Testing names the file with the -swift-testing suffix. It records 264 tests, 0 failures.",
+  "tests": [
+    {
+      "name": "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "status": "passed"
+    },
+    {
+      "name": "horizontalAxisIsInvertedAndVerticalIsNot",
+      "status": "passed"
+    },
+    {
+      "name": "capturedNotchFramesReEncodeByteForByteThroughTheServerEncoder",
+      "status": "passed"
+    },
+    {
+      "name": "zeroOnBothAxesIsDroppedWithADiagnostic",
+      "status": "passed"
+    },
+    {
+      "name": "extremesDoNotOverflow",
+      "status": "passed"
+    },
+    {
+      "name": "capturedNotchesDecodeToTheNamedDirectionsUpDownLeftRight",
+      "status": "passed"
+    },
+    {
+      "name": "outcomeEventsAreAlwaysScroll",
+      "status": "passed"
+    },
+    {
+      "name": "dropDiagnosticsAndErrorsCarryOnlyAllowlistedMetadata",
+      "status": "passed"
+    },
+    {
+      "name": "clientToServerDirectionFailsClosed",
+      "status": "passed"
+    },
+    {
+      "name": "unknownAndShortTokensFailClosed",
+      "status": "passed"
+    },
+    {
+      "name": "bodyMustBeExactlyFourBytes",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceImportsOnlyKVMContracts",
+      "status": "passed"
+    },
+    {
+      "name": "everyWireValueOnEachAxisMatchesAnIndependentTowardZeroOracle",
+      "status": "passed"
+    },
+    {
+      "name": "scrollRoundTripsThroughTheServerEncoderForEveryDeltaPairUpTo273",
+      "status": "passed"
+    },
+    {
+      "name": "decoderIsStatelessAndDeterministic",
+      "status": "passed"
+    },
+    {
+      "name": "remaindersAreDroppedTowardZero",
+      "status": "passed"
+    },
+    {
+      "name": "tokenBytesAreTheFrozenAsciiToken",
+      "status": "passed"
+    }
+  ],
+  "testsStatusNote": "Per-test status for the 17 M1-034 tests is read from the raw xUnit file; the full package passed (264 tests in 9 suites).",
+  "mutationRuns": {
+    "note": "Implementer mutants: one-line edits run against the final test file and restored from a backup copy (git diff empty). Reviewer mutants: run independently by the fresh-context reviewer in its own worktree.",
+    "implementer": [
+      {
+        "mutation": "remove the horizontal inversion",
+        "result": "killed: 9 of 17 tests failed"
+      },
+      {
+        "mutation": "invert the vertical axis too",
+        "result": "killed: 10 of 17 tests failed"
+      },
+      {
+        "mutation": "floor division instead of division toward zero",
+        "result": "killed: 5 of 17 tests failed"
+      },
+      {
+        "mutation": "emit a zero .scroll instead of dropping",
+        "result": "killed: 3 of 17 tests failed"
+      },
+      {
+        "mutation": "negate in Int16 before widening",
+        "result": "killed: the test process traps (signal 5)"
+      }
+    ],
+    "reviewer": "no inversion, negate in Int16 (trap), floor division, round-to-nearest, body >= 4, drop if either axis is zero, payload count in the diagnostic, swapped axes, length check before direction, little-endian: all 10 killed"
+  }
+}
