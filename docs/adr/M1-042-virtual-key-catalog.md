@@ -169,6 +169,9 @@ previous), brightness and IME/language keys, are represented as
 - Not covered: the Barrier client-role inbound mapping (M1-043) still turns
   punctuation identifiers into `unknown`. That needs its own evidence-backed
   change.
+  - Update, 2026-10-29: M1-PROTOCOL-003 is that change. It freezes the eleven
+    punctuation identifiers, plain and shifted (BARRIER-EVID-0008), and names
+    M1-043 as a consumer, so M1-043 maps them.
 
 ## Selected versus rejected alternatives
 
@@ -267,7 +270,7 @@ Exact Files. It is tracked as an open question below.
 | Add catalog-version constant and payload-domain validation to `KVMContracts` | Contracts owner, through a new contract-change Issue | Must be resolved before the first persisted or Native wire representation of `VirtualKey` (M3-004). Until then M1-043 and M1-044 tests enforce domains. |
 | Decide whether a Native keyboard wire representation may carry `unknown(rawCode)`, must reject it, or must first add a source namespace | M3-004/M3-017 owners with Security Reviewer | Must be resolved before the first Native keyboard encoder represents `VirtualKey.unknown`. This does not block M1's Barrier-to-macOS v1 mapper, where `unknown` stays reject-only at the platform boundary. |
 | Source namespace for `unknown`, enabling explicit platform handling | Contracts owner and Security Reviewer, through a superseding catalog ADR | Blocks any mapper that would inject an `unknown` value. Reject-only handling stays in force until resolved. |
-| M1-043 Exact Files place `BarrierVirtualKeyMapper` in `KVMCore`, while M1-002 and Frozen Decision 4 keep Barrier key tables in `BarrierCompatibility` | M1-043 implementer with Architecture Reviewer | Must be resolved by Product Owner decision before M1-043 starts. This ADR does not authorize Barrier key identifiers in `KVMCore`. |
+| M1-043 Exact Files place `BarrierVirtualKeyMapper` in `KVMCore`, while M1-002 and Frozen Decision 4 keep Barrier key tables in `BarrierCompatibility` | M1-043 implementer with Architecture Reviewer | Must be resolved by Product Owner decision before M1-043 starts. Resolved on 2026-10-29: M4-SCOPE-001 (PR #331, merged) moves the Exact Files to `BarrierCompatibility`. This ADR does not authorize Barrier key identifiers in `KVMCore`. |
 
 No other open question remains.
 
