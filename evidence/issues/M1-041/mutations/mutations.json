@@ -1,0 +1,248 @@
+[
+  {
+    "id": "1",
+    "mutation": "a release uses its own identifier instead of the press's",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 81.295 seconds with 6502 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "capturedKeyFramesDecodeInOrderAndLeaveNothingHeld",
+      "everyButtonValueIsHeldAndReleasedWithItsPressIdentity",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "releaseUsesThePressIdentityByButton",
+      "repeatsUseThePressIdentityAndKeepTheHeldSet",
+      "roundTripThroughTheServerEncoderForEveryEncodableKey",
+      "secondPressOnAHeldButtonKeepsTheFirstIdentity",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "2",
+    "mutation": "an unpaired release is dropped instead of emitted (no event: decode throws)",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.276 seconds with 5 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "bodyLengthsAreExact",
+      "goldenKeyFramesReEncodeByteForByte",
+      "releasePairsByButtonOnlyNeverByIdentifier",
+      "secondPressOnAHeldButtonKeepsTheFirstIdentity",
+      "unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "3a",
+    "mutation": "mask bits beyond the five are kept: 0x2000, 0x4000, 0x8000 read as Caps Lock",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.209 seconds with 73 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "modifierMaskDecodesExactlyTheFiveFrozenBits",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "3b",
+    "mutation": "mask bits beyond the five are kept: 0x0008 read as Alt",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.288 seconds with 41 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "modifierMaskDecodesExactlyTheFiveFrozenBits",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "4",
+    "mutation": "a DKRP with count N > 1 yields N repeats (the extra ones on the next decode calls)",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.354 seconds with 19 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "repeatsUseThePressIdentityAndKeepTheHeldSet",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly",
+      "unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "5a",
+    "mutation": "heldKeys is cleared after a fail-closed error",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.190 seconds with 11 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "failureIsStickyAndHeldKeysSurviveIt",
+      "heldKeysAreSortedByButtonAndFreshDecodersAreIndependent"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "5b",
+    "mutation": "the failure is not latched after a fail-closed error",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.192 seconds with 109 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "bodyLengthsAreExact",
+      "clientToServerDirectionFailsClosed",
+      "errorsCarryOnlyAllowlistedMetadata",
+      "failureIsStickyAndHeldKeysSurviveIt",
+      "heldKeysAreSortedByButtonAndFreshDecodersAreIndependent",
+      "unknownAndShortTokensFailClosed"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "6",
+    "mutation": "a second DKDN on a held button replaces the held identity (latest press wins)",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.112 seconds with 6 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "secondPressOnAHeldButtonKeepsTheFirstIdentity"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "R1",
+    "mutation": "the token is checked before the latch, so an unknown token after a failure reports itself instead of the latched error",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 7.264 seconds with 5 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "failureIsStickyAndHeldKeysSurviveIt"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "R2",
+    "mutation": "the held set evicts its lowest button beyond 8 entries",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.242 seconds with 3 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "everyButtonValueIsHeldAndReleasedWithItsPressIdentity"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "F1",
+    "mutation": "identifier fallback: an unpaired DKUP frees a held entry with the same identifier",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 5.227 seconds with 2 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "releasePairsByButtonOnlyNeverByIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "F2",
+    "mutation": "identifier first: a DKUP frees the lowest held button with the same identifier before trying its own button",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 15.970 seconds with 4 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "everyButtonValueIsHeldAndReleasedWithItsPressIdentity",
+      "releasePairsByButtonOnlyNeverByIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "G1",
+    "mutation": "the identifier is misread (byte-swapped)",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 151.047 seconds with 11923 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "capturedKeyFramesDecodeInOrderAndLeaveNothingHeld",
+      "everyButtonValueIsHeldAndReleasedWithItsPressIdentity",
+      "failureIsStickyAndHeldKeysSurviveIt",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "goldenKeyFramesReEncodeByteForByte",
+      "heldKeysAreSortedByButtonAndFreshDecodersAreIndependent",
+      "modifierKeysCarryTheMaskBeforeOnDownAndIncludingOnUpAndNothingIsSynthesized",
+      "modifierMaskDecodesExactlyTheFiveFrozenBits",
+      "releasePairsByButtonOnlyNeverByIdentifier",
+      "releaseUsesThePressIdentityByButton",
+      "repeatsUseThePressIdentityAndKeepTheHeldSet",
+      "roundTripThroughTheServerEncoderForEveryEncodableKey",
+      "secondPressOnAHeldButtonKeepsTheFirstIdentity",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly",
+      "unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  },
+  {
+    "id": "G2",
+    "mutation": "the button is misread (byte-swapped)",
+    "exitCode": 1,
+    "summary": [
+      "\u2718 Test run with 21 tests in 1 suite failed after 150.183 seconds with 14483 issues."
+    ],
+    "compileErrors": [],
+    "failedTests": [
+      "capturedKeyFramesDecodeInOrderAndLeaveNothingHeld",
+      "everyButtonValueIsHeldAndReleasedWithItsPressIdentity",
+      "failureIsStickyAndHeldKeysSurviveIt",
+      "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "goldenKeyFramesReEncodeByteForByte",
+      "heldKeysAreSortedByButtonAndFreshDecodersAreIndependent",
+      "modifierKeysCarryTheMaskBeforeOnDownAndIncludingOnUpAndNothingIsSynthesized",
+      "modifierMaskDecodesExactlyTheFiveFrozenBits",
+      "releasePairsByButtonOnlyNeverByIdentifier",
+      "releaseUsesThePressIdentityByButton",
+      "repeatsUseThePressIdentityAndKeepTheHeldSet",
+      "roundTripThroughTheServerEncoderForEveryEncodableKey",
+      "secondPressOnAHeldButtonKeepsTheFirstIdentity",
+      "unknownIdentifiersAreRecordedAndReleasedCleanly",
+      "unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier"
+    ],
+    "restoredByteForByte": true,
+    "gitDiffExitCodeAfterRestore": 0
+  }
+]

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-041",
+  "framework": "swift-testing",
+  "author": "Claude Code (implementation: --model opus; evidence finishing pass: --model opus)",
+  "baseCommit": "76f4045415d298612384a4348c4046e7ff0b88d7",
+  "date": "2026-10-30T00:17:10Z",
+  "toolchain": {
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "target": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "python": "Python 3.9.6",
+    "macOS": "26.6.2",
+    "macOSBuild": "25G83",
+    "architecture": "arm64"
+  },
+  "testFirstOutcome": "red-then-green",
+  "testFirstNote": "Original: 19 tests against a compiling stub, \"Test run with 19 tests in 1 suite failed after 0.018 seconds with 75 issues\". First-identity change: \"Test run with 20 tests in 1 suite failed after 5.151 seconds with 6 issues\", only the renamed test failing. GREEN at e189692: 21 tests focused, 268 in the package.",
+  "rawReport": "evidence/issues/M1-041/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Written by `swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-041/tests/swift-testing-xunit.xml`; it records 268 tests, 0 failures.",
+  "tests": [
+    {
+      "name": "tokenBytesBodyLengthsAndPhasesAreFrozen",
+      "status": "passed"
+    },
+    {
+      "name": "everyButtonValueIsHeldAndReleasedWithItsPressIdentity",
+      "status": "passed"
+    },
+    {
+      "name": "releasePairsByButtonOnlyNeverByIdentifier",
+      "status": "passed"
+    },
+    {
+      "name": "errorsCarryOnlyAllowlistedMetadata",
+      "status": "passed"
+    },
+    {
+      "name": "secondPressOnAHeldButtonKeepsTheFirstIdentity",
+      "status": "passed"
+    },
+    {
+      "name": "failureIsStickyAndHeldKeysSurviveIt",
+      "status": "passed"
+    },
+    {
+      "name": "capturedKeyFramesDecodeInOrderAndLeaveNothingHeld",
+      "status": "passed"
+    },
+    {
+      "name": "goldenKeyFramesReEncodeByteForByte",
+      "status": "passed"
+    },
+    {
+      "name": "unknownIdentifiersAreRecordedAndReleasedCleanly",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceImportsOnlyKVMContracts",
+      "status": "passed"
+    },
+    {
+      "name": "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "status": "passed"
+    },
+    {
+      "name": "clientToServerDirectionFailsClosed",
+      "status": "passed"
+    },
+    {
+      "name": "unknownAndShortTokensFailClosed",
+      "status": "passed"
+    },
+    {
+      "name": "modifierKeysCarryTheMaskBeforeOnDownAndIncludingOnUpAndNothingIsSynthesized",
+      "status": "passed"
+    },
+    {
+      "name": "bodyLengthsAreExact",
+      "status": "passed"
+    },
+    {
+      "name": "roundTripThroughTheServerEncoderForEveryEncodableKey",
+      "status": "passed"
+    },
+    {
+      "name": "releaseUsesThePressIdentityByButton",
+      "status": "passed"
+    },
+    {
+      "name": "heldKeysAreSortedByButtonAndFreshDecodersAreIndependent",
+      "status": "passed"
+    },
+    {
+      "name": "repeatsUseThePressIdentityAndKeepTheHeldSet",
+      "status": "passed"
+    },
+    {
+      "name": "modifierMaskDecodesExactlyTheFiveFrozenBits",
+      "status": "passed"
+    },
+    {
+      "name": "unpairedReleasesAndRepeatsAreEmittedWithTheirOwnIdentifier",
+      "status": "passed"
+    }
+  ],
+  "mutationRuns": {
+    "runner": "evidence/issues/M1-041/mutations/mutate.py",
+    "results": "evidence/issues/M1-041/mutations/mutations.json",
+    "note": "14 mutants, each killed; see summary.md for the killing tests."
+  }
+}
