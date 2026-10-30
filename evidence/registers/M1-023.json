@@ -1428,7 +1428,8 @@
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierMouseMoveDecoderTests.swift",
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierMouseButtonDecoderTests.swift",
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierMouseWheelDecoderTests.swift",
-        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierKeyboardDecoderTests.swift"
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierKeyboardDecoderTests.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift"
       ]
     },
     {
@@ -1834,7 +1835,8 @@
         "Tests/Contracts/test_m1_protocol_003_input_clipboard_message_contracts.py",
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierServerInputEncoderTests.swift",
         "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClipboardTests.swift",
-        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierKeyboardDecoderTests.swift"
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierKeyboardDecoderTests.swift",
+        "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift"
       ]
     }
   ]

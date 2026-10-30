@@ -430,7 +430,8 @@ independent reviewer approved them on 2026-10-29
     bytes copied from them (`BarrierClipboardControlEncoderTests.swift`).
   - The client decoders' tests read them too: `BarrierMouseMoveDecoderTests.swift`,
     `BarrierMouseButtonDecoderTests.swift` and `BarrierMouseWheelDecoderTests.swift` (0006),
-    and `BarrierKeyboardDecoderTests.swift` (0006 and 0008).
+    and `BarrierKeyboardDecoderTests.swift` and `BarrierVirtualKeyMapperTests.swift` (0006 and
+    0008).
 - **Sanitization.**
   - Raw streams are not committed.
   - Every clipboard format's content is zero-filled; the client-clipboard fixture
