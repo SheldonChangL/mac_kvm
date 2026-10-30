@@ -3,16 +3,16 @@
 ## Status
 
 Freezes the Barrier pointer, button, wheel, key and clipboard frames that
-`BARRIER-EVID-0006`, `0007` and `0008` establish (M2-022 capture). Once the Product
-Owner merges it, the client decoders M1-032, M1-033, M1-034 and M1-041, the key mapper
-M1-043 and the client session M1-029-FOLLOWUP-001 may consume it.
+`BARRIER-EVID-0006`, `0007` and `0008` establish (M2-022 capture). Accepted: the Product
+Owner merged PR #334 on 2026-10-29. The client decoders M1-032, M1-033, M1-034 and M1-041
+consume it (PRs #336–#339), as will the key mapper M1-043 and the client session
+M1-029-FOLLOWUP-001.
 
 Independent protocol review (`independent-review.md`): accept with conditions on the
 draft at `4ee8f62`, accept on the revision at `a621ca3`. The five wording nits of the
 second review are fixed in `fd32fee`. A Codex finding relayed by the Product Owner (P2):
 the client's wheel rule did not invert the horizontal axis. It is fixed in the commit
-that adds that finding to `independent-review.md`. Merging needs the Product Owner's
-explicit approval.
+that adds that finding to `independent-review.md`.
 
 Base commit: `b48bf5ce3d2d32c31369ddf107344251a1cd7424`.
 
