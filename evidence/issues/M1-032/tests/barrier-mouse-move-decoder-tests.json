@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-032",
+  "framework": "swift-testing",
+  "author": "Claude Code (implementation: --model sonnet; evidence finishing pass: --model opus)",
+  "baseCommit": "76f4045415d298612384a4348c4046e7ff0b88d7",
+  "testFirstOutcome": "red-then-green",
+  "testFirstNote": "BarrierMouseMoveDecoderTests.swift was written first and run against a compiling stub: 16 tests ran, 14 failed and 2 passed by construction, with 7530 recorded issues. The implementation then made the focused run pass: \"Test run with 16 tests in 1 suite passed after 3.640 seconds\".",
+  "rawReport": "evidence/issues/M1-032/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Written by `swift test --package-path Packages/BarrierCompatibility --xunit-output evidence/issues/M1-032/tests/swift-testing-xunit.xml` at 039299e; Swift Testing names the file with the -swift-testing suffix. It records 263 tests, 0 failures.",
+  "tests": [
+    {
+      "name": "normalizedIsThePixelOffsetOverExtentMinusOneAndZeroForASinglePixel",
+      "status": "passed"
+    },
+    {
+      "name": "tokenBytesAreTheFrozenAsciiToken",
+      "status": "passed"
+    },
+    {
+      "name": "dropDiagnosticsAndErrorsCarryOnlyAllowlistedMetadata",
+      "status": "passed"
+    },
+    {
+      "name": "unknownAndShortTokensFailClosedWithOnlyAByteCount",
+      "status": "passed"
+    },
+    {
+      "name": "edgesAndCenterRoundTripThroughTheEncoder",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceImportsOnlyKVMContracts",
+      "status": "passed"
+    },
+    {
+      "name": "capturedDmmvFramesReEncodeByteForByteThroughTheServerEncoder",
+      "status": "passed"
+    },
+    {
+      "name": "outcomeEventsAreAlwaysMouseMove",
+      "status": "passed"
+    },
+    {
+      "name": "everyReachablePixelRoundTripsDecodeThenEncode",
+      "status": "passed"
+    },
+    {
+      "name": "clientToServerDirectionFailsClosedBeforeTheBody",
+      "status": "passed"
+    },
+    {
+      "name": "coordinatesOutsideTheScreenAreDroppedNotClamped",
+      "status": "passed"
+    },
+    {
+      "name": "capturedDmmvFramesDecodeToTheObservedPixelsNormalizedByExtentMinusOne",
+      "status": "passed"
+    },
+    {
+      "name": "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+      "status": "passed"
+    },
+    {
+      "name": "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment",
+      "status": "passed"
+    },
+    {
+      "name": "decoderIsPureAndScreensAreIndependent",
+      "status": "passed"
+    },
+    {
+      "name": "bodyMustBeExactlyFourBytes",
+      "status": "passed"
+    }
+  ],
+  "testsStatusNote": "Per-test status for the 16 M1-032 tests is read from the raw xUnit file; the full package passed (263 tests in 9 suites).",
+  "mutationRuns": {
+    "note": "One edit each to BarrierMouseMoveDecoder.swift, run against the final test file and restored from a backup copy; R1-R4 were required, E1-E9 are extra.",
+    "runs": [
+      {
+        "id": "R1",
+        "mutation": "normalize by `extent` instead of `extent - 1`: `Double(Int(extent) - 1)` becomes `Double(Int(extent))`",
+        "result": "killed",
+        "failingTests": [
+          "capturedDmmvFramesDecodeToTheObservedPixelsNormalizedByExtentMinusOne",
+          "capturedDmmvFramesReEncodeByteForByteThroughTheServerEncoder",
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "decoderIsPureAndScreensAreIndependent",
+          "edgesAndCenterRoundTripThroughTheEncoder",
+          "everyReachablePixelRoundTripsDecodeThenEncode",
+          "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated",
+          "normalizedIsThePixelOffsetOverExtentMinusOneAndZeroForASinglePixel",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "R2",
+        "mutation": "remove the `0x0000...0x7FFF` bound: the `guard x <= maximumRawCoordinate, y <= ...` block is deleted",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "R3",
+        "mutation": "remove the client-rectangle check: the `guard screen.contains(x:y:)` block is deleted, so an outside value is not dropped",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "decoderIsPureAndScreensAreIndependent",
+          "dropDiagnosticsAndErrorsCarryOnlyAllowlistedMetadata",
+          "outcomeEventsAreAlwaysMouseMove",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "R4",
+        "mutation": "swap x and y: the first wire field is read as y and the second as x",
+        "result": "killed",
+        "failingTests": [
+          "capturedDmmvFramesDecodeToTheObservedPixelsNormalizedByExtentMinusOne",
+          "capturedDmmvFramesReEncodeByteForByteThroughTheServerEncoder",
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "decoderIsPureAndScreensAreIndependent",
+          "edgesAndCenterRoundTripThroughTheEncoder",
+          "everyReachablePixelRoundTripsDecodeThenEncode",
+          "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated"
+        ]
+      },
+      {
+        "id": "E1",
+        "mutation": "swap x and y on the output point only",
+        "result": "killed",
+        "failingTests": [
+          "capturedDmmvFramesDecodeToTheObservedPixelsNormalizedByExtentMinusOne",
+          "capturedDmmvFramesReEncodeByteForByteThroughTheServerEncoder",
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "decoderIsPureAndScreensAreIndependent",
+          "edgesAndCenterRoundTripThroughTheEncoder",
+          "everyReachablePixelRoundTripsDecodeThenEncode",
+          "fixtureServerStreamThroughTheReassemblerCoalescedFragmentedAndTruncated"
+        ]
+      },
+      {
+        "id": "E2",
+        "mutation": "check the rectangle before the raw bound",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "E3",
+        "mutation": "raw bound `<` instead of `<=`: 0x7FFF is rejected",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "everyReachablePixelRoundTripsDecodeThenEncode",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "E4",
+        "mutation": "raw bound 0x8000 instead of 0x7FFF: 0x8000 is accepted",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "E5",
+        "mutation": "body length `>= 4` instead of `== 4`",
+        "result": "killed",
+        "failingTests": [
+          "bodyMustBeExactlyFourBytes"
+        ]
+      },
+      {
+        "id": "E6",
+        "mutation": "the direction is not checked",
+        "result": "killed",
+        "failingTests": [
+          "clientToServerDirectionFailsClosedBeforeTheBody"
+        ]
+      },
+      {
+        "id": "E7",
+        "mutation": "the one-pixel-axis guard is removed: 0 / 0",
+        "result": "killed",
+        "failingTests": [
+          "normalizedIsThePixelOffsetOverExtentMinusOneAndZeroForASinglePixel"
+        ]
+      },
+      {
+        "id": "E8",
+        "mutation": "the screen origin is ignored when normalizing",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "decoderIsPureAndScreensAreIndependent",
+          "edgesAndCenterRoundTripThroughTheEncoder",
+          "everyReachablePixelRoundTripsDecodeThenEncode",
+          "normalizedIsThePixelOffsetOverExtentMinusOneAndZeroForASinglePixel",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      },
+      {
+        "id": "E9",
+        "mutation": "an out-of-range value is reported as `coordinateOutsideScreen`",
+        "result": "killed",
+        "failingTests": [
+          "coordinatesOutsideTheScreenAreDroppedNotClamped",
+          "rawCoordinatesAbove0x7fffAreDroppedBeforeContainment"
+        ]
+      }
+    ]
+  }
+}
