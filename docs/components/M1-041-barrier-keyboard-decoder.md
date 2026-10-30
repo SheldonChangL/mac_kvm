@@ -146,13 +146,15 @@ button.
 - First-party policy, not a Barrier claim: a paired release carries the
   press's identifier. That is how this decoder represents the pairing, so that
   M1-043 maps a release to the same key as its press.
-- Contract (ADR decoder policy): the `DKRP` count is never read; any count is
-  one repeat.
+- First-party policy, not a Barrier claim (the ADR files it under "Decoder
+  policy (first-party, not a capture claim)"): the `DKRP` count is never read;
+  any count is one repeat. Only count 1 was captured.
 - First-party policy, not a Barrier claim: an unpaired release or repeat is
   emitted with its own identifier. No release is dropped, and emitting it lets
   a key that this view lost be released on the injector side; what an unpaired
   release means is decided downstream by the pressed-input ledger
-  (M1-063-FOLLOWUP-001).
+  (M1-063-FOLLOWUP-001). An unpaired repeat must never be injected; see the
+  fail-safe requirement for consumers below.
 - First-party fail-safe policy, not a Barrier claim: a second `DKDN` for a
   held button was never observed. While the button is held, the first press's
   identity stays for the whole press: the second `DKDN` is emitted as `down`
@@ -228,11 +230,24 @@ instead of `BarrierControlDecoder`, and never to both. M1-031's
 and does not know `DKRP` at all, so a `DKRP` passed to it fails that decoder
 closed and would end the session on the first key repeat.
 
-An unpaired event (`pairing == .unpaired`) has no press in `heldKeys`. For a
-release this is the point: the key is released anyway. An unpaired repeat
-presses nothing in the decoder's view; whether to inject it is for the session
-and the pressed-input ledger to decide, because an injector that turns a repeat
-into a press would need a matching release.
+## Fail-safe requirement for consumers
+
+**MUST:** the session must not inject an unpaired repeat
+(`pairing == .unpaired`); a paired repeat may be injected only as a repeat of
+the held key, never as a new press.
+
+An unpaired repeat is neither a held press nor a release, and it is absent from
+`heldKeys`. If the client session or the X11 injector (M4-024) turned it into a
+key press, that key would stick with no release and no cleanup entry. The
+contract's decoder policy says that "no unknown identifier, button, mask bit or
+count may cause a decoder to drop a key or button release", and Frozen Decision
+7 puts fail-safe above completeness, so the decoder's view must never create a
+press that nothing releases. A paired repeat belongs to a press that `heldKeys`
+lists, so its release and the terminal cleanup cover it, as long as it repeats
+the held key and does not start a new press.
+
+An unpaired release is different: it may be injected, because releasing a key
+that is not pressed leaves nothing stuck.
 
 ## Diagnostics and privacy
 
@@ -279,19 +294,21 @@ into a press would need a matching release.
 
 ## Tests
 
-`BarrierKeyboardDecoderTests` (20 Swift Testing tests):
+`BarrierKeyboardDecoderTests` (21 Swift Testing tests):
 
 - golden and fixtures: the token bytes, body lengths and phases; every key
   frame of both captures in order through one decoder each, compared with an
   independent pairing walk (232 and 66 frames, nothing left held); the shifted
   sequences and the eleven punctuation sequences with literal identifiers; the
-  14 captured repeats; Caps Lock toggles; golden frames re-encoded byte for
-  byte;
+  14 captured repeats; Caps Lock toggles; golden frames decoded with each
+  event's identifier and button checked against the frame's bytes, then
+  re-encoded byte for byte;
 - round trip: every key the first-party encoder accepts (81) in all 32
   modifier states, down then repeat then up through one decoder, plus a release
   under the other Shift state; Caps Lock as two frames per toggle with no
   repeat; one stable button per key and no two keys sharing a button;
-- pairing and policy: unpaired releases and repeats, a second release, a
+- pairing and policy: unpaired releases and repeats, pairing by button only
+  (never by an equal identifier on another button), a second release, a
   second press of a held button keeping the first identity until its release,
   identifiers outside the frozen set with
   extreme buttons, masks and counts, every one of the 65,536 button values held

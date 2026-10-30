@@ -650,6 +650,29 @@ struct BarrierKeyboardDecoderTests {
     #expect(decoder.failure == nil)
   }
 
+  @Test func releasePairsByButtonOnlyNeverByIdentifier() throws {
+    // A repeat or release of a button that is not held is unpaired, even when another held
+    // button carries the same identifier; that press stays held.
+    var decoder = BarrierKeyboardDecoder()
+    _ = try decoder.decode(payload: dkdn(0x61, button: 38), direction: .serverToClient)
+    #expect(
+      try decoder.decode(payload: dkrp(0x61, button: 56), direction: .serverToClient)
+        == event(.repeatKey, 0x61, button: 56, .unpaired))
+    #expect(
+      try decoder.decode(payload: dkup(0x61, button: 56), direction: .serverToClient)
+        == event(.up, 0x61, button: 56, .unpaired))
+    #expect(decoder.heldKeys == held([(38, 0x61)]))
+
+    // Two held buttons with the same identifier: a release frees its own button only.
+    var twice = BarrierKeyboardDecoder()
+    _ = try twice.decode(payload: dkdn(0x61, button: 38), direction: .serverToClient)
+    _ = try twice.decode(payload: dkdn(0x61, button: 56), direction: .serverToClient)
+    #expect(
+      try twice.decode(payload: dkup(0x61, button: 56), direction: .serverToClient)
+        == event(.up, 0x61, button: 56, .paired))
+    #expect(twice.heldKeys == held([(38, 0x61)]))
+  }
+
   @Test func secondPressOnAHeldButtonKeepsTheFirstIdentity() throws {
     var decoder = BarrierKeyboardDecoder()
     #expect(
@@ -827,6 +850,12 @@ struct BarrierKeyboardDecoderTests {
       var decoder = BarrierKeyboardDecoder()
       let events = try frames.map {
         try decoder.decode(payload: payload($0), direction: .serverToClient)
+      }
+      // Each event's identifier is the frame's bytes at offset 8 and its button the frame's
+      // last field: offset 12, or 14 in a DKRP frame.
+      for (frame, decoded) in zip(frames, events) {
+        #expect(decoded.identifier.rawValue == u16(frame, 8), "\(key)")
+        #expect(decoded.button.rawValue == u16(frame, frame.count == 16 ? 14 : 12), "\(key)")
       }
       let first = try #require(events.first)
       let last = try #require(events.last)
