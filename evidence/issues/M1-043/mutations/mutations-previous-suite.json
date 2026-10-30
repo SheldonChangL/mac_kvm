@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-043",
+  "date": "2026-10-30T01:10:58Z",
+  "source": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierVirtualKeyMapper.swift",
+  "sourceSha256": "c41b01c03c39f23059534b2e973ff06a3cb45e901ccb578a8389432fd0de38cb",
+  "tests": "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierVirtualKeyMapperTests.swift",
+  "testRevision": "472b96a0699334eb01acfdd01d884110e65a465e",
+  "testsSha256": "f1fa2d53f3e18afabda31292c12a46c2253df75ffb9bf68454fe229cf0bb481f",
+  "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierVirtualKeyMapperTests",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 23.2,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 14 tests in 1 suite passed after 0.596 seconds."
+  },
+  "mutants": [
+    {
+      "id": "8",
+      "requirement": "review: a decimal literal outside the named lists",
+      "description": "virtualKey(for:) answers 97 (0x0061) with .letter(0) before the table lookup; the behavior is unchanged, so only the source check can catch it",
+      "killed": false,
+      "exitCode": 0,
+      "durationSeconds": 2.0,
+      "failingTests": [],
+      "compileError": false,
+      "summary": "Test run with 14 tests in 1 suite passed after 0.607 seconds.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": false,
+  "testsRestored": true,
+  "allRestored": true,
+  "killedCount": 0,
+  "mutantCount": 1
+}

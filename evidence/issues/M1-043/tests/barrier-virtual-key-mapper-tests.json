@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-043",
+  "framework": "swift-testing",
+  "author": "Claude Code (implementation: --model opus; evidence finishing pass: --model opus)",
+  "baseCommit": "bacd364fef78eff458c1cc973a2f70219ccf4f38",
+  "date": "2026-10-30",
+  "toolchain": {
+    "swiftVersion": [
+      "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0",
+      "swift-driver version: 1.127.14.1"
+    ],
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "target": "arm64-apple-macosx26.0",
+    "swiftFormat": "6.2.3",
+    "xcode": "Xcode 26.2 Build version 17C52",
+    "python": "Python 3.9.6",
+    "macOS": "26.6.2",
+    "macOSBuild": "25G83",
+    "architecture": "arm64"
+  },
+  "testFirstOutcome": "red-then-green",
+  "testFirstNote": "RED at 3578e01 against a stub: \"Test run with 14 tests in 1 suite failed after 0.764 seconds with 752 issues\" (12 of 14 failed). GREEN at ddbf459: 15 focused, 336 in the package.",
+  "rawReport": "evidence/issues/M1-043/tests/swift-testing-xunit-swift-testing.xml",
+  "rawReportNote": "Swift Testing xUnit report of the full package at ddbf459: 336 tests, 0 failures.",
+  "tests": [
+    {
+      "name": "frozenNonMembersAndUnknownIdentifiersBecomeUnknownWithTheZeroExtendedRawValue",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceImportsOnlyKVMContracts",
+      "status": "passed"
+    },
+    {
+      "name": "everyTableValueStaysInsideItsCatalogDomain",
+      "status": "passed"
+    },
+    {
+      "name": "conventionIdentifiersMapToTheirLettersAndDigits",
+      "status": "passed"
+    },
+    {
+      "name": "mappingIsPureDeterministicAndConcurrencySafe",
+      "status": "passed"
+    },
+    {
+      "name": "catalogVersionIsTwoAndTheTableHas134Identifiers",
+      "status": "passed"
+    },
+    {
+      "name": "shiftedIdentifiersMapToThePhysicalKeyOfTheirPlainPair",
+      "status": "passed"
+    },
+    {
+      "name": "encodeDecodeAndMapReturnTheKeyPhaseAndModifiersOfEveryEncodableKey",
+      "status": "passed"
+    },
+    {
+      "name": "serverInputCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+      "status": "passed"
+    },
+    {
+      "name": "identifiersAtRawValueShortcutEdgesMapToTheirOwnKeys",
+      "status": "passed"
+    },
+    {
+      "name": "kvmEventKeepsThePhaseAndModifiersAndIgnoresTheButtonAndPairing",
+      "status": "passed"
+    },
+    {
+      "name": "contractIdentifiersEqualTheFrozenSetUnionTheConventionList",
+      "status": "passed"
+    },
+    {
+      "name": "punctuationCaptureKeysMapToTheKeysTheDriverPressedInOrder",
+      "status": "passed"
+    },
+    {
+      "name": "productionSourceKeepsEveryNumericLiteralInsideTheNamedLists",
+      "status": "passed"
+    },
+    {
+      "name": "mapperIsTheInverseOfTheServerEncoderForEveryEncodableKey",
+      "status": "passed"
+    }
+  ],
+  "mutationRuns": {
+    "runner": "evidence/issues/M1-043/mutations/run_mutations.py",
+    "results": "evidence/issues/M1-043/mutations/mutations.json",
+    "previousSuite": "evidence/issues/M1-043/mutations/mutations-previous-suite.json",
+    "note": "12 mutants, each killed; mutant 8 survived the previous suite and is killed by the current one."
+  }
+}
