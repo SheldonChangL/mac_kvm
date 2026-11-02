@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-061",
+  "date": "2026-11-02T01:59:30Z",
+  "source": "Packages/KVMCore/Sources/KVMCore/MacRecoveryCoordinator.swift",
+  "sourceSha256": "14c2c74cbcf7b1ea8cafa53751a1d51b3eb89c7333cf8934c0865937646884fe",
+  "tests": "Packages/KVMCore/Tests/KVMCoreTests/MacRecoveryCoordinatorTests.swift",
+  "testsSha256": "e003dd7c6694556e22d83d10b0439a2f5172e2817dabd8087c1f0cefbba3b647",
+  "command": "timeout --kill-after=30 600 swift test --filter MacRecoveryCoordinator --xunit-output <temporary>/xunit.xml",
+  "timeoutSeconds": 600,
+  "baseline": {
+    "exitCode": 0,
+    "timedOut": false,
+    "durationSeconds": 9.6,
+    "failingTests": [],
+    "timeLimitIssues": 0,
+    "compileError": false,
+    "summary": "Test run with 15 tests in 1 suite passed after 0.001 seconds."
+  },
+  "mutants": [
+    {
+      "id": "1",
+      "requirement": "wake connects although the network is unavailable",
+      "description": "didWake calls connect() whatever the network state; it still remembers the wake when the network is down",
+      "killers": [
+        "wakeWithoutNetworkDoesNotConnect()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
+        "lateNetworkAfterWakeConnectsOnce()",
+        "sleepAndWakeDriveTheReconnectManager()",
+        "sleepCancelsAPendingWakeReconnect()",
+        "wakeWithoutNetworkDoesNotConnect()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 14 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "2",
+      "requirement": "sleep disconnects before the cleanup hook runs",
+      "description": "willSleep calls disconnect() first and runs the onSleep hook after it",
+      "killers": [
+        "sleepRunsTheCleanupHookBeforeDisconnecting()",
+        "sleepAndWakeDriveTheReconnectManager()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "cancelledCallersStillHaveTheirSignalsProcessed()",
+        "repeatedSleepRunsTheCleanupEveryTime()",
+        "signalsAreProcessedOneAtATimeInArrivalOrder()",
+        "sleepAndWakeDriveTheReconnectManager()",
+        "sleepCancelsAPendingWakeReconnect()",
+        "sleepRunsTheCleanupHookBeforeDisconnecting()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 11 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3",
+      "requirement": "network loss while connected triggers a disconnect",
+      "description": "networkAvailable(false) calls disconnect()",
+      "killers": [
+        "networkLossWhileConnectedDoesNothing()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 1.4,
+      "failingTests": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
+        "lateNetworkAfterWakeConnectsOnce()",
+        "networkLossWhileConnectedDoesNothing()",
+        "networkReportsWithoutAWakeCauseNoEffect()",
+        "sleepCancelsAPendingWakeReconnect()",
+        "wakeWithoutNetworkDoesNotConnect()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 13 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "4",
+      "requirement": "a late networkAvailable(true) after a wake does not connect",
+      "description": "the network's return clears the waiting wake without calling connect()",
+      "killers": [
+        "lateNetworkAfterWakeConnectsOnce()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 65.4,
+      "failingTests": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
+        "lateNetworkAfterWakeConnectsOnce()",
+        "sleepAndWakeDriveTheReconnectManager()"
+      ],
+      "timeLimitIssues": 1,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 64.001 seconds with 7 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5a",
+      "requirement": "a duplicate wake starts a second connect beyond the supersede rule",
+      "description": "wakes during an outage are counted, and the network's return calls connect() once per wake instead of once",
+      "killers": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 3.4,
+      "failingTests": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5b",
+      "requirement": "a duplicate wake starts a second connect beyond the supersede rule",
+      "description": "a repeated wake while an earlier one waits for the network calls connect() at once, and the network's return connects again",
+      "killers": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 10.2,
+      "failingTests": [
+        "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.012 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "6",
+      "requirement": "extra: signals are not processed one at a time",
+      "description": "handle(_:) applies its signal at once on the reentrant actor, so a wake that arrives during the sleep cleanup connects before the disconnect",
+      "killers": [
+        "signalsAreProcessedOneAtATimeInArrivalOrder()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 66.1,
+      "failingTests": [
+        "cancelledCallersStillHaveTheirSignalsProcessed()",
+        "signalsAreProcessedOneAtATimeInArrivalOrder()"
+      ],
+      "timeLimitIssues": 2,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 64.000 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "7",
+      "requirement": "extra: a sleep keeps a wake that waits for the network",
+      "description": "willSleep no longer clears awaitingNetworkAfterWake, so the network's return connects during or after the sleep",
+      "killers": [
+        "sleepCancelsAPendingWakeReconnect()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "sleepCancelsAPendingWakeReconnect()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "8",
+      "requirement": "extra: a repeated sleep skips the cleanup hook",
+      "description": "a willSleep with no didWake since the previous one calls disconnect() without running the onSleep hook",
+      "killers": [
+        "repeatedSleepRunsTheCleanupEveryTime()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 3.1,
+      "failingTests": [
+        "repeatedSleepRunsTheCleanupEveryTime()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "9",
+      "requirement": "extra: a caller that stops waiting drops queued signals",
+      "description": "a cancelled caller of handle(_:) empties the queue, so a queued wake is never processed",
+      "killers": [
+        "cancelledCallersStillHaveTheirSignalsProcessed()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 67.1,
+      "failingTests": [
+        "cancelledCallersStillHaveTheirSignalsProcessed()"
+      ],
+      "timeLimitIssues": 1,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 64.000 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "10",
+      "requirement": "extra: before any network signal the network counts as unavailable",
+      "description": "networkAvailable starts false, so a wake before the first network report waits instead of connecting",
+      "killers": [
+        "beforeAnyNetworkSignalTheNetworkCountsAsAvailable()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 67.2,
+      "failingTests": [
+        "beforeAnyNetworkSignalTheNetworkCountsAsAvailable()",
+        "duplicateWakeSupersedesThroughTheReconnectManager()",
+        "networkLossWhileConnectedDoesNothing()",
+        "signalsAreProcessedOneAtATimeInArrivalOrder()"
+      ],
+      "timeLimitIssues": 1,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 63.994 seconds with 11 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "11",
+      "requirement": "extra: the network's return connects with no wake waiting",
+      "description": "every networkAvailable(true) calls connect(), whether or not a wake waits for it",
+      "killers": [
+        "networkReportsWithoutAWakeCauseNoEffect()",
+        "networkLossWhileConnectedDoesNothing()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 5.6,
+      "failingTests": [
+        "cancelledCallersStillHaveTheirSignalsProcessed()",
+        "lateNetworkAfterWakeConnectsOnce()",
+        "networkLossWhileConnectedDoesNothing()",
+        "networkReportsWithoutAWakeCauseNoEffect()",
+        "sleepCancelsAPendingWakeReconnect()",
+        "wakeConnectsAtOnceWhenTheNetworkIsAvailable()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.004 seconds with 7 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsUnchanged": true,
+  "allRestored": true,
+  "killedCount": 12,
+  "mutantCount": 12
+}
