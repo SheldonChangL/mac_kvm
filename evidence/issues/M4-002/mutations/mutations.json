@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-002",
+  "date": "2026-11-02T23:51:28Z",
+  "source": "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift",
+  "sourceSha256": "40405fc23838c6548ad85f131a21f92a1e1125779893eaa72b8153b6c1fddb0b",
+  "tests": "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift",
+  "testsSha256": "8c7e35347a069aefdbac393ee761abfa476eeff2ab2c2c6f69d45448f3d56c5b",
+  "command": "swift test --package-path Packages/KVMContracts --filter PlatformBackendContractsTests",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 6.7,
+    "failingTests": [],
+    "compileError": false,
+    "compilerDiagnostics": [],
+    "summary": "Test run with 54 tests in 1 suite passed after 0.005 seconds."
+  },
+  "mutants": [
+    {
+      "id": "1",
+      "requirement": "required 1: the in-memory injection conformer records an unknown key",
+      "description": "the reference injector sends something to the platform for an unknown or out-of-domain key while still answering .unsupported(.unknownKey)",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "unknownAndOutOfDomainKeysAreUnsupportedInEveryPhaseAndNothingIsRecorded"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.3,
+      "failingTests": [
+        "unknownAndOutOfDomainKeysAreUnsupportedInEveryPhaseAndNothingIsRecorded"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "2a",
+      "requirement": "required 2: the clipboard limit is checked after allocating or reading",
+      "description": "a read takes all of the platform's content into the process first and checks the limit afterwards",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "anOversizedReadIsRefusedBeforeAnyContentIsTransferred",
+        "aReadInPartsWithAnUnderstatedSizeNeverHoldsMoreThanTheLimit"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.8,
+      "failingTests": [
+        "aReadInPartsWithAnUnderstatedSizeNeverHoldsMoreThanTheLimit",
+        "anOversizedReadIsRefusedBeforeAnyContentIsTransferred"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.007 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "2b",
+      "requirement": "required 2: the clipboard limit is checked after allocating or reading",
+      "description": "a write encodes the text for the platform first and checks the limit afterwards",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "anOversizedWriteIsRefusedBeforeAnythingIsEncodedAndChangesNothing"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.1,
+      "failingTests": [
+        "anOversizedWriteIsRefusedBeforeAnythingIsEncodedAndChangesNothing"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "2c",
+      "requirement": "required 2 and review M4: a transfer in parts is checked only at the end",
+      "description": "the stated size is still checked, but parts are accumulated without a check and the codec refuses the whole only afterwards",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "aReadInPartsWithAnUnderstatedSizeNeverHoldsMoreThanTheLimit"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 7.2,
+      "failingTests": [
+        "aReadInPartsWithAnUnderstatedSizeNeverHoldsMoreThanTheLimit"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.006 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "3",
+      "requirement": "required 3: PlatformClipboardText's description exposes the text",
+      "description": "description renders the text: PlatformClipboardText(<text>)",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "platformClipboardTextNeverRendersItsTextOrHash"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.9,
+      "failingTests": [
+        "platformClipboardTextNeverRendersItsTextOrHash",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 19 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "4",
+      "requirement": "required 4: PeerKey normalization keeps uppercase",
+      "description": "init?(host:port:) stores the host as given, without lowercasing",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyNormalizationLowercasesTheHost"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.7,
+      "failingTests": [
+        "peerKeyNormalizationLowercasesTheHost",
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 8 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "5",
+      "requirement": "required 5: a new InjectionUnsupportedReason case is added without the closed-set test noticing",
+      "description": "a fifth case, unsupportedEvent, is added, and the test file's exhaustive switch gets the branch a developer would add to make it compile again; the closed-set test must still fail",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift",
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "injectionUnsupportedReasonIsAClosedSetWithAFrozenCoding"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.6,
+      "failingTests": [
+        "injectionUnsupportedReasonIsAClosedSetWithAFrozenCoding",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "5-compile",
+      "requirement": "required 5, first guard: the exhaustive switch",
+      "description": "the same fifth case without the test-file branch: the switch without a default in the test file stops the build",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "compile error matching 'switch must be exhaustive'",
+      "killers": [],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 3.4,
+      "failingTests": [],
+      "compileError": true,
+      "compilerDiagnostics": [
+        "switch must be exhaustive"
+      ],
+      "summary": null,
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "6",
+      "requirement": "required 6: a Codable round trip drops a field",
+      "description": "PlatformScreenGeometry's coding keys omit cursorY (the property gets a default so the mutant compiles), so encoding drops it and decoding yields 0",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "platformScreenGeometryRoundTripsWithAFrozenCodingShape"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "platformScreenGeometryRoundTripsWithAFrozenCodingShape",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 5 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "7",
+      "requirement": "extra: PeerKey decoding skips validation",
+      "description": "init(from:) stores the decoded rawValue as it is",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.9,
+      "failingTests": [
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 14 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "8",
+      "requirement": "review M7: PeerKey accepts hosts outside printable ASCII",
+      "description": "a host may hold any byte from 0x80 up, so non-ASCII letters, composed or not, and invisible characters pass",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer",
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.9,
+      "failingTests": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 12 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "8b",
+      "requirement": "extra: PeerKey accepts any non-empty host",
+      "description": "a host only has to be non-empty",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.2,
+      "failingTests": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 22 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "9",
+      "requirement": "extra: PeerKey accepts port 0",
+      "description": "init?(host:port:) no longer refuses port 0",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.9,
+      "failingTests": [
+        "peerKeyRefusesHostsAndPortsThatCannotIdentifyAPeer"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "10",
+      "requirement": "extra: PlatformClipboardText's reflection exposes its fields",
+      "description": "customMirror lists text and contentHash as children",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "platformClipboardTextNeverRendersItsTextOrHash"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.8,
+      "failingTests": [
+        "platformClipboardTextNeverRendersItsTextOrHash",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "11",
+      "requirement": "extra: the reference clipboard reports its own writes",
+      "description": "writePlainText yields an owner change after its own write",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "ownerChangesReportOtherApplicationsButNeverOwnWrites"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.6,
+      "failingTests": [
+        "ownerChangesReportOtherApplicationsButNeverOwnWrites"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "12",
+      "requirement": "extra: the reference trust store replaces an existing record",
+      "description": "insertTrustedFingerprintIfAbsent overwrites a stored fingerprint",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "insertNeverReplacesAnExistingRecord",
+        "concurrentInsertsForOnePeerKeepExactlyOneRecord"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "concurrentInsertsForOnePeerKeepExactlyOneRecord",
+        "insertNeverReplacesAnExistingRecord"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "13",
+      "requirement": "extra: flush returns without the platform processing anything",
+      "description": "the reference injector's flush succeeds and leaves its queue as it is",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "flushIsTheBarrierForEverythingInjectedBeforeItAndCanRepeat"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 7.7,
+      "failingTests": [
+        "flushIsTheBarrierForEverythingInjectedBeforeItAndCanRepeat",
+        "inputEventsAreInjectedAndReachThePlatformInCallOrder"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "14",
+      "requirement": "review H1: a held key is released with the current mapping",
+      "description": "the reference injector releases a key with the keyboard mapping in force at release instead of the code it pressed",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releasingHeldInputReleasesWhatWasPressedEvenAfterTheMappingChanged"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.7,
+      "failingTests": [
+        "releasingHeldInputReleasesWhatWasPressedEvenAfterTheMappingChanged"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "14b",
+      "requirement": "review H1: a held button is released with the current pointer mapping",
+      "description": "the reference injector releases a button with the pointer mapping in force at release instead of the button it pressed",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releasingHeldInputReleasesWhatWasPressedEvenAfterTheMappingChanged"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.6,
+      "failingTests": [
+        "releasingHeldInputReleasesWhatWasPressedEvenAfterTheMappingChanged"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "15",
+      "requirement": "review M1: a store others could change still reads its records",
+      "description": "the reference trust store's load ignores that its records are exposed to other users",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "aStoreOthersCouldChangeFailsClosedWithoutTouchingARecord"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.0,
+      "failingTests": [
+        "aStoreOthersCouldChangeFailsClosedWithoutTouchingARecord"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "16",
+      "requirement": "review M2: capture drops a key or button that does not fit",
+      "description": "the reference capture drops any event that does not fit and keeps capturing",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "captureNeverDropsAKeyOrButtonAndEndsTheStreamWhenOneDoesNotFit"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 69.9,
+      "failingTests": [
+        "captureNeverDropsAKeyOrButtonAndEndsTheStreamWhenOneDoesNotFit"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 63.991 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "16b",
+      "requirement": "review M2: capture stops on a move that does not fit",
+      "description": "the reference capture ends capture for a dropped pointer move too, the behavior the M2-003 policy does not require",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "captureMayDropAPointerMoveThatDoesNotFitAndKeepsCapturing"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.2,
+      "failingTests": [
+        "captureMayDropAPointerMoveThatDoesNotFitAndKeepsCapturing"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "17",
+      "requirement": "review M3: lifecycle signals that do not fit vanish",
+      "description": "the reference lifecycle keeps the newest signals and drops the oldest silently",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "lifecycleSignalsThatDoNotFitEndTheStreamInsteadOfVanishing"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "lifecycleSignalsThatDoNotFitEndTheStreamInsteadOfVanishing"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.004 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "18",
+      "requirement": "review M5: the content hash is not the frozen lowercase SHA-256 hex",
+      "description": "the reference clipboard writes the digest in uppercase hex",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "contentHashIsTheLowercaseHexSHA256OfTheUTF8Bytes"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "contentHashIsTheLowercaseHexSHA256OfTheUTF8Bytes"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.004 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "19",
+      "requirement": "review M6: a conformance on a continuation line",
+      "description": "PlatformClipboardText gains Codable on the second line of its header, which would let an encoder emit the text and the hash",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "publicSurfaceIsExactlyTheC015Inventory",
+        "platformClipboardTextNeverRendersItsTextOrHash"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.0,
+      "failingTests": [
+        "platformClipboardTextNeverRendersItsTextOrHash",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "20",
+      "requirement": "review M6: a conformance in an extension",
+      "description": "an extension makes PlatformClipboardText Encodable",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "publicSurfaceIsExactlyTheC015Inventory",
+        "platformClipboardTextNeverRendersItsTextOrHash"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.4,
+      "failingTests": [
+        "platformClipboardTextNeverRendersItsTextOrHash",
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.004 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "21",
+      "requirement": "review M6: an attributed public member in an extension",
+      "description": "an extension adds an @inlinable public property to PeerKey",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.1,
+      "failingTests": [
+        "publicSurfaceIsExactlyTheC015Inventory"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.006 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "22",
+      "requirement": "review L6: PeerKey splits at the first colon",
+      "description": "the parser takes the port after the first colon, so a host with a colon no longer parses",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.0,
+      "failingTests": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.004 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "23",
+      "requirement": "review L6: a lenient port parse",
+      "description": "the port is whatever UInt16(_:) accepts, so a sign or a leading zero passes",
+      "files": [
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 4.9,
+      "failingTests": [
+        "peerKeyParsesARawValueWithTheRulesOfItsInitializer",
+        "peerKeyRoundTripsAndDecodingNormalizesOrRefuses"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.004 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "24",
+      "requirement": "review L2: cancellation is checked before the length",
+      "description": "the reference trust store answers a cancelled insert of a wrong-length value with cancellation instead of trustRejected",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "loadAndInsertFromACancelledTaskReadAndWriteNothing"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.7,
+      "failingTests": [
+        "loadAndInsertFromACancelledTaskReadAndWriteNothing"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "25",
+      "requirement": "review L3: a read waits for an owner that never answers",
+      "description": "the reference clipboard ignores that the owner stopped answering",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "aReadFromAnOwnerThatNeverAnswersTimesOutAndChangesNothing"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "aReadFromAnOwnerThatNeverAnswersTimesOutAndChangesNothing"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "26",
+      "requirement": "review L4: pointer movement alone is reported as a change",
+      "description": "the reference screen yields its geometry when only the pointer moved",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "pointerMovementAloneIsNotAScreenChange"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.8,
+      "failingTests": [
+        "pointerMovementAloneIsNotAScreenChange"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "27",
+      "requirement": "amendment h.1: releaseAllHeld releases in press order",
+      "description": "the sweep releases each group in press order instead of reverse press order",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.7,
+      "failingTests": [
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "27b",
+      "requirement": "amendment h.1: releaseAllHeld releases modifiers first",
+      "description": "the sweep releases modifier keys before the other keys and the buttons",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.0,
+      "failingTests": [
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.006 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "28",
+      "requirement": "amendment h.1: releaseAllHeld is not idempotent",
+      "description": "a successful sweep keeps its record, so the next sweep releases the same input again",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releaseAllHeldIsIdempotentAndHasNothingToReleaseOnceAllWasReleased"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 6.2,
+      "failingTests": [
+        "releaseAllHeldIsIdempotentAndHasNothingToReleaseOnceAllWasReleased"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "29",
+      "requirement": "amendment h.1: releaseAllHeld skips buttons",
+      "description": "the sweep releases keys only, so a held button stays pressed",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder",
+        "releaseAllHeldReleasesInputWhoseReleaseNeverArrivedWithItsPressedCode"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.7,
+      "failingTests": [
+        "releaseAllHeldReleasesInputWhoseReleaseNeverArrivedWithItsPressedCode",
+        "releaseAllHeldReleasesKeysThenButtonsThenModifiersInReversePressOrder"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    },
+    {
+      "id": "30",
+      "requirement": "amendment h.1: a failed sweep forgets what is still pressed",
+      "description": "the sweep clears its record before it knows the releases went out, so a retry after a failure finds nothing to release",
+      "files": [
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift"
+      ],
+      "expectedOutcome": "named tests fail",
+      "killers": [
+        "releaseAllHeldOnALostPlatformFailsAsPartialCleanupAndKeepsTheRecord"
+      ],
+      "killersNotFailing": [],
+      "caught": true,
+      "exitCode": 1,
+      "durationSeconds": 5.7,
+      "failingTests": [
+        "releaseAllHeldOnALostPlatformFailsAsPartialCleanupAndKeepsTheRecord"
+      ],
+      "compileError": false,
+      "compilerDiagnostics": [],
+      "summary": "Test run with 54 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodesAfterRestore": {
+        "Packages/KVMContracts/Sources/KVMContracts/PlatformBackendContracts.swift": 0,
+        "Packages/KVMContracts/Tests/KVMContractsTests/PlatformBackendContractsTests.swift": 0
+      }
+    }
+  ],
+  "baselinePassed": true,
+  "allCaught": true,
+  "allRestored": true,
+  "killedByNamedTestsCount": 36,
+  "caughtAtCompileTimeCount": 1,
+  "mutantCount": 37
+}
