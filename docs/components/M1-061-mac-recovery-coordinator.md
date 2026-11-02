@@ -73,13 +73,20 @@ barrier like `ReconnectManager.waitForState(_:)`.
   network up, it connects at once. Otherwise it connects once when the network
   returns, however many wakes arrived in between. `ReconnectManager.connect()`
   cancels the previous generation before it starts the new one. So repeated
-  wakes never leave two sessions in force, as the Issue requires. The
-  coordinator creates no listener and no session itself.
-- **Unknown network.** Before any network signal, the network counts as
-  available. A wrong guess costs one failed attempt, which backoff retries. The
-  opposite default could leave a woken client disconnected for good when a
-  monitor reports only changes. A monitor should report the current state
-  first.
+  wakes never leave two generations in force, as the Issue requires. The
+  cancelled attempt may still be closing its connection while the new one
+  connects. How the server treats a second connection under the same screen
+  name during that overlap is not verified here. The coordinator creates no
+  listener and no session itself.
+- **Network state.** The coordinator acts on the last report. Before any
+  report, the network counts as available. A wrong guess costs one failed
+  attempt, which backoff retries. The opposite default could leave a woken
+  client disconnected for good when a monitor reports only changes. A monitor
+  must report the current state first, and again before each `didWake`,
+  because after a resume the last report dates from before the sleep. With a
+  stale `true`, the wake connects at once into a network that is not back yet;
+  the attempt fails, and backoff retries it within 15 s instead of the wake
+  waiting for the network.
 - **Wake without sleep.** A wake needs no preceding sleep. Without logind, the
   Linux monitor sees a resume but not the suspend, so every resume arrives as a
   lone `didWake`.
@@ -122,7 +129,8 @@ attempts that hold a connection until they are cancelled:
   manager is `idle`, and 60 s of clock time start no attempt. A wake without
   network starts none either; the network's return starts exactly one.
 - After a duplicate wake, the first attempt is cancelled before the second one
-  starts. At most one attempt is ever in force.
+  starts. At most one generation's attempt is ever in force; an attempt counts
+  as out of force once it is cancelled, even while it is still closing.
 
 The mutation checks are in `evidence/issues/M1-061/mutations/`.
 
@@ -134,7 +142,8 @@ Issue's hardware evidence. That case is "Linux suspend/resume with the pointer
 local"; the same run also covers Mac sleep/wake. It runs on the owner's
 hardware, and a reviewer who is not the implementing agent verifies it. Until
 that run passes, the hardware half of the acceptance criteria stays open. This
-change carries the automated half only.
+change carries the automated half only. The lead relayed the decision; it is
+not recorded in the repository yet, so the evidence summary must record it.
 
 ## Required command note
 
@@ -160,11 +169,26 @@ The other required commands run as listed.
   replaces the session that the first wake established, and that session's
   cleanup releases its input. A monitor should report one wake per resume.
 - A network return without a waiting wake does not reconnect a stopped or
-  waiting manager. Backoff reconnects a waiting manager within 15 s.
+  waiting manager. Backoff reconnects a waiting manager within 15 s. So a
+  generation stopped with `immediateAfterStateChange` restarts only on a wake,
+  or on the network's return after a wake. M1-060's doc comment and
+  `docs/components/M1-060-reconnect-manager.md` say that M1-061 restarts it. No
+  client error uses that disposition today (master plan a.5). Reconciling the
+  texts needs a follow-up, because the M1-060 files are outside this Issue's
+  Exact Files.
 - Linux without logind sends no `willSleep`. Keys held at suspend are released
-  after resume, by the terminal path of the dead connection.
+  after resume, by a terminal path of the old connection: the cancellation
+  that the wake's new generation causes, or the dead stream, whichever comes
+  first (master plan a.6, item 4). This relies on the composition root routing
+  the cancellation of an attempt into the cleanup hooks (M1-064,
+  M4-020-FOLLOWUP-001).
 - The coordinator does not bound `onSleep`. A hook that never returns holds
   every later signal.
+- The coordinator has no stop. A signal queued behind a slow hook, or a late
+  wake, can call `connect()` after a termination has disconnected. On
+  termination the composition root must stop the monitors first and keep the
+  reconnector from connecting again, for example with a reconnector adapter
+  that ignores `connect()` once termination has started.
 
 ## Rollback
 

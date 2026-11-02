@@ -183,6 +183,14 @@ private final class StateProbe: @unchecked Sendable {
   }
 }
 
+/// Whether a trimmed code line declares an import, with or without attributes and an access
+/// level (`@preconcurrency import`, `internal import`, `@_spi(Name) import`).
+private func isImportDeclaration(_ line: String) -> Bool {
+  let modifiers: Set<Substring> = ["private", "fileprivate", "internal", "package", "public"]
+  let words = line.split(separator: " ").drop { $0.hasPrefix("@") || modifiers.contains($0) }
+  return words.first == "import"
+}
+
 /// A coordinator over a scripted reconnector whose sleep hook records `cleanup`.
 private func recordingCoordinator(_ log: EffectLog) -> RecoveryCoordinator {
   RecoveryCoordinator(reconnector: log) { log.record(.cleanup) }
@@ -421,7 +429,7 @@ struct MacRecoveryCoordinatorTests {
     #expect(connections.cancellations == 2)
   }
 
-  @Test("round trip: a duplicate wake supersedes the first generation; one session is in force")
+  @Test("round trip: a duplicate wake supersedes the first generation; one is in force at a time")
   func duplicateWakeSupersedesThroughTheReconnectManager() async {
     let clock = TestKVMClock()
     let connections = HeldConnections()
@@ -452,10 +460,15 @@ struct MacRecoveryCoordinatorTests {
       .map { $0.trimmingCharacters(in: .whitespaces) }
       .filter { !$0.isEmpty && !$0.hasPrefix("//") }
     #expect(code.contains { $0.hasPrefix("package actor RecoveryCoordinator") })
-    #expect(code.filter { $0.hasPrefix("import ") }.allSatisfy { $0 == "import KVMContracts" })
+    // Every import form, also with attributes or an access level, counts. The file imports
+    // nothing today; `KVMContracts` is the only module it may import.
+    let imports = code.filter(isImportDeclaration)
+    #expect(imports.allSatisfy { $0 == "import KVMContracts" }, "imports: \(imports)")
+    // No platform API, and no way to write text anywhere.
     let forbidden = [
-      "NWPath", "NSWorkspace", "IORegister", "Glibc", "print(", "Print(", "dump(", "Logger",
-      "os_log", "NSLog", "fputs",
+      "NWPath", "NSWorkspace", "IORegister", "Foundation", "Darwin", "Glibc", "print(", "Print(",
+      "dump(", "Logger", "os_log", "NSLog", "syslog(", "fputs(", "fwrite(", "write(", "FileHandle",
+      "standardError", "standardOutput",
     ]
     for word in forbidden {
       #expect(!code.contains { $0.contains(word) }, "production code mentions \(word)")

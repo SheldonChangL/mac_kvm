@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
   "issue": "M1-061",
-  "date": "2026-11-02T01:59:30Z",
+  "date": "2026-11-02T23:28:53Z",
   "source": "Packages/KVMCore/Sources/KVMCore/MacRecoveryCoordinator.swift",
   "sourceSha256": "14c2c74cbcf7b1ea8cafa53751a1d51b3eb89c7333cf8934c0865937646884fe",
   "tests": "Packages/KVMCore/Tests/KVMCoreTests/MacRecoveryCoordinatorTests.swift",
-  "testsSha256": "e003dd7c6694556e22d83d10b0439a2f5172e2817dabd8087c1f0cefbba3b647",
+  "testsSha256": "fd235648d0d6f7c8daf212b39993f16cd0daa479194ec7c24a1ff11a7ca43e2f",
   "command": "timeout --kill-after=30 600 swift test --filter MacRecoveryCoordinator --xunit-output <temporary>/xunit.xml",
   "timeoutSeconds": 600,
   "baseline": {
     "exitCode": 0,
     "timedOut": false,
-    "durationSeconds": 9.6,
+    "durationSeconds": 13.5,
     "failingTests": [],
     "timeLimitIssues": 0,
     "compileError": false,
-    "summary": "Test run with 15 tests in 1 suite passed after 0.001 seconds."
+    "summary": "Test run with 15 tests in 1 suite passed after 0.003 seconds."
   },
   "mutants": [
     {
@@ -29,7 +29,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 1.5,
+      "durationSeconds": 2.7,
       "failingTests": [
         "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
         "lateNetworkAfterWakeConnectsOnce()",
@@ -39,7 +39,7 @@
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 14 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.003 seconds with 14 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -55,7 +55,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.7,
       "failingTests": [
         "cancelledCallersStillHaveTheirSignalsProcessed()",
         "repeatedSleepRunsTheCleanupEveryTime()",
@@ -81,7 +81,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 1.4,
+      "durationSeconds": 3.0,
       "failingTests": [
         "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
         "lateNetworkAfterWakeConnectsOnce()",
@@ -92,7 +92,7 @@
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 13 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.006 seconds with 13 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -107,7 +107,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 65.4,
+      "durationSeconds": 67.2,
       "failingTests": [
         "duplicateWakesConnectOncePerWakeAndOncePerOutage()",
         "lateNetworkAfterWakeConnectsOnce()",
@@ -115,7 +115,7 @@
       ],
       "timeLimitIssues": 1,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 64.001 seconds with 7 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 64.000 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -130,13 +130,13 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 3.4,
+      "durationSeconds": 3.1,
       "failingTests": [
         "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.004 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -151,13 +151,13 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 10.2,
+      "durationSeconds": 3.0,
       "failingTests": [
         "duplicateWakesConnectOncePerWakeAndOncePerOutage()"
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.012 seconds with 3 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.004 seconds with 3 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -172,14 +172,14 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 66.1,
+      "durationSeconds": 65.5,
       "failingTests": [
         "cancelledCallersStillHaveTheirSignalsProcessed()",
         "signalsAreProcessedOneAtATimeInArrivalOrder()"
       ],
       "timeLimitIssues": 2,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 64.000 seconds with 6 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 64.003 seconds with 6 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -200,7 +200,7 @@
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 3 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.003 seconds with 3 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -215,13 +215,13 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 3.1,
+      "durationSeconds": 2.9,
       "failingTests": [
         "repeatedSleepRunsTheCleanupEveryTime()"
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.002 seconds with 1 issue.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.003 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -236,13 +236,13 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 67.1,
+      "durationSeconds": 66.9,
       "failingTests": [
         "cancelledCallersStillHaveTheirSignalsProcessed()"
       ],
       "timeLimitIssues": 1,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 64.000 seconds with 2 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 63.999 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -257,7 +257,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 67.2,
+      "durationSeconds": 67.8,
       "failingTests": [
         "beforeAnyNetworkSignalTheNetworkCountsAsAvailable()",
         "duplicateWakeSupersedesThroughTheReconnectManager()",
@@ -266,7 +266,7 @@
       ],
       "timeLimitIssues": 1,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 63.994 seconds with 11 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 64.002 seconds with 11 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -282,7 +282,7 @@
       "killed": true,
       "exitCode": 1,
       "timedOut": false,
-      "durationSeconds": 5.6,
+      "durationSeconds": 12.4,
       "failingTests": [
         "cancelledCallersStillHaveTheirSignalsProcessed()",
         "lateNetworkAfterWakeConnectsOnce()",
@@ -293,7 +293,28 @@
       ],
       "timeLimitIssues": 0,
       "compileError": false,
-      "summary": "Test run with 15 tests in 1 suite failed after 0.004 seconds with 7 issues.",
+      "summary": "Test run with 15 tests in 1 suite failed after 0.005 seconds with 7 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "12",
+      "requirement": "extra (review): the source imports a module through an attribute and writes text",
+      "description": "`@preconcurrency import Foundation` is added and every signal writes to standard error through FileHandle; behavior is otherwise unchanged, so only the source check can catch it",
+      "killers": [
+        "productionSourceImportsNoPlatformModuleAndNeverLogs()"
+      ],
+      "killersFailed": true,
+      "killed": true,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 9.1,
+      "failingTests": [
+        "productionSourceImportsNoPlatformModuleAndNeverLogs()"
+      ],
+      "timeLimitIssues": 0,
+      "compileError": false,
+      "summary": "Test run with 15 tests in 1 suite failed after 0.003 seconds with 5 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     }
@@ -302,6 +323,6 @@
   "allKilled": true,
   "testsUnchanged": true,
   "allRestored": true,
-  "killedCount": 12,
-  "mutantCount": 12
+  "killedCount": 13,
+  "mutantCount": 13
 }

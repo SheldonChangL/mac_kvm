@@ -237,6 +237,27 @@ MUTANTS = [
             "networkLossWhileConnectedDoesNothing()",
         ],
     },
+    {
+        "id": "12",
+        "requirement": "extra (review): the source imports a module through an attribute and "
+                       "writes text",
+        "description": "`@preconcurrency import Foundation` is added and every signal writes to "
+                       "standard error through FileHandle; behavior is otherwise unchanged, so "
+                       "only the source check can catch it",
+        "replacements": [
+            (
+                "/// A platform-neutral lifecycle or network signal (M1-061).\n",
+                "@preconcurrency import Foundation\n\n"
+                "/// A platform-neutral lifecycle or network signal (M1-061).\n",
+            ),
+            (
+                "  private func apply(_ signal: RecoverySignal) async {\n",
+                "  private func apply(_ signal: RecoverySignal) async {\n"
+                "    FileHandle.standardError.write(Data())\n",
+            ),
+        ],
+        "killers": ["productionSourceImportsNoPlatformModuleAndNeverLogs()"],
+    },
 ]
 
 RUN_SUMMARY = re.compile(r"Test run with \d+ tests? in \d+ suites? (passed|failed)[^\n]*")
