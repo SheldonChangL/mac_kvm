@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-046",
+  "date": "2026-11-03T00:00:28Z",
+  "source": "Packages/KVMCore/Sources/KVMCore/ModifierStateLedger.swift",
+  "sourceSha256": "b4caf3d4862cf27d8b0e042c88f5bd0045ce3f93d2d993ee48c55bef0dc1f494",
+  "tests": "Packages/KVMCore/Tests/KVMCoreTests/ModifierStateLedgerTests.swift",
+  "testRevision": "fe8dff38d7d8976d541af9a7f5c106237093ba3f",
+  "testsSha256": "33e0900136da3e2fe877286009c0224ea349486fc40732ba01da88d24568b0d8",
+  "command": "swift test --filter ModifierStateLedger",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 4.2,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 20 tests in 1 suite passed after 0.108 seconds."
+  },
+  "mutants": [
+    {
+      "id": "R1",
+      "requirement": "independent review: a non-key event clears the pending toggle",
+      "description": "an event other than a key event between a Caps Lock event and the next key event ends the exemption",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
+      ],
+      "compileError": false,
+      "summary": "Test run with 20 tests in 1 suite failed after 0.005 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R2",
+      "requirement": "independent review: only a Caps Lock release opens the exemption",
+      "description": "a Caps Lock press alone leaves the next key event's lock bit compared",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.4,
+      "failingTests": [
+        "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
+      ],
+      "compileError": false,
+      "summary": "Test run with 20 tests in 1 suite failed after 0.004 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsUntouched": true,
+  "allRestored": true,
+  "killedCount": 2,
+  "mutantCount": 2
+}
