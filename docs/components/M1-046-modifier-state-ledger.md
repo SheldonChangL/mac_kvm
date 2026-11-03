@@ -87,8 +87,12 @@ Every rule below is first-party policy over those facts, not a Barrier claim.
      bit is taken as it is.
    - Any other change of the bit was not seen being made, such as a lock that
      was already on at the server when the pointer entered. It is reported once,
-     as `implied` when the bit turns on and `stale` when it turns off, and then
-     taken.
+     on the first key event that is neither a Caps Lock frame nor the key event
+     right after one: as `implied` when the bit turns on and `stale` when it
+     turns off. Then it is taken. A change that first shows on a Caps Lock
+     frame, or on the key event right after one, is taken without a report, so
+     a lock already on at enter whose first frames are a toggle-off pair is
+     never reported.
 4. **Reconciliation reports; it never corrects.** Each key event's modifiers
    are compared with the ledger:
    - `implied`: what the event reports held, or the lock it reports on, that
@@ -125,14 +129,18 @@ after every toggle-off, whose frames both carry the bit, until the next Caps
 Lock press, and reconciling against that value would report every later key.
 Rule 3 keeps the sketch's own definition of the field ("the lock bit last
 seen"), still copies the bit of Caps Lock frames, and lets the other keys both
-reconcile and refresh it. This refinement is recorded for the reviewer.
+reconcile and refresh it. The master plan records this as amendment h.2.
 
 C-006 asks for explicit state that never relies on one event's flags alone. The
 held modifiers never come from flags. The lock has no key identity to follow:
 the lead's design forbids deriving it from Caps Lock presses, so it comes from
-the frames, and every change that no Caps Lock event explains is reported
-rather than silently taken. This reading of C-006 for the lock is recorded for
-the lead and the Product Owner to confirm.
+the frames. The lock bit is compared only across consecutive key events, each
+against the one before it, and every change that no Caps Lock event explains is
+reported rather than silently taken. This reading of C-006 for the lock was
+adopted by the lead in master plan amendment h.2 and confirmed by the
+independent review of 2026-11-03. V1 uses the lock bit for diagnostics only and
+never for releases or injection, consistent with the Product Owner's decision
+of 2026-11-02 that V1 synthesizes no modifier or Caps Lock state.
 
 ## Consulted, not authoritative, for injection
 
@@ -148,7 +156,8 @@ applied and then dropped before the injector performs it would leave a
 modifier held on the client that neither this ledger nor M1-062's held-key
 record lists. The master plan's terminal path resets the injection queue before
 the release-all (sections a.3 and b.4), and `CaptureQueue.reset()` discards
-every queued event, releases included; the owners must close that gap (Follow-up).
+every queued event, releases included. Master plan amendment h.1 closes that
+gap with an injector sweep after the ledger's release plan (Follow-up).
 
 ## Modifiers held at enter (Product Owner decision of 2026-11-02)
 
@@ -159,8 +168,10 @@ every key event that carries it and never adopts it, so nothing is pressed on
 the client that a release-all would then have to undo. The Caps Lock state at
 enter is not synchronized either; the client's own lock state applies (master
 plan e.3 and risk f.6). A lock already on at the server is reported once, at
-the first key event (rule 3). The visible effect, such as an unshifted letter,
-is recorded by the owner E2E (M4-036-FOLLOWUP-001).
+the first key event that is neither a Caps Lock frame nor the key event right
+after one; if its first frames are a toggle-off pair, it is not reported
+(rule 3). The visible effect, such as an unshifted letter, is recorded by the
+owner E2E (M4-036-FOLLOWUP-001).
 
 ## Fail-safe (Frozen Decision 7)
 
@@ -201,9 +212,10 @@ and are the same on every run, on concurrent owners and on a cancelled task.
   is ignored, and the other bits of a modifier's own frame are reconciled;
 - both sides collapse, and the first-party pattern (three presses, one
   release) leaves nothing held;
-- Caps Lock through both toggle patterns without a report, a later unexplained
-  change reported once, and a lock bit that changes without any Caps Lock event
-  reported once on every kind of key event;
+- Caps Lock through both toggle patterns without a report; the exemption kept
+  across a non-key event and opened by a Caps Lock press alone; a later
+  unexplained change reported once; and a lock bit that changes without any
+  Caps Lock event reported once on every kind of key event;
 - `reconcile(with:)` against all 16 held states, both lock bits and all 32
   reported states, field by field, and `apply` on the same pairs;
 - a modifier held at enter is implied and never adopted; a missed release is
@@ -235,8 +247,13 @@ from Caps Lock frames (2c), a stale modifier corrected from the mask (7), an
 implied one adopted (8), a repeat treated as a press (9), `isEmpty` ignoring
 stale (10), crossed fields (11), a `default` branch (12), non-key events
 clearing the ledger (13), a toggle's lock change reported (14), an unexplained
-lock change not reported (15), the toggle exemption kept too long (16) and
-`clear()` keeping a pending toggle (17).
+lock change not reported (15), the toggle exemption kept too long (16),
+`clear()` keeping a pending toggle (17), and the independent review's R1 (a
+non-key event clears the pending toggle) and R2 (only a Caps Lock release opens
+the exemption). `mutations/mutations-previous-suite.json` shows that the suite
+before the review's fixes caught R1 and R2 only through the seeded random test;
+the current suite also catches each with a deterministic assertion in
+`capsLockFollowsTheFramesLockBitThroughBothTogglePatterns`.
 
 ## Required command note
 
@@ -254,6 +271,11 @@ Commands (`xcodebuild`, `python3 Tools/Backlog/validate_package.py`,
 - After a toggle-off, `state.capsLock` stays on until the next key event,
   because both of the toggle's frames carry the bit (rule 3). The ledger does
   not know the client's own lock state, and nothing synchronizes it in V1.
+- A lock change that first shows on a Caps Lock frame, or on the key event
+  right after one, is not reported: a lock already on at enter whose first
+  frames are a toggle-off pair goes unreported (rule 3). Comparing the Caps
+  Lock press frame instead would make the rule depend on the toggle pattern,
+  which the independent review advised against. V1 only counts the reports.
 - On a modifier's own press or release the own bit is not compared, so a
   modifier held at enter is not reported again at its release. It is reported
   as implied on every key typed while it is held, which is when it matters.
@@ -288,13 +310,14 @@ owns no runtime resource or persisted state.
 
 ## Follow-up
 
-- Before M1-062, M1-063 and M1-063-FOLLOWUP-001 are built: the terminal path's
-  queue reset discards queued releases that the held-key records already
-  count as done, which can leave a key held on the client (section "Consulted,
-  not authoritative, for injection"). Options include recording a release only
-  when the injector performs it, keeping queued releases through the reset, or
-  adding them to the release plan. The lead decides; it is a master plan issue,
-  not an M1-046 change.
+- Lost releases on terminal paths (section "Consulted, not authoritative, for
+  injection"): decided by master plan amendment h.1 of 2026-11-03. After the
+  ledger's release plan, terminal paths add an injector sweep,
+  `releaseAllHeld()` on `InputInjectionBackend` and `releaseRemaining()` on
+  `ClientInputSafety`; the injector's record of what it pressed is the
+  authority for what the platform holds (plan a.3, a.6.4, b.4, b.9, b.12 and
+  risk f.16). M4-002, M1-063, M4-024 and M1-063-FOLLOWUP-001 carry it; M1-046
+  does not change.
 - M1-062 owns a `ModifierStateLedger`, applies the key events the injector
   performs and clears it with the rest of its state.
 - M1-063-FOLLOWUP-001 decides what a stale report triggers: counting only (V1
@@ -303,5 +326,9 @@ owns no runtime resource or persisted state.
   ledger, for example in M1-029-FOLLOWUP-001's loopback integration test.
 - M1-046-FOLLOWUP-001 only if the Product Owner later wants modifiers held at
   enter synthesized (master plan e.3).
+- A future synthesis feature must not act on an `implied` report caused by the
+  first-party server's releases before it leaves, which carry each key's
+  press-time modifiers (`ServerCoordinator`, `releaseRemoteInput`); otherwise
+  the server must send those releases with the current modifiers.
 - The issue's Required Commands need no amendment: its
   `--package-path Packages/KVMCore` resolves to the root package.

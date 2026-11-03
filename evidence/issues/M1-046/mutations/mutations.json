@@ -1,19 +1,20 @@
 {
   "schemaVersion": 1,
   "issue": "M1-046",
-  "date": "2026-11-02T23:27:23Z",
+  "date": "2026-11-03T00:01:58Z",
   "source": "Packages/KVMCore/Sources/KVMCore/ModifierStateLedger.swift",
-  "sourceSha256": "dde5c43ad856aab0dfbd68c9026ec9d8c119f8985473e107901a65cf4dc41068",
+  "sourceSha256": "b4caf3d4862cf27d8b0e042c88f5bd0045ce3f93d2d993ee48c55bef0dc1f494",
   "tests": "Packages/KVMCore/Tests/KVMCoreTests/ModifierStateLedgerTests.swift",
-  "testsSha256": "33e0900136da3e2fe877286009c0224ea349486fc40732ba01da88d24568b0d8",
+  "testRevision": null,
+  "testsSha256": "dafbb10df98ae32a7edf0bdb24b7fbdeba4bcf11a19180a26f68bccd1a2b2bf0",
   "command": "swift test --filter ModifierStateLedger",
   "timeoutSeconds": 900,
   "baseline": {
     "exitCode": 0,
-    "durationSeconds": 1.7,
+    "durationSeconds": 3.6,
     "failingTests": [],
     "compileError": false,
-    "summary": "Test run with 20 tests in 1 suite passed after 0.107 seconds."
+    "summary": "Test run with 20 tests in 1 suite passed after 0.109 seconds."
   },
   "mutants": [
     {
@@ -42,7 +43,7 @@
         "staleModifierIsReportedAndStaysHeldUntilItsOwnRelease"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.361 seconds with 3545 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.355 seconds with 3545 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -52,7 +53,7 @@
       "description": "the state follows the key, but the key's own bit is compared inverted: clear on its own press and set on its own release, as the frame carries it",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.5,
+      "durationSeconds": 1.4,
       "failingTests": [
         "bothSidesOfAModifierCollapseAndTheFirstReleaseReleases",
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
@@ -69,7 +70,7 @@
         "staleModifierIsReportedAndStaysHeldUntilItsOwnRelease"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.007 seconds with 97 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.006 seconds with 97 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -79,7 +80,7 @@
       "description": "a modifier key's flag is taken from its own frame's bit instead of the key and phase",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.1,
+      "durationSeconds": 1.8,
       "failingTests": [
         "bothSidesOfAModifierCollapseAndTheFirstReleaseReleases",
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
@@ -99,7 +100,7 @@
         "staleModifierIsReportedAndStaysHeldUntilItsOwnRelease"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.365 seconds with 3534 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.347 seconds with 3534 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -121,7 +122,7 @@
         "serverChainRoundTripKeepsTheLedgerOnTheServersState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.187 seconds with 1611 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.187 seconds with 1613 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -131,7 +132,7 @@
       "description": "Caps Lock is held like a modifier: set by its press, cleared by its release",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.8,
+      "durationSeconds": 1.6,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
@@ -143,7 +144,7 @@
         "serverChainRoundTripKeepsTheLedgerOnTheServersState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.181 seconds with 1631 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.185 seconds with 1633 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -153,7 +154,7 @@
       "description": "only Caps Lock's own frames update the lock bit; other keys only reconcile it (the design sketch's literal wording)",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.7,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
@@ -165,7 +166,7 @@
         "serverChainRoundTripKeepsTheLedgerOnTheServersState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.185 seconds with 1616 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.186 seconds with 1620 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -180,7 +181,7 @@
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.107 seconds with 7 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.108 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -190,7 +191,7 @@
       "description": "presses of a modifier are counted, and its flag clears only when every counted press has had a release",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 5.0,
+      "durationSeconds": 3.9,
       "failingTests": [
         "bothSidesOfAModifierCollapseAndTheFirstReleaseReleases",
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
@@ -199,7 +200,7 @@
         "serverChainRoundTripKeepsTheLedgerOnTheServersState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.008 seconds with 39 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.005 seconds with 39 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -209,7 +210,7 @@
       "description": "the implied set is always empty",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 8.2,
+      "durationSeconds": 4.2,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
@@ -223,7 +224,7 @@
         "serverReleasesBeforeLeavingLeaveNothingHeld"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.394 seconds with 1891 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.241 seconds with 1891 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -233,7 +234,7 @@
       "description": "the stale set is always empty",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.4,
+      "durationSeconds": 1.7,
       "failingTests": [
         "lockBitChangesThatNoCapsLockEventExplainsAreReportedOnce",
         "otherKeysNeverChangeTheHeldModifiers",
@@ -244,7 +245,7 @@
         "staleModifierIsReportedAndStaysHeldUntilItsOwnRelease"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.248 seconds with 1884 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.236 seconds with 1884 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -254,7 +255,7 @@
       "description": "the ledger drops a held modifier that an event reports released, so a release-all would skip it",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.9,
+      "durationSeconds": 1.5,
       "failingTests": [
         "otherKeysNeverChangeTheHeldModifiers",
         "ownBitOfAModifierPressOrReleaseIsNotComparedButItsOtherBitsAre",
@@ -274,7 +275,7 @@
       "description": "the ledger adds a modifier that an event reports held without a press (synthesis into the ledger)",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.9,
+      "durationSeconds": 1.5,
       "failingTests": [
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
         "modifierHeldAtEnterIsReportedAsImpliedAndNeverSynthesized",
@@ -286,7 +287,7 @@
         "serverReleasesBeforeLeavingLeaveNothingHeld"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.046 seconds with 816 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.045 seconds with 816 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -296,7 +297,7 @@
       "description": "a repeat of Shift, Control, Option or Command sets its flag",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 1.5,
       "failingTests": [
         "randomSequencesFollowTheRulesStatedOverTheWholeHistory",
         "repeatOfAModifierChangesNothingAndAnUnheldRepeatIsImplied"
@@ -318,7 +319,7 @@
         "reconcileReportsEveryFieldOnItsOwnAgainstEveryLedgerState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.110 seconds with 216 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.107 seconds with 216 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -337,7 +338,7 @@
         "staleModifierIsReportedAndStaysHeldUntilItsOwnRelease"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.196 seconds with 1333 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.194 seconds with 1333 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -347,12 +348,12 @@
       "description": "behavior-neutral today; a later catalog modifier would silently count as an ordinary key, so only the source check can catch it",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.5,
       "failingTests": [
         "productionSourceImportsOnlyKVMContractsAndNeverLogs"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.114 seconds with 1 issue.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.111 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -362,14 +363,14 @@
       "description": "any event other than a key event (leaving the screen among them) clears the ledger",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.0,
+      "durationSeconds": 1.4,
       "failingTests": [
         "eventsOtherThanKeysChangeNothingAndReportNothing",
         "lockBitChangesThatNoCapsLockEventExplainsAreReportedOnce",
         "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.007 seconds with 10 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.004 seconds with 10 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -379,14 +380,14 @@
       "description": "the first key event after a Caps Lock event compares its lock bit, so every toggle-off reports a stale lock",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.2,
+      "durationSeconds": 1.5,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "randomSequencesFollowTheRulesStatedOverTheWholeHistory",
         "serverChainRoundTripKeepsTheLedgerOnTheServersState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.005 seconds with 3 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.005 seconds with 5 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -396,7 +397,7 @@
       "description": "every key event takes the lock bit without comparing it, so a lock already on at enter is never reported",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.4,
+      "durationSeconds": 1.5,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent",
@@ -405,7 +406,7 @@
         "reconcileReportsEveryFieldOnItsOwnAgainstEveryLedgerState"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.099 seconds with 519 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.080 seconds with 519 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -415,7 +416,7 @@
       "description": "once a Caps Lock event was seen, no later lock change is reported",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.8,
+      "durationSeconds": 1.4,
       "failingTests": [
         "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
         "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
@@ -431,12 +432,44 @@
       "description": "after a Caps Lock event and clear(), the next key event's lock bit is taken without comparison",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.9,
+      "durationSeconds": 1.5,
       "failingTests": [
         "clearForgetsEveryModifierAndTheLockBitAndIsIdempotent"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.108 seconds with 2 issues.",
+      "summary": "Test run with 20 tests in 1 suite failed after 0.107 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R1",
+      "requirement": "independent review: a non-key event clears the pending toggle",
+      "description": "an event other than a key event between a Caps Lock event and the next key event ends the exemption",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
+        "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
+      ],
+      "compileError": false,
+      "summary": "Test run with 20 tests in 1 suite failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R2",
+      "requirement": "independent review: only a Caps Lock release opens the exemption",
+      "description": "a Caps Lock press alone leaves the next key event's lock bit compared",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.4,
+      "failingTests": [
+        "capsLockFollowsTheFramesLockBitThroughBothTogglePatterns",
+        "randomSequencesFollowTheRulesStatedOverTheWholeHistory"
+      ],
+      "compileError": false,
+      "summary": "Test run with 20 tests in 1 suite failed after 0.004 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     }
@@ -445,6 +478,6 @@
   "allKilled": true,
   "testsUntouched": true,
   "allRestored": true,
-  "killedCount": 21,
-  "mutantCount": 21
+  "killedCount": 23,
+  "mutantCount": 23
 }

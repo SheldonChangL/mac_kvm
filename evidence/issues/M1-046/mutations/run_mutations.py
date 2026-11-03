@@ -2,7 +2,7 @@
 
 Usage (from anywhere):
   python3 -I evidence/issues/M1-046/mutations/run_mutations.py <repository> [--out <json>]
-      [--only <id> ...]
+      [--only <id> ...] [--test-revision <git revision>]
 
 For each mutant the runner edits the production source by exact text replacement, runs the
 M1-046 suite from the root package (KVMCore has no package manifest of its own), records which
@@ -10,7 +10,11 @@ tests failed, and restores the source from a backup copy. A mutant is killed whe
 exits non-zero with at least one named failing test and no compile error. Before the mutants it
 runs the suite once unmodified (the baseline, which must pass). After every restore it checks
 that the source is byte-for-byte the original and that `git diff --exit-code` on it returns 0,
-so stage the source before running.
+so stage the source and the tests before running.
+
+`--only` runs the listed mutants. `--test-revision` runs them against the test file as of that
+git revision instead of the current one, which shows what an older suite caught; the current
+test file is restored from a backup copy and checked like the source.
 
 The JSON report holds repository-relative paths only. It defaults to
 evidence/issues/M1-046/mutations/mutations.json inside the repository. The exit code is 0 only
@@ -305,6 +309,28 @@ MUTANTS = [
             "",
         )],
     },
+    {
+        "id": "R1",
+        "requirement": "independent review: a non-key event clears the pending toggle",
+        "description": "an event other than a key event between a Caps Lock event and the next "
+                       "key event ends the exemption",
+        "replacements": [(
+            GUARD,
+            "    guard case .key(let key, let phase, let modifiers) = event else {\n"
+            "      lockMayHaveToggled = false\n"
+            "      return ModifierDiscrepancy()\n"
+            "    }\n",
+        )],
+    },
+    {
+        "id": "R2",
+        "requirement": "independent review: only a Caps Lock release opens the exemption",
+        "description": "a Caps Lock press alone leaves the next key event's lock bit compared",
+        "replacements": [(
+            "    lockMayHaveToggled = key == .capsLock\n",
+            "    lockMayHaveToggled = key == .capsLock && phase == .up\n",
+        )],
+    },
 ]
 
 FAILED_TEST = re.compile(r"Test (\w+)\(\) failed")
@@ -352,6 +378,8 @@ def main() -> int:
     parser.add_argument("--out", default="evidence/issues/M1-046/mutations/mutations.json")
     parser.add_argument("--only", action="append", default=[],
                         help="run only the mutant with this id; repeat for more")
+    parser.add_argument("--test-revision",
+                        help="run against the test file as of this git revision")
     arguments = parser.parse_args()
     repository = pathlib.Path(arguments.repository).resolve()
     selected = [mutant for mutant in MUTANTS
@@ -366,10 +394,18 @@ def main() -> int:
                              "check needs them tracked")
     original = source_path.read_bytes()
     original_hash = sha256(original)
-    tests_hash = sha256(tests_path.read_bytes())
+    tests_original_hash = sha256(tests_path.read_bytes())
     backup_directory = pathlib.Path(tempfile.mkdtemp(prefix="m1-046-mutations-"))
     backup = backup_directory / "ModifierStateLedger.swift.backup"
+    tests_backup = backup_directory / "ModifierStateLedgerTests.swift.backup"
     shutil.copyfile(source_path, backup)
+    shutil.copyfile(tests_path, tests_backup)
+    tests_hash = tests_original_hash
+    if arguments.test_revision:
+        older = subprocess.run(["git", "show", f"{arguments.test_revision}:{TESTS}"],
+                               cwd=repository, capture_output=True, check=True).stdout
+        tests_path.write_bytes(older)
+        tests_hash = sha256(older)
 
     results = []
     clean = True
@@ -407,10 +443,13 @@ def main() -> int:
             print(f"mutant {mutant['id']}: killed={killed} exit={outcome['exitCode']} "
                   f"failing={len(outcome['failingTests'])} restored={restored} "
                   f"diff={diff_exit}", flush=True)
+            print(f"  {outcome['summary']}", flush=True)
+            print(f"  failing: {', '.join(outcome['failingTests']) or 'none'}", flush=True)
     finally:
         shutil.copyfile(backup, source_path)
+        shutil.copyfile(tests_backup, tests_path)
         shutil.rmtree(backup_directory, ignore_errors=True)
-    tests_untouched = (sha256(tests_path.read_bytes()) == tests_hash
+    tests_untouched = (sha256(tests_path.read_bytes()) == tests_original_hash
                        and git_diff_exit_code(repository, TESTS) == 0)
     clean = clean and tests_untouched
 
@@ -423,6 +462,7 @@ def main() -> int:
         "source": SOURCE,
         "sourceSha256": original_hash,
         "tests": TESTS,
+        "testRevision": arguments.test_revision,
         "testsSha256": tests_hash,
         "command": " ".join(COMMAND),
         "timeoutSeconds": TIMEOUT_SECONDS,

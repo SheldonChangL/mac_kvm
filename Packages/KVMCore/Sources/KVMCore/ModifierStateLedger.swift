@@ -51,7 +51,8 @@ package struct ModifierDiscrepancy: Equatable, Sendable {
 ///    Lock is never a held modifier. A Caps Lock event's own frames, and the first other key
 ///    event after them, may carry a bit that its toggle changed, so their bit is taken as it is.
 ///    Any other change of the bit was not seen being made, such as a lock already on when the
-///    pointer entered, and is reported once before it is taken.
+///    pointer entered. It is reported once, on the first key event that is neither a Caps Lock
+///    event nor the key event right after one, before it is taken.
 /// 4. Every key event is reconciled with the ledger. On a modifier key's own press or release,
 ///    its own bit is replaced by the state the key gives before the comparison, because with the
 ///    sides collapsed the key cannot tell whether the other side is still held. The other bits

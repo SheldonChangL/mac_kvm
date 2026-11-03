@@ -446,6 +446,19 @@ struct ModifierStateLedgerTests {
     #expect(ledger.apply(key(.capsLock, .down, modifiers(.shift))).isEmpty)
     #expect(ledger.apply(key(.capsLock, .up, modifiers(.shift, .capsLock))).isEmpty)
     #expect(ledger.state == modifiers(.shift, .capsLock))
+
+    // An event other than a key event between a Caps Lock event and the next key event keeps
+    // the exemption: the next key event's bit is still taken as it is.
+    var paused = ModifierStateLedger()
+    #expect(paused.apply(key(.capsLock, .up, lock)).isEmpty)
+    #expect(paused.apply(.mouseMove(position: NormalizedPoint(x: 0.5, y: 0.5))).isEmpty)
+    #expect(paused.apply(key(.letter(0), .down)).isEmpty)
+    #expect(paused.state == ModifierState())
+    // A Caps Lock press alone opens the exemption too, as its release does.
+    var pressed = ModifierStateLedger()
+    #expect(pressed.apply(key(.capsLock, .down)).isEmpty)
+    #expect(pressed.apply(key(.letter(0), .down, lock)).isEmpty)
+    #expect(pressed.state == lock)
   }
 
   @Test func lockBitChangesThatNoCapsLockEventExplainsAreReportedOnce() {
