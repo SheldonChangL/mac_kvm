@@ -4,7 +4,7 @@
 # answer survives rebuilds. Usage: build.sh [server-repo] [install-dir]
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-repo=${1:-$HOME/.codex/worktrees/m2-mac-server-linux-e2e/mac_kvm}
+repo=${1:-$(cd "$here/../.." && pwd)}
 dest=${2:-$HOME/Applications}
 identity=$(security find-identity -v -p codesigning | grep -m1 -o '"Apple Development[^"]*"' | tr -d '"' || true)
 
