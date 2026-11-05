@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-029-FOLLOWUP-001",
+  "date": "2026-11-02T23:37:50Z",
+  "sources": {
+    "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift": "b3f9bc09008700806f903eea24bf9787c3ef2b99704060be9753d7d4fbc82ab8",
+    "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientControlEncoder.swift": "985647596c71d6346b22efe7b75de989fd3b9d1d11b808ebd8e7d71fb2990336"
+  },
+  "tests": {
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientProtocolSessionTests.swift": "5c7221f5de76b227b447ba7e58bc20dd6dfb256794fcbf3cdf761368c149a14f",
+    "Packages/BarrierCompatibility/Tests/BarrierCompatibilityTests/BarrierClientControlEncoderTests.swift": "1902f268114e2150ac25ccb1040e1ebb273c44d0394dedac43c929441abdfd84"
+  },
+  "command": "swift test --package-path Packages/BarrierCompatibility --filter BarrierClient(ProtocolSession|ControlEncoder)Tests",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 0.8,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 38 tests in 2 suites passed after 0.114 seconds."
+  },
+  "mutants": [
+    {
+      "id": "1",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "control decoder consulted before the input decoders",
+      "description": "route() offers every BarrierControlToken (DKDN, DKUP and DCLP among them) to BarrierControlDecoder before the input and clipboard decoders",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "anUnpairedRepeatIsNeverYieldedAndAnUnpairedReleaseIsPassedOn",
+        "diagnosticsHoldOnlyCounts",
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn",
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation",
+        "everyServerKeepaliveIsAnsweredAtOnce",
+        "fiveRepeatedReplaysGiveIdenticalBytesAndEvents",
+        "inputBeforeTheScreenIsReportedFailsClosed",
+        "randomKeyStreamsNeverYieldARepeatOfAKeyThatIsNotHeld",
+        "serverClipboardTransfersBecomeClipboardEvents",
+        "theM2022ServerStreamReplaysToTheExpectedEvents",
+        "theServerClosingEndsTheStreamCleanlyAndNoReleaseIsSynthesized"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.056 seconds with 26 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "1b",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "control decoder consulted before the input decoders",
+      "description": "DKRP, which BarrierControlToken does not know, falls through to BarrierControlDecoder instead of the key decoder",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "anUnpairedRepeatIsNeverYieldedAndAnUnpairedReleaseIsPassedOn",
+        "diagnosticsHoldOnlyCounts",
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn",
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation",
+        "fiveRepeatedReplaysGiveIdenticalBytesAndEvents",
+        "randomKeyStreamsNeverYieldARepeatOfAKeyThatIsNotHeld",
+        "theM2022ServerStreamReplaysToTheExpectedEvents"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.106 seconds with 15 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "2",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "unpaired repeat yielded",
+      "description": "the M1-041 consumer check is missing: a DKRP of a key that is not held is composed into a .repeatKey event",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "anUnpairedRepeatIsNeverYieldedAndAnUnpairedReleaseIsPassedOn",
+        "diagnosticsHoldOnlyCounts",
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn",
+        "randomKeyStreamsNeverYieldARepeatOfAKeyThatIsNotHeld"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.108 seconds with 170 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: no release is ever dropped",
+      "description": "every unpaired key event is dropped, so an unpaired DKUP release is dropped too",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 65.8,
+      "failingTests": [
+        "anUnpairedRepeatIsNeverYieldedAndAnUnpairedReleaseIsPassedOn",
+        "randomKeyStreamsNeverYieldARepeatOfAKeyThatIsNotHeld"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 64.002 seconds with 11 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "4",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "CALV not echoed",
+      "description": "a server CALV is accepted without the CALV answer",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 66.1,
+      "failingTests": [
+        "aFailedWriteEndsTheSessionWithTheTransportError",
+        "aScreenChangeWhileNotEnteredIsReportedAtOnce",
+        "everyServerKeepaliveIsAnsweredAtOnce",
+        "framesLeaveInTheOrderTheyWereComposed",
+        "nineSilentSecondsEndTheSessionAsAKeepaliveTimeout",
+        "serverClipboardTransfersBecomeClipboardEvents",
+        "splitAndCoalescedChunksAreReassembled",
+        "theM2022ServerStreamReplaysToTheExpectedEvents"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 64.001 seconds with 15 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5a",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "wrong CINN sequence used for CCLP/DCLP",
+      "description": "the first CINN's sequence stays in force after later enters",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.7,
+      "failingTests": [
+        "localClipboardIsSentAsCclpThenDclpWithTheSequenceOfTheEnterInForce"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 1.560 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5b",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "wrong CINN sequence used for CCLP/DCLP",
+      "description": "the client sends the server's sequence 0 instead of the CINN in force",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.3,
+      "failingTests": [
+        "framesLeaveInTheOrderTheyWereComposed",
+        "localClipboardIsSentAsCclpThenDclpWithTheSequenceOfTheEnterInForce"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 1.534 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "6",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "keepalive timeout not enforced",
+      "description": "nine silent checks in a row no longer end the session",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.3,
+      "failingTests": [
+        "nineSilentSecondsEndTheSessionAsAKeepaliveTimeout"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.103 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "7",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "server-to-client CCLP accepted",
+      "description": "a server-to-client CCLP is ignored instead of failing closed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.103 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "8a",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "DINF not rebuilt after updateScreen",
+      "description": "the pointer decoder is built for the first DINF only, so pointer frames keep the old rectangle after a screen update",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "aScreenChangeWhileEnteredIsReportedAfterTheLeave"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.100 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "8b",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "DINF not rebuilt after updateScreen",
+      "description": "an updated DINF is written but not fed to the control decoder, so enters are still checked against the old rectangle",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "anEnterIsValidatedAgainstTheNewlyReportedScreen"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.104 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "9",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "a broken DCLP transfer ending the session instead of dropping it",
+      "description": "an assembler failure ends the session with protocol.malformed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.058 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "10",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: send of input fails closed",
+      "description": "send(_:) returns silently for input events instead of failing",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "sendingInputFailsClosedAndWritesNothing"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.103 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "11",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: inbound clipboard text limit",
+      "description": "server text up to 2 MiB is yielded instead of dropped over 1 MiB",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.105 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "12",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: only clipboard 0 is shared",
+      "description": "clipboard 1 transfers are handled like clipboard 0",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.1,
+      "failingTests": [
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn",
+        "theM2022ServerStreamReplaysToTheExpectedEvents"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.103 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "13",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: frames leave in composition order",
+      "description": "a composed frame never waits for an earlier write",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "framesLeaveInTheOrderTheyWereComposed"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.103 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "14",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "updateScreen deferral",
+      "description": "a screen update while entered is reported at once instead of after COUT",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "aScreenChangeWhileEnteredIsReportedAfterTheLeave",
+        "aScreenChangeWhileNotEnteredIsReportedAtOnce"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.106 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "15",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: enter position",
+      "description": "the enter's x position is computed from its y coordinate",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "aScreenChangeWhileEnteredIsReportedAfterTheLeave",
+        "aScreenChangeWhileNotEnteredIsReportedAtOnce",
+        "splitAndCoalescedChunksAreReassembled",
+        "theM2022ServerStreamReplaysToTheExpectedEvents"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.107 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "16",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: error taxonomy (plan a.5)",
+      "description": "a frame over 64 KiB is reported as protocol.malformed, not oversized",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.101 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "17",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "extra: error taxonomy (plan a.5)",
+      "description": "protocol violations carry retry disposition never instead of backoff",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.102 seconds with 27 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "18",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientProtocolSession.swift",
+      "requirement": "cancellation during connect",
+      "description": "a cancelled handshake wait counts as setup completed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "cancellingConnectFailsClosedWhetherTheTransportOrTheServerIsSlow"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.102 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "E1",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientControlEncoder.swift",
+      "requirement": "golden DINF bytes",
+      "description": "the DINF cursor fields are written y first",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.9,
+      "failingTests": [
+        "aFailedWriteEndsTheSessionWithTheTransportError",
+        "aScreenChangeWhileEnteredIsReportedAfterTheLeave",
+        "aScreenChangeWhileNotEnteredIsReportedAtOnce",
+        "aServerThatNeverCompletesSetupTimesOut",
+        "aTransportConnectFailurePassesThroughUnchanged",
+        "anEnterIsValidatedAgainstTheNewlyReportedScreen",
+        "anUnpairedRepeatIsNeverYieldedAndAnUnpairedReleaseIsPassedOn",
+        "anUnsupportedServerHelloIsRejectedBeforeAnyHelloBack",
+        "cancellingConnectFailsClosedWhetherTheTransportOrTheServerIsSlow",
+        "connectIsSingleUse",
+        "diagnosticsHoldOnlyCounts",
+        "disconnectIsIdempotentAndEndsEverything",
+        "disconnectReasonsFinishTheStreamAsTheContractSays",
+        "dropAndContinueCasesAreCountedAndTheSessionGoesOn",
+        "everyFailClosedCaseEndsTheSessionWithATypedProtocolViolation",
+        "everyServerKeepaliveIsAnsweredAtOnce",
+        "fiveRepeatedReplaysGiveIdenticalBytesAndEvents",
+        "framesLeaveInTheOrderTheyWereComposed",
+        "handshakeWritesTheGoldenHelloBackAndDinfAndAcceptsTheSetupFrames",
+        "inputBeforeTheScreenIsReportedFailsClosed",
+        "invalidConfigurationIsRejectedAtConstruction",
+        "localClipboardIsSentAsCclpThenDclpWithTheSequenceOfTheEnterInForce",
+        "nineSilentSecondsEndTheSessionAsAKeepaliveTimeout",
+        "randomKeyStreamsNeverYieldARepeatOfAKeyThatIsNotHeld",
+        "screenInfoIsTheExactInverseOfTheFrozenParse",
+        "screenInfoOfTheCaptureScreenEqualsEveryCapturedClientDinf",
+        "screenInfoWritesTheM1031GoldenFrame",
+        "sendingInputFailsClosedAndWritesNothing",
+        "serverClipboardTransfersBecomeClipboardEvents",
+        "splitAndCoalescedChunksAreReassembled",
+        "theLatestScreenBeforeQinfIsTheOneReported",
+        "theM2022ServerStreamReplaysToTheExpectedEvents",
+        "theServerClosingDuringSetupFailsConnect",
+        "theServerClosingEndsTheStreamCleanlyAndNoReleaseIsSynthesized"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 0.056 seconds with 36 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "E2",
+      "file": "Packages/BarrierCompatibility/Sources/BarrierCompatibility/BarrierClientControlEncoder.swift",
+      "requirement": "golden CCLP bytes",
+      "description": "CCLP is written without its clipboard id byte",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 4.3,
+      "failingTests": [
+        "clipboardOwnershipCarriesTheIdAndTheSequence",
+        "clipboardTransferEqualsTheCapturedClientFramesByteForByte",
+        "clipboardTransferOfTextReassemblesWithTheSequenceOfTheEnter",
+        "framesLeaveInTheOrderTheyWereComposed",
+        "localClipboardIsSentAsCclpThenDclpWithTheSequenceOfTheEnterInForce"
+      ],
+      "compileError": false,
+      "summary": "Test run with 38 tests in 2 suites failed after 2.721 seconds with 10 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsUnchanged": true,
+  "allRestored": true,
+  "killedCount": 23,
+  "mutantCount": 23
+}
