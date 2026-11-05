@@ -52,4 +52,6 @@ fi
 mkdir -p "$dest"
 rm -rf "$dest/MacKVM.app"
 cp -R "$app" "$dest/"
+# Remove the staging copy so Spotlight/Launchpad list only the installed app.
+rm -rf "$out"
 echo "== installed $dest/MacKVM.app"
