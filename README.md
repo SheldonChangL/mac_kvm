@@ -11,6 +11,18 @@ MacKVM is a native Swift macOS KVM application under incremental development. M1
 - `docs/` — canonical specifications, ADRs, build notes, and tooling documentation.
 - `MacKVM_Implementation_Package_v2/` — Product Owner backlog and frozen governance inputs.
 
+## Build and install the launcher app
+
+`Tools/MacKVMLauncher/` builds `MacKVM.app`, a menu-bar app that configures and runs the MacKVM server.
+
+```bash
+Tools/MacKVMLauncher/build.sh
+```
+
+The script builds the server (debug), compiles the launcher, signs both with your Apple Development certificate when one is in the keychain (ad-hoc otherwise), and installs the app to `~/Applications/MacKVM.app`. Optional arguments: `build.sh [server-repo] [install-dir]`.
+
+On first start, grant MacKVM.app Accessibility and Input Monitoring in System Settings → Privacy & Security, then reopen it. Closing the window keeps the server running in the menu bar.
+
 ## Bootstrap verification
 
 M1-004 creates structure, build metadata, and a zero-behavior application shell. Run:
