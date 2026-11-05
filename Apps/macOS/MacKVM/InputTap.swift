@@ -67,7 +67,8 @@ final class InputTap: @unchecked Sendable {
         leakCount &+= 1
         if leakCount <= 5 || leakCount % 100 == 0 {
           report(
-            "DIAG motion passed locally while suppressing (moveRemote=false, state=\(coordinator.state), count=\(leakCount), dx=\(event.getDoubleValueField(.mouseEventDeltaX)), dy=\(event.getDoubleValueField(.mouseEventDeltaY)))")
+            "DIAG motion passed locally while suppressing (moveRemote=false, state=\(coordinator.state), count=\(leakCount), dx=\(event.getDoubleValueField(.mouseEventDeltaX)), dy=\(event.getDoubleValueField(.mouseEventDeltaY)))"
+          )
         }
         observeLocal(type, event)
         return event
@@ -98,19 +99,31 @@ final class InputTap: @unchecked Sendable {
     let point = CGEvent(source: nil)?.location ?? .zero
     let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "?"
     if front != lastFront {
-      if !lastFront.isEmpty { report("DIAG frontmost app changed while remote: \(lastFront) -> \(front)") }
+      if !lastFront.isEmpty {
+        report("DIAG frontmost app changed while remote: \(lastFront) -> \(front)")
+      }
       lastFront = front
     }
-    guard let anchor else { self.anchor = point; return }
+    guard let anchor else {
+      self.anchor = point
+      return
+    }
     let drift = hypot(point.x - anchor.x, point.y - anchor.y)
     if drift > 3, !anchorDriftLogged {
       anchorDriftLogged = true
-      report("DIAG local cursor moved while remote: \(Int(anchor.x)),\(Int(anchor.y)) -> \(Int(point.x)),\(Int(point.y)) (frontmost=\(front))")
+      report(
+        "DIAG local cursor moved while remote: \(Int(anchor.x)),\(Int(anchor.y)) -> \(Int(point.x)),\(Int(point.y)) (frontmost=\(front))"
+      )
     }
   }
 
   /// Called when input returns local so the next remote stint gets a new anchor.
-  func resetDiagnostics() { anchor = nil; anchorDriftLogged = false; lastFront = ""; motionCount = 0 }
+  func resetDiagnostics() {
+    anchor = nil
+    anchorDriftLogged = false
+    lastFront = ""
+    motionCount = 0
+  }
 
   private func observeLocal(_ type: CGEventType, _ event: CGEvent) {
     if let captured = map(type, event) { coordinator.observeLocal(captured, at: uptime()) }
