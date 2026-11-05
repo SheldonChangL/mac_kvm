@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import KVMContracts
 import KVMCore
@@ -50,6 +51,7 @@ final class InputTap: @unchecked Sendable {
       if !wasLocal { report("emergency escape: input is local") }
       return event
     case .passThrough:
+      if anchor != nil { resetDiagnostics() }
       observeLocal(type, event)
       return event
     case .suppress:
@@ -57,7 +59,17 @@ final class InputTap: @unchecked Sendable {
         let moved = coordinator.moveRemote(
           deltaX: event.getDoubleValueField(.mouseEventDeltaX),
           deltaY: event.getDoubleValueField(.mouseEventDeltaY))
-        if moved { return nil }
+        if moved {
+          checkCursorVisibility()
+          return nil
+        }
+        // DIAG(remote-leak): suppressed motion handed back to the local system.
+        leakCount &+= 1
+        if leakCount <= 5 || leakCount % 100 == 0 {
+          report(
+            "DIAG motion passed locally while suppressing (moveRemote=false, state=\(coordinator.state), count=\(leakCount), dx=\(event.getDoubleValueField(.mouseEventDeltaX)), dy=\(event.getDoubleValueField(.mouseEventDeltaY)))"
+          )
+        }
         observeLocal(type, event)
         return event
       }
@@ -70,6 +82,47 @@ final class InputTap: @unchecked Sendable {
         return event
       }
     }
+  }
+
+  // DIAG(remote-leak): counters touched only on the tap callback thread.
+  private var leakCount = 0
+  private var motionCount = 0
+  private var anchor: CGPoint?
+  private var anchorDriftLogged = false
+  private var lastFront = ""
+
+  /// Logs when the local logical cursor drifts while input is remote, and the
+  /// frontmost app at that moment (an app switch can show the hidden cursor).
+  private func checkCursorVisibility() {
+    motionCount &+= 1
+    guard motionCount % 20 == 0 else { return }
+    let point = CGEvent(source: nil)?.location ?? .zero
+    let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "?"
+    if front != lastFront {
+      if !lastFront.isEmpty {
+        report("DIAG frontmost app changed while remote: \(lastFront) -> \(front)")
+      }
+      lastFront = front
+    }
+    guard let anchor else {
+      self.anchor = point
+      return
+    }
+    let drift = hypot(point.x - anchor.x, point.y - anchor.y)
+    if drift > 3, !anchorDriftLogged {
+      anchorDriftLogged = true
+      report(
+        "DIAG local cursor moved while remote: \(Int(anchor.x)),\(Int(anchor.y)) -> \(Int(point.x)),\(Int(point.y)) (frontmost=\(front))"
+      )
+    }
+  }
+
+  /// Called when input returns local so the next remote stint gets a new anchor.
+  func resetDiagnostics() {
+    anchor = nil
+    anchorDriftLogged = false
+    lastFront = ""
+    motionCount = 0
   }
 
   private func observeLocal(_ type: CGEventType, _ event: CGEvent) {
