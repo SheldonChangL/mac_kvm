@@ -19,6 +19,9 @@ import KVMContracts
 ///    capture adapters forward (M2-004, M2-005). Unsupported buttons, zero
 ///    scrolls, unmapped keys, tablet, gesture and system-defined events fail
 ///    open locally, because nothing would deliver them to the remote screen.
+/// 6. Exception to 5: while suppressing, smooth-scroll events below one line
+///    and trackpad/Magic Mouse gesture events return `discard`. They move the
+///    local screen (scrolling, swiping spaces) while the user works remotely.
 ///
 /// The flag lives behind one `NSLock`; `decide` never awaits, allocates only
 /// the mapped event, and never logs. Disabling is idempotent and always wins:
@@ -29,7 +32,12 @@ package final class LocalEventSuppressor: @unchecked Sendable {
     case suppress
     case failOpen
     case emergencyEscape
+    /// Dropped while remote without being forwarded (sub-line scroll, gestures).
+    case discard
   }
+
+  /// Gesture, magnify, swipe and dock-control (space switching) event types.
+  package static let gestureTypes: [UInt32] = [29, 30, 31, 32]
 
   private let filter: SyntheticEventFilter
   private let isEmergencyEscape: @Sendable (KVMEvent) -> Bool
@@ -82,7 +90,9 @@ package final class LocalEventSuppressor: @unchecked Sendable {
       }
     }
     guard isSuppressing else { return .passThrough }
-    return Self.isForwardable(type: type, event: event) ? .suppress : .passThrough
+    if Self.isForwardable(type: type, event: event) { return .suppress }
+    if type == .scrollWheel || Self.gestureTypes.contains(type.rawValue) { return .discard }
+    return .passThrough
   }
 
   /// The suppressible-event allowlist: an event may be swallowed only when a

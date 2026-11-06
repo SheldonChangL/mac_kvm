@@ -133,19 +133,26 @@ struct LocalEventSuppressorTests {
     }
     let zeroScroll = try scrollEvent(vertical: 0, horizontal: 0)
     #expect(mouse.map(zeroScroll) == nil)
-    #expect(suppressor.decide(type: .scrollWheel, event: zeroScroll) == .passThrough)
+    #expect(suppressor.decide(type: .scrollWheel, event: zeroScroll) == .discard)
 
     let tabletPointer = CGEventType.tabletPointer
     let tabletProximity = CGEventType.tabletProximity
     let others = [
       tabletPointer, tabletProximity,
-      try #require(CGEventType(rawValue: 29)),  // gesture
       try #require(CGEventType(rawValue: 14)),  // system-defined
     ]
     for type in others {
       let event = try moveEvent()
       event.type = type
       #expect(suppressor.decide(type: type, event: event) == .passThrough, "type \(type.rawValue)")
+    }
+
+    // Gestures are discarded so they do not swipe local spaces while remote.
+    for raw in LocalEventSuppressor.gestureTypes {
+      let type = try #require(CGEventType(rawValue: raw))
+      let event = try moveEvent()
+      event.type = type
+      #expect(suppressor.decide(type: type, event: event) == .discard, "type \(raw)")
     }
 
     // Forwardable input is still suppressed.
