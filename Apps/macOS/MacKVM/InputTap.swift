@@ -50,6 +50,8 @@ final class InputTap: @unchecked Sendable {
       coordinator.dispatch(LeaveRemoteFlow.escapeAction)
       if !wasLocal { report("emergency escape: input is local") }
       return event
+    case .discard:
+      return nil
     case .passThrough:
       if anchor != nil { resetDiagnostics() }
       observeLocal(type, event)

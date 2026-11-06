@@ -134,6 +134,8 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   private var returnPoint: CGPoint?
   /// Whether this server hid the cursor (main queue only).
   private var cursorHidden = false
+  /// Whether this server detached the cursor from the mouse (main queue only).
+  private var cursorDetached = false
   private var timeouts: [ScreenID: Task<Void, Never>] = [:]
   private var onEnterTimeout: (@Sendable (ScreenID) -> Void)?
 
@@ -161,6 +163,9 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
   /// Shows the cursor again if this server hid it. Main queue only.
   func showCursor() {
     if cursorHidden, MacDesktop.hideCursor(false) { cursorHidden = false }
+    if cursorDetached {
+      cursorDetached = !MacDesktop.attachCursorToMouse(true)
+    }
   }
 
   // MARK: ServerCoordinatorEffects
@@ -178,6 +183,13 @@ final class MacServerEffects: ServerCoordinatorEffects, @unchecked Sendable {
     if cursor != nil {
       DispatchQueue.main.async { [self] in
         if !cursorHidden { cursorHidden = MacDesktop.hideCursor(true) }
+        // The hidden cursor image still follows the hand when hiding is not
+        // honoured; detaching it from the mouse keeps it still (deltas keep
+        // arriving at the tap).
+        if !cursorDetached { cursorDetached = MacDesktop.attachCursorToMouse(false) }
+        if !cursorHidden || !cursorDetached {
+          report("DIAG remote cursor: hidden=\(cursorHidden) detached=\(cursorDetached)")
+        }
       }
     }
     suppressor?.enableSuppression()

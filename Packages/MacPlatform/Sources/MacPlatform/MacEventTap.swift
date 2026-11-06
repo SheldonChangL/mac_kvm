@@ -18,14 +18,17 @@ package final class MacEventTap: @unchecked Sendable {
   /// main thread, also for `tapDisabledByTimeout` and `tapDisabledByUserInput`.
   package typealias Handler = (CGEventType, CGEvent) -> CGEvent?
 
-  /// Keyboard, pointer, button and wheel events.
+  /// Keyboard, pointer, button, wheel and gesture events.
   static let eventMask: CGEventMask = {
     let types: [CGEventType] = [
       .keyDown, .keyUp, .flagsChanged, .mouseMoved, .leftMouseDown, .leftMouseUp,
       .leftMouseDragged, .rightMouseDown, .rightMouseUp, .rightMouseDragged, .otherMouseDown,
       .otherMouseUp, .otherMouseDragged, .scrollWheel,
     ]
-    return types.reduce(CGEventMask(0)) { $0 | (CGEventMask(1) << CGEventMask($1.rawValue)) }
+    let gestures = LocalEventSuppressor.gestureTypes.map(CGEventMask.init)
+    return (types.map { CGEventMask($0.rawValue) } + gestures).reduce(CGEventMask(0)) {
+      $0 | (CGEventMask(1) << $1)
+    }
   }()
 
   private let handler: Handler

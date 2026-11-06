@@ -61,4 +61,11 @@ package enum MacDesktop {
     return (hidden ? CGDisplayHideCursor(display) : CGDisplayShowCursor(display)) == .success
   }
 
+  /// Attaches (`true`) or detaches (`false`) the cursor from mouse motion.
+  /// Detached, motion events still carry deltas but the cursor stays put.
+  @discardableResult
+  package static func attachCursorToMouse(_ attached: Bool) -> Bool {
+    CGAssociateMouseAndMouseCursorPosition(attached ? 1 : 0) == .success
+  }
+
 }
