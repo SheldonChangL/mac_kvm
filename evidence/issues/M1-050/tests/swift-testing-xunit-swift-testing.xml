@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="22" failures="0" skipped="0" time="0.001990375">
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="modifierKeysReleaseNewestFirst()" time="0.001404041" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="keysThenButtonsThenModifiersWithEachGroupInReversePressOrder()" time="0.001452125" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="eachKeyReleaseCarriesTheModifiersRecordedAtItsPress()" time="0.001482375" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="capsLockIsAModifierKeyAndReleasesWithTheModifiers()" time="0.001479083" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="everyModifierKeyReleasesAfterTheButtons()" time="0.001435792" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="nothingHeldMakesAnEmptyPlan()" time="0.001277583" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="anUnclassifiedKeyIsAnOrdinaryKey()" time="0.001346791" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="buttonsReleaseNewestFirst()" time="0.001313042" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="nonModifierKeysReleaseNewestFirst()" time="0.001429792" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="everyStepIsARelease()" time="0.001298708" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="planningIsPureAndRepeatable()" time="0.001472958" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="planAndExecuteFromHeldInputReleaseEverythingInOrder()" time="0.001496042" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="everyStepFailingIsFailedNotPartial()" time="0.001480041" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="releasesEveryStepInPlanOrderAndReportsCompleted()" time="0.001405166" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheSecondStepStillAttemptsTheRest()" time="0.001508541" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="anEmptyPlanIsNotRequiredAndTouchesNothing()" time="0.001494417" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailedRunCanBeRepeatedAndRetriesEveryStep()" time="0.001389959" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="eachRunAttemptsEachStepExactlyOnce()" time="0.001404958" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="runningThePlanTwiceIsHarmless()" time="0.001605167" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aSingleStepPlanIsCompletedOrFailed()" time="0.00133125" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheFirstStepStillAttemptsTheRest()" time="0.001428208" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheLastStepIsPartial()" time="0.001368" />
+  </testsuite>
+</testsuites>
