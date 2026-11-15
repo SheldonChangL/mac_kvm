@@ -220,6 +220,21 @@ struct ReleaseAllKeysExecuteTests {
     #expect(report == ReleaseReport(attempted: 5, failed: 1, disposition: .partial))
   }
 
+  @Test func oneFailureInATwoStepPlanIsPartial() {
+    let plan = ReleaseAllKeys.plan(keys: [(.letter(0), noModifiers)], buttons: [.left])
+    for failing in [0, 1] {
+      let report = ReleaseAllKeys.execute(plan, with: RecordingReleaser(failingCalls: [failing]))
+      #expect(report == ReleaseReport(attempted: 2, failed: 1, disposition: .partial))
+    }
+  }
+
+  @Test func twoFailuresInAThreeStepPlanArePartial() {
+    let keys: [Held] = [(.letter(0), noModifiers), (.letter(1), noModifiers)]
+    let plan = ReleaseAllKeys.plan(keys: keys, buttons: [.left])
+    let report = ReleaseAllKeys.execute(plan, with: RecordingReleaser(failingCalls: [0, 2]))
+    #expect(report == ReleaseReport(attempted: 3, failed: 2, disposition: .partial))
+  }
+
   @Test func aFailureOnTheLastStepIsPartial() {
     let releaser = RecordingReleaser(failingCalls: [4])
     let report = ReleaseAllKeys.execute(Self.plan, with: releaser)

@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
   "issue": "M1-050",
-  "date": "2026-11-15T12:03:08Z",
+  "date": "2026-11-15T12:19:03Z",
   "source": "Packages/KVMCore/Sources/KVMCore/ReleaseAllKeys.swift",
   "sourceSha256": "3e48dadbae021fcd339a535cb4d6d75c57b984ae9507e6a05d8a4d20b17806ee",
   "tests": "Packages/KVMCore/Tests/KVMCoreTests/ReleaseAllKeysTests.swift",
-  "testsSha256": "a777d775a7833601501159e6d10460f5570b4cacac5414d51225e6d49250c365",
+  "testsSha256": "9fbba2a10dad78b7e09e150dae1fa1051f556ecae64ed698e846e4971003608b",
   "command": "swift test --filter ReleaseAllKeys",
   "timeoutSeconds": 900,
   "baseline": {
     "exitCode": 0,
-    "durationSeconds": 16.3,
+    "durationSeconds": 2.9,
     "failingTests": [],
     "compileError": false,
-    "summary": "Test run with 22 tests in 2 suites passed after 0.001 seconds."
+    "summary": "Test run with 24 tests in 2 suites passed after 0.001 seconds."
   },
   "mutants": [
     {
@@ -22,7 +22,7 @@
       "description": "modifier keys come before the other keys and the buttons",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.5,
+      "durationSeconds": 2.0,
       "failingTests": [
         "anUnclassifiedKeyIsAnOrdinaryKey",
         "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
@@ -32,7 +32,7 @@
         "planAndExecuteFromHeldInputReleaseEverythingInOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.006 seconds with 10 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.010 seconds with 10 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -42,7 +42,7 @@
       "description": "the buttons come before the non-modifier keys",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 2.6,
       "failingTests": [
         "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
         "everyModifierKeyReleasesAfterTheButtons",
@@ -50,7 +50,7 @@
         "planAndExecuteFromHeldInputReleaseEverythingInOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.006 seconds with 8 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.007 seconds with 8 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -60,7 +60,7 @@
       "description": "keys and buttons release in press order instead of reverse",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.5,
+      "durationSeconds": 1.8,
       "failingTests": [
         "anUnclassifiedKeyIsAnOrdinaryKey",
         "buttonsReleaseNewestFirst",
@@ -71,7 +71,7 @@
         "nonModifierKeysReleaseNewestFirst"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.006 seconds with 7 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -81,7 +81,7 @@
       "description": "keys release in press order; buttons stay in reverse order",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.5,
+      "durationSeconds": 1.6,
       "failingTests": [
         "anUnclassifiedKeyIsAnOrdinaryKey",
         "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
@@ -91,7 +91,7 @@
         "nonModifierKeysReleaseNewestFirst"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.004 seconds with 6 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 6 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -101,13 +101,13 @@
       "description": "buttons release in press order; keys stay in reverse order",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.5,
+      "durationSeconds": 2.1,
       "failingTests": [
         "buttonsReleaseNewestFirst",
         "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.003 seconds with 2 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -117,15 +117,16 @@
       "description": "execute stops at the first step that throws",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.6,
       "failingTests": [
         "aFailedRunCanBeRepeatedAndRetriesEveryStep",
         "aFailureOnTheFirstStepStillAttemptsTheRest",
         "aFailureOnTheSecondStepStillAttemptsTheRest",
-        "everyStepFailingIsFailedNotPartial"
+        "everyStepFailingIsFailedNotPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.003 seconds with 5 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.010 seconds with 6 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -135,7 +136,7 @@
       "description": "every step is attempted twice, so a run is not exactly one release per step",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.3,
+      "durationSeconds": 3.7,
       "failingTests": [
         "aFailedRunCanBeRepeatedAndRetriesEveryStep",
         "aFailureOnTheFirstStepStillAttemptsTheRest",
@@ -146,7 +147,7 @@
         "runningThePlanTwiceIsHarmless"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.007 seconds with 7 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.009 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -161,7 +162,7 @@
         "anEmptyPlanIsNotRequiredAndTouchesNothing"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.001 seconds with 1 issue.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -171,13 +172,13 @@
       "description": "the failed disposition is never produced",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.5,
       "failingTests": [
         "aSingleStepPlanIsCompletedOrFailed",
         "everyStepFailingIsFailedNotPartial"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.001 seconds with 2 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -187,7 +188,7 @@
       "description": "each key release carries no modifiers",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.5,
       "failingTests": [
         "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
         "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
@@ -196,7 +197,7 @@
         "planAndExecuteFromHeldInputReleaseEverythingInOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.003 seconds with 5 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.004 seconds with 5 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -206,13 +207,29 @@
       "description": "capsLock is classified as an ordinary key",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 1.8,
       "failingTests": [
         "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
         "everyModifierKeyReleasesAfterTheButtons"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.003 seconds with 2 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.004 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R1",
+      "requirement": "independent review: failed also when all but one step failed",
+      "description": "failed is reported when failed > 0 and failed + 1 >= attempted, so a minority-of-one success and a two-step plan with one failure read failed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 3 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -228,10 +245,12 @@
         "aFailureOnTheLastStepIsPartial",
         "aFailureOnTheSecondStepStillAttemptsTheRest",
         "aSingleStepPlanIsCompletedOrFailed",
-        "everyStepFailingIsFailedNotPartial"
+        "everyStepFailingIsFailedNotPartial",
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.002 seconds with 5 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.002 seconds with 8 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -245,10 +264,12 @@
       "failingTests": [
         "aFailureOnTheFirstStepStillAttemptsTheRest",
         "aFailureOnTheLastStepIsPartial",
-        "aFailureOnTheSecondStepStillAttemptsTheRest"
+        "aFailureOnTheSecondStepStillAttemptsTheRest",
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.001 seconds with 3 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.002 seconds with 6 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -265,7 +286,7 @@
         "planAndExecuteFromHeldInputReleaseEverythingInOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.004 seconds with 5 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 5 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -288,7 +309,7 @@
         "planAndExecuteFromHeldInputReleaseEverythingInOrder"
       ],
       "compileError": false,
-      "summary": "Test run with 22 tests in 2 suites failed after 0.008 seconds with 15 issues.",
+      "summary": "Test run with 24 tests in 2 suites failed after 0.008 seconds with 15 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     }
@@ -297,6 +318,6 @@
   "allKilled": true,
   "testsUntouched": true,
   "allRestored": true,
-  "killedCount": 15,
-  "mutantCount": 15
+  "killedCount": 16,
+  "mutantCount": 16
 }

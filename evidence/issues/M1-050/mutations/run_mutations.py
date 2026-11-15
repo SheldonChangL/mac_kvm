@@ -119,6 +119,15 @@ MUTANTS = [
                           "      .punctuation, .unknown, .capsLock:\n      return false\n")],
     },
     {
+        "id": "R1",
+        "requirement": "independent review: failed also when all but one step failed",
+        "description": "failed is reported when failed > 0 and failed + 1 >= attempted, so a "
+                       "minority-of-one success and a two-step plan with one failure read failed",
+        "replacements": [("    } else if failed == attempted {\n      disposition = .failed\n",
+                          "    } else if failed > 0 && failed + 1 >= attempted {\n"
+                          "      disposition = .failed\n")],
+    },
+    {
         "id": "10",
         "requirement": "extra: a failure counts as nothing",
         "description": "failed is never incremented, so a failing run reports completed",

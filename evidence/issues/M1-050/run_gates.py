@@ -67,6 +67,8 @@ def main() -> int:
         ["swift", "format", "lint", "--strict", "--no-color-diagnostics", *LINT_FILES],
         ["swift", "format", "lint", "--recursive", "--strict", "--no-color-diagnostics",
          "Package.swift", "Apps", "Packages", "Tests", "reference"],
+        ["xcodebuild", "-workspace", "MacKVM.xcworkspace", "-scheme", "MacKVM",
+         "-destination", "platform=macOS", "build"],
         ["make", "docs-check"],
         ["make", "architecture-check"],
         ["python3", "Tools/Backlog/validate_package.py"],
