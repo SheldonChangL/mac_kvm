@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
   "issue": "M1-062",
-  "date": "2026-11-15T12:09:19Z",
+  "date": "2026-11-15T12:25:26Z",
   "source": "Packages/KVMCore/Sources/KVMCore/InputStateLedger.swift",
-  "sourceSha256": "d793afc09b4ad8071c73d1e8e6bbcbea9096a346115dc9d3134a6364c7531a9e",
+  "sourceSha256": "eff5e4644366c69075533bce257d67e15d8f4434e0db42feeb7c56b7da84cbe1",
   "tests": "Packages/KVMCore/Tests/KVMCoreTests/InputStateLedgerTests.swift",
   "testRevision": null,
-  "testsSha256": "86144bd58a454775fbb47146b7a2ca3b29a21c51e8b3665c7f9d1ce8dce8bdb1",
+  "testsSha256": "f84f24edf105a1d5b36e0248e8871d929ca39cd86641ca6eee9abf0580f908b0",
   "command": "swift test --filter InputStateLedger",
   "timeoutSeconds": 900,
   "baseline": {
     "exitCode": 0,
-    "durationSeconds": 12.5,
+    "durationSeconds": 11.6,
     "failingTests": [],
     "compileError": false,
-    "summary": "Test run with 20 tests in 1 suite passed after 0.024 seconds."
+    "summary": "Test run with 22 tests in 1 suite passed after 0.024 seconds."
   },
   "mutants": [
     {
@@ -23,15 +23,16 @@
       "description": "a press of a held key is injected (and not re-recorded)",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 3.5,
+      "durationSeconds": 1.6,
       "failingTests": [
         "aDuplicateDownOfAHeldKeyIsDropped",
         "capsLockIsAnOrdinaryHeldKey",
         "heldKeysMatchTheUnmatchedInjectedDowns",
+        "keysOverTheBoundAreInjectedCountedAndFlagged",
         "theModifierLedgerFollowsInjectedKeyEvents"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.102 seconds with 528 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.026 seconds with 539 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -41,14 +42,15 @@
       "description": "every repeat is injected",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 3.6,
+      "durationSeconds": 1.5,
       "failingTests": [
         "aRepeatOfAnUnheldKeyIsDropped",
         "heldKeysMatchTheUnmatchedInjectedDowns",
+        "keysOverTheBoundAreInjectedCountedAndFlagged",
         "smallBoundsAreEnforcedForKeys"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.117 seconds with 1728 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.037 seconds with 1718 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -58,13 +60,13 @@
       "description": "a release of an unheld key is recorded as a held key",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.6,
+      "durationSeconds": 1.7,
       "failingTests": [
         "aReleaseOfAnUnheldKeyIsInjectedButNotRecorded",
         "heldKeysMatchTheUnmatchedInjectedDowns"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.308 seconds with 10574 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.231 seconds with 11488 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -74,7 +76,7 @@
       "description": "a release of a held key is injected but the key stays held",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.0,
+      "durationSeconds": 1.6,
       "failingTests": [
         "aReleaseOfAHeldKeyIsInjectedAndFreed",
         "aRepeatOfAnUnheldKeyIsDropped",
@@ -83,7 +85,7 @@
         "heldKeysMatchTheUnmatchedInjectedDowns"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.180 seconds with 4871 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.129 seconds with 5476 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -93,13 +95,13 @@
       "description": "a new press is inserted first instead of appended",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.0,
+      "durationSeconds": 1.7,
       "failingTests": [
         "heldKeysKeepPressOrderAndTheModifiersAtThePress",
         "heldKeysMatchTheUnmatchedInjectedDowns"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.194 seconds with 3326 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.158 seconds with 3325 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -109,8 +111,9 @@
       "description": "the key bound check always admits",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 4.4,
+      "durationSeconds": 1.6,
       "failingTests": [
+        "aNegativeBoundBehavesAsZero",
         "aNegativeOrZeroBoundHoldsNothing",
         "heldKeysMatchTheUnmatchedInjectedDowns",
         "keysOverTheBoundAreInjectedCountedAndFlagged",
@@ -118,7 +121,7 @@
         "smallBoundsAreEnforcedForKeys"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.117 seconds with 442 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.035 seconds with 838 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -128,15 +131,15 @@
       "description": "an overflowed key press is not counted",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 4.5,
+      "durationSeconds": 1.5,
       "failingTests": [
-        "aNegativeOrZeroBoundHoldsNothing",
+        "heldKeysMatchTheUnmatchedInjectedDowns",
         "keysOverTheBoundAreInjectedCountedAndFlagged",
         "resetForgetsEverything",
         "smallBoundsAreEnforcedForKeys"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.039 seconds with 6 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.025 seconds with 465 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -146,14 +149,16 @@
       "description": "the button bound check always admits",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 3.7,
+      "durationSeconds": 1.5,
       "failingTests": [
+        "aNegativeBoundBehavesAsZero",
         "aNegativeOrZeroBoundHoldsNothing",
         "buttonsOverTheBoundAreInjectedCountedAndFlagged",
-        "heldKeysMatchTheUnmatchedInjectedDowns"
+        "heldKeysMatchTheUnmatchedInjectedDowns",
+        "untrackedButtonsAreCountedAndSticky"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.055 seconds with 171 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.029 seconds with 684 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -163,12 +168,12 @@
       "description": "the snapshot gains a field holding the held keys",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 10.3,
+      "durationSeconds": 3.8,
       "failingTests": [
         "theSnapshotCarriesNoKeyOrButtonIdentity"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.052 seconds with 6 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.022 seconds with 6 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -178,13 +183,14 @@
       "description": "reset() changes nothing",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 9.6,
+      "durationSeconds": 3.9,
       "failingTests": [
         "heldKeysMatchTheUnmatchedInjectedDowns",
-        "resetForgetsEverything"
+        "resetForgetsEverything",
+        "untrackedButtonsAreCountedAndSticky"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.224 seconds with 1888 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.098 seconds with 7640 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -194,12 +200,12 @@
       "description": "a clipboard event is injected without remembering its transaction",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 4.3,
+      "durationSeconds": 1.6,
       "failingTests": [
         "theClipboardTransactionIsTracked"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.045 seconds with 2 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.024 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -209,14 +215,97 @@
       "description": "Caps Lock presses and releases are injected but not held, like a lock",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 3.6,
+      "durationSeconds": 1.7,
       "failingTests": [
         "capsLockIsAnOrdinaryHeldKey",
         "heldKeysMatchTheUnmatchedInjectedDowns",
         "theModifierLedgerFollowsInjectedKeyEvents"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.115 seconds with 3889 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.089 seconds with 4132 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R-M1a",
+      "requirement": "review M1: a second down of an overflowed key is injected",
+      "description": "the duplicate check ignores the overflow set",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "heldKeysMatchTheUnmatchedInjectedDowns",
+        "keysOverTheBoundAreInjectedCountedAndFlagged"
+      ],
+      "compileError": false,
+      "summary": "Test run with 22 tests in 1 suite failed after 0.025 seconds with 104 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R-M1b",
+      "requirement": "review M1: repeats of an overflowed key are dropped",
+      "description": "the repeat check ignores the overflow set",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "heldKeysMatchTheUnmatchedInjectedDowns",
+        "keysOverTheBoundAreInjectedCountedAndFlagged",
+        "smallBoundsAreEnforcedForKeys"
+      ],
+      "compileError": false,
+      "summary": "Test run with 22 tests in 1 suite failed after 0.023 seconds with 15 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R-M2",
+      "requirement": "review M2: releasing an overflowed key does not clear the flag",
+      "description": "the overflowed key stays in the overflow set after its release",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "heldKeysMatchTheUnmatchedInjectedDowns",
+        "keysOverTheBoundAreInjectedCountedAndFlagged",
+        "smallBoundsAreEnforcedForKeys"
+      ],
+      "compileError": false,
+      "summary": "Test run with 22 tests in 1 suite failed after 0.025 seconds with 134 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R-M2b",
+      "requirement": "extra: releasing an overflowed button does not clear the flag",
+      "description": "the overflowed button stays in the overflow set after its release",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "buttonsOverTheBoundAreInjectedCountedAndFlagged",
+        "heldKeysMatchTheUnmatchedInjectedDowns",
+        "untrackedButtonsAreCountedAndSticky"
+      ],
+      "compileError": false,
+      "summary": "Test run with 22 tests in 1 suite failed after 0.024 seconds with 75 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R-L3",
+      "requirement": "review L3: a negative bound is not clamped to zero",
+      "description": "the key bound is taken as given",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "aNegativeBoundBehavesAsZero",
+        "aNegativeOrZeroBoundHoldsNothing"
+      ],
+      "compileError": false,
+      "summary": "Test run with 22 tests in 1 suite failed after 0.022 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -226,13 +315,13 @@
       "description": "a held button's release frees the first held button",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 2.0,
+      "durationSeconds": 1.5,
       "failingTests": [
         "aButtonReleaseFreesOnlyItsOwnButton",
         "heldKeysMatchTheUnmatchedInjectedDowns"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.016 seconds with 103 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.025 seconds with 110 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -247,7 +336,7 @@
         "theModifierLedgerFollowsInjectedKeyEvents"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.016 seconds with 1 issue.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.023 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -257,13 +346,14 @@
       "description": "a press of a held button is injected",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 1.6,
       "failingTests": [
         "buttonsFollowTheSameRules",
+        "buttonsOverTheBoundAreInjectedCountedAndFlagged",
         "heldKeysMatchTheUnmatchedInjectedDowns"
       ],
       "compileError": false,
-      "summary": "Test run with 20 tests in 1 suite failed after 0.016 seconds with 153 issues.",
+      "summary": "Test run with 22 tests in 1 suite failed after 0.023 seconds with 167 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     }
@@ -272,6 +362,6 @@
   "allKilled": true,
   "testsUntouched": true,
   "allRestored": true,
-  "killedCount": 15,
-  "mutantCount": 15
+  "killedCount": 20,
+  "mutantCount": 20
 }

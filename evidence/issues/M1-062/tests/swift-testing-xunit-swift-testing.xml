@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="TestResults" errors="0" tests="20" failures="0" skipped="0" time="0.015763416">
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysMatchTheUnmatchedInjectedDowns(seed:)" time="0.015267084" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDownOfAnUnheldKeyIsInjectedAndHeld()" time="0.000659291" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theModifierLedgerFollowsInjectedKeyEvents()" time="0.000523625" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAHeldKeyIsInjectedAndFreed()" time="0.000516917" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theSnapshotCarriesNoKeyOrButtonIdentity()" time="0.001032375" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aButtonReleaseFreesOnlyItsOwnButton()" time="0.00059975" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="eventsWithoutHeldStateAreIgnored()" time="0.000467208" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAnUnheldKeyIsInjectedButNotRecorded()" time="0.000500417" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsOverTheBoundAreInjectedCountedAndFlagged()" time="0.000475833" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysKeepPressOrderAndTheModifiersAtThePress()" time="0.000547583" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aNegativeOrZeroBoundHoldsNothing()" time="0.000449459" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="keysOverTheBoundAreInjectedCountedAndFlagged()" time="0.001263708" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAHeldKeyIsInjected()" time="0.00057275" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsFollowTheSameRules()" time="0.000553833" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAnUnheldKeyIsDropped()" time="0.000520833" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDuplicateDownOfAHeldKeyIsDropped()" time="0.000475667" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="smallBoundsAreEnforcedForKeys()" time="0.000579084" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theClipboardTransactionIsTracked()" time="0.00055325" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="resetForgetsEverything()" time="0.000617167" />
-    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="capsLockIsAnOrdinaryHeldKey()" time="0.000418333" />
+  <testsuite name="TestResults" errors="0" tests="22" failures="0" skipped="0" time="0.025044417">
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDownOfAnUnheldKeyIsInjectedAndHeld()" time="0.001804875" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="untrackedButtonsAreCountedAndSticky()" time="0.001653208" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="resetForgetsEverything()" time="0.001920958" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="eventsWithoutHeldStateAreIgnored()" time="0.00175675" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aNegativeBoundBehavesAsZero()" time="0.0016575" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theClipboardTransactionIsTracked()" time="0.001955709" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAnUnheldKeyIsDropped()" time="0.001687333" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsOverTheBoundAreInjectedCountedAndFlagged()" time="0.001828" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="capsLockIsAnOrdinaryHeldKey()" time="0.001713709" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAHeldKeyIsInjected()" time="0.001845208" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAnUnheldKeyIsInjectedButNotRecorded()" time="0.002038" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysKeepPressOrderAndTheModifiersAtThePress()" time="0.00184225" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theModifierLedgerFollowsInjectedKeyEvents()" time="0.002041166" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysMatchTheUnmatchedInjectedDowns(seed:)" time="0.024588209" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aNegativeOrZeroBoundHoldsNothing()" time="0.001696709" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDuplicateDownOfAHeldKeyIsDropped()" time="0.001708958" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aButtonReleaseFreesOnlyItsOwnButton()" time="0.001840375" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsFollowTheSameRules()" time="0.0019525" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theSnapshotCarriesNoKeyOrButtonIdentity()" time="0.00235975" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="keysOverTheBoundAreInjectedCountedAndFlagged()" time="0.002010917" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAHeldKeyIsInjectedAndFreed()" time="0.001636375" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="smallBoundsAreEnforcedForKeys()" time="0.001818625" />
   </testsuite>
 </testsuites>

@@ -33,10 +33,10 @@ TESTS = "Packages/KVMCore/Tests/KVMCoreTests/InputStateLedgerTests.swift"
 COMMAND = ["swift", "test", "--filter", "InputStateLedger"]
 TIMEOUT_SECONDS = 900
 
-KEY_DOWN = "    case .down:\n      guard index == nil else { return .dropDuplicateDown }\n      if heldKeys.count"
-BUTTON_DOWN = "    case .down:\n      guard index == nil else { return .dropDuplicateDown }\n      if heldButtons.count"
-KEY_UP = "      guard let index else { return .injectUnheldRelease }\n      heldKeys.remove(at: index)\n"
-BUTTON_UP = "      guard let index else { return .injectUnheldRelease }\n      heldButtons.remove(at: index)\n"
+KEY_DOWN = "    case .down:\n      guard index == nil, overflowIndex == nil else { return .dropDuplicateDown }\n      if heldKeys.count"
+BUTTON_DOWN = "    case .down:\n      guard index == nil, overflowIndex == nil else { return .dropDuplicateDown }\n      if heldButtons.count"
+KEY_UP = "      if let index {\n        heldKeys.remove(at: index)\n        return .inject\n      }\n      guard let overflowIndex else { return .injectUnheldRelease }\n      overflowedKeys"
+BUTTON_UP = "      if let index {\n        heldButtons.remove(at: index)\n        return .inject\n      }\n"
 
 MUTANTS = [
     {"id": "1", "requirement": "a duplicate down is injected",
@@ -44,18 +44,18 @@ MUTANTS = [
      "replacements": [(KEY_DOWN, KEY_DOWN.replace("return .dropDuplicateDown", "return .inject"))]},
     {"id": "2", "requirement": "an unheld repeat is injected",
      "description": "every repeat is injected",
-     "replacements": [("      return index == nil ? .dropUnheldRepeat : .inject\n",
+     "replacements": [("      return index == nil && overflowIndex == nil ? .dropUnheldRepeat : .inject\n",
                        "      return .inject\n")]},
     {"id": "3", "requirement": "an unheld release is recorded",
      "description": "a release of an unheld key is recorded as a held key",
      "replacements": [(KEY_UP, KEY_UP.replace(
-         "guard let index else { return .injectUnheldRelease }",
-         "guard let index else {\n        heldKeys.append(HeldKey(key: key, modifiers: modifierState))\n"
+         "guard let overflowIndex else { return .injectUnheldRelease }",
+         "guard let overflowIndex else {\n        heldKeys.append(HeldKey(key: key, modifiers: modifierState))\n"
          "        return .injectUnheldRelease\n      }"))]},
     {"id": "4", "requirement": "a held release is not freed",
      "description": "a release of a held key is injected but the key stays held",
-     "replacements": [(KEY_UP, KEY_UP.replace("      heldKeys.remove(at: index)\n",
-                                              "      _ = index\n"))]},
+     "replacements": [(KEY_UP, KEY_UP.replace("        heldKeys.remove(at: index)\n",
+                                              "        _ = index\n"))]},
     {"id": "5", "requirement": "press order is lost",
      "description": "a new press is inserted first instead of appended",
      "replacements": [("        heldKeys.append(HeldKey(key: key, modifiers: modifierState))\n",
@@ -65,7 +65,7 @@ MUTANTS = [
      "replacements": [("      if heldKeys.count < keyBound {\n", "      if true || heldKeys.count < keyBound {\n")]},
     {"id": "6b", "requirement": "the overflow is not flagged",
      "description": "an overflowed key press is not counted",
-     "replacements": [("        overflowedKeys += 1\n", "        overflowedKeys += 0\n")]},
+     "replacements": [("        overflowedKeys.append(key)\n", "        _ = key\n")]},
     {"id": "6c", "requirement": "extra: the button bound is not enforced",
      "description": "the button bound check always admits",
      "replacements": [("      if heldButtons.count < buttonBound {\n",
@@ -91,6 +91,22 @@ MUTANTS = [
      "replacements": [("    let index = heldKeys.firstIndex { $0.key == key }\n",
                        "    if key == .capsLock, phase != .repeatKey { return .inject }\n"
                        "    let index = heldKeys.firstIndex { $0.key == key }\n")]},
+    {"id": "R-M1a", "requirement": "review M1: a second down of an overflowed key is injected",
+     "description": "the duplicate check ignores the overflow set",
+     "replacements": [(KEY_DOWN, KEY_DOWN.replace("guard index == nil, overflowIndex == nil", "guard index == nil"))]},
+    {"id": "R-M1b", "requirement": "review M1: repeats of an overflowed key are dropped",
+     "description": "the repeat check ignores the overflow set",
+     "replacements": [("      return index == nil && overflowIndex == nil ? .dropUnheldRepeat : .inject\n",
+                       "      return index == nil ? .dropUnheldRepeat : .inject\n")]},
+    {"id": "R-M2", "requirement": "review M2: releasing an overflowed key does not clear the flag",
+     "description": "the overflowed key stays in the overflow set after its release",
+     "replacements": [("      overflowedKeys.remove(at: overflowIndex)\n", "      _ = overflowIndex\n")]},
+    {"id": "R-M2b", "requirement": "extra: releasing an overflowed button does not clear the flag",
+     "description": "the overflowed button stays in the overflow set after its release",
+     "replacements": [("      overflowedButtons.remove(at: overflowIndex)\n", "      _ = overflowIndex\n")]},
+    {"id": "R-L3", "requirement": "review L3: a negative bound is not clamped to zero",
+     "description": "the key bound is taken as given",
+     "replacements": [("    keyBound = max(0, maximumHeldKeys)\n", "    keyBound = maximumHeldKeys == 0 ? 0 : abs(maximumHeldKeys)\n")]},
     {"id": "11", "requirement": "a button release frees a different button",
      "description": "a held button's release frees the first held button",
      "replacements": [(BUTTON_UP, BUTTON_UP.replace("heldButtons.remove(at: index)",

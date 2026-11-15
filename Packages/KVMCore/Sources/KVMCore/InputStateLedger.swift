@@ -36,10 +36,17 @@ package enum LedgerDecision: Equatable, Sendable {
 package struct InputStateSnapshot: Equatable, Sendable {
   package let heldKeyCount: Int
   package let heldButtonCount: Int
-  /// Presses injected while the key bound was full, so not held by the ledger.
+  /// Keys pressed while the key bound was full and not released since. They are tracked in a
+  /// separate overflow set, so their repeats and releases stay paired, but a release-all built
+  /// from `heldKeys` does not include them.
   package let overflowedKeyCount: Int
-  /// Presses injected while the button bound was full, so not held by the ledger.
+  /// Buttons pressed while the button bound was full and not released since.
   package let overflowedButtonCount: Int
+  /// Key presses injected while the overflow set was full too. Not tracked at all, so this count
+  /// is sticky until `reset()`.
+  package let untrackedKeyCount: Int
+  /// Button presses injected while the button overflow set was full too; sticky until `reset()`.
+  package let untrackedButtonCount: Int
   /// The modifier ledger's state.
   package let modifiers: ModifierState
   /// The last clipboard transaction recorded, an opaque identifier.
@@ -48,7 +55,8 @@ package struct InputStateSnapshot: Equatable, Sendable {
   /// True when a press was injected that the ledger does not hold, so a release-all built from
   /// the ledger may miss it and cleanup must report itself partial unless another sweep covers it.
   package var hasOverflowed: Bool {
-    overflowedKeyCount > 0 || overflowedButtonCount > 0
+    overflowedKeyCount > 0 || overflowedButtonCount > 0 || untrackedKeyCount > 0
+      || untrackedButtonCount > 0
   }
 }
 
@@ -66,7 +74,8 @@ package struct InputStateSnapshot: Equatable, Sendable {
 /// 4. Caps Lock is an ordinary key here: it arrives as a press and release per toggle (M1-043),
 ///    and is held between them. Buttons follow the same rules as keys.
 /// 5. The bounds are checked before anything is stored. A press over the bound is still injected,
-///    since dropping it would lose input, but it is not held: it is counted as an overflow and the
+///    since dropping it would lose input, but it is not held: it goes into a separate overflow set
+///    with the same bound, where its duplicate presses, repeats and release follow rules 1-3, and the
 ///    snapshot flags it. Its later release is an unheld release.
 /// 6. A clipboard event is injected and its transaction ID remembered; no content is kept.
 /// 7. Key events that are injected are applied to the modifier ledger (M1-046), in order; dropped
@@ -89,8 +98,10 @@ package struct InputStateLedger: Sendable {
   package private(set) var heldKeys: [HeldKey] = []
   package private(set) var heldButtons: [MouseButton] = []
   package private(set) var modifiers = ModifierStateLedger()
-  private var overflowedKeys = 0
-  private var overflowedButtons = 0
+  private var overflowedKeys: [VirtualKey] = []
+  private var overflowedButtons: [MouseButton] = []
+  private var untrackedKeys = 0
+  private var untrackedButtons = 0
   private var clipboardTransaction: ClipboardTransactionID?
 
   /// Creates a ledger that holds nothing. A bound below zero is taken as zero.
@@ -126,8 +137,10 @@ package struct InputStateLedger: Sendable {
     InputStateSnapshot(
       heldKeyCount: heldKeys.count,
       heldButtonCount: heldButtons.count,
-      overflowedKeyCount: overflowedKeys,
-      overflowedButtonCount: overflowedButtons,
+      overflowedKeyCount: overflowedKeys.count,
+      overflowedButtonCount: overflowedButtons.count,
+      untrackedKeyCount: untrackedKeys,
+      untrackedButtonCount: untrackedButtons,
       modifiers: modifiers.state,
       clipboardTransaction: clipboardTransaction)
   }
@@ -138,8 +151,10 @@ package struct InputStateLedger: Sendable {
     heldKeys = []
     heldButtons = []
     modifiers.clear()
-    overflowedKeys = 0
-    overflowedButtons = 0
+    overflowedKeys = []
+    overflowedButtons = []
+    untrackedKeys = 0
+    untrackedButtons = 0
     clipboardTransaction = nil
   }
 
@@ -147,38 +162,52 @@ package struct InputStateLedger: Sendable {
     _ key: VirtualKey, phase: KeyPhase, modifiers modifierState: ModifierState
   ) -> LedgerDecision {
     let index = heldKeys.firstIndex { $0.key == key }
+    let overflowIndex = overflowedKeys.firstIndex(of: key)
     switch phase {
     case .down:
-      guard index == nil else { return .dropDuplicateDown }
+      guard index == nil, overflowIndex == nil else { return .dropDuplicateDown }
       if heldKeys.count < keyBound {
         heldKeys.append(HeldKey(key: key, modifiers: modifierState))
+      } else if overflowedKeys.count < keyBound {
+        overflowedKeys.append(key)
       } else {
-        overflowedKeys += 1
+        untrackedKeys += 1
       }
       return .inject
     case .repeatKey:
-      return index == nil ? .dropUnheldRepeat : .inject
+      return index == nil && overflowIndex == nil ? .dropUnheldRepeat : .inject
     case .up:
-      guard let index else { return .injectUnheldRelease }
-      heldKeys.remove(at: index)
+      if let index {
+        heldKeys.remove(at: index)
+        return .inject
+      }
+      guard let overflowIndex else { return .injectUnheldRelease }
+      overflowedKeys.remove(at: overflowIndex)
       return .inject
     }
   }
 
   private mutating func recordButton(_ button: MouseButton, phase: ButtonPhase) -> LedgerDecision {
     let index = heldButtons.firstIndex(of: button)
+    let overflowIndex = overflowedButtons.firstIndex(of: button)
     switch phase {
     case .down:
-      guard index == nil else { return .dropDuplicateDown }
+      guard index == nil, overflowIndex == nil else { return .dropDuplicateDown }
       if heldButtons.count < buttonBound {
         heldButtons.append(button)
+      } else if overflowedButtons.count < buttonBound {
+        overflowedButtons.append(button)
       } else {
-        overflowedButtons += 1
+        untrackedButtons += 1
       }
       return .inject
     case .up:
-      guard let index else { return .injectUnheldRelease }
-      heldButtons.remove(at: index)
+      if let index {
+        heldButtons.remove(at: index)
+        return .inject
+      }
+      guard let overflowIndex else { return .injectUnheldRelease }
+      overflowedButtons.remove(at: overflowIndex)
       return .inject
     }
   }

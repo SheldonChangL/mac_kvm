@@ -50,11 +50,23 @@ transaction. It never injects, synthesizes or logs anything.
 
 The bound is checked before anything is stored, so the ledger never grows
 past 64 keys or 8 buttons. A press over the bound is still injected, because
-dropping it would lose the user's input, but it is not held: the overflow is
-counted and `snapshot().hasOverflowed` is true. A release-all built from the
-ledger cannot release such a press, so the cleanup owner reports
-`inputSafety.cleanupPartial` unless the injector sweep covers it. The press's
-own release is an unheld release, still injected. `reset()` clears the counts.
+dropping it would lose the user's input, but it is not held: it goes into a
+separate overflow set with the same bound. An overflowed key or button keeps
+rules 1-3: a second press is dropped as a duplicate, a repeat is injected (so
+autorepeat keeps working), and its release is injected and removes it, which
+clears the flag. Only a press beyond the overflow set's bound too is not
+tracked at all; it is counted in `untrackedKeyCount` or
+`untrackedButtonCount`, which stay set until `reset()`.
+
+`snapshot().hasOverflowed` is true while the overflow sets are not empty or an
+untracked count is set. A release-all built from `heldKeys` and `heldButtons`
+cannot release overflowed presses, so the cleanup owner reports
+`inputSafety.cleanupPartial` unless the injector sweep covers them.
+
+The snapshot fields `overflowedKeyCount`, `overflowedButtonCount`,
+`untrackedKeyCount`, `untrackedButtonCount` and `hasOverflowed` go beyond the
+plan b.2 sketch on purpose: they are how the snapshot flags overflow, as the
+plan's bound rule requires. They are counts only.
 
 ## Records decisions, not platform state (plan amendments h.1 and h.6)
 
@@ -86,7 +98,7 @@ documents for its owner. `reset()` is the cleanup step and is idempotent.
 Testing) covers every decision row for keys and buttons, press order with the
 press modifiers, Caps Lock as an ordinary key, the modifier ledger fed only by
 injected events, ignored events, clipboard transaction tracking, both bounds
-(default and small, and zero/negative), the snapshot's lack of identities (a
+(default and small, the overflow set's pairing, untracked presses, and a negative bound behaving as zero), the snapshot's lack of identities (a
 `Mirror` walker), `reset()` and its idempotence, and a seeded property test
 over random sequences: `heldKeys` equals, in press order, the keys with an
 injected down and no injected up since, and every decision matches an

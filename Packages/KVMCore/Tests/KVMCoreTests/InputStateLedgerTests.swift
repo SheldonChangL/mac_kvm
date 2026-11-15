@@ -233,9 +233,16 @@ struct InputStateLedgerTests {
     #expect(snapshot.heldKeyCount == InputStateLedger.maximumHeldKeys)
     #expect(snapshot.overflowedKeyCount == 1)
     #expect(snapshot.hasOverflowed)
-    // The overflowed key's own release is still injected, as an unheld release.
-    #expect(ledger.record(up(extra)) == .injectUnheldRelease)
+    // The overflowed key stays paired: duplicate press dropped, repeat injected, release
+    // injected and the flag cleared.
+    #expect(ledger.record(down(extra)) == .dropDuplicateDown)
     #expect(ledger.snapshot().overflowedKeyCount == 1)
+    #expect(ledger.record(repeated(extra)) == .inject)
+    #expect(ledger.record(up(extra)) == .inject)
+    #expect(ledger.snapshot().overflowedKeyCount == 0)
+    #expect(!ledger.snapshot().hasOverflowed)
+    #expect(ledger.record(repeated(extra)) == .dropUnheldRepeat)
+    #expect(ledger.record(up(extra)) == .injectUnheldRelease)
   }
 
   @Test func buttonsOverTheBoundAreInjectedCountedAndFlagged() {
@@ -247,6 +254,11 @@ struct InputStateLedgerTests {
     #expect(ledger.heldButtons == [.left, .right])
     #expect(ledger.snapshot().overflowedButtonCount == 1)
     #expect(ledger.snapshot().hasOverflowed)
+    // The overflowed button stays paired.
+    #expect(ledger.record(press(.middle)) == .dropDuplicateDown)
+    #expect(ledger.record(release(.middle)) == .inject)
+    #expect(!ledger.snapshot().hasOverflowed)
+    #expect(ledger.record(release(.middle)) == .injectUnheldRelease)
     // A freed slot is usable again.
     _ = ledger.record(release(.left))
     #expect(ledger.record(press(.middle)) == .inject)
@@ -259,7 +271,31 @@ struct InputStateLedgerTests {
     #expect(ledger.record(down(.letter(1))) == .inject)
     #expect(ledger.heldKeys.map(\.key) == [.letter(0)])
     #expect(ledger.snapshot().overflowedKeyCount == 1)
-    #expect(ledger.record(repeated(.letter(1))) == .dropUnheldRepeat)
+    #expect(ledger.record(repeated(.letter(1))) == .inject)
+    // The overflow set has the same bound; past it a press is injected, untracked and sticky.
+    #expect(ledger.record(down(.letter(2))) == .inject)
+    #expect(ledger.snapshot().untrackedKeyCount == 1)
+    #expect(ledger.record(repeated(.letter(2))) == .dropUnheldRepeat)
+    #expect(ledger.record(up(.letter(1))) == .inject)
+    #expect(ledger.record(up(.letter(2))) == .injectUnheldRelease)
+    #expect(ledger.snapshot().overflowedKeyCount == 0)
+    #expect(ledger.snapshot().untrackedKeyCount == 1)
+    #expect(ledger.snapshot().hasOverflowed)
+  }
+
+  @Test func untrackedButtonsAreCountedAndSticky() {
+    var ledger = InputStateLedger(maximumHeldKeys: 1, maximumHeldButtons: 1)
+    _ = ledger.record(press(.left))
+    _ = ledger.record(press(.right))
+    #expect(ledger.record(press(.middle)) == .inject)
+    #expect(ledger.snapshot().overflowedButtonCount == 1)
+    #expect(ledger.snapshot().untrackedButtonCount == 1)
+    #expect(ledger.record(release(.middle)) == .injectUnheldRelease)
+    _ = ledger.record(release(.right))
+    #expect(ledger.snapshot().overflowedButtonCount == 0)
+    #expect(ledger.snapshot().hasOverflowed)
+    ledger.reset()
+    #expect(!ledger.snapshot().hasOverflowed)
   }
 
   // MARK: - Snapshot and reset
@@ -284,7 +320,7 @@ struct InputStateLedgerTests {
     #expect(
       Set(labels) == [
         "heldKeyCount", "heldButtonCount", "overflowedKeyCount", "overflowedButtonCount",
-        "modifiers", "clipboardTransaction",
+        "untrackedKeyCount", "untrackedButtonCount", "modifiers", "clipboardTransaction",
       ])
   }
 
@@ -313,8 +349,20 @@ struct InputStateLedgerTests {
     #expect(ledger.record(down(.space)) == .inject)
     #expect(ledger.record(press(.left)) == .inject)
     #expect(ledger.heldKeys.isEmpty && ledger.heldButtons.isEmpty)
-    #expect(ledger.snapshot().overflowedKeyCount == 1)
-    #expect(ledger.snapshot().overflowedButtonCount == 1)
+    #expect(ledger.snapshot().untrackedKeyCount == 1)
+    #expect(ledger.snapshot().untrackedButtonCount == 1)
+  }
+
+  @Test func aNegativeBoundBehavesAsZero() {
+    var negative = InputStateLedger(maximumHeldKeys: -5, maximumHeldButtons: -1)
+    var zero = InputStateLedger(maximumHeldKeys: 0, maximumHeldButtons: 0)
+    let events: [KVMEvent] = [
+      down(.space), repeated(.space), press(.left), down(.space), up(.space), release(.left),
+    ]
+    for event in events { #expect(negative.record(event) == zero.record(event)) }
+    #expect(negative.snapshot() == zero.snapshot())
+    #expect(negative.snapshot().untrackedKeyCount == 2)
+    #expect(negative.snapshot().untrackedButtonCount == 1)
   }
 
   // MARK: - Property
@@ -328,45 +376,62 @@ struct InputStateLedgerTests {
     var ledger = InputStateLedger(maximumHeldKeys: 4, maximumHeldButtons: 2)
     var model: [VirtualKey] = []
     var modelButtons: [MouseButton] = []
+    var overflowKeys: [VirtualKey] = []
+    var overflowButtons: [MouseButton] = []
     for _ in 0..<2_000 {
       let roll = Int.random(in: 0..<10, using: &generator)
       if roll == 0 {
         ledger.reset()
         model = []
         modelButtons = []
+        overflowKeys = []
+        overflowButtons = []
         continue
       }
       if roll < 3 {
         let button = allButtons.randomElement(using: &generator)!
         let isDown = Bool.random(using: &generator)
-        let held = modelButtons.contains(button)
+        let held = modelButtons.contains(button) || overflowButtons.contains(button)
         let decision = ledger.record(isDown ? press(button) : release(button))
         if isDown {
           #expect(decision == (held ? .dropDuplicateDown : .inject))
-          if !held && modelButtons.count < 2 { modelButtons.append(button) }
+          if !held && modelButtons.count < 2 {
+            modelButtons.append(button)
+          } else if !held {
+            overflowButtons.append(button)
+          }
         } else {
           #expect(decision == (held ? .inject : .injectUnheldRelease))
           modelButtons.removeAll { $0 == button }
+          overflowButtons.removeAll { $0 == button }
         }
         #expect(ledger.heldButtons == modelButtons)
+        #expect(ledger.snapshot().overflowedButtonCount == overflowButtons.count)
         continue
       }
       let key = keys.randomElement(using: &generator)!
       let phase = [KeyPhase.down, .up, .repeatKey].randomElement(using: &generator)!
-      let held = model.contains(key)
+      let held = model.contains(key) || overflowKeys.contains(key)
       let decision = ledger.record(.key(key: key, phase: phase, modifiers: none))
       switch phase {
       case .down:
         #expect(decision == (held ? .dropDuplicateDown : .inject))
-        if !held && model.count < 4 { model.append(key) }
+        if !held && model.count < 4 {
+          model.append(key)
+        } else if !held {
+          overflowKeys.append(key)
+        }
       case .up:
         #expect(decision == (held ? .inject : .injectUnheldRelease))
         model.removeAll { $0 == key }
+        overflowKeys.removeAll { $0 == key }
       case .repeatKey:
         #expect(decision == (held ? .inject : .dropUnheldRepeat))
       }
       #expect(ledger.heldKeys.map(\.key) == model)
       #expect(ledger.snapshot().heldKeyCount == model.count)
+      #expect(ledger.snapshot().overflowedKeyCount == overflowKeys.count)
+      #expect(ledger.snapshot().hasOverflowed == !(overflowKeys.isEmpty && overflowButtons.isEmpty))
     }
   }
 }
