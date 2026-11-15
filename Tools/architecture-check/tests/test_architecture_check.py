@@ -440,6 +440,76 @@ class ArchitectureCheckTests(unittest.TestCase):
         "Crypto",
     )
 
+    def assert_single_violation(self, relative_path, module, rule):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_linux_repository(temporary_directory)
+            (root / relative_path).write_text(f"import {module}\n")
+            violations = architecture_check.scan_repository(root)
+        self.assertEqual(len(violations), 1, module)
+        self.assertEqual(violations[0].rule, rule)
+        self.assertEqual(violations[0].detail, module)
+
+    LINUX_MODULE_FAMILY = (
+        "NIOFoundationCompat",
+        "NIOConcurrencyHelpers",
+        "NIOEmbedded",
+        "NIOHTTP1",
+        "_CryptoExtras",
+        "CryptoExtras",
+        "SwiftASN1",
+        "Atomics",
+        "SystemPackage",
+        "X509",
+        "Musl",
+    )
+
+    def test_kvmcore_rejects_linux_module_families(self):
+        for module in self.LINUX_MODULE_FAMILY:
+            with self.subTest(module=module):
+                self.assert_single_violation(
+                    "Packages/KVMCore/Sources/KVMCore/Core.swift",
+                    module,
+                    "kvmcore-forbidden-import",
+                )
+
+    def test_contracts_reject_linux_module_families(self):
+        for module in self.LINUX_MODULE_FAMILY:
+            with self.subTest(module=module):
+                self.assert_single_violation(
+                    "Packages/KVMContracts/Sources/KVMContracts/Event.swift",
+                    module,
+                    "contracts-forbidden-import",
+                )
+
+    def test_protocol_modules_reject_nio_family(self):
+        for module in ("NIOEmbedded", "NIOFoundationCompat", "NIOConcurrencyHelpers"):
+            with self.subTest(module=module):
+                self.assert_single_violation(
+                    "Packages/BarrierCompatibility/Sources/BarrierCompatibility/Codec.swift",
+                    module,
+                    "protocol-concrete-network-import",
+                )
+
+    def test_protocol_modules_may_import_libc_like_darwin(self):
+        for module in ("Glibc", "Darwin", "Musl"):
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                (
+                    root
+                    / "Packages/BarrierCompatibility/Sources/BarrierCompatibility/Codec.swift"
+                ).write_text(f"import {module}\n")
+                violations = architecture_check.scan_repository(root)
+            self.assertEqual(violations, [])
+
+    def test_lookalike_names_are_not_prefix_matches(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_linux_repository(temporary_directory)
+            (root / "Packages/KVMCore/Sources/KVMCore/Core.swift").write_text(
+                "import Foundation\nimport KVMContracts\n"
+            )
+            violations = architecture_check.scan_repository(root)
+        self.assertEqual(violations, [])
+
     def make_linux_repository(self, temporary_directory):
         root = self.make_repository(temporary_directory)
         (root / "Packages/LinuxPlatform/Sources/LinuxPlatform").mkdir(parents=True)

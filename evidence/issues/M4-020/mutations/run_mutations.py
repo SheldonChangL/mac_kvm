@@ -87,17 +87,16 @@ MUTANTS = {
         },
         {
             "id": "M5",
-            "mutation": "the checker no longer forbids NIOCore in contracts",
-            "file": CHECKER,
-            "find": (
-                "FORBIDDEN_CONTRACT_IMPORTS = (\n    \"CX11\",\n    \"CXFixes\",\n"
-                "    \"CXRandR\",\n    \"CXTest\",\n    \"Crypto\",\n    \"Glibc\",\n"
-                "    \"NIO\",\n    \"NIOCore\",\n"
+            "mutation": (
+                "the checker no longer forbids NIOCore in contracts (name dropped and, since the"
+                " NIO prefix rule would still catch it, the contracts prefix rule dropped too)"
             ),
+            "file": CHECKER,
+            "find": "imported_module, FORBIDDEN_CONTRACT_IMPORTS, LINUX_CORE_FORBIDDEN_PREFIXES\n",
             "replace": (
-                "FORBIDDEN_CONTRACT_IMPORTS = (\n    \"CX11\",\n    \"CXFixes\",\n"
-                "    \"CXRandR\",\n    \"CXTest\",\n    \"Crypto\",\n    \"Glibc\",\n"
-                "    \"NIO\",\n"
+                "imported_module,\n"
+                "                    tuple(m for m in FORBIDDEN_CONTRACT_IMPORTS if m != \"NIOCore\"),\n"
+                "                    (),\n"
             ),
             "killers": ["test_contracts_reject_linux_platform_imports"],
         },
@@ -108,6 +107,40 @@ MUTANTS = {
             "find": "    \"XButtonEvent\",\n    \"XEvent\",\n",
             "replace": "    \"XButtonEvent\",\n",
             "killers": ["test_contracts_reject_x11_event_types"],
+        },
+        {
+            "id": "R1",
+            "mutation": "review: NIO*/Crypto*/_Crypto* families no longer forbidden by prefix in Core",
+            "file": CHECKER,
+            "find": 'LINUX_CORE_FORBIDDEN_PREFIXES = ("NIO", "Crypto", "_Crypto")\n',
+            "replace": "LINUX_CORE_FORBIDDEN_PREFIXES = ()\n",
+            "killers": [
+                "test_kvmcore_rejects_linux_module_families",
+                "test_contracts_reject_linux_module_families",
+            ],
+        },
+        {
+            "id": "R2",
+            "mutation": "review: NIO* family no longer concrete networking in protocol roots",
+            "file": CHECKER,
+            "find": 'CONCRETE_NETWORK_PREFIXES = ("NIO",)\n',
+            "replace": "CONCRETE_NETWORK_PREFIXES = ()\n",
+            "killers": ["test_protocol_modules_reject_nio_family"],
+        },
+        {
+            "id": "R3",
+            "mutation": "review: Musl no longer forbidden in KVMCore",
+            "file": CHECKER,
+            "find": (
+                "FORBIDDEN_KVMCORE_IMPORTS = (\n    \"CX11\",\n    \"CXFixes\",\n"
+                "    \"CXRandR\",\n    \"CXTest\",\n    \"Crypto\",\n    \"Glibc\",\n"
+                "    \"Musl\",\n"
+            ),
+            "replace": (
+                "FORBIDDEN_KVMCORE_IMPORTS = (\n    \"CX11\",\n    \"CXFixes\",\n"
+                "    \"CXRandR\",\n    \"CXTest\",\n    \"Crypto\",\n    \"Glibc\",\n"
+            ),
+            "killers": ["test_kvmcore_rejects_linux_module_families"],
         },
     ],
 }

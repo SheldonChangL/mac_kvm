@@ -93,6 +93,11 @@ declared in `LinuxSkeletonTests.swift`) and enabled with
 is on only when `MACKVM_X11_TESTS` is exactly `1`. A plain `swift test` is
 therefore headless; `verify-linux` sets the variable under `xvfb-run`.
 
+The one `.x11` test in M4-020 proves only that the gate works: under `xvfb-run`
+the environment has a `DISPLAY` and detection says `.x11`. It does not link or
+open X11, so it is not X11 evidence; the first X11 evidence comes from the
+backends (M4-024, M4-026, M4-027).
+
 ### Toolchain lock constants
 
 `LinuxPlatformSkeleton.toolchainLock` mirrors LOCK's language, build image,
@@ -125,7 +130,9 @@ the container it:
 6. `swift test` for the `KVMContracts` and `BarrierCompatibility` packages;
 7. `MACKVM_X11_TESTS=1 xvfb-run -a -s "-screen 0 1600x900x24 +extension RANDR"
    swift test --filter LinuxPlatformTests`, with the report in
-   `<id>-x11-xunit.xml`.
+   `<id>-x11-xunit.xml`; the run fails if that report holds fewer than
+   `LINUX_MIN_TESTS` test cases (15 today), so a renamed suite cannot pass with
+   zero tests.
 
 Any failure stops the run with a non-zero exit.
 
@@ -146,10 +153,12 @@ setting for the owner; until then a red Linux job blocks merges by policy.
 - treats `Packages/LinuxPlatform` as a platform root, so it may not import
   `BarrierCompatibility` or `NativeProtocol` and may not use Barrier wire
   tokens;
-- forbids `CX11`, `CXTest`, `CXRandR`, `CXFixes`, `Glibc`, `NIO`, `NIOCore`,
-  `NIOPosix`, `NIOSSL` and `Crypto` in `KVMCore` and `KVMContracts`;
+- forbids `CX11`, `CXTest`, `CXRandR`, `CXFixes`, `Glibc`, `Musl`, `SwiftASN1`,
+  `Atomics`, `SystemPackage`, `X509`, and every module whose name starts with
+  `NIO`, `Crypto` or `_Crypto`, in `KVMCore` and `KVMContracts`;
 - forbids the four X11 modules in the protocol packages as platform imports,
-  and the four NIO modules there as concrete networking;
+  and every `NIO*` module there as concrete networking (the C library modules
+  `Glibc` and `Musl` stay allowed there, like `Darwin`);
 - reports `XEvent`, `XKeyEvent` and `XButtonEvent` in `KVMContracts` as platform
   types (`XK_` constants were already caught).
 

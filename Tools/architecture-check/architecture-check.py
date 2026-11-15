@@ -28,6 +28,11 @@ FORBIDDEN_KVMCORE_IMPORTS = (
     "CXTest",
     "Crypto",
     "Glibc",
+    "Musl",
+    "SwiftASN1",
+    "Atomics",
+    "SystemPackage",
+    "X509",
     "NIO",
     "NIOCore",
     "NIOPosix",
@@ -50,6 +55,11 @@ FORBIDDEN_CONTRACT_IMPORTS = (
     "CXTest",
     "Crypto",
     "Glibc",
+    "Musl",
+    "SwiftASN1",
+    "Atomics",
+    "SystemPackage",
+    "X509",
     "NIO",
     "NIOCore",
     "NIOPosix",
@@ -91,6 +101,18 @@ PLATFORM_PROTOCOL_IMPORTS = (
     "BarrierCompatibility",
     "NativeProtocol",
 )
+# Module families forbidden by name prefix (swift-nio, swift-crypto ship many modules:
+# NIOFoundationCompat, NIOConcurrencyHelpers, NIOEmbedded, _CryptoExtras, ...).
+LINUX_CORE_FORBIDDEN_PREFIXES = ("NIO", "Crypto", "_Crypto")
+CONCRETE_NETWORK_PREFIXES = ("NIO",)
+
+
+def module_matches(module, names, prefixes=()):
+    if module is None:
+        return False
+    return module in names or any(module.startswith(prefix) for prefix in prefixes)
+
+
 CONTRACT_PLATFORM_TYPES = (
     "CGEvent",
     "CGKeyCode",
@@ -259,7 +281,9 @@ def scan_repository(repository_root: Path) -> List[Violation]:
             import_match = IMPORT_PATTERN.match(line)
             imported_module = import_match.group(1) if import_match else None
 
-            if path_is_kvmcore and imported_module in FORBIDDEN_KVMCORE_IMPORTS:
+            if path_is_kvmcore and module_matches(
+                imported_module, FORBIDDEN_KVMCORE_IMPORTS, LINUX_CORE_FORBIDDEN_PREFIXES
+            ):
                 violations.append(
                     Violation(
                         path=relative_path,
@@ -270,7 +294,9 @@ def scan_repository(repository_root: Path) -> List[Violation]:
                 )
 
             if path_is_contracts:
-                if imported_module in FORBIDDEN_CONTRACT_IMPORTS:
+                if module_matches(
+                    imported_module, FORBIDDEN_CONTRACT_IMPORTS, LINUX_CORE_FORBIDDEN_PREFIXES
+                ):
                     violations.append(
                         Violation(
                             path=relative_path,
@@ -309,7 +335,9 @@ def scan_repository(repository_root: Path) -> List[Violation]:
                             detail=imported_module,
                         )
                     )
-                elif imported_module in CONCRETE_NETWORK_IMPORTS:
+                elif module_matches(
+                    imported_module, CONCRETE_NETWORK_IMPORTS, CONCRETE_NETWORK_PREFIXES
+                ):
                     violations.append(
                         Violation(
                             path=relative_path,

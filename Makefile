@@ -32,6 +32,9 @@ e2e:
 # reports to artifacts/ci/linux/. Exit 64: bad ISSUE; exit 65: dependency graph drifted from the lock.
 LINUX_IMAGE := swift:6.2.3-jammy@sha256:33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6
 DOCKER ?= docker
+# A renamed suite must not let --filter LinuxPlatformTests pass with zero tests. Later Linux
+# issues raise this as they add tests.
+LINUX_MIN_TESTS := 15
 
 define VERIFY_LINUX_SCRIPT
 set -o pipefail
@@ -73,6 +76,9 @@ echo "== BarrierCompatibility package tests"
 swift test --package-path /work/Packages/BarrierCompatibility --scratch-path /scratch/barrier
 echo "== X11 tests under Xvfb"
 MACKVM_X11_TESTS=1 xvfb-run -a -s "-screen 0 1600x900x24 +extension RANDR" swift test --skip-build --scratch-path /scratch --filter LinuxPlatformTests --xunit-output /artifacts/ci/linux/$$ISSUE-x11-xunit.xml
+x11_cases=$$(grep -o '<testcase ' /artifacts/ci/linux/$$ISSUE-x11-xunit-swift-testing.xml | wc -l)
+echo "LinuxPlatformTests cases under Xvfb: $$x11_cases (minimum $(LINUX_MIN_TESTS))"
+test "$$x11_cases" -ge $(LINUX_MIN_TESTS)
 echo "verify-linux OK"
 endef
 export VERIFY_LINUX_SCRIPT
