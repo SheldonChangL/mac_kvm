@@ -427,6 +427,126 @@ class ArchitectureCheckTests(unittest.TestCase):
             ],
         )
 
+    LINUX_FORBIDDEN_CORE_IMPORTS = (
+        "CX11",
+        "CXTest",
+        "CXRandR",
+        "CXFixes",
+        "Glibc",
+        "NIO",
+        "NIOCore",
+        "NIOPosix",
+        "NIOSSL",
+        "Crypto",
+    )
+
+    def make_linux_repository(self, temporary_directory):
+        root = self.make_repository(temporary_directory)
+        (root / "Packages/LinuxPlatform/Sources/LinuxPlatform").mkdir(parents=True)
+        return root
+
+    def test_kvmcore_rejects_linux_platform_imports(self):
+        for module in self.LINUX_FORBIDDEN_CORE_IMPORTS:
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                source = root / "Packages/KVMCore/Sources/KVMCore/Core.swift"
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "kvmcore-forbidden-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_contracts_reject_linux_platform_imports(self):
+        for module in self.LINUX_FORBIDDEN_CORE_IMPORTS:
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-forbidden-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_protocol_modules_reject_x11_and_nio_imports(self):
+        cases = (
+            ("CX11", "protocol-platform-import"),
+            ("CXTest", "protocol-platform-import"),
+            ("CXRandR", "protocol-platform-import"),
+            ("CXFixes", "protocol-platform-import"),
+            ("NIO", "protocol-concrete-network-import"),
+            ("NIOCore", "protocol-concrete-network-import"),
+            ("NIOPosix", "protocol-concrete-network-import"),
+            ("NIOSSL", "protocol-concrete-network-import"),
+        )
+        for module, rule in cases:
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                source = (
+                    root
+                    / "Packages/BarrierCompatibility/Sources/BarrierCompatibility/Codec.swift"
+                )
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, rule)
+            self.assertEqual(violations[0].detail, module)
+
+    def test_contracts_reject_x11_event_types(self):
+        for symbol in ("XEvent", "XKeyEvent", "XButtonEvent"):
+            with self.subTest(symbol=symbol), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                source = root / "Packages/KVMContracts/Sources/KVMContracts/Event.swift"
+                source.write_text(f"struct Event {{ let raw: {symbol} }}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "contracts-platform-type")
+            self.assertEqual(violations[0].detail, symbol)
+
+    def test_linux_platform_cannot_import_protocol_implementations(self):
+        for module in ("BarrierCompatibility", "NativeProtocol"):
+            with self.subTest(module=module), tempfile.TemporaryDirectory() as temporary_directory:
+                root = self.make_linux_repository(temporary_directory)
+                source = root / "Packages/LinuxPlatform/Sources/LinuxPlatform/Injector.swift"
+                source.write_text(f"import {module}\n")
+
+                violations = architecture_check.scan_repository(root)
+
+            self.assertEqual(len(violations), 1)
+            self.assertEqual(violations[0].rule, "platform-protocol-import")
+            self.assertEqual(violations[0].detail, module)
+
+    def test_linux_platform_may_import_x11_nio_and_contracts(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_linux_repository(temporary_directory)
+            (root / "Packages/LinuxPlatform/Sources/LinuxPlatform/Injector.swift").write_text(
+                "import CX11\nimport CXTest\nimport Glibc\nimport KVMContracts\n"
+                "import NIOCore\nimport NIOSSL\nimport Crypto\n"
+                "let event = XEvent()\n"
+            )
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(violations, [])
+
+    def test_linux_platform_rejects_barrier_wire_identifiers(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.make_linux_repository(temporary_directory)
+            source = root / "Packages/LinuxPlatform/Sources/LinuxPlatform/Injector.swift"
+            source.write_text('let wireIdentifier = "DKDN"\n')
+
+            violations = architecture_check.scan_repository(root)
+
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0].rule, "barrier-token-outside-adapter")
+
     def test_make_and_ci_expose_the_canonical_architecture_check(self):
         makefile = (REPOSITORY_ROOT / "Makefile").read_text()
         ci_gate = (REPOSITORY_ROOT / "Tools/cigates/cigates.py").read_text()

@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020",
+  "baseCommit": "b80270e963e0685e7063d16ac28cee0861b5fbb1",
+  "date": "2026-11-15",
+  "toolchain": {
+    "swiftVersion": [
+      "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0",
+      "swift-driver version: 1.127.14.1"
+    ],
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6",
+    "macOS": "26.6.2",
+    "architecture": "arm64",
+    "linuxImage": "swift:6.2.3-jammy@sha256:33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6"
+  },
+  "note": "Run by the implementing agent on the staged M4-020 tree. Expected failure: red-mirror-swift-test (RED stub, 15 tests, 12 failed). LinuxPlatform builds only on Linux; local Swift runs use a macOS mirror package of LinuxSkeleton.swift and its tests (see run_mutations.py). Local make verify-linux under Docker linux/amd64 emulation hung or failed with swift-build JSON parse errors (Rosetta), so the Linux evidence is the CI verify-linux job. Architecture-checker RED: 34 tests, 5 failed before the checker change. Paths masked.",
+  "commands": [
+    {
+      "name": "red-mirror-swift-test",
+      "command": "cd \"$PRODUCER_SCRATCH/mirror-red\" && swift test 2>&1 | grep -E 'Test run|failed after|passed after'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-15T13:48:55Z",
+      "endedAt": "2026-11-15T13:48:58Z",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "\u25c7 Test run started.\n\u2714 Test \"detection is deterministic\" passed after 0.001 seconds.\n\u2718 Test \"XDG_SESSION_TYPE=x11 without DISPLAY is headless: there is nothing to connect to\" failed after 0.001 seconds with 1 issue.\n\u2714 Test \"the X11 gate sees a display when it is enabled\" passed after 0.001 seconds.\n\u2718 Test \"only x11 is supported by this toolchain lock\" failed after 0.001 seconds with 1 issue.\n\u2718 Test \"the lock targets X11 on x86_64 Ubuntu 22.04\" failed after 0.001 seconds with 4 issues.\n\u2714 Test \"the root manifest pins every LOCK dependency with exact:\" passed after 0.001 seconds.\n\u2718 Test \"WAYLAND_DISPLAY makes the session wayland, even with an XWayland DISPLAY\" failed after 0.001 seconds with 2 issues.\n\u2718 Test \"unknown session types fall back to the DISPLAY rule\" failed after 0.001 seconds with 1 issue.\n\u2714 Test \"an X11 session with DISPLAY set is x11\" passed after 0.001 seconds.\n\u2718 Test \"nothing set is headless\" failed after 0.001 seconds with 1 issue.\n\u2718 Test \"empty and blank values count as unset\" failed after 0.001 seconds with 2 issues.\n\u2718 Test \"unrelated variables do not change the answer\" failed after 0.001 seconds with 1 issue.\n\u2718 Test \"XDG_SESSION_TYPE=wayland makes the session wayland, whatever its case\" failed after 0.001 seconds with 3 issues.\n\u2718 Suite \"M4-020 Linux skeleton: display-server detection\" failed after 0.001 seconds with 12 issues.\n\u2718 Test \"X11 tests run only when MACKVM_X11_TESTS is exactly 1\" failed after 0.001 seconds with 8 issues.\n\u2718 Suite \"M4-020 Linux skeleton: headless test mode\" failed after 0.001 seconds with 8 issues.\n\u2718 Test \"the constants mirror the LOCK file exactly\" failed after 0.001 seconds with 7 issues.\n\u2718 Suite \"M4-020 Linux skeleton: toolchain lock\" failed after 0.001 seconds with 11 issues.\n\u2718 Test run with 15 tests in 3 suites failed after 0.001 seconds with 31 issues.",
+      "stderr": ""
+    },
+    {
+      "name": "green-mirror-swift-test",
+      "command": "cd \"$PRODUCER_SCRATCH/mirror\" && swift test --xunit-output \"$REPOSITORY/evidence/issues/M4-020/tests/swift-testing-xunit.xml\" 2>&1 | grep -E 'Test run|failed|skipped'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-15T13:48:58Z",
+      "endedAt": "2026-11-15T13:49:01Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "\u25c7 Test run started.\n\u279c Test \"the X11 gate sees a display when it is enabled\" skipped.\n\u2714 Test run with 15 tests in 3 suites passed after 0.001 seconds.",
+      "stderr": ""
+    },
+    {
+      "name": "architecture-check-tests",
+      "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py'",
+      "startedAt": "2026-11-15T13:49:01Z",
+      "endedAt": "2026-11-15T13:49:02Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "",
+      "stderr": "................architecture check cancelled\n...repository root does not exist: /private/var/folders/0j/7kzdh01x2tl0n7th1y46gq2w0000gp/T/tmpob8dzq16/missing\n...............\n----------------------------------------------------------------------\nRan 34 tests in 1.200s\n\nOK"
+    },
+    {
+      "name": "mutations-checker",
+      "command": "python3 -I evidence/issues/M4-020/mutations/run_mutations.py . --group checker",
+      "startedAt": "2026-11-15T13:49:02Z",
+      "endedAt": "2026-11-15T13:49:07Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "M4: killed=True restored=True failed=['test_kvmcore_rejects_linux_platform_imports']\nM5: killed=True restored=True failed=['test_contracts_reject_linux_platform_imports']\nM6: killed=True restored=True failed=['test_contracts_reject_x11_event_types']",
+      "stderr": ""
+    },
+    {
+      "name": "mutations-swift-mirror",
+      "command": "python3 -I \"$PRODUCER_SCRATCH/run_mutations.py\" \"$PRODUCER_SCRATCH/mirror\" --group swift --out \"$PRODUCER_SCRATCH/mutations-swift.json\"",
+      "startedAt": "2026-11-15T13:49:07Z",
+      "endedAt": "2026-11-15T13:49:11Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "M1: killed=True restored=True failed=['WAYLAND_DISPLAY makes the session wayland, even with an XWayland DISPLAY', 'XDG_SESSION_TYPE=wayland makes the session wayland, whatever its case']\nM2: killed=True restored=True failed=['XDG_SESSION_TYPE=x11 without DISPLAY is headless: there is nothing to connect to', 'empty and blank values count as unset', 'nothing set is headless', 'unknown session types fall back to the DISPLAY rule', 'unrelated variables do not change the answer']\nM3: killed=True restored=True failed=['the constants mirror the LOCK file exactly', 'the root manifest pins every LOCK dependency with exact:']",
+      "stderr": ""
+    },
+    {
+      "name": "swift-format-lint-files",
+      "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxSkeleton.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxSkeletonTests.swift Package.swift",
+      "startedAt": "2026-11-15T13:49:11Z",
+      "endedAt": "2026-11-15T13:49:12Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "swift-format-lint-repository",
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-15T13:49:12Z",
+      "endedAt": "2026-11-15T13:49:14Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "docs-check",
+      "command": "make docs-check",
+      "startedAt": "2026-11-15T13:49:14Z",
+      "endedAt": "2026-11-15T13:49:14Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK",
+      "stderr": ""
+    },
+    {
+      "name": "architecture-check",
+      "command": "make architecture-check",
+      "startedAt": "2026-11-15T13:49:14Z",
+      "endedAt": "2026-11-15T13:49:15Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK",
+      "stderr": ""
+    },
+    {
+      "name": "backlog-validate",
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-15T13:49:15Z",
+      "endedAt": "2026-11-15T13:49:15Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "stderr": ""
+    },
+    {
+      "name": "diff-cached-check",
+      "command": "git diff --cached --check",
+      "startedAt": "2026-11-15T13:49:15Z",
+      "endedAt": "2026-11-15T13:49:15Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "swift-test-root",
+      "command": "timeout 900 swift test 2>&1 | grep -E 'Test run|Executed|error:' | tail -5; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-15T13:49:15Z",
+      "endedAt": "2026-11-15T13:49:16Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u25c7 Test run started.\n\u2714 Test run with 222 tests in 22 suites passed after 0.126 seconds.",
+      "stderr": ""
+    },
+    {
+      "name": "make-verify",
+      "command": "make verify REPORT=\"$PRODUCER_SCRATCH/verify.json\" 2>&1 | grep -E '^\\[|CI report'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-15T13:49:16Z",
+      "endedAt": "2026-11-15T15:42:56Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "[PASSED] manifest-validation exit=0 durationMs=51\n[PASSED] docs-check exit=0 durationMs=139\n[PASSED] architecture-check exit=0 durationMs=501\n[PASSED] code-quality exit=0 durationMs=19761\n[PASSED] tool-test-discovery exit=0 durationMs=109\n[PASSED] evidence-test-discovery exit=0 durationMs=117\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=313\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4787\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=280\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=1172\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=404\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=397\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=79\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=277\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=178\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=56\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=65\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=48\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=1151\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=2096\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=17808\n[PASSED] repository-contract-tests exit=0 durationMs=108988\n[PASSED] swift-test-targets exit=0 durationMs=3986\n[PASSED] native-arm64-build exit=0 durationMs=1746\nCI report: <producer-scratch>/verify.json",
+      "stderr": ""
+    }
+  ]
+}

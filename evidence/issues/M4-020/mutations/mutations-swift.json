@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020",
+  "group": "swift",
+  "date": "2026-11-15T12:40:20Z",
+  "command": "swift test --filter LinuxPlatformTests",
+  "files": {
+    "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxSkeleton.swift": "3839c12fd6ced4d16dc31fa97c87f05d06961f2017a7d37e93b8c9464b13715a"
+  },
+  "mutants": [
+    {
+      "id": "M1",
+      "mutation": "detection ignores WAYLAND_DISPLAY and XDG_SESSION_TYPE=wayland",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxSkeleton.swift",
+      "killers": [
+        "WAYLAND_DISPLAY makes the session wayland, even with an XWayland DISPLAY",
+        "XDG_SESSION_TYPE=wayland makes the session wayland, whatever its case"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "WAYLAND_DISPLAY makes the session wayland, even with an XWayland DISPLAY",
+        "XDG_SESSION_TYPE=wayland makes the session wayland, whatever its case"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M2",
+      "mutation": "detection returns x11 when nothing is set",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxSkeleton.swift",
+      "killers": [
+        "nothing set is headless",
+        "empty and blank values count as unset",
+        "XDG_SESSION_TYPE=x11 without DISPLAY is headless: there is nothing to connect to",
+        "unrelated variables do not change the answer"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "XDG_SESSION_TYPE=x11 without DISPLAY is headless: there is nothing to connect to",
+        "empty and blank values count as unset",
+        "nothing set is headless",
+        "unknown session types fall back to the DISPLAY rule",
+        "unrelated variables do not change the answer"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M3",
+      "mutation": "a toolchain lock constant drifts from LOCK (swift-nio 2.104.0 -> 2.105.0)",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxSkeleton.swift",
+      "killers": [
+        "the constants mirror the LOCK file exactly",
+        "the root manifest pins every LOCK dependency with exact:"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "the constants mirror the LOCK file exactly",
+        "the root manifest pins every LOCK dependency with exact:"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    }
+  ],
+  "baseline": {
+    "exitCode": 0,
+    "built": true,
+    "failedTests": []
+  },
+  "allKilled": true
+}

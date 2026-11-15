@@ -18,10 +18,20 @@ IGNORED_GENERATED_DIRECTORY_NAMES = (".build",)
 KVMCORE_ROOT = "Packages/KVMCore"
 KVMCONTRACTS_ROOT = "Packages/KVMContracts"
 PROTOCOL_ROOTS = ("Packages/BarrierCompatibility", "Packages/NativeProtocol")
-PLATFORM_ROOTS = ("Packages/MacPlatform",)
+PLATFORM_ROOTS = ("Packages/MacPlatform", "Packages/LinuxPlatform")
 BARRIER_TOKEN_ALLOWED_ROOTS = ("Packages/BarrierCompatibility",)
 
 FORBIDDEN_KVMCORE_IMPORTS = (
+    "CX11",
+    "CXFixes",
+    "CXRandR",
+    "CXTest",
+    "Crypto",
+    "Glibc",
+    "NIO",
+    "NIOCore",
+    "NIOPosix",
+    "NIOSSL",
     "ApplicationServices",
     "AppKit",
     "BarrierCompatibility",
@@ -34,6 +44,16 @@ FORBIDDEN_KVMCORE_IMPORTS = (
     "WinSDK",
 )
 FORBIDDEN_CONTRACT_IMPORTS = (
+    "CX11",
+    "CXFixes",
+    "CXRandR",
+    "CXTest",
+    "Crypto",
+    "Glibc",
+    "NIO",
+    "NIOCore",
+    "NIOPosix",
+    "NIOSSL",
     "ApplicationServices",
     "AppKit",
     "BarrierCompatibility",
@@ -47,6 +67,10 @@ FORBIDDEN_CONTRACT_IMPORTS = (
     "WinSDK",
 )
 PROTOCOL_PLATFORM_IMPORTS = (
+    "CX11",
+    "CXFixes",
+    "CXRandR",
+    "CXTest",
     "ApplicationServices",
     "AppKit",
     "CoreGraphics",
@@ -58,6 +82,10 @@ CONCRETE_NETWORK_IMPORTS = (
     "CFNetwork",
     "Network",
     "NetworkExtension",
+    "NIO",
+    "NIOCore",
+    "NIOPosix",
+    "NIOSSL",
 )
 PLATFORM_PROTOCOL_IMPORTS = (
     "BarrierCompatibility",
@@ -69,6 +97,9 @@ CONTRACT_PLATFORM_TYPES = (
     "KEYBDINPUT",
     "KeySym",
     "NSEvent",
+    "XButtonEvent",
+    "XEvent",
+    "XKeyEvent",
     "input_event",
     "wl_keyboard",
     "xkb_keycode_t",

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020",
+  "group": "checker",
+  "date": "2026-11-15T13:49:02Z",
+  "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p test_*.py",
+  "files": {
+    "Tools/architecture-check/architecture-check.py": "a81236545f749567e3e5abede450c9ce95b3025ef5e9f167c491e6e3059b9681"
+  },
+  "mutants": [
+    {
+      "id": "M4",
+      "mutation": "the checker no longer forbids CX11 in KVMCore",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_kvmcore_rejects_linux_platform_imports"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_kvmcore_rejects_linux_platform_imports"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M5",
+      "mutation": "the checker no longer forbids NIOCore in contracts",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_contracts_reject_linux_platform_imports"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_contracts_reject_linux_platform_imports"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M6",
+      "mutation": "XEvent is not flagged as a contract platform type",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_contracts_reject_x11_event_types"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_contracts_reject_x11_event_types"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    }
+  ],
+  "baseline": {
+    "exitCode": 0,
+    "built": true,
+    "failedTests": []
+  },
+  "allKilled": true
+}
