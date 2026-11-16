@@ -3,6 +3,7 @@ import Foundation
 import Glibc
 import KVMContracts
 import LinuxPlatform
+import Synchronization
 import Testing
 
 // M4-026 tests. The pure suite runs everywhere. The X11 suite runs under Xvfb (`make
@@ -88,16 +89,6 @@ struct LinuxX11ClipboardPureTests {
   func readDeadline() {
     #expect(LinuxX11ClipboardRules.readTimeout == .seconds(2))
   }
-
-  @Test("a display that cannot be opened is subsystemUnavailable")
-  func noDisplay() {
-    do {
-      let clipboard = try LinuxX11Clipboard(displayName: "unix:/nonexistent-mackvm-display:99")
-      Issue.record("opened a display that does not exist: \(clipboard)")
-    } catch {
-      #expect(error.code == .lifecycle(.subsystemUnavailable))
-    }
-  }
 }
 
 // MARK: - X11 peer
@@ -128,6 +119,9 @@ private final class X11TestPeer: @unchecked Sendable {
   init() throws {
     _ = xlibThreadsInitialized
     guard let display = XOpenDisplay(nil) else {
+      Issue.record(
+        "XOpenDisplay failed: errno \(errno) DISPLAY \(ProcessInfo.processInfo.environment["DISPLAY"] ?? "-")"
+      )
       throw CocoaError(.featureUnsupported)
     }
     self.display = display
@@ -342,7 +336,8 @@ private final class X11TestPeer: @unchecked Sendable {
       })
     else { return }
     let bytes = lock.withLock { served }
-    let start = transfers[index].offset
+    // A transfer left open by an abandoned read can outlive the content it started with.
+    let start = min(transfers[index].offset, bytes.count)
     let end = min(start + 65_536, bytes.count)
     bytes.withUnsafeBufferPointer { buffer in
       _ = XChangeProperty(
@@ -362,9 +357,19 @@ private final class X11TestPeer: @unchecked Sendable {
 /// test opens a display (the peer uses its display from two threads).
 private let xlibThreadsInitialized: Bool = XInitThreads() != 0
 
+/// An X server resets when its last client disconnects, and a connection opened during the
+/// reset fails with ECONNRESET. Between two tests every connection can be closed, so the test
+/// process holds this one open for its whole life.
+nonisolated(unsafe) private let serverAnchor: OpaquePointer? = XOpenDisplay(nil)
+
 private func x11Enabled() -> Bool {
   _ = xlibThreadsInitialized
-  return LinuxPlatformSkeleton.x11TestsEnabled(environment: ProcessInfo.processInfo.environment)
+  let enabled = LinuxPlatformSkeleton.x11TestsEnabled(
+    environment: ProcessInfo.processInfo.environment)
+  if enabled {
+    _ = serverAnchor
+  }
+  return enabled
 }
 
 /// Waits until `condition` holds, polling the X server through `peer`, for at most 5 s.
@@ -382,6 +387,17 @@ private func eventually(_ peer: X11TestPeer, _ condition: () -> Bool) -> Bool {
   "M4-026 Linux X11 clipboard under Xvfb", .serialized, .tags(.x11),
   .enabled(if: x11Enabled(), "needs MACKVM_X11_TESTS=1 and an X server"))
 struct LinuxX11ClipboardX11Tests {
+  // Inside the serialized suite: it opens a display, and the X11 tests must not race it.
+  @Test("a display that cannot be opened is subsystemUnavailable")
+  func noDisplay() {
+    do {
+      let clipboard = try LinuxX11Clipboard(displayName: "unix:/nonexistent-mackvm-display:99")
+      Issue.record("opened a display that does not exist: \(clipboard)")
+    } catch {
+      #expect(error.code == .lifecycle(.subsystemUnavailable))
+    }
+  }
+
   @Test("a write is served to another application as UTF8_STRING and text/plain")
   func writeThenPeerReads() async throws {
     let peer = try X11TestPeer()
@@ -647,6 +663,24 @@ struct LinuxX11ClipboardX11Tests {
     #expect(write.failureCode == .lifecycle(.subsystemUnavailable))
   }
 
+  @Test("an X error on another display reaches the previous handler, and stop restores it")
+  func errorHandlerScope() async throws {
+    let peer = try X11TestPeer()
+    defer { peer.close() }
+    let original = XSetErrorHandler(recordingErrorHandler)
+    defer { XSetErrorHandler(original) }
+    let clipboard = try LinuxX11Clipboard(displayName: nil)
+    let before = recordedErrors.withLock { $0 }
+    XDestroyWindow(peer.display, 0x1F_FFFF)  // no such window: BadWindow on the peer's display
+    XSync(peer.display, 0)
+    #expect(recordedErrors.withLock { $0 } == before + 1)
+    await clipboard.stop()
+    let installed = XSetErrorHandler(recordingErrorHandler)
+    #expect(
+      installed.map { unsafeBitCast($0, to: UnsafeRawPointer.self) }
+        == unsafeBitCast(recordingErrorHandler as XErrorHandler, to: UnsafeRawPointer.self))
+  }
+
   @Test("stop while a read waits on a silent owner ends the read")
   func stopDuringRead() async throws {
     let peer = try X11TestPeer()
@@ -676,4 +710,14 @@ extension Result where Success == PlatformClipboardText?, Failure == CoreError {
     if case .success(nil) = self { return true }
     return false
   }
+}
+
+/// Errors seen by `recordingErrorHandler`, the handler installed before a clipboard is made.
+private let recordedErrors = Mutex(0)
+
+private func recordingErrorHandler(
+  _ display: OpaquePointer?, _ event: UnsafeMutablePointer<XErrorEvent>?
+) -> Int32 {
+  recordedErrors.withLock { $0 += 1 }
+  return 0
 }

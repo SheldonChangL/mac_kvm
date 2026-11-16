@@ -171,6 +171,26 @@ MUTANTS = [
         "replace": "let text = String(decoding: bytes, as: UTF8.self)",
         "killers": ["malformed UTF-8 fails with invalidUTF8 and is never repaired"],
     },
+    {
+        "id": "M16",
+        "rule": "X errors on other displays reach the previous handler",
+        "mutation": "the scoped handler swallows every error",
+        "find": "    guard !ours, let chained else { return 0 }",
+        "replace": "    guard false, let chained else { return 0 }",
+        "killers": [
+            "an X error on another display reaches the previous handler, and stop restores it",
+        ],
+    },
+    {
+        "id": "M17",
+        "rule": "the last clipboard to stop restores the previous error handler",
+        "mutation": "the previous handler is never restored",
+        "find": "      XSetErrorHandler(previous)\n",
+        "replace": "",
+        "killers": [
+            "an X error on another display reaches the previous handler, and stop restores it",
+        ],
+    },
 ]
 
 

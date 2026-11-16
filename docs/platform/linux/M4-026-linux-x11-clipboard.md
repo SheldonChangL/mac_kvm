@@ -42,8 +42,9 @@ package enum LinuxX11ClipboardRules   // pure rules, testable without a display
 
 `init` fails with `lifecycle.subsystemUnavailable` when the display cannot be
 opened and with `permission.capabilityUnavailable` when the server lacks XFixes.
-The composition root calls `XInitThreads()` once before any backend opens a
-display.
+**Requirement on the composition root (M4-020-FOLLOWUP-001):** call
+`XInitThreads()` once, before any `Display` is opened by any backend. This
+backend does not call it, and its Xlib use is only safe once it has been called.
 
 ## Threading
 
@@ -88,11 +89,18 @@ display.
 - Otherwise `XConvertSelection(CLIPBOARD, UTF8_STRING)` into a private property.
   Reads rotate through four properties, so an abandoned `INCR` transfer that the
   owner keeps writing, or a late answer to a timed-out read, never lands in the
-  next read's property.
+  next read's property. The protection is bounded: a fifth read reuses the first
+  property, so an owner that is still writing late chunks of a transfer abandoned
+  four reads earlier can still reach it. Such an owner has already been ignored
+  for four reads; the chunk then fails the read's checks (unexpected `INCR` phase,
+  limit or UTF-8) or, at worst, completes that read with wrong content.
 - `property = None` in the answer → `nil` (the owner has no UTF-8 text).
 - A plain answer: its size is read first with a zero-length
   `XGetWindowProperty`; over the limit → `clipboard.oversized` before the
   content is fetched. A format other than 8 → `clipboard.unsupportedType`.
+  Only the format is checked, not the type: an owner that answers the
+  `UTF8_STRING` request with a `STRING` (Latin-1) property whose bytes include a
+  value above 0x7F fails closed with `clipboard.invalidUTF8`; pure ASCII passes.
 - An `INCR` answer: the stated size over the limit → `clipboard.oversized`, and
   no chunk is requested (the property is not deleted). Otherwise every chunk's
   size is checked before it is fetched, so the bytes held never pass the limit,
@@ -159,6 +167,8 @@ independent owner and requestor:
 - no owner → `nil`; owner that exits → `nil`; ownership lost to the peer;
 - silent owner → `timeout.read` between 2 s and 4 s;
 - `ownerChanges` fires for the peer and stays quiet for our own writes;
+- an X error on the peer's display reaches the previously installed handler,
+  and `stop()` restores that handler;
 - cancelled task; `stop()` idempotent and refusing later calls; `stop()` ending
   a read in progress.
 
@@ -167,9 +177,13 @@ independent owner and requestor:
 - `PRIMARY` is not synchronized; only `CLIPBOARD`, only UTF-8 text.
 - `MULTIPLE` requests are refused.
 - `CurrentTime` is used for ownership and conversion requests.
-- Xlib's error handler is process-wide; this backend installs one that ignores
-  protocol errors (Xlib's default exits the process), so a requestor window that
-  disappears mid-transfer cannot kill the client.
+- Xlib's error handler is process-wide. The first clipboard keeps the handler
+  installed before it and installs a scoped one: errors on a clipboard's own
+  display are ignored (Xlib's default would exit the process when a requestor
+  window disappears mid-transfer); errors on every other display go to the
+  previous handler. The last clipboard to stop restores the previous handler. A
+  handler someone else installs while a clipboard is open is replaced by that
+  restore, so the composition root installs its handlers first.
 - A lost X connection is detected by a hang-up on the socket; Xlib's own
   I/O-error handler still exits the process if an Xlib call hits the dead
   connection first. The composition root owns display-loss policy.

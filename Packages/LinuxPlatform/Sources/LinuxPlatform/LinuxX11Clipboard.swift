@@ -106,20 +106,60 @@ private enum X {
   static let xfixesSelectionNotify: Int32 = 0
 }
 
-/// Xlib's default error handler exits the process. A requestor window can disappear while it
-/// is being served, so errors are ignored instead; every call that matters is checked by its
-/// result. The handler is process-wide.
-private func ignoreXErrors(_ display: OpaquePointer?, _ event: UnsafeMutablePointer<XErrorEvent>?)
+/// Scopes Xlib's process-wide error handler to the clipboards' own displays.
+///
+/// Xlib's default error handler exits the process, and a requestor window can disappear while
+/// it is being served, so errors on a clipboard's display are ignored; every call that matters
+/// is checked by its result. Errors on any other display are passed to the handler that was
+/// installed before the first clipboard registered, so other Xlib users (the screen backend,
+/// the injector) keep their own error handling. When the last clipboard unregisters, that
+/// previous handler is put back. A handler installed by someone else while a clipboard is
+/// registered is replaced by that restore; the composition root installs its handlers first.
+enum ClipboardXErrorScope {
+  private static let lock = NSLock()
+  nonisolated(unsafe) private static var displays: Set<UInt> = []
+  nonisolated(unsafe) private static var previous: XErrorHandler?
+
+  static func register(_ display: OpaquePointer) {
+    lock.withLock {
+      if displays.isEmpty {
+        previous = XSetErrorHandler(scopedHandler)
+      }
+      displays.insert(UInt(bitPattern: display))
+    }
+  }
+
+  static func unregister(_ display: OpaquePointer) {
+    lock.withLock {
+      guard displays.remove(UInt(bitPattern: display)) != nil, displays.isEmpty else { return }
+      XSetErrorHandler(previous)
+      previous = nil
+    }
+  }
+
+  fileprivate static func handle(
+    _ display: OpaquePointer?, _ event: UnsafeMutablePointer<XErrorEvent>?
+  ) -> Int32 {
+    let (ours, chained) = lock.withLock { () -> (Bool, XErrorHandler?) in
+      (display.map { displays.contains(UInt(bitPattern: $0)) } ?? false, previous)
+    }
+    guard !ours, let chained else { return 0 }
+    return chained(display, event)
+  }
+}
+
+private func scopedHandler(_ display: OpaquePointer?, _ event: UnsafeMutablePointer<XErrorEvent>?)
   -> Int32
 {
-  0
+  ClipboardXErrorScope.handle(display, event)
 }
 
 // MARK: - Backend
 
 /// The X11 `CLIPBOARD` as a `ClipboardBackend`.
 ///
-/// The composition root calls `XInitThreads()` once before any backend opens a display. The
+/// Requirement on the composition root (M4-020-FOLLOWUP-001): call `XInitThreads()` once,
+/// before any `Display` is opened by any backend. This backend does not call it. The
 /// owner calls `stop()` when done; dropping the last reference also stops the private thread,
 /// without waiting for it.
 package final class LinuxX11Clipboard: ClipboardBackend, @unchecked Sendable {
@@ -281,13 +321,14 @@ private final class ClipboardEngine: @unchecked Sendable {
     }
     _ = fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL) | O_NONBLOCK)
     _ = fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) | O_NONBLOCK)
-    XSetErrorHandler(ignoreXErrors)
+    ClipboardXErrorScope.register(display)
     let root = XDefaultRootWindow(display)
     let window = XCreateSimpleWindow(display, root, 0, 0, 1, 1, 0, 0, 0)
     guard window != X.none else {
       close(fds[0])
       close(fds[1])
       XCloseDisplay(display)
+      ClipboardXErrorScope.unregister(display)
       throw clipboardError(.lifecycle(.subsystemUnavailable))
     }
     XSelectInput(display, window, X.propertyChangeMask)
@@ -433,6 +474,7 @@ private final class ClipboardEngine: @unchecked Sendable {
       XSync(display, 0)
     }
     XCloseDisplay(display)
+    ClipboardXErrorScope.unregister(display)
     ownerChanges.finish()
     let (late, waiters) = lock.withLock { () -> ([Command], [@Sendable () -> Void]) in
       stopRequested = true
