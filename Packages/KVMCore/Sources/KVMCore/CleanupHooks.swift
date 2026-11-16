@@ -125,9 +125,7 @@ package final class CleanupHooks: @unchecked Sendable {
     return await withCheckedContinuation {
       (continuation: CheckedContinuation<CleanupDisposition, Never>) in
       let thread = Thread {
-        // Named from inside as well: Linux Foundation may not apply a name set before
-        // start() to the running pthread.
-        Thread.current.name = Self.threadName
+        Self.nameCurrentThread()
         let disposition = recoveryLock.withLock { () -> CleanupDisposition in
           let result = failSafe.recover(plan: plan())
           clearLedger()
@@ -138,6 +136,24 @@ package final class CleanupHooks: @unchecked Sendable {
       thread.name = Self.threadName
       thread.start()
     }
+  }
+
+  /// Names the calling thread synchronously. On Linux, Foundation ignores a name set before
+  /// start(), and `Thread.current.name = ...` inside the body only reaches the pthread once the
+  /// starting thread has stored the new thread's handle, which races the body; the kernel name
+  /// then stays the process name. pthread_setname_np on pthread_self() has no such race.
+  private static func nameCurrentThread() {
+    #if os(Linux)
+      // Glibc's module map hides pthread_setname_np (it needs _GNU_SOURCE), so resolve it.
+      typealias SetName = @convention(c) (pthread_t, UnsafePointer<CChar>) -> Int32
+      if let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: 0), "pthread_setname_np") {
+        _ = unsafeBitCast(symbol, to: SetName.self)(pthread_self(), threadName)
+      } else {
+        Thread.current.name = threadName
+      }
+    #else
+      Thread.current.name = threadName
+    #endif
   }
 
   /// Returns `true` when the disconnect timed out.
