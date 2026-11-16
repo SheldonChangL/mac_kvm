@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-026",
+  "baseCommit": "a0b40d382a9566d7237d63382ea79b71f61fd0b0",
+  "date": "2026-11-16",
+  "toolchain": {
+    "swiftVersion": [
+      "swift-driver version: 1.127.14.1 Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0"
+    ],
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6",
+    "macOS": "26.6.2",
+    "architecture": "arm64",
+    "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native; amd64 emulation hangs locally)"
+  },
+  "note": "Run by the implementing agent. Expected failure: red-linux-x11-tests-stub (23 tests, all failing on the RED stub). Updated after the Tier H review fix (scoped X error handler): LinuxPlatformTests has 40 tests in 5 suites, of which 24 are the clipboard tests in 2 suites; 0 failures in 60 repeated Linux runs. Local Linux runs use a native arm64 swift:6.2.3-jammy container with Xvfb; the pinned amd64 make verify-linux evidence is the CI verify-linux job. Paths masked.",
+  "commands": [
+    {
+      "name": "red-linux-x11-tests-stub",
+      "command": "RED stub: swift test --filter LinuxX11Clipboard under Xvfb (arm64 container)",
+      "startedAt": "2026-11-16T09:00:00Z",
+      "endedAt": "2026-11-16T09:00:01Z",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✘ Test run with 23 tests in 2 suites failed after 0.147 seconds with 29 issues. (recorded from the session log; the raw file was lost with a session restart)",
+      "stderr": ""
+    },
+    {
+      "name": "linux-arm64-container-x11-tests",
+      "command": "docker exec m4026 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch -Xswiftc -warnings-as-errors 2>&1 | tail -1 && MACKVM_X11_TESTS=1 xvfb-run -a -s \"-screen 0 1600x900x24 +extension RANDR\" swift test --skip-build --scratch-path /scratch --filter LinuxPlatformTests --xunit-output /src/evidence/issues/M4-026/tests/swift-testing-xunit.xml 2>&1 | grep -E \"Test run with|✘\"; exit ${PIPESTATUS[0]}'",
+      "startedAt": "2026-11-16T13:36:43Z",
+      "endedAt": "2026-11-16T13:37:02Z",
+      "exitCode": 0,
+      "stdout": "Build complete! (13.30s)\n✔ Test run with 40 tests in 5 suites passed after 2.498 seconds.\n",
+      "stderr": ""
+    },
+    {
+      "name": "swift-test",
+      "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:37:02Z",
+      "endedAt": "2026-11-16T13:37:04Z",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds\n✔ Test run with 285 tests in 27 suites passed after 0.137 seconds.\n",
+      "stderr": ""
+    },
+    {
+      "name": "swift-test-warnings-as-errors",
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:37:04Z",
+      "endedAt": "2026-11-16T13:37:17Z",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n✔ Test run with 285 tests in 27 suites passed after 0.137 seconds.\n",
+      "stderr": ""
+    },
+    {
+      "name": "swift-format-lint-files",
+      "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxX11ClipboardTests.swift",
+      "startedAt": "2026-11-16T13:37:17Z",
+      "endedAt": "2026-11-16T13:37:17Z",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "swift-format-lint-repo",
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-16T13:37:17Z",
+      "endedAt": "2026-11-16T13:37:20Z",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "docs-check",
+      "command": "make docs-check",
+      "startedAt": "2026-11-16T13:37:20Z",
+      "endedAt": "2026-11-16T13:37:20Z",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "architecture-check",
+      "command": "make architecture-check",
+      "startedAt": "2026-11-16T13:37:20Z",
+      "endedAt": "2026-11-16T13:37:21Z",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "validate-package",
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-16T13:37:21Z",
+      "endedAt": "2026-11-16T13:37:21Z",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
+      "stderr": ""
+    },
+    {
+      "name": "make-verify",
+      "command": "mkdir -p <producer-scratch>/m4-026 && make verify REPORT=<producer-scratch>/m4-026/verify.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:37:21Z",
+      "endedAt": "2026-11-16T13:39:29Z",
+      "exitCode": 0,
+      "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=101090\n[PASSED] swift-test-targets exit=0 durationMs=1250\n[PASSED] native-arm64-build exit=0 durationMs=1301\nCI report: <producer-scratch>/m4-026/verify.json\n",
+      "stderr": ""
+    }
+  ]
+}
