@@ -146,6 +146,66 @@
       "expectedFailure": false,
       "stdout": "[PASSED] manifest-validation exit=0 durationMs=51\n[PASSED] docs-check exit=0 durationMs=139\n[PASSED] architecture-check exit=0 durationMs=501\n[PASSED] code-quality exit=0 durationMs=19761\n[PASSED] tool-test-discovery exit=0 durationMs=109\n[PASSED] evidence-test-discovery exit=0 durationMs=117\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=313\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4787\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=280\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=1172\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=404\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=397\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=79\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=277\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=178\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=56\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=65\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=48\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=1151\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=2096\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=17808\n[PASSED] repository-contract-tests exit=0 durationMs=108988\n[PASSED] swift-test-targets exit=0 durationMs=3986\n[PASSED] native-arm64-build exit=0 durationMs=1746\nCI report: <producer-scratch>/verify.json",
       "stderr": ""
+    },
+    {
+      "name": "review-red-checker-tests-old-checker",
+      "command": "C=Tools/architecture-check/architecture-check.py; cp $C \"$PRODUCER_SCRATCH/checker.keep\" && git show 7b23d03:$C > $C; python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' 2>&1 | grep -E '^Ran|^FAILED|^OK'; rc=${PIPESTATUS[0]}; cp \"$PRODUCER_SCRATCH/checker.keep\" $C; git diff --quiet HEAD -- $C || exit 99; exit $rc",
+      "startedAt": "2026-11-16T07:10:16Z",
+      "endedAt": "2026-11-16T07:10:20Z",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "Ran 39 tests in 3.643s\nFAILED (failures=25)",
+      "stderr": ""
+    },
+    {
+      "name": "review-checker-tests",
+      "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p 'test_*.py' 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T07:10:20Z",
+      "endedAt": "2026-11-16T07:10:23Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "Ran 39 tests in 2.160s\n\nOK",
+      "stderr": ""
+    },
+    {
+      "name": "review-architecture-check",
+      "command": "make architecture-check",
+      "startedAt": "2026-11-16T07:10:23Z",
+      "endedAt": "2026-11-16T07:10:25Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK",
+      "stderr": ""
+    },
+    {
+      "name": "review-docs-check",
+      "command": "make docs-check",
+      "startedAt": "2026-11-16T07:10:25Z",
+      "endedAt": "2026-11-16T07:10:25Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK",
+      "stderr": ""
+    },
+    {
+      "name": "review-make-verify",
+      "command": "make verify REPORT=\"$PRODUCER_SCRATCH/verify3.json\" > \"$PRODUCER_SCRATCH/verify3.log\" 2>&1; rc=$?; grep -c '^\\[PASSED\\]' \"$PRODUCER_SCRATCH/verify3.log\"; grep '^\\[' \"$PRODUCER_SCRATCH/verify3.log\" | grep -v '^\\[PASSED\\]'; echo \"make verify exit code: $rc\"; exit $rc",
+      "startedAt": "2026-11-16T07:10:25Z",
+      "endedAt": "2026-11-16T07:12:38Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "24\nmake verify exit code: 0",
+      "stderr": ""
+    },
+    {
+      "name": "review-ci-run-43790182654",
+      "command": "gh run view 43790182654 --json jobs --jq '.jobs[] | \"\\(.name) \\(.conclusion) \\(.databaseId)\"'",
+      "startedAt": "2026-11-16T07:12:38Z",
+      "endedAt": "2026-11-16T07:12:39Z",
+      "exitCode": 0,
+      "expectedFailure": false,
+      "stdout": "verify-linux success 133046596884\nbuild-test-manifest success 133046597490",
+      "stderr": ""
     }
   ]
 }
