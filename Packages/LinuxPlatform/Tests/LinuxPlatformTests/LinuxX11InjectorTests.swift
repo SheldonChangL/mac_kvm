@@ -470,18 +470,6 @@ struct LinuxX11InjectorPortTests {
     try injector.releaseRemaining()
   }
 
-  @Test("no display is lifecycle.subsystemUnavailable")
-  func noDisplay() {
-    #expect(xlibThreadsEnabled)
-    #expect(throws: CoreError.self) {
-      _ = try LinuxX11Injector(displayName: ":4097", screen: screen1600x900)
-    }
-    do {
-      _ = try LinuxX11Injector(displayName: ":4097", screen: screen1600x900)
-    } catch {
-      #expect(error.code == .lifecycle(.subsystemUnavailable))
-    }
-  }
 }
 
 // MARK: - Drain worker
@@ -730,8 +718,24 @@ private func keyEvents(_ events: [(type: Int32, detail: UInt32)]) -> [String] {
   }
 }
 
-@Suite("M4-024 injector against Xvfb", .serialized, .tags(.x11), .enabled(if: x11Enabled))
+// Serialized, and the only suite that calls Xlib, so no two Xlib connections are opened or used
+// at the same time by the test process. Each test is bounded, so a hang names its test.
+@Suite(
+  "M4-024 injector against Xvfb", .serialized, .tags(.x11), .enabled(if: x11Enabled),
+  .timeLimit(.minutes(1)))
 struct LinuxX11InjectorXvfbTests {
+  @Test("no display is lifecycle.subsystemUnavailable")
+  func noDisplay() {
+    #expect(xlibThreadsEnabled)
+    #expect(throws: CoreError.self) {
+      _ = try LinuxX11Injector(displayName: ":4097", screen: screen1600x900)
+    }
+    do {
+      _ = try LinuxX11Injector(displayName: ":4097", screen: screen1600x900)
+    } catch {
+      #expect(error.code == .lifecycle(.subsystemUnavailable))
+    }
+  }
   @Test("keys arrive with the Xvfb default keymap's key codes (the M2-035 oracle)")
   func keycodes() throws {
     let observer = try X11Observer()
@@ -812,7 +816,12 @@ struct LinuxX11InjectorXvfbTests {
 
   @Test("an X server without XTest is permission.capabilityUnavailable")
   func missingXTest() throws {
-    let number = 151
+    // A display number nobody holds: no lock file and no socket.
+    let free = (150..<250).first {
+      !FileManager.default.fileExists(atPath: "/tmp/.X\($0)-lock")
+        && !FileManager.default.fileExists(atPath: "/tmp/.X11-unix/X\($0)")
+    }
+    let number = try #require(free)
     let xvfb = Process()
     xvfb.executableURL = URL(fileURLWithPath: "/usr/bin/Xvfb")
     xvfb.arguments = [":\(number)", "-extension", "XTEST", "-nolisten", "tcp"]
@@ -821,8 +830,11 @@ struct LinuxX11InjectorXvfbTests {
     #expect(xlibThreadsEnabled)
     try xvfb.run()
     defer {
+      // Bounded: `waitUntilExit()` can block forever on Linux Foundation.
       xvfb.terminate()
-      xvfb.waitUntilExit()
+      let stopBy = Date().addingTimeInterval(5)
+      while xvfb.isRunning, Date() < stopBy { usleep(20_000) }
+      if xvfb.isRunning { kill(xvfb.processIdentifier, SIGKILL) }
     }
     let socket = "/tmp/.X11-unix/X\(number)"
     let deadline = Date().addingTimeInterval(10)
