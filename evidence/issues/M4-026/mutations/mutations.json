@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-026",
+  "date": "2026-11-16",
+  "baseline": {
+    "exitCode": 0,
+    "passed": true,
+    "failedTests": [],
+    "tail": ""
+  },
+  "mutants": [
+    {
+      "id": "M1",
+      "rule": "STRING is served only for Latin-1 text",
+      "mutation": "TARGETS always lists STRING",
+      "killers": [
+        "TARGETS lists STRING only when the text is Latin-1, and STRING carries Latin-1"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "TARGETS lists STRING only when the text is Latin-1, and STRING carries Latin-1"
+      ]
+    },
+    {
+      "id": "M2",
+      "rule": "Latin-1 check",
+      "mutation": "scalars up to U+FFFF count as Latin-1",
+      "killers": [
+        "Latin-1 conversion accepts U+0000 to U+00FF and refuses anything above"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "Latin-1 conversion accepts U+0000 to U+00FF and refuses anything above"
+      ]
+    },
+    {
+      "id": "M3",
+      "rule": "INCR stated size over the limit is refused before any chunk",
+      "mutation": "the stated INCR size is not checked",
+      "killers": [
+        "a read over the limit is refused before the content is transferred"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a read over the limit is refused before the content is transferred"
+      ]
+    },
+    {
+      "id": "M4",
+      "rule": "INCR reassembly is bounded by the limit",
+      "mutation": "received chunks are not checked against the limit",
+      "killers": [
+        "a read over the limit is refused before the content is transferred"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a read over the limit is refused before the content is transferred"
+      ]
+    },
+    {
+      "id": "M5",
+      "rule": "a whole property over the limit is refused before it is fetched",
+      "mutation": "the property size is not checked",
+      "killers": [
+        "a read over the limit is refused before the content is transferred"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a read over the limit is refused before the content is transferred"
+      ]
+    },
+    {
+      "id": "M6",
+      "rule": "ownerChanges never fires for our own window (loop prevention)",
+      "mutation": "the own-window filter is dropped",
+      "killers": [
+        "ownerChanges stays quiet for our own writes"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "ownerChanges stays quiet for our own writes"
+      ]
+    },
+    {
+      "id": "M7",
+      "rule": "ownerChanges fires for another application's copy",
+      "mutation": "ownerChanges never yields",
+      "killers": [
+        "ownerChanges fires for another application's copy"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 124,
+      "built": true,
+      "killed": true,
+      "timedOut": true,
+      "restoredCleanly": true,
+      "failedKillers": []
+    },
+    {
+      "id": "M8",
+      "rule": "2 s read deadline",
+      "mutation": "the read deadline is 5 s",
+      "killers": [
+        "the read deadline is 2 seconds",
+        "an owner that never answers times out within the deadline"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "an owner that never answers times out within the deadline",
+        "the read deadline is 2 seconds"
+      ]
+    },
+    {
+      "id": "M9",
+      "rule": "a write over the limit is refused and changes nothing",
+      "mutation": "the write size check is dropped",
+      "killers": [
+        "a write over the limit is refused and leaves the clipboard as it was"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 5,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a write over the limit is refused and leaves the clipboard as it was"
+      ]
+    },
+    {
+      "id": "M10",
+      "rule": "a call from a cancelled task fails with cancellation.requested",
+      "mutation": "writePlainText ignores cancellation",
+      "killers": [
+        "a call from a cancelled task fails with cancellation and changes nothing"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a call from a cancelled task fails with cancellation and changes nothing"
+      ]
+    },
+    {
+      "id": "M11",
+      "rule": "stop ends a read in progress (cleanup)",
+      "mutation": "shutdown does not answer the read in progress",
+      "killers": [
+        "stop while a read waits on a silent owner ends the read"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 124,
+      "built": true,
+      "killed": true,
+      "timedOut": true,
+      "restoredCleanly": true,
+      "failedKillers": []
+    },
+    {
+      "id": "M12",
+      "rule": "contentHash is lowercase SHA-256 hex",
+      "mutation": "hex digits are not zero-padded",
+      "killers": [
+        "the content hash is the lowercase SHA-256 hex of the UTF-8 bytes, and stable"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "the content hash is the lowercase SHA-256 hex of the UTF-8 bytes, and stable"
+      ]
+    },
+    {
+      "id": "M13",
+      "rule": "content above a quarter of the maximum request goes out with INCR",
+      "mutation": "INCR is never used",
+      "killers": [
+        "content larger than a quarter of the maximum request is sent with INCR",
+        "1 MiB goes out through INCR"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "1 MiB goes out through INCR",
+        "content larger than a quarter of the maximum request is sent with INCR"
+      ]
+    },
+    {
+      "id": "M14",
+      "rule": "an abandoned transfer never lands in the next read",
+      "mutation": "every read uses the same property",
+      "killers": [
+        "an abandoned INCR transfer does not leak into the next read"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "an abandoned INCR transfer does not leak into the next read"
+      ]
+    },
+    {
+      "id": "M15",
+      "rule": "malformed UTF-8 fails with invalidUTF8 and is never repaired",
+      "mutation": "bytes are decoded with replacement characters",
+      "killers": [
+        "malformed UTF-8 fails with invalidUTF8 and is never repaired"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Clipboard.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "malformed UTF-8 fails with invalidUTF8 and is never repaired"
+      ]
+    }
+  ],
+  "allKilled": true
+}

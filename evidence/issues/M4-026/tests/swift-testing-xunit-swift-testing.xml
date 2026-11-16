@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="39" failures="0" skipped="0" time="2.785069585">
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="readOverLimit()" time="0.039894292" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="peerWritesThenRead()" time="0.040233583" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="stopIdempotent()" time="0.016266459" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerChangesNotForSelf()" time="0.017524583" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="invalidUTF8()" time="0.041608125" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="oneMiBIn()" time="0.240896375" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="targetsAndString()" time="0.02442925" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="writeOverLimit()" time="0.016604959" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="abandonedTransfer()" time="0.041865166" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="noOwner()" time="0.016033125" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownershipLostToPeer()" time="0.048873833" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerChangesForPeer()" time="0.052311916" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="oneMiBOut()" time="0.053833625" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="stopDuringRead()" time="0.037595333" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerTimeout()" time="2.032448959" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="cancelled()" time="0.017736125" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="writeThenPeerReads()" time="0.004106667" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerLoss()" time="0.038743375" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unrelatedVariables()" time="0.000696292" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11TypeWithoutDisplay()" time="0.000728083" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandDisplay()" time="0.000775792" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="deterministic()" time="0.000916083" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="nothingSet()" time="0.000740625" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="supportedServers()" time="0.000771667" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11Session()" time="0.001322292" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="blankValues()" time="0.000712708" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandSessionType()" time="0.000824375" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unknownSessionType()" time="0.000758833" />
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11TestsFlag()" time="0.000788083" />
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11GateSeesDisplay()" time="0.000542042" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="incrThreshold()" time="0.000831" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="latin1()" time="0.000843083" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="hashStability()" time="0.003980833" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="readDeadline()" time="0.000585083" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="targetList()" time="0.000841708" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="noDisplay()" time="0.002281209" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="manifestPinsExactVersions()" time="0.001267792" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="lockTargetsX11()" time="0.000519667" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="constantsMatchLock()" time="0.002330417" />
+  </testsuite>
+</testsuites>
