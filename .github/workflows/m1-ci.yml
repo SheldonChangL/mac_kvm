@@ -47,3 +47,31 @@ jobs:
           path: artifacts/ci/m1-008-report.json
           if-no-files-found: error
           retention-days: 14
+
+  verify-linux:
+    name: verify-linux
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Restore Linux build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build-linux
+          key: verify-linux-${{ hashFiles('Package.swift') }}-33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6
+
+      - name: Build and test the shared and Linux targets in the pinned image
+        run: make verify-linux ISSUE=ci
+
+      - name: Upload Linux test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verify-linux-${{ github.run_id }}
+          path: artifacts/ci/linux/
+          if-no-files-found: error
+          retention-days: 14

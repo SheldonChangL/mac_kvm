@@ -1,0 +1,5 @@
+module CXFixes [system] {
+  header "shim.h"
+  link "Xfixes"
+  export *
+}

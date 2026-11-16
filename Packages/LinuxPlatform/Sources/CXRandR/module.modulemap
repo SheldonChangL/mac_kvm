@@ -1,0 +1,5 @@
+module CXRandR [system] {
+  header "shim.h"
+  link "Xrandr"
+  export *
+}

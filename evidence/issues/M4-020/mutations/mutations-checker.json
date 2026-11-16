@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020",
+  "group": "checker",
+  "date": "2026-11-15T20:55:54Z",
+  "command": "python3 -m unittest discover -s Tools/architecture-check/tests -p test_*.py",
+  "files": {
+    "Tools/architecture-check/architecture-check.py": "89a79f9ddcbe8c4f771bf2075b2cdb7706316f3d7e3fe93919922cda86aa5e6a"
+  },
+  "mutants": [
+    {
+      "id": "M4",
+      "mutation": "the checker no longer forbids CX11 in KVMCore",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_kvmcore_rejects_linux_platform_imports"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_kvmcore_rejects_linux_platform_imports"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M5",
+      "mutation": "the checker no longer forbids NIOCore in contracts (name dropped and, since the NIO prefix rule would still catch it, the contracts prefix rule dropped too)",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_contracts_reject_linux_platform_imports"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_contracts_reject_linux_module_families",
+        "test_contracts_reject_linux_platform_imports"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "M6",
+      "mutation": "XEvent is not flagged as a contract platform type",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_contracts_reject_x11_event_types"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_contracts_reject_x11_event_types"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "R1",
+      "mutation": "review: NIO*/Crypto*/_Crypto* families no longer forbidden by prefix in Core",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_kvmcore_rejects_linux_module_families",
+        "test_contracts_reject_linux_module_families"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_contracts_reject_linux_module_families",
+        "test_kvmcore_rejects_linux_module_families"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "R2",
+      "mutation": "review: NIO* family no longer concrete networking in protocol roots",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_protocol_modules_reject_nio_family"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_protocol_modules_reject_nio_family"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    },
+    {
+      "id": "R3",
+      "mutation": "review: Musl no longer forbidden in KVMCore",
+      "file": "Tools/architecture-check/architecture-check.py",
+      "killers": [
+        "test_kvmcore_rejects_linux_module_families"
+      ],
+      "applied": true,
+      "exitCode": 1,
+      "built": true,
+      "failedTests": [
+        "test_kvmcore_rejects_linux_module_families"
+      ],
+      "killed": true,
+      "restoredByteForByte": true
+    }
+  ],
+  "baseline": {
+    "exitCode": 0,
+    "built": true,
+    "failedTests": []
+  },
+  "allKilled": true
+}
