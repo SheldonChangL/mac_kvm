@@ -101,6 +101,96 @@
       "exitCode": 0,
       "stdout": "",
       "stderr": ""
+    },
+    {
+      "command": "swift test --filter LinuxPlatformTests; then 3 x MACKVM_X11_TESTS=1 xvfb-run swift test --filter LinuxPlatformTests (Linux, linux/arm64 swift:6.2.3-jammy)",
+      "startedAt": "2026-11-16T23:21:00+00:00",
+      "endedAt": "2026-11-16T23:21:00+00:00",
+      "exitCode": 0,
+      "stdout": "plain rc=0\n✔ Test run with 52 tests in 7 suites passed after 0.206 seconds.\nx11 rc=0\n✔ Test run with 52 tests in 7 suites passed after 6.345 seconds.\nx11 rc=0\n✔ Test run with 52 tests in 7 suites passed after 6.337 seconds.\nx11 rc=0\n✔ Test run with 52 tests in 7 suites passed after 6.328 seconds.",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes). Transcribed from the container run's output."
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxX11Injector.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxX11InjectorTests.swift",
+      "startedAt": "2026-11-16T23:21:00+00:00",
+      "endedAt": "2026-11-16T23:21:01+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-16T23:21:01+00:00",
+      "endedAt": "2026-11-16T23:21:03+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-11-16T23:21:03+00:00",
+      "endedAt": "2026-11-16T23:21:04+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-11-16T23:21:04+00:00",
+      "endedAt": "2026-11-16T23:21:04+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-16T23:21:04+00:00",
+      "endedAt": "2026-11-16T23:21:04+00:00",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "timeout 900 swift test",
+      "startedAt": "2026-11-16T23:21:04+00:00",
+      "endedAt": "2026-11-16T23:21:07+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test \"failures are retried after 1, 2 and 4 seconds until a connection is established\" passed after 0.012 seconds.\n✔ Test \"round trip: a duplicate wake supersedes the first generation; one is in force at a time\" passed after 0.012 seconds.\n✔ Test \"ordering: a wake that arrives during the sleep cleanup waits for the sleep to finish\" passed after 0.012 seconds.\n✔ Test \"cancellation: a cancelled queued enter sends nothing and the session stays ready\" passed after 0.012 seconds.\n✔ Test \"the network returning after a wake connects once; a later flap does not reconnect\" passed after 0.013 seconds.\n✔ Suite \"M2-030 SessionManager\" passed after 0.016 seconds.\n✔ Test \"an established connection resets the backoff, and a clean end is retried\" passed after 0.012 seconds.\n✔ Test \"invalid order: network reports with no wake waiting only update the network state\" passed after 0.013 seconds.\n✔ Test \"cancel: a sleep drops a wake that still waits for the network\" passed after 0.013 seconds.\n✔ Test \"manual disconnect cancels the wait and the attempt, and never reconnects\" passed after 0.012 seconds.\n✔ Test \"edge enter reaches the Barrier client, pointer input follows, unsupported input fails closed\" passed after 0.012 seconds.\n✔ Suite \"M2-029 ServerSession\" passed after 0.016 seconds.\n✔ Test \"round trip: sleep stops ReconnectManager after the cleanup; the network reconnects it\" passed after 0.013 seconds.\n✔ Test \"duplicate wakes: one connect per outage, and one per wake while the network is up\" passed after 0.013 seconds.\n✔ Suite \"M2 server control path integration\" passed after 0.017 seconds.\n✔ Test \"cancel: callers that stop waiting still have their signals processed, in order\" passed after 0.012 seconds.\n✔ Test \"joiners wait for the in-flight recovery and get its result; the steps run once\" passed after 0.015 seconds.\n✔ Test \"boundary: after four failures every wait is capped at 15 seconds\" passed after 0.013 seconds.\n✔ Suite \"M1-063 FailSafeCoordinator in-flight recovery\" passed after 0.017 seconds.\n✔ Suite \"M1-061 Network change and sleep/wake recovery\" passed after 0.016 seconds.\n✔ Suite \"M1-060 Reconnect backoff and manual disconnect\" passed after 0.016 seconds.\n✔ Test \"a server close with a key held ends the client stream; no release is synthesized\" passed after 0.015 seconds.\n✔ Test reconcileReportsEveryFieldOnItsOwnAgainstEveryLedgerState() passed after 0.016 seconds.\n✔ Test heldKeysMatchTheUnmatchedInjectedDowns(seed:) with 5 test cases passed after 0.032 seconds.\n✔ Suite \"InputStateLedger\" passed after 0.036 seconds.\n✔ Test \"enter, pointer, buttons, wheel, keys, clipboard both ways, keepalive, leave, disconnect\" passed after 0.132 seconds.\n✔ Suite \"M1-029-FOLLOWUP-001 Barrier client and server loopback\" passed after 0.134 seconds.\n✔ Test randomSequencesFollowTheRulesStatedOverTheWholeHistory() passed after 0.129 seconds.\n✔ Suite \"M1-046 Modifier state ledger\" passed after 0.134 seconds.\n✔ Test run with 285 tests in 27 suites passed after 0.135 seconds.",
+      "stderr": "warning: '<worktree>': found 9 file(s) which are unhandled; explicitly declare them as resources or exclude from the target\n    <repository>/Tests/SystemTests/Plans/M1-040-barrier-keyboard-fixtures.md\n    <repository>/Tests/SystemTests/Plans/M1-024-barrier-client-handshake-fixtures.md\n    <repository>/Tests/SystemTests/Scripts/M1-040-barrier-keyboard-fixtures.sh\n    <repository>/Tests/SystemTests/Plans/M2-035-mac-to-linux-barrier-e2-e.md\n    <repository>/Tests/SystemTests/Scripts/M1-024-barrier-client-handshake-fixtures.sh\n    <repository>/Tests/SystemTests/Scripts/M2-035-linux-smoke.sh\n    <repository>/Tests/SystemTests/Plans/M2-022-barrier-server-fixtures.md\n    <repository>/Tests/SystemTests/Scripts/M2-035-mac-to-linux-barrier-e2-e.sh\n    <repository>/Tests/SystemTests/Scripts/M2-022-barrier-server-fixtures.sh\n[0/1] Planning build\nBuilding for debugging...\n[0/4] Write swift-version--58304C5D6DBC2206.txt\nBuild complete! (0.21s)",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors",
+      "startedAt": "2026-11-16T23:21:07+00:00",
+      "endedAt": "2026-11-16T23:21:18+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test \"concurrent register and remove keep the dictionary consistent\" passed after 0.012 seconds.\n✔ Test \"cancellation: a cancelled queued enter sends nothing and the session stays ready\" passed after 0.014 seconds.\n✔ Test \"ordering: a wake that arrives during the sleep cleanup waits for the sleep to finish\" passed after 0.012 seconds.\n✔ Test \"failures are retried after 1, 2 and 4 seconds until a connection is established\" passed after 0.011 seconds.\n✔ Suite \"M2-030 SessionManager\" passed after 0.016 seconds.\n✔ Test \"manual disconnect cancels the wait and the attempt, and never reconnects\" passed after 0.011 seconds.\n✔ Test \"invalid order: network reports with no wake waiting only update the network state\" passed after 0.013 seconds.\n✔ Test \"cancel: a sleep drops a wake that still waits for the network\" passed after 0.013 seconds.\n✔ Test \"the network returning after a wake connects once; a later flap does not reconnect\" passed after 0.013 seconds.\n✔ Suite \"M2-029 ServerSession\" passed after 0.016 seconds.\n✔ Test \"cancel: callers that stop waiting still have their signals processed, in order\" passed after 0.013 seconds.\n✔ Test \"an established connection resets the backoff, and a clean end is retried\" passed after 0.011 seconds.\n✔ Test \"round trip: sleep stops ReconnectManager after the cleanup; the network reconnects it\" passed after 0.012 seconds.\n✔ Test \"duplicate wakes: one connect per outage, and one per wake while the network is up\" passed after 0.012 seconds.\n✔ Test \"boundary: after four failures every wait is capped at 15 seconds\" passed after 0.011 seconds.\n✔ Test \"joiners wait for the in-flight recovery and get its result; the steps run once\" passed after 0.013 seconds.\n✔ Test \"edge enter reaches the Barrier client, pointer input follows, unsupported input fails closed\" passed after 0.015 seconds.\n✔ Suite \"M1-063 FailSafeCoordinator in-flight recovery\" passed after 0.016 seconds.\n✔ Suite \"M1-060 Reconnect backoff and manual disconnect\" passed after 0.016 seconds.\n✔ Suite \"M1-061 Network change and sleep/wake recovery\" passed after 0.016 seconds.\n✔ Suite \"M2 server control path integration\" passed after 0.016 seconds.\n✔ Test \"a server close with a key held ends the client stream; no release is synthesized\" passed after 0.015 seconds.\n✔ Test reconcileReportsEveryFieldOnItsOwnAgainstEveryLedgerState() passed after 0.016 seconds.\n✔ Test heldKeysMatchTheUnmatchedInjectedDowns(seed:) with 5 test cases passed after 0.034 seconds.\n✔ Suite \"InputStateLedger\" passed after 0.036 seconds.\n✔ Test randomSequencesFollowTheRulesStatedOverTheWholeHistory() passed after 0.129 seconds.\n✔ Suite \"M1-046 Modifier state ledger\" passed after 0.134 seconds.\n✔ Test \"enter, pointer, buttons, wheel, keys, clipboard both ways, keepalive, leave, disconnect\" passed after 0.136 seconds.\n✔ Suite \"M1-029-FOLLOWUP-001 Barrier client and server loopback\" passed after 0.137 seconds.\n✔ Test run with 285 tests in 27 suites passed after 0.137 seconds.",
+      "stderr": "[117/129] Compiling KVMCoreTests CaptureQueueTests.swift\n[118/129] Compiling KVMCoreTests ClipboardLoopGuardTests.swift\n[119/129] Compiling MacKVMIntegrationTests BarrierClientServerLoopbackIntegrationTests.swift\n[120/129] Compiling MacKVMIntegrationTests IntegrationTargetTests.swift\n[121/129] Compiling MacKVMIntegrationTests M2ServerControlPathIntegrationTests.swift\n[122/129] Emitting module MacKVMIntegrationTests\n[122/129] Linking MacKVM\n[123/129] Applying MacKVM\n[125/129] Emitting module KVMCoreTests\n[126/129] Compiling KVMCoreTests FailSafeCoordinatorTests.swift\n[127/129] Compiling KVMCoreTests InputStateLedgerTests.swift\n[128/131] Emitting module MacKVMPackageTests\n[129/131] Compiling MacKVMPackageTests runner.swift\n[129/130] Linking MacKVMPackageTests\nBuild complete! (10.24s)",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "make verify REPORT=<producer-scratch>/m4-024/verify.json",
+      "startedAt": "2026-11-16T23:21:18+00:00",
+      "endedAt": "2026-11-16T23:23:04+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/cigates/cigates.py --repository-root . --report \"<producer-scratch>/m4-024/verify.json\"\nCI context: commit=402c7957fe1d5fa03dd192302b8f628c985f748f machine=arm64 python=3.9.6 swift=Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)\n[PASSED] manifest-validation exit=0 durationMs=52\n[PASSED] docs-check exit=0 durationMs=237\n[PASSED] architecture-check exit=0 durationMs=520\n[PASSED] code-quality exit=0 durationMs=3916\n[PASSED] tool-test-discovery exit=0 durationMs=60\n[PASSED] evidence-test-discovery exit=0 durationMs=66\n[PASSED] tool-test:Evidence/tests/test_m1_wire_002_stream_analysis.py exit=0 durationMs=196\n[PASSED] tool-test:Evidence/tests/test_run_e2e.py exit=0 durationMs=4535\n[PASSED] tool-test:Evidence/tests/test_validate_evidence.py exit=0 durationMs=278\n[PASSED] tool-test:architecture-check/tests/test_architecture_check.py exit=0 durationMs=1325\n[PASSED] tool-test:async-harness/tests/test_async_harness.py exit=0 durationMs=428\n[PASSED] tool-test:cigates/tests/test_cigates.py exit=0 durationMs=417\n[PASSED] tool-test:code-quality/tests/test_code_quality.py exit=0 durationMs=80\n[PASSED] tool-test:diagnostic-bundle/tests/test_diagnostic_bundle.py exit=0 durationMs=287\n[PASSED] tool-test:docs-check/tests/test_docs_check.py exit=0 durationMs=277\n[PASSED] evidence-test:M1-023/tests/test_register.py exit=0 durationMs=58\n[PASSED] evidence-test:M1-EVIDENCE-001/tests/test_registration.py exit=0 durationMs=67\n[PASSED] evidence-test:M1-SCOPE-001/tests/test_m1_014_exact_files.py exit=0 durationMs=48\n[PASSED] swift-package-test:KVMContracts exit=0 durationMs=1215\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=1492\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=9123\n[PASSED] repository-contract-tests exit=0 durationMs=78062\n[PASSED] swift-test-targets exit=0 durationMs=1555\n[PASSED] native-arm64-build exit=0 durationMs=1187\nCI report: <producer-scratch>/m4-024/verify.json",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
+    },
+    {
+      "command": "git diff --cached --check",
+      "startedAt": "2026-11-16T23:23:04+00:00",
+      "endedAt": "2026-11-16T23:23:04+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Rerun after the Tier H review notes (commit fix(m4-024): address the review notes)."
     }
   ]
 }

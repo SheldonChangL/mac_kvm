@@ -518,6 +518,10 @@ private final class GatedInjector: InputInjectionBackend, @unchecked Sendable {
   func releaseAllHeld() -> CoreResult<Void> { .success(()) }
 }
 
+private final class DrainHolder: @unchecked Sendable {
+  var drain: LinuxInjectionDrain?
+}
+
 private final class FailureBox: @unchecked Sendable {
   private let lock = NSLock()
   private var stored: [CoreError] = []
@@ -559,7 +563,8 @@ struct LinuxInjectionDrainTests {
     }.start()
     #expect(cleared.wait(timeout: .now() + 0.2) == .timedOut)
     injector.gate.signal()
-    cleared.wait()
+    // Bounded, so a missing join fails here instead of hanging the run.
+    #expect(cleared.wait(timeout: .now() + 5) == .success)
     #expect(injector.injected == [press])
     #expect(drain.count == 0)
     #expect(!drain.enqueue(release))
@@ -597,6 +602,32 @@ struct LinuxInjectionDrainTests {
     reported.wait()
     drain.clearTransientState()
     #expect(failures.errors.map(\.code) == [.lifecycle(.subsystemUnavailable)])
+    #expect(injector.injected.isEmpty)
+  }
+
+  @Test("clearTransientState called from onFailure, on the worker itself, does not deadlock")
+  func clearFromWorker() {
+    let bad = key(.letter(5), .down)
+    let injector = GatedInjector(failOn: bad)
+    let holder = DrainHolder()
+    let done = DispatchSemaphore(value: 0)
+    let drain = LinuxInjectionDrain(injector: injector, capacity: 8) { _ in
+      holder.drain?.clearTransientState()
+      done.signal()
+    }
+    holder.drain = drain
+    #expect(drain.enqueue(bad))
+    #expect(drain.enqueue(key(.letter(6), .down)))
+    drain.start()
+    #expect(done.wait(timeout: .now() + 5) == .success)
+    #expect(drain.count == 0)
+    #expect(!drain.enqueue(key(.letter(6), .down)))
+    let cleared = DispatchSemaphore(value: 0)
+    Thread {
+      drain.clearTransientState()
+      cleared.signal()
+    }.start()
+    #expect(cleared.wait(timeout: .now() + 5) == .success)
     #expect(injector.injected.isEmpty)
   }
 

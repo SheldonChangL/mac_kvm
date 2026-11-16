@@ -133,3 +133,7 @@ so calls from any thread take effect one at a time, in call order.
 - A crash of the client leaves XTest-held input pressed (risk f.9).
 - The Tier H evidence is the Xvfb suite now and the owner E2E (M4-036-FOLLOWUP-001)
   later.
+- The `screen` callback runs under the injector's lock on every move; it must
+  return promptly and never call back into the injector.
+- `deinit` closes the connection without releasing held input; callers sweep
+  with `releaseRemaining()` or `close()` first.

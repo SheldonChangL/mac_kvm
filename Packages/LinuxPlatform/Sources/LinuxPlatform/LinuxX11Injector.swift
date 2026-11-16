@@ -221,7 +221,8 @@ package final class LinuxX11Injector: InputInjectionBackend, @unchecked Sendable
   private var closed = false
 
   /// Connects to `displayName` (`DISPLAY` when `nil`). Fails with `lifecycle.subsystemUnavailable`
-  /// without a display and `permission.capabilityUnavailable` without XTest.
+  /// without a display and `permission.capabilityUnavailable` without XTest. `screen` follows the
+  /// rule of `init(port:screen:)`: it runs under the injector's lock and never calls back into it.
   package convenience init(
     displayName: String?, screen: @escaping @Sendable () -> PlatformScreenGeometry
   ) throws(CoreError) {
@@ -229,6 +230,9 @@ package final class LinuxX11Injector: InputInjectionBackend, @unchecked Sendable
   }
 
   /// Over an already opened port (tests use an in-memory one).
+  ///
+  /// `screen` is called while the injector holds its lock, for every `.mouseMove`. It must return
+  /// promptly and must never call back into this injector, or it deadlocks.
   package init(
     port: any LinuxX11InputPort, screen: @escaping @Sendable () -> PlatformScreenGeometry
   ) {
@@ -237,6 +241,8 @@ package final class LinuxX11Injector: InputInjectionBackend, @unchecked Sendable
     buttonCount = port.pointerButtonCount()
   }
 
+  /// Closes the connection without sweeping: it does not release held keys or buttons. Callers
+  /// release through `releaseRemaining()` or `close()` before dropping the injector.
   deinit {
     if !closed { port.close() }
   }
