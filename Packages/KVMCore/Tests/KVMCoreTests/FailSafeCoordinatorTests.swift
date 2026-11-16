@@ -113,6 +113,21 @@ private final class RecordingSafety: ClientInputSafety, @unchecked Sendable {
   }
 }
 
+/// Awaits `operation` for at most `seconds`; returns nil when it has not finished, so a hang fails
+/// the test instead of stalling the run. The abandoned operation is left behind.
+private func bounded<T: Sendable>(
+  seconds: Int = 10, _ operation: @escaping @Sendable () async -> T
+) async -> T? {
+  let (results, sink) = AsyncStream<T?>.makeStream()
+  Task { sink.yield(await operation()) }
+  Task {
+    try? await Task.sleep(for: .seconds(seconds))
+    sink.yield(nil)
+  }
+  var iterator = results.makeAsyncIterator()
+  return await iterator.next() ?? nil
+}
+
 /// Walks a value and reports whether any part of it is a key or button identity or an event.
 private func containsIdentity(_ value: Any) -> Bool {
   if value is VirtualKey || value is MouseButton || value is KVMEvent || value is HeldKey {
@@ -402,7 +417,7 @@ struct FailSafeCoordinatorInFlightTests {
           .start()
       }
     }
-    await safety.waitUntilBlocked()
+    #expect(await bounded { await safety.waitUntilBlocked() } != nil)
     #expect(coordinator.recover(plan: keyAndButtonPlan) == .notRequired)
     let joiners = (0..<3).map { _ in
       Task { await coordinator.recoverJoiningInFlight(plan: keyAndButtonPlan) }
@@ -417,13 +432,15 @@ struct FailSafeCoordinatorInFlightTests {
       _ = await joiners[0].value
       signal.yield(false)
     }
-    var iterator = signals.makeAsyncIterator()
-    let allJoined = await iterator.next()
+    let allJoined = await bounded {
+      var iterator = signals.makeAsyncIterator()
+      return await iterator.next() ?? false
+    }
     #expect(allJoined == true, "a joiner returned before the in-flight recovery finished")
     safety.open()
-    #expect(await first.value == .partial)
+    #expect(await bounded { await first.value } == .partial)
     for joiner in joiners {
-      #expect(await joiner.value == .partial)
+      #expect(await bounded { await joiner.value } == .partial)
     }
     #expect(safety.clearCount == 1)
   }
@@ -432,7 +449,9 @@ struct FailSafeCoordinatorInFlightTests {
   func asyncCallerRuns() async {
     let safety = RecordingSafety()
     let coordinator = FailSafeCoordinator(safety: safety)
-    #expect(await coordinator.recoverJoiningInFlight(plan: keyAndButtonPlan) == .completed)
+    #expect(
+      await bounded { await coordinator.recoverJoiningInFlight(plan: keyAndButtonPlan) }
+        == .completed)
     #expect(safety.calls.first == .clear)
     #expect(safety.calls.last == .restore)
   }

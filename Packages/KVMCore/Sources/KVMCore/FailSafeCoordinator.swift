@@ -13,6 +13,10 @@ import KVMContracts
 package protocol ClientInputSafety: InputReleaser {
   /// Stops and joins the injection worker, then resets the injection queue and drops any pending
   /// clipboard work, so no queued press can be injected after the releases (plan a.3, h.6).
+  /// The drain worker must be a dedicated `Thread`, never a `Task` on the cooperative pool: this
+  /// call blocks while it joins the worker, and `recover(plan:)` may run on a pool thread
+  /// (`recoverJoiningInFlight`), so a pool-hosted worker could deadlock. Owners (M1-064) should run
+  /// `recover(plan:)` off the cooperative pool.
   func clearTransientState() throws(CoreError)
   /// Releases everything the platform still holds from this client, whatever the plan said: the
   /// injector's own record of what it pressed is the authority (plan h.1). Idempotent.

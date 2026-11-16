@@ -36,6 +36,11 @@ earlier one fails:
 1. `clearTransientState()`: the adapter stops and joins the injection worker,
    then resets the injection queue and drops pending clipboard work (plan a.3,
    h.6), so no queued or already-dequeued press is injected after the releases.
+   The injection drain worker must be a dedicated `Thread`, never a `Task` on
+   Swift's cooperative pool: this step blocks while it joins the worker, and
+   `recover(plan:)` can run on a pool thread (`recoverJoiningInFlight`), so a
+   pool-hosted worker could deadlock. M1-064 should run `recover(plan:)` off the
+   cooperative pool (for example on its own thread), as the in-flight test does.
 2. `ReleaseAllKeys.execute(plan)`: the ledger's release plan.
 3. `releaseRemaining()`: the injector sweep (plan h.1). The injector's own
    record of what it pressed is the authority for what the platform holds, so
