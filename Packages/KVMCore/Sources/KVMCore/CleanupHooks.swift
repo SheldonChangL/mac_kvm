@@ -113,6 +113,10 @@ package final class CleanupHooks: @unchecked Sendable {
     return CleanupOutcome(ran: true, disposition: disposition, disconnectTimedOut: timedOut)
   }
 
+  /// Residual risk: the recovery itself is not bounded. If an adapter step hangs, this
+  /// `runOnce` never returns, and through `recoveryLock` every later generation's cleanup waits
+  /// behind it, each parking one OS thread. The adapter contract (M1-063) requires every step to
+  /// return promptly; the bound here covers only the disconnect.
   private func recoverOffPool() async -> CleanupDisposition {
     let failSafe = failSafe
     let plan = plan
@@ -143,21 +147,27 @@ package final class CleanupHooks: @unchecked Sendable {
     let clock = clock
     let timeout = disconnectTimeout
     return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
-      let work = Task {
-        await disconnect(reason)
-        if gate.claim() { continuation.resume(returning: false) }
-      }
-      Task {
+      let work = TaskBox()
+      let timer = Task {
         do {
           try await clock.sleep(for: timeout)
         } catch {
-          // A failed or cancelled timer still bounds the wait: treat it as expired.
+          // A failed or cancelled timer still bounds the wait: treat it as expired. A timer
+          // cancelled because the disconnect finished loses the gate below and does nothing.
         }
         if gate.claim() {
           work.cancel()
           continuation.resume(returning: true)
         }
       }
+      work.set(
+        Task {
+          await disconnect(reason)
+          if gate.claim() {
+            timer.cancel()
+            continuation.resume(returning: false)
+          }
+        })
     }
   }
 
@@ -219,6 +229,29 @@ package final class CleanupHooks: @unchecked Sendable {
   private static func error(_ code: CoreErrorCode, retry: RetryDisposition) -> CoreError {
     CoreError(
       code: code, severity: .error, retryDisposition: retry, cleanupDisposition: .completed)
+  }
+}
+
+/// Holds the disconnect task so the timer, created first, can cancel it.
+private final class TaskBox: @unchecked Sendable {
+  private let lock = NSLock()
+  private var task: Task<Void, Never>?
+  private var cancelled = false
+
+  func set(_ task: Task<Void, Never>) {
+    let cancelNow = lock.withLock { () -> Bool in
+      self.task = task
+      return cancelled
+    }
+    if cancelNow { task.cancel() }
+  }
+
+  func cancel() {
+    let task = lock.withLock { () -> Task<Void, Never>? in
+      cancelled = true
+      return self.task
+    }
+    task?.cancel()
   }
 }
 

@@ -86,6 +86,14 @@ MUTANTS = [
      "description": "termination disconnects with userRequested",
      "replacements": [("    case .termination:\n      return .applicationTermination\n",
                        "    case .termination:\n      return .userRequested\n")]},
+    {"id": "T1", "requirement": "review: the timer is cancelled when the disconnect finishes in time",
+     "description": "the disconnect path no longer cancels the timer",
+     "replacements": [("            timer.cancel()\n", "")]},
+    {"id": "T2", "requirement": "review: a clock that throws counts as expired",
+     "description": "a throwing timer resolves as not timed out",
+     "replacements": [("          // A failed or cancelled timer still bounds the wait: treat it as expired. A timer\n",
+                       "          if gate.claim() { continuation.resume(returning: false) }\n          return\n"
+                       "          // A failed or cancelled timer still bounds the wait: treat it as expired. A timer\n")]},
 ]
 
 FAILED_TEST = re.compile(r"Test (\"[^\"]+\"|\w+\([^)]*\))(?: with \d+ test cases?)? failed")

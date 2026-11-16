@@ -79,4 +79,13 @@ The switch is exhaustive, so a new error domain fails to compile until mapped.
   `ReconnectManager`, `RecoveryCoordinator`'s sleep hook and the signal
   handlers to `runOnce`; this issue proves the hooks against models only.
 - An abandoned disconnect task keeps running until it honours cancellation.
+- The recovery itself is not bounded: if an adapter step hangs, `runOnce`
+  never returns and, through the recovery lock, every later generation's
+  cleanup waits behind it, each parking one OS thread. M1-063's adapter
+  contract requires prompt steps; only the disconnect is bounded here.
+- A disconnect that finishes in time cancels the timer; a clock that throws
+  (cancelled or failed) counts as expired, so the disconnect is abandoned.
+- The off-pool test checks the recovery thread's name. It does not prove that
+  a pool-hosted recovery would starve the pool; a deterministic starvation
+  test depends on the pool's width and is not attempted.
 - A process crash runs no cleanup (plan risk f.9).

@@ -110,6 +110,70 @@ private final class ManualClock: KVMClock, @unchecked Sendable {
   }
 }
 
+/// A clock whose sleep only ends by cancellation. It records whether the sleep was cancelled
+/// and lets the test wait until a sleep has been requested.
+private final class CancelObservingClock: KVMClock, @unchecked Sendable {
+  private let lock = NSLock()
+  private var sleeper: CheckedContinuation<Void, Never>?
+  private var requested: CheckedContinuation<Void, Never>?
+  private var didRequest = false
+  private var cancelledFlag = false
+
+  var cancelled: Bool { lock.withLock { cancelledFlag } }
+
+  func sleep(for duration: Duration) async throws(CoreError) {
+    let observer = lock.withLock { () -> CheckedContinuation<Void, Never>? in
+      didRequest = true
+      defer { requested = nil }
+      return requested
+    }
+    observer?.resume()
+    await withTaskCancellationHandler {
+      await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        let resumeNow = lock.withLock { () -> Bool in
+          if cancelledFlag || Task.isCancelled {
+            cancelledFlag = true
+            return true
+          }
+          sleeper = continuation
+          return false
+        }
+        if resumeNow { continuation.resume() }
+      }
+    } onCancel: {
+      let pending = lock.withLock { () -> CheckedContinuation<Void, Never>? in
+        cancelledFlag = true
+        defer { sleeper = nil }
+        return sleeper
+      }
+      pending?.resume()
+    }
+    throw CoreError(
+      code: .cancellation(.requested), severity: .notice, retryDisposition: .never,
+      cleanupDisposition: .completed)
+  }
+
+  func waitUntilRequested() async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+      let ready = lock.withLock { () -> Bool in
+        guard !didRequest else { return true }
+        requested = continuation
+        return false
+      }
+      if ready { continuation.resume() }
+    }
+  }
+}
+
+/// A clock whose sleep fails at once.
+private struct ThrowingClock: KVMClock {
+  func sleep(for duration: Duration) async throws(CoreError) {
+    throw CoreError(
+      code: .internalFailure(.unclassified), severity: .error, retryDisposition: .never,
+      cleanupDisposition: .notRequired)
+  }
+}
+
 /// A disconnect that never returns until the test releases it.
 private final class HangingDisconnect: @unchecked Sendable {
   private let lock = NSLock()
@@ -313,6 +377,32 @@ struct CleanupHooksTests {
     let outcome = await hooks.runOnce(.termination, generation: hooks.beginGeneration())
     #expect(!outcome.disconnectTimedOut)
     clock.fire()
+  }
+
+  @Test("a disconnect that finishes in time cancels the timer, so no timer outlives it")
+  func promptDisconnectCancelsTimer() async {
+    let recorder = Recorder()
+    let clock = CancelObservingClock()
+    let hooks = makeHooks(recorder, clock: clock)
+    let outcome = await hooks.runOnce(.termination, generation: hooks.beginGeneration())
+    await clock.waitUntilRequested()
+    #expect(!outcome.disconnectTimedOut)
+    #expect(clock.cancelled)
+  }
+
+  @Test("a clock that throws at once counts as expired: the hung disconnect is abandoned")
+  func throwingClockCountsAsExpired() async {
+    let recorder = Recorder()
+    let hanging = HangingDisconnect()
+    let hooks = makeHooks(recorder, clock: ThrowingClock()) { reason in
+      recorder.append(.disconnect(reason))
+      await hanging.run()
+      recorder.append(.disconnectFinished)
+    }
+    let outcome = await hooks.runOnce(.keepaliveTimeout, generation: hooks.beginGeneration())
+    #expect(outcome == CleanupOutcome(ran: true, disposition: .completed, disconnectTimedOut: true))
+    #expect(!recorder.calls.contains(.disconnectFinished))
+    hanging.release()
   }
 
   @Test("the recovery runs on the dedicated cleanup thread, off the cooperative pool")
