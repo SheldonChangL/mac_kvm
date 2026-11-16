@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="16" failures="0" skipped="0" time="0.003227333">
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="throwingClockCountsAsExpired()" time="0.001893375" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="emptyPlanBoundary()" time="0.002006792" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="failedRecoveryIsReported()" time="0.002187833" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectIsNotTimedOut()" time="0.00203875" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="roundTrip(trigger:)" time="0.001715458" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectCancelsTimer()" time="0.002103625" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="hangingDisconnectIsBoundedAndReported()" time="0.001885792" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="mappingTable()" time="0.001619833" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="newGenerationRunsAgain()" time="0.002506417" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="eachTriggerRunsOnceInOrder(trigger:)" time="0.002385875" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="outcomeIsPrivacySafe()" time="0.001728417" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="olderGenerationStillRuns()" time="0.001535875" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="recoveryRunsOnDedicatedThread()" time="0.002513208" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="concurrentTriggersRunOnce()" time="0.0023545" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="secondTriggerSameGenerationDoesNotRun()" time="0.001968791" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="unknownGenerationIsRejected()" time="0.001962167" />
+  </testsuite>
+</testsuites>
