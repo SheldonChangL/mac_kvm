@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="TestResults" errors="0" tests="14" failures="0" skipped="0" time="0.002509541">
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="olderGenerationStillRuns()" time="0.002122708" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="newGenerationRunsAgain()" time="0.001944125" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="mappingTable()" time="0.001493792" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="secondTriggerSameGenerationDoesNotRun()" time="0.001725167" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="emptyPlanBoundary()" time="0.001546292" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="eachTriggerRunsOnceInOrder(trigger:)" time="0.002051709" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="outcomeIsPrivacySafe()" time="0.001483333" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectIsNotTimedOut()" time="0.001993458" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="hangingDisconnectIsBoundedAndReported()" time="0.001918125" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="roundTrip(trigger:)" time="0.001789375" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="recoveryRunsOnDedicatedThread()" time="0.001839917" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="unknownGenerationIsRejected()" time="0.001618958" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="failedRecoveryIsReported()" time="0.002191542" />
-    <testcase classname="KVMCoreTests.CleanupHooksTests" name="concurrentTriggersRunOnce()" time="0.001759334" />
+  <testsuite name="TestResults" errors="0" tests="14" failures="0" skipped="0" time="0.001976416">
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="eachTriggerRunsOnceInOrder(trigger:)" time="0.001355708" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="recoveryRunsOnDedicatedThread()" time="0.001236792" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="concurrentTriggersRunOnce()" time="0.001182625" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="emptyPlanBoundary()" time="0.000985708" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="mappingTable()" time="0.000701208" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="secondTriggerSameGenerationDoesNotRun()" time="0.001034541" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="hangingDisconnectIsBoundedAndReported()" time="0.001112" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="outcomeIsPrivacySafe()" time="0.000605583" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="unknownGenerationIsRejected()" time="0.000589417" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectIsNotTimedOut()" time="0.001044792" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="newGenerationRunsAgain()" time="0.001203666" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="failedRecoveryIsReported()" time="0.001137542" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="olderGenerationStillRuns()" time="0.001295791" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="roundTrip(trigger:)" time="0.001164625" />
   </testsuite>
 </testsuites>

@@ -32,7 +32,7 @@ list names the `KVMClock` bound), `disconnectReason(for:)`,
 The first `runOnce` for a generation runs, in order:
 
 1. `FailSafeCoordinator.recover(plan:)` on a dedicated `Thread` named
-   `mackvm.cleanup-hooks`, never on the cooperative pool: the adapter's
+   `mackvm-cleanup`, never on the cooperative pool: the adapter's
    `clearTransientState()` stops and joins the injection drain worker (M1-063,
    h.6). The recovery is queue reset, the ledger's `ReleaseAllKeys` plan, the
    injector sweep `releaseRemaining()` (h.1) and `restoreLocalInput()`.

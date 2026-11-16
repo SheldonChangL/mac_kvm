@@ -62,7 +62,8 @@ package struct CleanupOutcome: Equatable, Sendable {
 /// issued, get `ran == false` at once and run nothing.
 package final class CleanupHooks: @unchecked Sendable {
   package static let defaultDisconnectTimeout: Duration = .seconds(2)
-  static let threadName = "mackvm.cleanup-hooks"
+  /// At most 15 bytes: Linux truncates or rejects longer pthread names.
+  static let threadName = "mackvm-cleanup"
 
   private let failSafe: FailSafeCoordinator
   private let plan: @Sendable () -> ReleasePlan

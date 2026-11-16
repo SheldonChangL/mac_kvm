@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
   "issue": "M1-064",
-  "date": "2026-11-16T09:22:32Z",
+  "date": "2026-11-16T12:36:40Z",
   "source": "Packages/KVMCore/Sources/KVMCore/CleanupHooks.swift",
-  "sourceSha256": "b45f991cbfcc6f130874d9a6a9bd72feb0edd2696b5b3530a6f9d97441a747c1",
+  "sourceSha256": "1b6b5dbd848096e193b1b7b70d8bae5ba9e0a2459f489a391bdca002bf17b94d",
   "tests": "Packages/KVMCore/Tests/KVMCoreTests/CleanupHooksTests.swift",
   "testRevision": null,
-  "testsSha256": "840b25be6044547adf5fbd59aa8da8dbb382ac85db230a6283960f25001e969d",
+  "testsSha256": "58645dd84904086913c0c1cf0d58a5dbb476e1ba7f4c3675874628586bc2da72",
   "command": "swift test --filter CleanupHooks",
   "timeoutSeconds": 600,
   "baseline": {
     "exitCode": 0,
-    "durationSeconds": 12.7,
+    "durationSeconds": 17.1,
     "failingTests": [],
     "compileError": false,
-    "summary": "Test run with 14 tests in 1 suite passed after 0.001 seconds."
+    "summary": "Test run with 14 tests in 1 suite passed after 0.003 seconds."
   },
   "mutants": [
     {
@@ -23,7 +23,7 @@
       "description": "the disconnect is awaited before the recovery",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.1,
       "failingTests": [
         "\"a failed recovery is reported, never swallowed, and the disconnect still runs\"",
         "\"a new generation runs its own cleanup\"",
@@ -33,7 +33,7 @@
         "\"the releases finish before the disconnect starts, even when the disconnect hangs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.012 seconds with 15 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.017 seconds with 15 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -43,14 +43,14 @@
       "description": "the generation check is removed: every caller runs",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 3.5,
       "failingTests": [
         "\"a generation this instance never issued runs nothing\"",
         "\"a second trigger for the same generation runs nothing\"",
         "\"concurrent triggers for one generation: exactly one runs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.004 seconds with 7 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.008 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -60,13 +60,13 @@
       "description": "the generation is checked but never consumed",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 3.8,
+      "durationSeconds": 3.4,
       "failingTests": [
         "\"a second trigger for the same generation runs nothing\"",
         "\"concurrent triggers for one generation: exactly one runs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.003 seconds with 5 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.007 seconds with 5 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -76,14 +76,14 @@
       "description": "any generation is accepted",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 3.6,
       "failingTests": [
         "\"a generation this instance never issued runs nothing\"",
         "\"a second trigger for the same generation runs nothing\"",
         "\"concurrent triggers for one generation: exactly one runs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.004 seconds with 7 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.007 seconds with 7 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -93,12 +93,12 @@
       "description": "the thread's body runs inline on the caller's pool thread",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.0,
       "failingTests": [
         "\"the recovery runs on the dedicated cleanup thread, off the cooperative pool\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.001 seconds with 1 issue.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.002 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -108,7 +108,7 @@
       "description": "clearLedger is never called",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.6,
+      "durationSeconds": 3.4,
       "failingTests": [
         "\"a failed recovery is reported, never swallowed, and the disconnect still runs\"",
         "\"a new generation runs its own cleanup\"",
@@ -119,7 +119,7 @@
         "\"the releases finish before the disconnect starts, even when the disconnect hangs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.012 seconds with 16 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.021 seconds with 16 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -129,12 +129,12 @@
       "description": "the timeout is reported as a normal disconnect",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.6,
       "failingTests": [
         "\"the releases finish before the disconnect starts, even when the disconnect hangs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.002 seconds with 1 issue.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.003 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -144,12 +144,12 @@
       "description": "runOnce always reports completed",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.0,
       "failingTests": [
         "\"a failed recovery is reported, never swallowed, and the disconnect still runs\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.001 seconds with 1 issue.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.002 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -159,13 +159,13 @@
       "description": "timeout(.keepalive) maps to transportFailure",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 2.9,
       "failingTests": [
         "\"mapping table: every disconnect reason maps to its trigger\"",
         "\"round trip: a trigger's disconnect reason maps back to the same trigger\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.002 seconds with 2 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.003 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -175,7 +175,7 @@
       "description": "DisconnectReason.cancellation(.shutdown) maps to cancelled",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.6,
       "failingTests": [
         "\"mapping table: every disconnect reason maps to its trigger\""
       ],
@@ -190,13 +190,13 @@
       "description": "security errors map to streamEnded",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.7,
+      "durationSeconds": 3.6,
       "failingTests": [
         "\"mapping table: every disconnect reason maps to its trigger\"",
         "\"round trip: a trigger's disconnect reason maps back to the same trigger\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.001 seconds with 2 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.003 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -206,13 +206,13 @@
       "description": "lifecycle(.subsystemUnavailable) maps to streamEnded",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.8,
+      "durationSeconds": 3.9,
       "failingTests": [
         "\"mapping table: every disconnect reason maps to its trigger\"",
         "\"round trip: a trigger's disconnect reason maps back to the same trigger\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.001 seconds with 2 issues.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.028 seconds with 2 issues.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     },
@@ -222,7 +222,7 @@
       "description": "cancelled disconnects with cancellation(.requested)",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.8,
+      "durationSeconds": 3.7,
       "failingTests": [
         "\"an empty plan still runs the sweep and the disconnect\""
       ],
@@ -237,12 +237,12 @@
       "description": "termination disconnects with userRequested",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 1.9,
+      "durationSeconds": 2.4,
       "failingTests": [
         "\"round trip: a trigger's disconnect reason maps back to the same trigger\""
       ],
       "compileError": false,
-      "summary": "Test run with 14 tests in 1 suite failed after 0.001 seconds with 1 issue.",
+      "summary": "Test run with 14 tests in 1 suite failed after 0.002 seconds with 1 issue.",
       "restoredByteForByte": true,
       "gitDiffExitCodeAfterRestore": 0
     }

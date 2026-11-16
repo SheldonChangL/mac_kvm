@@ -320,7 +320,7 @@ struct CleanupHooksTests {
     let recorder = Recorder()
     let hooks = makeHooks(recorder)
     _ = await hooks.runOnce(.sleep, generation: hooks.beginGeneration())
-    #expect(recorder.stepThreadNames == ["mackvm.cleanup-hooks"])
+    #expect(recorder.stepThreadNames == ["mackvm-cleanup"])
   }
 
   @Test("a failed recovery is reported, never swallowed, and the disconnect still runs")
