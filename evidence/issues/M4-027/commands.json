@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-027",
+  "baseCommit": "69a8bd895cb63f052c418353b727b1f2f8703e47",
+  "date": "2026-11-16",
+  "toolchain": {
+    "swiftVersion": [
+      "swift-driver version: 1.127.14.1 Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0"
+    ],
+    "python": "3.9.6",
+    "macOS": "26.6.2",
+    "architecture": "arm64",
+    "linuxImage": "swift:6.2.3-jammy@sha256:33c73fc133767cdaafde26f0f9967c96ab25ff77618b7df1eabf46140bf2b6e6 (run as linux/arm64 in a local container)"
+  },
+  "note": "Run by the implementing agent on the staged M4-027 tree. LinuxPlatform builds only on Linux: the Linux evidence is the container runs recorded in the entries below (RED, GREEN, mutations) and the CI verify-linux job (see summary content). Local make verify-linux under linux/amd64 emulation hangs on this Mac. Paths masked.",
+  "commands": [
+    {
+      "name": "swift-test-full",
+      "command": "timeout 900 swift test --xunit-output evidence/issues/M4-027/tests/swift-testing-xunit.xml 2>&1 | grep -E 'Test run with|Executed .* tests' | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:10:48Z",
+      "endedAt": "2026-11-16T13:11:08Z",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u2714 Test run with 285 tests in 27 suites passed after 0.141 seconds.\n",
+      "stderr": ""
+    },
+    {
+      "name": "swift-test-warnings-as-errors",
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed .* tests|error' | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:11:08Z",
+      "endedAt": "2026-11-16T13:11:18Z",
+      "exitCode": 0,
+      "stdout": "\u25c7 Test \"a served consumer later observes overflow as a typed error\" started.\n\u2714 Test \"a served consumer later observes overflow as a typed error\" passed after 0.010 seconds.\n\u2714 Test run with 285 tests in 27 suites passed after 0.133 seconds.\n",
+      "stderr": ""
+    },
+    {
+      "name": "format-lint-files",
+      "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxScreenBackend.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxScreenBackendTests.swift",
+      "startedAt": "2026-11-16T13:11:18Z",
+      "endedAt": "2026-11-16T13:11:18Z",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "format-lint-repository",
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-16T13:11:18Z",
+      "endedAt": "2026-11-16T13:11:21Z",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "docs-check",
+      "command": "make docs-check 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:11:21Z",
+      "endedAt": "2026-11-16T13:11:21Z",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "architecture-check",
+      "command": "make architecture-check 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:11:21Z",
+      "endedAt": "2026-11-16T13:11:21Z",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "validate-package",
+      "command": "python3 Tools/Backlog/validate_package.py 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:11:21Z",
+      "endedAt": "2026-11-16T13:11:21Z",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
+      "stderr": ""
+    },
+    {
+      "name": "git-diff-cached-check",
+      "command": "git diff --cached --check",
+      "startedAt": "2026-11-16T13:11:21Z",
+      "endedAt": "2026-11-16T13:11:21Z",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "make-verify",
+      "command": "make verify REPORT=<producer-scratch>/m4-027/verify.json 2>&1 | tail -6; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-16T13:11:21Z",
+      "endedAt": "2026-11-16T13:14:17Z",
+      "exitCode": 0,
+      "stdout": "[PASSED] swift-package-test:MacPlatform exit=0 durationMs=25433\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=38994\n[PASSED] repository-contract-tests exit=0 durationMs=82175\n[PASSED] swift-test-targets exit=0 durationMs=1760\n[PASSED] native-arm64-build exit=0 durationMs=1236\nCI report: <producer-scratch>/m4-027/verify.json\n",
+      "stderr": ""
+    }
+  ]
+}
