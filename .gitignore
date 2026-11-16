@@ -4,3 +4,5 @@
 *.xcuserstate
 xcuserdata/
 /artifacts/
+/.build-linux/
+/Package.resolved

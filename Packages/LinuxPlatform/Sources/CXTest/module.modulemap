@@ -1,0 +1,5 @@
+module CXTest [system] {
+  header "shim.h"
+  link "Xtst"
+  export *
+}

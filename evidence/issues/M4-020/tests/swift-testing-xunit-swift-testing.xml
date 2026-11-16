@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="14" failures="0" skipped="1" time="0.001315417">
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11GateSeesDisplay()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11TestsFlag()" time="0.0002825" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="lockTargetsX11()" time="0.000219375" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="manifestPinsExactVersions()" time="0.000946959" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="constantsMatchLock()" time="0.000734833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="deterministic()" time="0.000332209" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unrelatedVariables()" time="0.00015775" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="nothingSet()" time="0.000253666" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandDisplay()" time="0.000295833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="blankValues()" time="0.000235958" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11Session()" time="0.000187625" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11TypeWithoutDisplay()" time="0.000186541" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="supportedServers()" time="0.000249583" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandSessionType()" time="0.000207584" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unknownSessionType()" time="0.000274667" />
+  </testsuite>
+</testsuites>
