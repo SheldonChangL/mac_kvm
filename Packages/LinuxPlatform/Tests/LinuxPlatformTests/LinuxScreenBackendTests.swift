@@ -2,6 +2,7 @@
   import CX11
   import CXRandR
   import Foundation
+  import Glibc
   import KVMContracts
   import LinuxPlatform
   import Testing
@@ -128,6 +129,10 @@
   private final class PrivateXvfb: @unchecked Sendable {
     let displayName: String
     private let process: Process
+    /// One client that stays connected for the server's whole life. Xvfb resets when its last
+    /// client disconnects, and a connection made during the reset is dropped (ECONNRESET); a raw
+    /// Xlib loop without a sentinel fails 556 of 600 times, with one it fails 0 of 600.
+    private var sentinel: OpaquePointer?
 
     init(randr: Bool = true) throws {
       let process = Process()
@@ -157,13 +162,18 @@
       }
       self.process = process
       self.displayName = ":" + number
+      self.sentinel = XOpenDisplay(self.displayName)
     }
 
     func stop() {
+      if let sentinel {
+        XCloseDisplay(sentinel)
+        self.sentinel = nil
+      }
       // SIGKILL, then reap here. `Process.waitUntilExit()` can miss the exit of one of several
       // concurrent children in swift-corelibs-foundation and hang the test; `waitpid` returns
       // when the child is gone, or at once with ECHILD when Foundation already reaped it.
-      kill(process.processIdentifier, SIGKILL)
+      Glibc.kill(process.processIdentifier, SIGKILL)
       var status: Int32 = 0
       _ = waitpid(process.processIdentifier, &status, 0)
     }
@@ -275,19 +285,19 @@
     return await condition()
   }
 
-  /// Opens a backend on the test server. Xvfb refuses an occasional connection when clients
-  /// connect and disconnect in quick succession (a plain Xlib loop shows about 8 percent in
-  /// the Linux container), which says nothing about the backend, so the harness retries a
-  /// refused open. Only the open is retried; every behavior under test runs once.
-  private func openBackend(_ server: PrivateXvfb) throws -> LinuxScreenBackend {
-    var attempts = 0
-    while true {
-      do {
-        return try LinuxScreenBackend(displayName: server.displayName)
-      } catch {
-        attempts += 1
-        if attempts >= 8 { throw error }
-      }
+  /// Opens a backend on the test server. The server's sentinel connection (see `PrivateXvfb`)
+  /// keeps Xvfb from resetting between connections, so an open that fails is a real failure and
+  /// is not retried.
+  private func openBackend(
+    _ server: PrivateXvfb, runsEventThread: Bool = true
+  ) throws -> LinuxScreenBackend {
+    try LinuxScreenBackend(displayName: server.displayName, runsEventThread: runsEventThread)
+  }
+
+  extension Result {
+    fileprivate var isSuccess: Bool {
+      if case .success = self { return true }
+      return false
     }
   }
 
@@ -297,7 +307,7 @@
 
   @Suite(
     "M4-027 Linux screen backend: X11 under Xvfb",
-    .tags(.x11),
+    .tags(.x11), .serialized,
     .enabled(
       if: LinuxPlatformSkeleton.x11TestsEnabled(
         environment: ProcessInfo.processInfo.environment))
@@ -377,14 +387,14 @@
       let warmUp = try openBackend(server)
       await warmUp.stop()
       let before = openDescriptorCount()
-      for _ in 0..<30 {
+      for _ in 0..<40 {
         let backend = try openBackend(server)
         await backend.stop()
       }
       let after = openDescriptorCount()
-      // A leak costs at least two descriptors per backend (60 or more); other test suites
+      // A leak costs at least two descriptors per backend (80 or more); other test suites
       // opening files in parallel move the count by a handful.
-      #expect(after - before < 20)
+      #expect(after - before < 40)
     }
 
     @Test("a screen resize yields the new geometry, and pointer movement alone yields nothing")
@@ -481,6 +491,37 @@
       await backend.stop()
       task.cancel()
       await task.value
+    }
+
+    @Test("failure: querying right after the server dies fails cleanly, no crash")
+    func queryAfterServerDeath() async throws {
+      // The server is gone and reaped (its sockets are closed) before the first query, and
+      // the test does not wait for `changes` to finish. Whichever of the event thread and this
+      // thread notices first, a query must never reach Xlib with the closed connection (its
+      // default handler ends the process). Repeated over 30 servers because which thread wins
+      // is not controllable; a query racing the kill itself cannot be guarded (the doc).
+      for _ in 0..<30 {
+        let server = try PrivateXvfb()
+        let backend = try openBackend(server)
+        server.stop()
+        #expect(backend.currentGeometry() == .failure(unavailable))
+        #expect(backend.currentGeometry() == .failure(unavailable))
+        await backend.stop()
+      }
+    }
+
+    @Test("failure: the query guard alone: without an event thread, a dead server fails cleanly")
+    func queryGuardWithoutEventThread() async throws {
+      for _ in 0..<10 {
+        let server = try PrivateXvfb()
+        let open = try openBackend(server, runsEventThread: false)
+        #expect(open.currentGeometry().isSuccess)
+        server.stop()
+        // Nothing but the query path can notice: it must not hand the closed connection to Xlib.
+        #expect(open.currentGeometry() == .failure(unavailable))
+        #expect(open.currentGeometry() == .failure(unavailable))
+        await open.stop()
+      }
     }
 
     @Test("no change is reported after stop(), even when the screen resizes")

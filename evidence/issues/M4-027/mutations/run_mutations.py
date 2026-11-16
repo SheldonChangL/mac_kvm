@@ -118,6 +118,20 @@ MUTANTS = [
     {"id": "S4", "requirement": "cleanup: both X connections are closed",
      "description": "shutdown leaves the displays open",
      "replacements": [(CLOSE_DISPLAYS, "      }\n")]},
+    {"id": "Q3", "requirement": "failure: the query connection is checked before Xlib uses it",
+     "description": "currentGeometry hands a closed connection to Xlib (crash kill: Xlib exits the process)",
+     "crashKill": True,
+     "replacements": [("      guard queryConnectionIsOpen() else { return .failure(LinuxScreenError.subsystemUnavailable) }\n      return Self.readGeometry",
+                       "      return Self.readGeometry")]},
+    {"id": "L1", "requirement": "failure: the event thread notices a closed connection before Xlib reads",
+     "description": "neither POLLHUP nor the EOF peek is checked (crash kill: Xlib exits the process)",
+     "crashKill": True,
+     "replacements": [("if descriptors[0].revents & hangUp != 0 || Self.connectionClosed(eventDescriptor) {",
+                       "if descriptors[0].revents & hangUp == 7 {")]},
+    {"id": "L2", "requirement": "failure: the drain loop never reads the socket after the EOF check",
+     "description": "the drain loop uses QueuedAfterReading, which reads the socket again (documented: not deterministically testable)",
+     "documentedSurvivor": True,
+     "replacements": [("while XEventsQueued(eventDisplay, 0) > 0 {", "while XEventsQueued(eventDisplay, 1) > 0 {")]},
     {"id": "H1", "requirement": "failure: a lost display finishes changes",
      "description": "markLost does not finish the stream",
      "replacements": [("      lock.unlock()\n      continuation.finish()\n    }\n\n    // MARK: Shutdown",
@@ -153,6 +167,7 @@ def run_suite(repository: pathlib.Path, image: str, volume: str) -> dict:
         "durationSeconds": round(time.monotonic() - started, 1),
         "failingTests": sorted(set(FAILED_TEST.findall(output))),
         "compileError": bool(COMPILE_ERROR.search(output)) and summary_line is None,
+        "xlibFatalIO": ("fatal IO error" in output or "broken (explicit kill or server shutdown)" in output),
         "summary": summary_line.group(0) if summary_line else None,
     }
 
@@ -226,9 +241,13 @@ def main() -> int:
             diff_clean = (not tracked) or git_diff_exit_code(repository, SOURCE) == 0
             killed = (outcome["exitCode"] not in (0, "timeout") and bool(outcome["failingTests"])
                       and not outcome["compileError"])
+            if mutant.get("crashKill") and outcome["xlibFatalIO"] and outcome["exitCode"] != 0:
+                killed = True  # the named test was running when Xlib ended the process
+            if mutant.get("documentedSurvivor"):
+                entry["documentedSurvivor"] = True
             entry.update({"killed": killed, **outcome, "restoredIdentical": restored,
                           "gitDiffClean": diff_clean})
-            if not (killed and restored and diff_clean):
+            if not (restored and diff_clean) or not (killed or mutant.get("documentedSurvivor")):
                 ok = False
             results.append(entry)
             if args.out:

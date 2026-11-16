@@ -79,7 +79,15 @@
     private let session: ScreenSession
 
     package init(displayName: String?) throws(CoreError) {
-      self.session = try ScreenSession.open(displayName: displayName)
+      self.session = try ScreenSession.open(displayName: displayName, runsEventThread: true)
+    }
+
+    /// Test seam: with `runsEventThread` false nothing watches the event connection, so a test
+    /// can reach the guards of `currentGeometry()` that the event thread would otherwise
+    /// pre-empt. `changes` never yields without the thread. Production uses `init(displayName:)`.
+    package init(displayName: String?, runsEventThread: Bool) throws(CoreError) {
+      self.session = try ScreenSession.open(
+        displayName: displayName, runsEventThread: runsEventThread)
     }
 
     deinit {
@@ -117,11 +125,14 @@
     /// Serializes `shutdown()` so a second caller waits for the first to finish.
     private let shutdownLock = NSLock()
     private let threadExited = DispatchSemaphore(value: 0)
+    private var threadStarted = false
     private var stopped = false
     private var lost = false
     private var lastReported: PlatformScreenGeometry
 
-    static func open(displayName: String?) throws(CoreError) -> ScreenSession {
+    static func open(
+      displayName: String?, runsEventThread: Bool
+    ) throws(CoreError) -> ScreenSession {
       guard let queryDisplay = XOpenDisplay(displayName) else {
         throw LinuxScreenError.subsystemUnavailable
       }
@@ -164,7 +175,9 @@
         let session = ScreenSession(
           queryDisplay: queryDisplay, eventDisplay: eventDisplay, eventBase: eventBase,
           wakeRead: descriptors[0], wakeWrite: descriptors[1], initial: geometry)
-        session.startEventThread()
+        if runsEventThread {
+          session.startEventThread()
+        }
         return session
       }
     }
@@ -192,7 +205,20 @@
       lock.lock()
       defer { lock.unlock() }
       guard !stopped, !lost else { return .failure(LinuxScreenError.subsystemUnavailable) }
+      guard queryConnectionIsOpen() else { return .failure(LinuxScreenError.subsystemUnavailable) }
       return Self.readGeometry(display: queryDisplay, root: queryRoot)
+    }
+
+    /// Whether the query connection can still be used. The caller holds the lock. A closed
+    /// connection is never handed to Xlib (its default IO handler would exit the process): the
+    /// session is marked lost and `changes` finishes, exactly as when the event thread notices.
+    private func queryConnectionIsOpen() -> Bool {
+      if Self.connectionClosed(XConnectionNumber(queryDisplay)) {
+        lost = true
+        continuation.finish()
+        return false
+      }
+      return true
     }
 
     /// Reads the root window's size and the pointer. The caller holds the lock, or has the
@@ -230,6 +256,7 @@
     // MARK: Event thread
 
     private func startEventThread() {
+      threadStarted = true
       let thread = Thread { [self] in
         runEvents()
         threadExited.signal()
@@ -257,7 +284,7 @@
         }
         if descriptors[1].revents != 0 { return }
         let hangUp = Int16(POLLHUP | POLLERR | POLLNVAL)
-        if descriptors[0].revents & hangUp != 0 || connectionClosed(eventDescriptor) {
+        if descriptors[0].revents & hangUp != 0 || Self.connectionClosed(eventDescriptor) {
           markLost()
           return
         }
@@ -269,7 +296,7 @@
 
     /// Whether the X server has closed the connection. Peeks without consuming, so Xlib still
     /// reads whatever is pending.
-    private func connectionClosed(_ descriptor: Int32) -> Bool {
+    private static func connectionClosed(_ descriptor: Int32) -> Bool {
       var byte: UInt8 = 0
       let received = recv(descriptor, &byte, 1, Int32(MSG_PEEK | MSG_DONTWAIT))
       if received == 0 { return true }
@@ -302,6 +329,10 @@
     private func publish() {
       lock.lock()
       if stopped || lost {
+        lock.unlock()
+        return
+      }
+      guard queryConnectionIsOpen() else {
         lock.unlock()
         return
       }
@@ -340,7 +371,9 @@
 
       var byte: UInt8 = 1
       _ = write(wakeWrite, &byte, 1)
-      threadExited.wait()
+      if threadStarted {
+        threadExited.wait()
+      }
 
       continuation.finish()
       // The event thread has exited, so `lost` can no longer change.

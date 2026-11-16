@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "issue": "M4-027",
-  "baseCommit": "69a8bd895cb63f052c418353b727b1f2f8703e47",
+  "baseCommit": "a0b40d382a9566d7237d63382ea79b71f61fd0b0",
   "date": "2026-11-16",
   "toolchain": {
     "swiftVersion": [
@@ -18,26 +18,26 @@
     {
       "name": "swift-test-full",
       "command": "timeout 900 swift test --xunit-output evidence/issues/M4-027/tests/swift-testing-xunit.xml 2>&1 | grep -E 'Test run with|Executed .* tests' | tail -3; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:10:48Z",
-      "endedAt": "2026-11-16T13:11:08Z",
+      "startedAt": "2026-11-16T14:02:46Z",
+      "endedAt": "2026-11-16T14:02:46Z",
       "exitCode": 0,
-      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u2714 Test run with 285 tests in 27 suites passed after 0.141 seconds.\n",
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u2714 Test run with 285 tests in 27 suites passed after 0.137 seconds.\n",
       "stderr": ""
     },
     {
       "name": "swift-test-warnings-as-errors",
       "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed .* tests|error' | tail -3; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:11:08Z",
-      "endedAt": "2026-11-16T13:11:18Z",
+      "startedAt": "2026-11-16T14:02:46Z",
+      "endedAt": "2026-11-16T14:02:56Z",
       "exitCode": 0,
-      "stdout": "\u25c7 Test \"a served consumer later observes overflow as a typed error\" started.\n\u2714 Test \"a served consumer later observes overflow as a typed error\" passed after 0.010 seconds.\n\u2714 Test run with 285 tests in 27 suites passed after 0.133 seconds.\n",
+      "stdout": "\u25c7 Test \"a served consumer later observes overflow as a typed error\" started.\n\u2714 Test \"a served consumer later observes overflow as a typed error\" passed after 0.009 seconds.\n\u2714 Test run with 285 tests in 27 suites passed after 0.137 seconds.\n",
       "stderr": ""
     },
     {
       "name": "format-lint-files",
       "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxScreenBackend.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxScreenBackendTests.swift",
-      "startedAt": "2026-11-16T13:11:18Z",
-      "endedAt": "2026-11-16T13:11:18Z",
+      "startedAt": "2026-11-16T14:02:56Z",
+      "endedAt": "2026-11-16T14:02:56Z",
       "exitCode": 0,
       "stdout": "",
       "stderr": ""
@@ -45,8 +45,8 @@
     {
       "name": "format-lint-repository",
       "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
-      "startedAt": "2026-11-16T13:11:18Z",
-      "endedAt": "2026-11-16T13:11:21Z",
+      "startedAt": "2026-11-16T14:02:56Z",
+      "endedAt": "2026-11-16T14:02:58Z",
       "exitCode": 0,
       "stdout": "",
       "stderr": ""
@@ -54,8 +54,8 @@
     {
       "name": "docs-check",
       "command": "make docs-check 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:11:21Z",
-      "endedAt": "2026-11-16T13:11:21Z",
+      "startedAt": "2026-11-16T14:02:58Z",
+      "endedAt": "2026-11-16T14:02:59Z",
       "exitCode": 0,
       "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
       "stderr": ""
@@ -63,8 +63,8 @@
     {
       "name": "architecture-check",
       "command": "make architecture-check 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:11:21Z",
-      "endedAt": "2026-11-16T13:11:21Z",
+      "startedAt": "2026-11-16T14:02:59Z",
+      "endedAt": "2026-11-16T14:02:59Z",
       "exitCode": 0,
       "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
       "stderr": ""
@@ -72,8 +72,8 @@
     {
       "name": "validate-package",
       "command": "python3 Tools/Backlog/validate_package.py 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:11:21Z",
-      "endedAt": "2026-11-16T13:11:21Z",
+      "startedAt": "2026-11-16T14:02:59Z",
+      "endedAt": "2026-11-16T14:02:59Z",
       "exitCode": 0,
       "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
       "stderr": ""
@@ -81,8 +81,8 @@
     {
       "name": "git-diff-cached-check",
       "command": "git diff --cached --check",
-      "startedAt": "2026-11-16T13:11:21Z",
-      "endedAt": "2026-11-16T13:11:21Z",
+      "startedAt": "2026-11-16T14:02:59Z",
+      "endedAt": "2026-11-16T14:02:59Z",
       "exitCode": 0,
       "stdout": "",
       "stderr": ""
@@ -90,11 +90,32 @@
     {
       "name": "make-verify",
       "command": "make verify REPORT=<producer-scratch>/m4-027/verify.json 2>&1 | tail -6; exit ${PIPESTATUS[0]}",
-      "startedAt": "2026-11-16T13:11:21Z",
-      "endedAt": "2026-11-16T13:14:17Z",
+      "startedAt": "2026-11-16T14:02:59Z",
+      "endedAt": "2026-11-16T14:04:40Z",
       "exitCode": 0,
-      "stdout": "[PASSED] swift-package-test:MacPlatform exit=0 durationMs=25433\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=38994\n[PASSED] repository-contract-tests exit=0 durationMs=82175\n[PASSED] swift-test-targets exit=0 durationMs=1760\n[PASSED] native-arm64-build exit=0 durationMs=1236\nCI report: <producer-scratch>/m4-027/verify.json\n",
+      "stdout": "[PASSED] swift-package-test:MacPlatform exit=0 durationMs=762\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=8456\n[PASSED] repository-contract-tests exit=0 durationMs=75906\n[PASSED] swift-test-targets exit=0 durationMs=1063\n[PASSED] native-arm64-build exit=0 durationMs=1146\nCI report: <producer-scratch>/m4-027/verify.json\n",
       "stderr": ""
+    },
+    {
+      "name": "linux-container-red",
+      "command": "MACKVM_X11_TESTS=1 swift test --filter LinuxScreen (linux/arm64 container, stub LinuxScreenBackend.swift)",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "",
+      "stderr": "",
+      "note": "RED run of the first implementation round: a compiling stub with the real tests; 6 of the pure-rule tests failed. The raw log was lost when the session ended, so no output is recorded here."
+    },
+    {
+      "name": "linux-container-green",
+      "command": "for i in 1..15: MACKVM_X11_TESTS=1 timeout -s KILL 150 swift test --skip-build --filter LinuxScreen (linux/arm64 container, same image digest as verify-linux)",
+      "startedAt": null,
+      "endedAt": null,
+      "exitCode": 0,
+      "stdout": "15 of 15 runs: Test run with 20 tests in 3 suites passed (about 2.0 seconds each)",
+      "stderr": "",
+      "note": "Observed output of the loop runner, summarised; the CI verify-linux job is the authoritative Linux evidence."
     }
   ]
 }

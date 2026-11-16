@@ -1,19 +1,20 @@
 {
   "schemaVersion": 1,
   "issue": "M4-027",
-  "date": "2026-11-16T13:04:20Z",
+  "date": "2026-11-16T13:54:34Z",
   "source": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxScreenBackend.swift",
-  "sourceSha256": "884056c0c375a7a833452322617d0037a0f59907f0e8374f1a33af8ccca95d8d",
+  "sourceSha256": "2c7f35fb30057a598d1ece203b48e8834145d07b10dc09a14c69cac1bbbce424",
   "tests": "Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxScreenBackendTests.swift",
-  "testsSha256": "e840196ea692d1559e6fe489175e3f45934d40a9deb84cc8ea1b9a59816cbf03",
+  "testsSha256": "343c21ac7c970c29a852a5e2d7879a19497a025e8a0e038bc45c9ba64ab887a5",
   "command": "swift test --filter LinuxScreen (linux/arm64 container, MACKVM_X11_TESTS=1)",
   "timeoutSeconds": 900,
   "baseline": {
     "exitCode": 0,
-    "durationSeconds": 12.3,
+    "durationSeconds": 10.0,
     "failingTests": [],
     "compileError": false,
-    "summary": "Test run with 18 tests in 3 suites passed after 0.612 seconds."
+    "xlibFatalIO": false,
+    "summary": "Test run with 20 tests in 3 suites passed after 2.036 seconds."
   },
   "mutants": [
     {
@@ -22,13 +23,14 @@
       "description": "maximumDimension becomes 0x8000",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 10.4,
+      "durationSeconds": 11.4,
       "failingTests": [
         "\"boundary: 1x1 and the largest DINF size 0x7FFF are accepted\"",
         "\"invalid: a width or height above 0x7FFF fails with protocol.invariantViolation\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.590 seconds with 3 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.024 seconds with 3 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -38,12 +40,13 @@
       "description": "the accepted range starts at 0",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 8.0,
+      "durationSeconds": 11.3,
       "failingTests": [
         "\"invalid: a zero width or height fails with protocol.invariantViolation\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.594 seconds with 2 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.008 seconds with 2 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -53,13 +56,14 @@
       "description": "only the width is checked",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 7.8,
+      "durationSeconds": 10.5,
       "failingTests": [
         "\"invalid: a width or height above 0x7FFF fails with protocol.invariantViolation\"",
         "\"invalid: a zero width or height fails with protocol.invariantViolation\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.610 seconds with 2 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.108 seconds with 2 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -69,12 +73,13 @@
       "description": "hasChanged ignores the height",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.7,
+      "durationSeconds": 10.8,
       "failingTests": [
         "\"a change is a different origin or size; pointer movement alone is not one\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.585 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.013 seconds with 1 issue.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -84,12 +89,14 @@
       "description": "hasChanged also compares the pointer",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.9,
+      "durationSeconds": 10.5,
       "failingTests": [
-        "\"a change is a different origin or size; pointer movement alone is not one\""
+        "\"a change is a different origin or size; pointer movement alone is not one\"",
+        "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.710 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.055 seconds with 4 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -99,14 +106,15 @@
       "description": "the geometry gets originX 1",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.8,
+      "durationSeconds": 10.4,
       "failingTests": [
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\"",
         "\"happy path: Xvfb 1600x900 reads as origin (0, 0), 1600x900\"",
         "\"happy path: a 1600x900 screen with the pointer inside has origin (0, 0)\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.589 seconds with 3 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.001 seconds with 3 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -116,14 +124,15 @@
       "description": "invariantViolation allows a backoff retry",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 9.2,
+      "durationSeconds": 11.2,
       "failingTests": [
         "\"invalid: a width or height above 0x7FFF fails with protocol.invariantViolation\"",
         "\"invalid: a zero width or height fails with protocol.invariantViolation\"",
         "\"the errors are terminal and carry no cleanup\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.950 seconds with 6 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.016 seconds with 6 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -133,16 +142,19 @@
       "description": "subsystemUnavailable carries lifecycle.sleep",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 28.4,
+      "durationSeconds": 11.5,
       "failingTests": [
         "\"cancel and cleanup: concurrent stop() calls all return and the backend is closed\"",
         "\"failure: a display that cannot be opened fails with lifecycle.subsystemUnavailable\"",
         "\"failure: losing the X server finishes changes and fails currentGeometry, no crash\"",
+        "\"failure: querying right after the server dies fails cleanly, no crash\"",
+        "\"failure: the query guard alone: without an event thread, a dead server fails cleanly\"",
         "\"idempotent: stop() twice, then currentGeometry fails and changes has finished\"",
         "\"the errors are terminal and carry no cleanup\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 1.504 seconds with 7 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.038 seconds with 87 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -152,13 +164,14 @@
       "description": "capabilityUnavailable reports a failed cleanup",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 21.7,
+      "durationSeconds": 13.6,
       "failingTests": [
         "\"failure: an X server without RandR fails with permission.capabilityUnavailable\"",
         "\"the errors are terminal and carry no cleanup\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.990 seconds with 2 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.111 seconds with 2 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -168,12 +181,13 @@
       "description": "the first open failure reports invariantViolation",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 10.3,
+      "durationSeconds": 11.7,
       "failingTests": [
         "\"failure: a display that cannot be opened fails with lifecycle.subsystemUnavailable\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.590 seconds with 3 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.008 seconds with 3 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -183,12 +197,13 @@
       "description": "a missing RandR reports subsystemUnavailable",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.7,
+      "durationSeconds": 10.5,
       "failingTests": [
         "\"failure: an X server without RandR fails with permission.capabilityUnavailable\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.585 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 1.967 seconds with 1 issue.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -198,13 +213,14 @@
       "description": "cursorX and cursorY are swapped",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.7,
+      "durationSeconds": 10.4,
       "failingTests": [
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\"",
         "\"the pointer position follows XWarpPointer, corners included\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.598 seconds with 4 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.009 seconds with 4 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -214,7 +230,7 @@
       "description": "width and height are swapped",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 21.5,
+      "durationSeconds": 40.2,
       "failingTests": [
         "\"a consumer that falls behind receives the newest geometry\"",
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\"",
@@ -222,7 +238,8 @@
         "\"the pointer position follows XWarpPointer, corners included\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 15.566 seconds with 10 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 32.099 seconds with 10 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -232,16 +249,16 @@
       "description": "the event type is compared with the wrong offset",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 35.9,
+      "durationSeconds": 55.1,
       "failingTests": [
         "\"a consumer that falls behind receives the newest geometry\"",
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 30.109 seconds with 5 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 47.000 seconds with 5 issues.",
       "restoredIdentical": true,
-      "gitDiffClean": true,
-      "note": "first run of the full pass hit a transient build failure (7.5 s, no test ran); rerun with --only C1 on the same sources"
+      "gitDiffClean": true
     },
     {
       "id": "C2",
@@ -249,13 +266,14 @@
       "description": "XRRSelectInput is never called",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 36.5,
+      "durationSeconds": 55.5,
       "failingTests": [
         "\"a consumer that falls behind receives the newest geometry\"",
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 30.123 seconds with 5 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 47.021 seconds with 5 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -265,12 +283,13 @@
       "description": "publish yields whenever a screen event arrives",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.6,
+      "durationSeconds": 10.3,
       "failingTests": [
         "\"a screen resize yields the new geometry, and pointer movement alone yields nothing\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.593 seconds with 2 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 1.991 seconds with 3 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -280,12 +299,13 @@
       "description": "the stream keeps the oldest buffered value",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 21.6,
+      "durationSeconds": 25.3,
       "failingTests": [
         "\"a consumer that falls behind receives the newest geometry\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 15.605 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 16.972 seconds with 1 issue.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -295,14 +315,17 @@
       "description": "currentGeometry reports invariantViolation once stopped",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.5,
+      "durationSeconds": 10.5,
       "failingTests": [
         "\"cancel and cleanup: concurrent stop() calls all return and the backend is closed\"",
         "\"failure: losing the X server finishes changes and fails currentGeometry, no crash\"",
+        "\"failure: querying right after the server dies fails cleanly, no crash\"",
+        "\"failure: the query guard alone: without an event thread, a dead server fails cleanly\"",
         "\"idempotent: stop() twice, then currentGeometry fails and changes has finished\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.581 seconds with 3 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.001 seconds with 73 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -312,14 +335,15 @@
       "description": "shutdown does not finish the stream",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 21.2,
+      "durationSeconds": 55.3,
       "failingTests": [
         "\"cancel: stop() releases a consumer that is waiting on changes\"",
         "\"idempotent: stop() twice, then currentGeometry fails and changes has finished\"",
         "\"no change is reported after stop(), even when the screen resizes\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 15.089 seconds with 3 issues.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 47.073 seconds with 3 issues.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -329,12 +353,13 @@
       "description": "shutdown leaves the pipe descriptors open",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.5,
+      "durationSeconds": 10.7,
       "failingTests": [
         "\"cleanup: creating and stopping a backend repeatedly does not leak descriptors\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.586 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.053 seconds with 1 issue.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -344,12 +369,56 @@
       "description": "shutdown leaves the displays open",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 6.4,
+      "durationSeconds": 10.5,
       "failingTests": [
         "\"cleanup: creating and stopping a backend repeatedly does not leak descriptors\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 0.595 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 2.047 seconds with 1 issue.",
+      "restoredIdentical": true,
+      "gitDiffClean": true
+    },
+    {
+      "id": "Q3",
+      "requirement": "failure: the query connection is checked before Xlib uses it",
+      "description": "currentGeometry hands a closed connection to Xlib (crash kill: Xlib exits the process)",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 10.0,
+      "failingTests": [],
+      "compileError": false,
+      "xlibFatalIO": true,
+      "summary": null,
+      "restoredIdentical": true,
+      "gitDiffClean": true
+    },
+    {
+      "id": "L1",
+      "requirement": "failure: the event thread notices a closed connection before Xlib reads",
+      "description": "neither POLLHUP nor the EOF peek is checked (crash kill: Xlib exits the process)",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 9.2,
+      "failingTests": [],
+      "compileError": false,
+      "xlibFatalIO": true,
+      "summary": null,
+      "restoredIdentical": true,
+      "gitDiffClean": true
+    },
+    {
+      "id": "L2",
+      "requirement": "failure: the drain loop never reads the socket after the EOF check",
+      "description": "the drain loop uses QueuedAfterReading, which reads the socket again (documented: not deterministically testable)",
+      "documentedSurvivor": true,
+      "killed": false,
+      "exitCode": 0,
+      "durationSeconds": 10.6,
+      "failingTests": [],
+      "compileError": false,
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites passed after 2.021 seconds.",
       "restoredIdentical": true,
       "gitDiffClean": true
     },
@@ -359,12 +428,13 @@
       "description": "markLost does not finish the stream",
       "killed": true,
       "exitCode": 1,
-      "durationSeconds": 20.9,
+      "durationSeconds": 25.3,
       "failingTests": [
         "\"failure: losing the X server finishes changes and fails currentGeometry, no crash\""
       ],
       "compileError": false,
-      "summary": "Test run with 18 tests in 3 suites failed after 15.043 seconds with 1 issue.",
+      "xlibFatalIO": false,
+      "summary": "Test run with 20 tests in 3 suites failed after 17.061 seconds with 1 issue.",
       "restoredIdentical": true,
       "gitDiffClean": true
     }
