@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="17" failures="0" skipped="0" time="0.002269416">
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="joinersGetFirstResult()" time="0.001808667" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="asyncCallerRuns()" time="0.001512" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releaseFailed()" time="0.001423541" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="repeated()" time="0.001479208" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reentrancy()" time="0.001566583" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="droppedReleaseCoveredBySweep()" time="0.001557833" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reportHasNoIdentity()" time="0.001656875" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="allFailed()" time="0.001539625" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="overflowCoveredBySweep()" time="0.001672625" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releasePartial()" time="0.001723083" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="everyStepAttempted()" time="0.001464542" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlan()" time="0.001394417" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlanAllOthersFail()" time="0.00140775" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="noReportBeforeRecovery()" time="0.001609541" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="concurrent()" time="0.00166225" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="order()" time="0.001379334" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="planFromLedger()" time="0.001678" />
+  </testsuite>
+</testsuites>

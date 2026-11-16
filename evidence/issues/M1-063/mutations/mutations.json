@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-063",
+  "date": "2026-11-16T07:16:06Z",
+  "source": "Packages/KVMCore/Sources/KVMCore/FailSafeCoordinator.swift",
+  "sourceSha256": "d087b00e37a3baf4bf0f4bc0becf16eea60cdfdd251c9b4b62d456630d201794",
+  "tests": "Packages/KVMCore/Tests/KVMCoreTests/FailSafeCoordinatorTests.swift",
+  "testRevision": null,
+  "testsSha256": "a1f556c68876bbafc2b1121059de45aa2ee445527e4185fa05f94585058c7105",
+  "command": "swift test --filter FailSafeCoordinator",
+  "timeoutSeconds": 600,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 3.9,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 17 tests in 2 suites passed after 0.001 seconds."
+  },
+  "mutants": [
+    {
+      "id": "T1",
+      "requirement": "terminal path step: the queue reset is skipped",
+      "description": "recover never calls clearTransientState",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"an async caller with nothing in flight runs the recovery itself\"",
+        "\"concurrent recoveries never interleave steps\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"joiners wait for the in-flight recovery and get its result; the steps run once\"",
+        "\"reentrant: a recovery triggered during a recovery returns notRequired without running\"",
+        "\"release disposition notRequired: an empty plan still sweeps and reports completed\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.006 seconds with 17 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T2",
+      "requirement": "the injector sweep is skipped (h.1)",
+      "description": "recover never calls releaseRemaining",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"boundary: overflowed and untracked presses are released by the sweep\"",
+        "\"concurrent recoveries never interleave steps\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"h.1: a release dropped with the queue is released only by the injector sweep\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"reentrant: a recovery triggered during a recovery returns notRequired without running\"",
+        "\"release disposition failed: the sweep is the next step and the recovery reports partial\"",
+        "\"release disposition notRequired: an empty plan still sweeps and reports completed\"",
+        "\"release disposition partial: the sweep still runs and the recovery reports partial\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.007 seconds with 22 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T3",
+      "requirement": "terminal path step: restoreLocalInput is skipped",
+      "description": "recover never calls restoreLocalInput",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"an async caller with nothing in flight runs the recovery itself\"",
+        "\"concurrent recoveries never interleave steps\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"joiners wait for the in-flight recovery and get its result; the steps run once\"",
+        "\"release disposition failed: the sweep is the next step and the recovery reports partial\"",
+        "\"release disposition notRequired: an empty plan still sweeps and reports completed\"",
+        "\"release disposition partial: the sweep still runs and the recovery reports partial\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.006 seconds with 21 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T4",
+      "requirement": "order: the sweep runs before the ledger plan",
+      "description": "releaseRemaining is moved ahead of ReleaseAllKeys.execute",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "\"concurrent recoveries never interleave steps\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"release disposition failed: the sweep is the next step and the recovery reports partial\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.006 seconds with 9 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T5",
+      "requirement": "order: the queue reset runs after the releases",
+      "description": "clearTransientState is moved after the sweep",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"an async caller with nothing in flight runs the recovery itself\"",
+        "\"concurrent recoveries never interleave steps\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"release disposition failed: the sweep is the next step and the recovery reports partial\"",
+        "\"release disposition notRequired: an empty plan still sweeps and reports completed\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.004 seconds with 9 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T6",
+      "requirement": "early return: a failed queue reset stops the recovery",
+      "description": "recover returns failed as soon as clearTransientState throws",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"failure: a failing step does not skip later steps\"",
+        "\"failure: every step failing reports failed and still attempts each\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.002 seconds with 5 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T7",
+      "requirement": "terminal path: the async joiner path does not wait",
+      "description": "recoverJoiningInFlight returns notRequired instead of joining",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "\"joiners wait for the in-flight recovery and get its result; the steps run once\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.001 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "T8",
+      "requirement": "terminal path: the async joiner gets a different result",
+      "description": "joiners are resumed with completed instead of the run's disposition",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"joiners wait for the in-flight recovery and get its result; the steps run once\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.001 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "D1",
+      "requirement": "release disposition notRequired is treated as a failure",
+      "description": "an empty plan is listed as a failed step",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.7,
+      "failingTests": [
+        "\"h.1: a release dropped with the queue is released only by the injector sweep\"",
+        "\"release disposition notRequired: an empty plan still sweeps and reports completed\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.001 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "D2",
+      "requirement": "release disposition completed is treated as a failure",
+      "description": "a completed plan is listed as a failed step",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "\"an async caller with nothing in flight runs the recovery itself\"",
+        "\"boundary: overflowed and untracked presses are released by the sweep\"",
+        "\"failure: a failing step does not skip later steps\"",
+        "\"happy path: queue reset, ledger plan, injector sweep, then restore, in that order\"",
+        "\"idempotent: a later recovery reruns the idempotent steps with no extra effect\"",
+        "\"reentrant: a recovery triggered during a recovery returns notRequired without running\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.001 seconds with 11 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "D3",
+      "requirement": "release disposition partial is swallowed",
+      "description": "a partial plan is counted as a success",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "\"release disposition partial: the sweep still runs and the recovery reports partial\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.002 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "D4",
+      "requirement": "release disposition failed is swallowed",
+      "description": "a failed plan is counted as a success",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "\"failure: every step failing reports failed and still attempts each\"",
+        "\"release disposition failed: the sweep is the next step and the recovery reports partial\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.002 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "D5",
+      "requirement": "the recovery never reports failed",
+      "description": "a recovery with no successful step reports partial",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "\"boundary: an empty plan with every other step failing reports failed\"",
+        "\"failure: every step failing reports failed and still attempts each\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.001 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "I1",
+      "requirement": "cleanup runs twice with a visible effect",
+      "description": "a reentrant or concurrent call runs the steps again instead of notRequired",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "\"concurrent recoveries never interleave steps\"",
+        "\"joiners wait for the in-flight recovery and get its result; the steps run once\"",
+        "\"reentrant: a recovery triggered during a recovery returns notRequired without running\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.009 seconds with 14 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "P1",
+      "requirement": "a key identity leaks into the report",
+      "description": "the report gains a field holding the plan's events",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.9,
+      "failingTests": [
+        "\"privacy: the report carries no key or button identity\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.002 seconds with 4 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R1",
+      "requirement": "review nit: the running flag is never reset",
+      "description": "recover leaves recovering set, so later calls and joiners never run",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.8,
+      "failingTests": [
+        "\"idempotent: a later recovery reruns the idempotent steps with no extra effect\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.003 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "L1",
+      "requirement": "extra: the ledger's buttons are left out of the plan",
+      "description": "releasePlan(for:) passes no buttons",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "\"releasePlan(for:) maps held keys and buttons in ReleaseAllKeys order\""
+      ],
+      "compileError": false,
+      "summary": "Test run with 17 tests in 2 suites failed after 0.003 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsUntouched": true,
+  "allRestored": true,
+  "killedCount": 17,
+  "mutantCount": 17
+}
