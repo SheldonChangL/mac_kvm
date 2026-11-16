@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-050",
+  "date": "2026-11-15T12:19:03Z",
+  "source": "Packages/KVMCore/Sources/KVMCore/ReleaseAllKeys.swift",
+  "sourceSha256": "3e48dadbae021fcd339a535cb4d6d75c57b984ae9507e6a05d8a4d20b17806ee",
+  "tests": "Packages/KVMCore/Tests/KVMCoreTests/ReleaseAllKeysTests.swift",
+  "testsSha256": "9fbba2a10dad78b7e09e150dae1fa1051f556ecae64ed698e846e4971003608b",
+  "command": "swift test --filter ReleaseAllKeys",
+  "timeoutSeconds": 900,
+  "baseline": {
+    "exitCode": 0,
+    "durationSeconds": 2.9,
+    "failingTests": [],
+    "compileError": false,
+    "summary": "Test run with 24 tests in 2 suites passed after 0.001 seconds."
+  },
+  "mutants": [
+    {
+      "id": "1",
+      "requirement": "modifiers released first",
+      "description": "modifier keys come before the other keys and the buttons",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "anUnclassifiedKeyIsAnOrdinaryKey",
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
+        "everyModifierKeyReleasesAfterTheButtons",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.010 seconds with 10 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "2",
+      "requirement": "buttons released before keys",
+      "description": "the buttons come before the non-modifier keys",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.6,
+      "failingTests": [
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "everyModifierKeyReleasesAfterTheButtons",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.007 seconds with 8 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3",
+      "requirement": "forward press order",
+      "description": "keys and buttons release in press order instead of reverse",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "anUnclassifiedKeyIsAnOrdinaryKey",
+        "buttonsReleaseNewestFirst",
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "modifierKeysReleaseNewestFirst",
+        "nonModifierKeysReleaseNewestFirst"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 7 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3b",
+      "requirement": "extra: forward press order for keys only",
+      "description": "keys release in press order; buttons stay in reverse order",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.6,
+      "failingTests": [
+        "anUnclassifiedKeyIsAnOrdinaryKey",
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "modifierKeysReleaseNewestFirst",
+        "nonModifierKeysReleaseNewestFirst"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "3c",
+      "requirement": "extra: forward press order for buttons only",
+      "description": "buttons release in press order; keys stay in reverse order",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.1,
+      "failingTests": [
+        "buttonsReleaseNewestFirst",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "4",
+      "requirement": "an early return after the first failure",
+      "description": "execute stops at the first step that throws",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.6,
+      "failingTests": [
+        "aFailedRunCanBeRepeatedAndRetriesEveryStep",
+        "aFailureOnTheFirstStepStillAttemptsTheRest",
+        "aFailureOnTheSecondStepStillAttemptsTheRest",
+        "everyStepFailingIsFailedNotPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.010 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "5",
+      "requirement": "not idempotent",
+      "description": "every step is attempted twice, so a run is not exactly one release per step",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 3.7,
+      "failingTests": [
+        "aFailedRunCanBeRepeatedAndRetriesEveryStep",
+        "aFailureOnTheFirstStepStillAttemptsTheRest",
+        "aFailureOnTheSecondStepStillAttemptsTheRest",
+        "eachRunAttemptsEachStepExactlyOnce",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder",
+        "releasesEveryStepInPlanOrderAndReportsCompleted",
+        "runningThePlanTwiceIsHarmless"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.009 seconds with 7 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "6",
+      "requirement": "an empty plan not reported as notRequired",
+      "description": "an empty plan reports completed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 2.0,
+      "failingTests": [
+        "anEmptyPlanIsNotRequiredAndTouchesNothing"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 1 issue.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "7",
+      "requirement": "all steps failing reported as partial instead of failed",
+      "description": "the failed disposition is never produced",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "aSingleStepPlanIsCompletedOrFailed",
+        "everyStepFailingIsFailedNotPartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "8",
+      "requirement": "a release without the press-time modifiers",
+      "description": "each key release carries no modifiers",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "modifierKeysReleaseNewestFirst",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.004 seconds with 5 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "9",
+      "requirement": "capsLock grouped with the non-modifier keys",
+      "description": "capsLock is classified as an ordinary key",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "everyModifierKeyReleasesAfterTheButtons"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.004 seconds with 2 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "R1",
+      "requirement": "independent review: failed also when all but one step failed",
+      "description": "failed is reported when failed > 0 and failed + 1 >= attempted, so a minority-of-one success and a two-step plan with one failure read failed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.8,
+      "failingTests": [
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.001 seconds with 3 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "10",
+      "requirement": "extra: a failure counts as nothing",
+      "description": "failed is never incremented, so a failing run reports completed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "aFailureOnTheFirstStepStillAttemptsTheRest",
+        "aFailureOnTheLastStepIsPartial",
+        "aFailureOnTheSecondStepStillAttemptsTheRest",
+        "aSingleStepPlanIsCompletedOrFailed",
+        "everyStepFailingIsFailedNotPartial",
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.002 seconds with 8 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "11",
+      "requirement": "extra: the disposition ignores a partial failure",
+      "description": "any failure short of all reports completed",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "aFailureOnTheFirstStepStillAttemptsTheRest",
+        "aFailureOnTheLastStepIsPartial",
+        "aFailureOnTheSecondStepStillAttemptsTheRest",
+        "oneFailureInATwoStepPlanIsPartial",
+        "twoFailuresInAThreeStepPlanArePartial"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.002 seconds with 6 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "12",
+      "requirement": "extra: only the first modifier group member classified",
+      "description": "control, option and command are treated as ordinary keys",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "everyModifierKeyReleasesAfterTheButtons",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.005 seconds with 5 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    },
+    {
+      "id": "13",
+      "requirement": "extra: the release phase is a press",
+      "description": "key releases are composed with phase down",
+      "killed": true,
+      "exitCode": 1,
+      "durationSeconds": 1.5,
+      "failingTests": [
+        "anUnclassifiedKeyIsAnOrdinaryKey",
+        "capsLockIsAModifierKeyAndReleasesWithTheModifiers",
+        "eachKeyReleaseCarriesTheModifiersRecordedAtItsPress",
+        "everyModifierKeyReleasesAfterTheButtons",
+        "everyStepIsARelease",
+        "keysThenButtonsThenModifiersWithEachGroupInReversePressOrder",
+        "modifierKeysReleaseNewestFirst",
+        "nonModifierKeysReleaseNewestFirst",
+        "planAndExecuteFromHeldInputReleaseEverythingInOrder"
+      ],
+      "compileError": false,
+      "summary": "Test run with 24 tests in 2 suites failed after 0.008 seconds with 15 issues.",
+      "restoredByteForByte": true,
+      "gitDiffExitCodeAfterRestore": 0
+    }
+  ],
+  "baselinePassed": true,
+  "allKilled": true,
+  "testsUntouched": true,
+  "allRestored": true,
+  "killedCount": 16,
+  "mutantCount": 16
+}
