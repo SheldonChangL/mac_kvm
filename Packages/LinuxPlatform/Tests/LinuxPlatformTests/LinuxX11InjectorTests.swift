@@ -479,6 +479,7 @@ private final class GatedInjector: InputInjectionBackend, @unchecked Sendable {
   private let lock = NSLock()
   private var events: [KVMEvent] = []
   private var threads: Set<String> = []
+  private var threadObjects: [Thread] = []
   let entered = DispatchSemaphore(value: 0)
   let gate = DispatchSemaphore(value: 0)
   let blockOn: KVMEvent?
@@ -491,9 +492,13 @@ private final class GatedInjector: InputInjectionBackend, @unchecked Sendable {
 
   var injected: [KVMEvent] { lock.withLock { events } }
   var threadNames: Set<String> { lock.withLock { threads } }
+  var injectingThreads: [Thread] { lock.withLock { threadObjects } }
 
   func inject(_ event: KVMEvent) -> CoreResult<InjectionOutcome> {
-    lock.withLock { _ = threads.insert(Thread.current.name ?? "") }
+    lock.withLock {
+      _ = threads.insert(Thread.current.name ?? "")
+      threadObjects.append(Thread.current)
+    }
     if event == blockOn {
       entered.signal()
       gate.wait()
@@ -523,7 +528,7 @@ private final class FailureBox: @unchecked Sendable {
 @Suite("M4-024 injection drain on a dedicated thread")
 struct LinuxInjectionDrainTests {
   @Test("events are injected in order on the drain's own thread")
-  func order() {
+  func order() throws {
     let injector = GatedInjector()
     let drain = LinuxInjectionDrain(injector: injector, capacity: 16, onFailure: { _ in })
     let events = (0..<5).map { key(.letter(UInt8($0)), .down) }
@@ -533,6 +538,8 @@ struct LinuxInjectionDrainTests {
     drain.clearTransientState()
     #expect(injector.injected == events)
     #expect(injector.threadNames == [LinuxInjectionDrain.threadName])
+    let worker = try #require(drain.workerThread)
+    #expect(injector.injectingThreads.allSatisfy { $0 === worker })
   }
 
   @Test("clearTransientState waits for the in-flight event, then drops the queue")

@@ -449,6 +449,10 @@ package final class LinuxInjectionDrain: @unchecked Sendable {
   /// Number of queued events not yet taken by the worker.
   package var count: Int { condition.withLock { queue.count - head } }
 
+  /// The dedicated worker thread, once started. Lets callers and tests check that injection runs
+  /// on it and not on a pool thread.
+  package var workerThread: Thread? { condition.withLock { thread } }
+
   /// Starts the worker thread. Idempotent; does nothing after `clearTransientState()`.
   package func start() {
     condition.withLock {

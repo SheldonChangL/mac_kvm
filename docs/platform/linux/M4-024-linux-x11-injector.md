@@ -29,7 +29,7 @@ The `${LINUX_SOURCE_ROOT}` placeholders of the issue resolve, by
 | `LinuxKeySymMapper.keysym(for:)` | The pure key table |
 | `LinuxX11PointerMath` | Pure pixel, button and wheel conversions |
 | `LinuxX11InputPort`, `init(port:screen:)` | The seam over the X11 calls; tests use an in-memory port |
-| `LinuxInjectionDrain` | Bounded FIFO and one dedicated `Thread`; `start()`, `enqueue(_:)`, `clearTransientState()` |
+| `LinuxInjectionDrain` | Bounded FIFO and one dedicated `Thread`; `start()`, `enqueue(_:)`, `clearTransientState()`, `count`, `workerThread` |
 
 `LinuxPlatform` does not import `KVMCore`, so the injector and the drain do not
 declare `ClientInputSafety` conformance. The composition root
