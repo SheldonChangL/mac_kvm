@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="TestResults" errors="0" tests="17" failures="0" skipped="0" time="0.001259167">
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="asyncCallerRuns()" time="0.000660458" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="joinersGetFirstResult()" time="0.000910875" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="allFailed()" time="0.000575958" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="order()" time="0.000746041" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releaseFailed()" time="0.000778792" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="droppedReleaseCoveredBySweep()" time="0.000663125" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reentrancy()" time="0.000752417" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="everyStepAttempted()" time="0.000769958" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="noReportBeforeRecovery()" time="0.000639125" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="concurrent()" time="0.000759917" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="overflowCoveredBySweep()" time="0.000659125" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="planFromLedger()" time="0.000709458" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="repeated()" time="0.000703125" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlan()" time="0.000847709" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlanAllOthersFail()" time="0.0007045" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reportHasNoIdentity()" time="0.000906958" />
-    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releasePartial()" time="0.000828" />
+  <testsuite name="TestResults" errors="0" tests="17" failures="0" skipped="0" time="0.001241542">
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reportHasNoIdentity()" time="0.000878292" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reentrancy()" time="0.000575917" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="droppedReleaseCoveredBySweep()" time="0.000604542" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlan()" time="0.000621958" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="concurrent()" time="0.000683125" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="noReportBeforeRecovery()" time="0.000575167" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="planFromLedger()" time="0.000711417" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="repeated()" time="0.000659417" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releasePartial()" time="0.000809792" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="everyStepAttempted()" time="0.000481959" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releaseFailed()" time="0.000724042" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="allFailed()" time="0.00060925" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlanAllOthersFail()" time="0.00073175" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="overflowCoveredBySweep()" time="0.000526708" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="order()" time="0.000572833" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="asyncCallerRuns()" time="0.000864083" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="joinersGetFirstResult()" time="0.00088925" />
   </testsuite>
 </testsuites>

@@ -394,7 +394,14 @@ struct FailSafeCoordinatorInFlightTests {
     let safety = BlockingSafety()
     safety.failRestoreStep()
     let coordinator = FailSafeCoordinator(safety: safety)
-    let first = Task.detached { coordinator.recover(plan: keyAndButtonPlan) }
+    // The blocked recovery runs on its own thread, so it never occupies the cooperative pool.
+    let first = Task {
+      await withCheckedContinuation {
+        (continuation: CheckedContinuation<CleanupDisposition, Never>) in
+        Thread { continuation.resume(returning: coordinator.recover(plan: keyAndButtonPlan)) }
+          .start()
+      }
+    }
     await safety.waitUntilBlocked()
     #expect(coordinator.recover(plan: keyAndButtonPlan) == .notRequired)
     let joiners = (0..<3).map { _ in
