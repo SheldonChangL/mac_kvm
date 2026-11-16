@@ -144,7 +144,11 @@ package final class CleanupHooks: @unchecked Sendable {
   /// then stays the process name. pthread_setname_np on pthread_self() has no such race.
   private static func nameCurrentThread() {
     #if os(Linux)
-      // Glibc's module map hides pthread_setname_np (it needs _GNU_SOURCE), so resolve it.
+      // Deliberate, Linux-only exception to KVMCore's platform-neutral rule: it covers OS thread
+      // naming only, never X11 or protocol code. KVMCore may not import Glibc (the architecture
+      // check forbids it), and Glibc's module map hides pthread_setname_np anyway (it needs
+      // _GNU_SOURCE), so the symbol is resolved with dlsym. If more such needs appear, the cleaner
+      // seam is a threadNamer closure defined in KVMContracts and injected from LinuxPlatform.
       typealias SetName = @convention(c) (pthread_t, UnsafePointer<CChar>) -> Int32
       if let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: 0), "pthread_setname_np") {
         _ = unsafeBitCast(symbol, to: SetName.self)(pthread_self(), threadName)
