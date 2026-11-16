@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-024",
+  "mutants": [
+    {
+      "id": "M01",
+      "mutation": "letters start at XK_b",
+      "killingTests": [
+        "everyMemberMaps"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "every catalog member maps to its X11 keysym"
+      ]
+    },
+    {
+      "id": "M02",
+      "mutation": "function keys off by one",
+      "killingTests": [
+        "everyMemberMaps"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "every catalog member maps to its X11 keysym"
+      ]
+    },
+    {
+      "id": "M03",
+      "mutation": "quote maps to XK_quotedbl",
+      "killingTests": [
+        "everyMemberMaps"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "every catalog member maps to its X11 keysym"
+      ]
+    },
+    {
+      "id": "M04",
+      "mutation": "command maps to XK_Super_R",
+      "killingTests": [
+        "everyMemberMaps"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "every catalog member maps to its X11 keysym"
+      ]
+    },
+    {
+      "id": "M05",
+      "mutation": "letter domain widened to 26",
+      "killingTests": [
+        "outOfDomain"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "unknown and out-of-domain payloads have no keysym"
+      ]
+    },
+    {
+      "id": "M06",
+      "mutation": "repeat is injected",
+      "killingTests": [
+        "repeatNotInjected"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a repeat is never injected, even for a held key"
+      ]
+    },
+    {
+      "id": "M07",
+      "mutation": "release uses the current keymap",
+      "killingTests": [
+        "releaseUsesPressedCode"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a release after a keymap change frees the key code that was pressed"
+      ]
+    },
+    {
+      "id": "M08",
+      "mutation": "key code 0 is injected",
+      "killingTests": [
+        "noKeyCode"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a key the keymap lacks is noPlatformKeyCode and is not recorded"
+      ]
+    },
+    {
+      "id": "M09",
+      "mutation": "vertical wheel sign inverted",
+      "killingTests": [
+        "wheelTable",
+        "scrollNotches"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a scroll is a press and release per notch",
+        "wheel sign table: up 4, down 5, left 6, right 7, vertical first"
+      ]
+    },
+    {
+      "id": "M10",
+      "mutation": "horizontal wheel sign inverted",
+      "killingTests": [
+        "wheelTable"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "wheel sign table: up 4, down 5, left 6, right 7, vertical first"
+      ]
+    },
+    {
+      "id": "M11",
+      "mutation": "notch cap 33",
+      "killingTests": [
+        "wheelCap"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "each wheel axis is capped at 32 notches, including Int32.min"
+      ]
+    },
+    {
+      "id": "M12",
+      "mutation": "auxiliary is X button 4",
+      "killingTests": [
+        "buttonTable"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "button table: left 1, middle 2, right 3, auxiliary 8"
+      ]
+    },
+    {
+      "id": "M13",
+      "mutation": "pixel scale uses extent",
+      "killingTests": [
+        "pixelRoundTrip"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "every pixel round-trips through the decoder's normalization"
+      ]
+    },
+    {
+      "id": "M14",
+      "mutation": "sweep in press order",
+      "killingTests": [
+        "releaseOrder"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "releaseAllHeld: other keys, then buttons, then modifiers, each in reverse press order"
+      ]
+    },
+    {
+      "id": "M15",
+      "mutation": "sweep skips buttons",
+      "killingTests": [
+        "releaseOrder",
+        "releaseAllLeavesNothingDown"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "releaseAllHeld: other keys, then buttons, then modifiers, each in reverse press order",
+        "the terminal path leaves no key or button down (h.1, h.6)"
+      ]
+    },
+    {
+      "id": "M16",
+      "mutation": "failed release forgotten",
+      "killingTests": [
+        "partialSweep"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a failed sweep reports cleanupPartial, keeps what failed and retries it"
+      ]
+    },
+    {
+      "id": "M17",
+      "mutation": "non-input injected as success",
+      "killingTests": [
+        "notInput"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "events that are not input fail with preconditionFailed and change nothing"
+      ]
+    },
+    {
+      "id": "M18",
+      "mutation": "flush is XFlush, not XSync",
+      "killingTests": [
+        "releaseRemaining",
+        "releaseStep"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "release(_:) waits for the server, and an unsupported release counts as done",
+        "releaseRemaining sweeps, then syncs; flush is XSync"
+      ]
+    },
+    {
+      "id": "M19",
+      "mutation": "release(_:) does not sync",
+      "killingTests": [
+        "releaseStep"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "release(_:) waits for the server, and an unsupported release counts as done"
+      ]
+    },
+    {
+      "id": "M20",
+      "mutation": "drain does not join the worker",
+      "killingTests": [
+        "joinsInFlight"
+      ],
+      "status": "killed-by-timeout",
+      "failingTests": []
+    },
+    {
+      "id": "M21",
+      "mutation": "drain keeps the queue",
+      "killingTests": [
+        "bounded",
+        "joinsInFlight"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a full queue refuses, and a stopped drain refuses",
+        "clearTransientState waits for the in-flight event, then drops the queue"
+      ]
+    },
+    {
+      "id": "M22",
+      "mutation": "drain unbounded",
+      "killingTests": [
+        "bounded"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a full queue refuses, and a stopped drain refuses"
+      ]
+    },
+    {
+      "id": "M23",
+      "mutation": "failure does not stop the worker",
+      "killingTests": [
+        "failureStops"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "an injection failure is reported once and stops the worker"
+      ]
+    },
+    {
+      "id": "M24",
+      "mutation": "missing XTest accepted",
+      "killingTests": [
+        "missingXTest"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "an X server without XTest is permission.capabilityUnavailable"
+      ]
+    },
+    {
+      "id": "M25",
+      "mutation": "pointer button count ignored",
+      "killingTests": [
+        "buttonUnavailable"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "buttons beyond the pointer's button count are unavailable"
+      ]
+    },
+    {
+      "id": "M26",
+      "mutation": "close does not release",
+      "killingTests": [
+        "closeReleases"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "close releases what is held, closes once, and later calls fail"
+      ]
+    },
+    {
+      "id": "M27",
+      "mutation": "motion ignores the origin",
+      "killingTests": [
+        "motion"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "a move lands on the pixel the server meant, offset by the origin"
+      ]
+    },
+    {
+      "id": "M28",
+      "mutation": "worker on the global queue, not a Thread",
+      "killingTests": [
+        "order"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "events are injected in order on the drain's own thread"
+      ]
+    },
+    {
+      "id": "M29",
+      "mutation": "modifiers released before buttons",
+      "killingTests": [
+        "releaseOrder"
+      ],
+      "status": "killed",
+      "failingTests": [
+        "releaseAllHeld: other keys, then buttons, then modifiers, each in reverse press order"
+      ]
+    }
+  ]
+}

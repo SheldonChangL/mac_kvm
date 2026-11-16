@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="51" failures="0" skipped="0" time="6.329777295">
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11GateSeesDisplay()" time="0.001524666" />
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11TestsFlag()" time="0.001830833" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="pointer()" time="0.025176542" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="releaseAllLeavesNothingDown()" time="0.027761541" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="autorepeat()" time="1.224803251" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="missingXTest()" time="5.035247836" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="noDisplay()" time="0.0038495" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="keycodes()" time="0.009927958" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="keyHappyPath()" time="0.001801625" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="unknownKeys()" time="0.002148375" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="buttonReleaseUsesPressedCode()" time="0.001731" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="motion()" time="0.001928958" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseOrder()" time="0.002327083" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="buttonUnavailable()" time="0.00185025" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="noKeyCode()" time="0.0020255" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseRemaining()" time="0.001983" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="notInput()" time="0.0015775" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="closeReleases()" time="0.001927417" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseStep()" time="0.003335834" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseUsesPressedCode()" time="0.001519625" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="repeatNotInjected()" time="0.001797334" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="partialSweep()" time="0.001975709" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="basicButtons()" time="0.00168875" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="platformLost()" time="0.002012916" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="scrollNotches()" time="0.001844791" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unrelatedVariables()" time="0.001664667" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="blankValues()" time="0.001807833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11Session()" time="0.00198425" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandDisplay()" time="0.001836833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="deterministic()" time="0.002019708" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="supportedServers()" time="0.001789333" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11TypeWithoutDisplay()" time="0.002454708" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="nothingSet()" time="0.001989916" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandSessionType()" time="0.002006833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unknownSessionType()" time="0.002037625" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="manifestPinsExactVersions()" time="0.001921042" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="lockTargetsX11()" time="0.001772042" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="constantsMatchLock()" time="0.001935125" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="bounded()" time="0.0022315" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="joinsInFlight()" time="0.207623292" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="failureStops()" time="0.002444708" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="order()" time="0.002447209" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="sweepCoversDroppedRelease()" time="0.002406" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="buttonTable()" time="0.001598583" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="wheelCap()" time="0.001406875" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="pixelClamp()" time="0.001526666" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="pixelRoundTrip()" time="0.004573667" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="everyMemberMaps()" time="0.001938959" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="modifierGroup()" time="0.001628459" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="wheelTable()" time="0.001534542" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="outOfDomain()" time="0.001564459" />
+  </testsuite>
+</testsuites>
