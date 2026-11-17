@@ -42,14 +42,14 @@ The Makefile passes `$(value ISSUE)` unexpanded, single-quoted with embedded
 quotes escaped, and does not export `ISSUE` into the recipe environment, so the
 value is never interpreted by the shell or by make. The runner then:
 
-1. Validates the Issue with `^M[1-5]-[0-9]{3}$` before any path is built.
+1. Validates the Issue with `^M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?$` before any path is built.
 2. Prints closed metadata: runner version, Issue, git commit (or
    `unavailable`), Python version.
 3. Requires `Tests/SystemTests/Scripts` and every ancestor below the
    repository root to be real directories (no symlinks).
 4. Resolves exactly one `<ISSUE>-*.sh` entry. Zero matches, multiple matches,
    a symlink, a non-regular file, a name outside
-   `M[1-5]-[0-9]{3}-[A-Za-z0-9._-]+.sh`, or a real path outside the script
+   `M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?-[A-Za-z0-9._-]+.sh`, or a real path outside the script
    root is rejected.
 5. Runs `bash <relative script path>` as an argv list (never `shell=True`)
    with cwd at the repository root, stdin from `/dev/null`, a new session and
@@ -112,6 +112,15 @@ identifier and never an untrusted value, followed by
 `e2e disposition: error`. Any unexpected exception is caught by `main`, which
 prints only `e2e error: internal_failure` (no traceback, path or exception
 text), returns 70 and restores the previous SIGTERM and SIGHUP handlers.
+
+### FOLLOWUP ids (M1-TOOLING-002, GitHub Issue #350)
+
+The runner, the validator (`issueId` and the `evidence/e2e/<ID>/` artifact path
+prefix) and `e2e-result.schema.json` accept the corrective id form
+`M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?`, for example `M4-036-FOLLOWUP-001`, and
+nothing else: `-FOLLOWUP-` without three digits, a second suffix and lower case
+are rejected. A base id such as `M4-036` never resolves the script of
+`M4-036-FOLLOWUP-001`, so the two ids stay independent.
 
 ## Exit codes
 

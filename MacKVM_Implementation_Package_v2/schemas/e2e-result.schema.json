@@ -24,7 +24,7 @@
     },
     "issueId": {
       "type": "string",
-      "pattern": "^M[1-5]-[0-9]{3}$"
+      "pattern": "^M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?$"
     },
     "status": {
       "enum": [
@@ -451,7 +451,7 @@
         "path": {
           "type": "string",
           "maxLength": 512,
-          "pattern": "^(evidence/e2e/M[1-5]-[0-9]{3}|Tests/Fixtures)(/[A-Za-z0-9_-][A-Za-z0-9._-]{0,127})+$"
+          "pattern": "^(evidence/e2e/M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?|Tests/Fixtures)(/[A-Za-z0-9_-][A-Za-z0-9._-]{0,127})+$"
         },
         "sha256": {
           "type": "string",

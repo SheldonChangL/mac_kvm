@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="394" failures="0" skipped="40" time="0.353363083">
+    <testcase classname="MacKVMUnitTests" name="unitTestTargetRequiresNoOSPermission()" time="0.037990125" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="constantsMatchLock()" time="0.04648075" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="lockTargetsX11()" time="0.046493375" />
+    <testcase classname="LinuxPlatformTests.LinuxToolchainLockTests" name="manifestPinsExactVersions()" time="0.047163375" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="secondInstance()" time="0.112600916" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="wrongLengthInsert()" time="0.044364125" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="duplicateInsert()" time="0.123076375" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="nothingStored()" time="0.111894167" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="directoryResolution()" time="0.12218" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="cancellation()" time="0.118419708" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="roundTrip()" time="0.153807917" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRecordTests" name="emptyFile()" time="0.117940667" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustPolicyTests" name="firstUseExisting()" time="0.122913166" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustPolicyTests" name="firstUse()" time="0.128652375" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustPolicyTests" name="table()" time="0.043922041" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustPolicyTests" name="firstUseStorageFailure()" time="0.112674833" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustPolicyTests" name="warningRedaction()" time="0.043879583" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="directorySwappedAfterCheck()" time="0.055427583" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="malformedLine()" time="0.169824708" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="missingParent()" time="0.056272083" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="wideFile(mode:)" time="0.127977834" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="wideDirectory(mode:)" time="0.122121125" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="foreignDirectoryOwner()" time="0.127758958" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="foreignFileOwner()" time="0.12612625" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="writableParent()" time="0.138184041" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="wrongTypes()" time="0.134163833" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="narrowFile(mode:)" time="0.055034542" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="symlinkFile()" time="0.125840416" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="fileSwappedAfterCheck()" time="0.057498333" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="injectedWideMode()" time="0.127228541" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreRefusalTests" name="symlinkDirectory()" time="0.124772833" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerChangesNotForSelf()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="cancelled()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="oneMiBIn()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="writeOverLimit()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerChangesForPeer()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerTimeout()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="oneMiBOut()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="peerWritesThenRead()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="targetsAndString()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="writeThenPeerReads()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="stopDuringRead()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="invalidUTF8()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="noDisplay()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="errorHandlerScope()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="abandonedTransfer()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownerLoss()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="stopIdempotent()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="ownershipLostToPeer()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="noOwner()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardX11Tests" name="readOverLimit()" >
+      <skipped>needs MACKVM_X11_TESTS=1 and an X server</skipped>
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="buttonTable()" time="0.043885209" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="pixelClamp()" time="0.044910541" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="modifierGroup()" time="0.045035458" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="outOfDomain()" time="0.044600458" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="pixelRoundTrip()" time="0.048348583" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="wheelCap()" time="0.045064292" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="wheelTable()" time="0.045779667" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorTableTests" name="everyMemberMaps()" time="0.045392833" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="boundarySizes()" time="0.045434667" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="errorShapes()" time="0.046052542" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="changeDefinition()" time="0.046547833" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="oversizeFails()" time="0.045962583" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="happyPath()" time="0.045336708" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenGeometryRulesTests" name="zeroSizeFails()" time="0.045013208" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseStep()" time="0.0458725" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="scrollNotches()" time="0.047280375" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="closeReleases()" time="0.044228125" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="motion()" time="0.045506584" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="notInput()" time="0.0441015" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="buttonReleaseUsesPressedCode()" time="0.045068209" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="partialSweep()" time="0.045645208" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="keyHappyPath()" time="0.044679791" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="buttonUnavailable()" time="0.045541375" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="platformLost()" time="0.045099709" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="repeatNotInjected()" time="0.045461209" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseUsesPressedCode()" time="0.044888208" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseRemaining()" time="0.045489459" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="noKeyCode()" time="0.046443083" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="releaseOrder()" time="0.043756459" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="basicButtons()" time="0.044583292" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorPortTests" name="unknownKeys()" time="0.046108083" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="queryGuardWithoutEventThread()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="concurrentStops()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="stopTwice()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="serverLoss()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="pointerPosition()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="noDescriptorLeak()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="stopReleasesWaitingConsumer()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="geometryOfTheRootWindow()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="newestGeometryWins()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="resizeIsReported()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="queryAfterServerDeath()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="nothingAfterStop()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendX11Tests" name="serverWithoutRandR()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerRecordFileTests" name="oversized()" time="0.046664916" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerRecordFileTests" name="refused()" time="0.046261167" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerRecordFileTests" name="fingerprintText()" time="0.045326958" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerRecordFileTests" name="wellFormed()" time="0.045772458" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="incrThreshold()" time="0.043935167" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="targetList()" time="0.045094917" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="readDeadline()" time="0.043245958" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="hashStability()" time="0.043709417" />
+    <testcase classname="LinuxPlatformTests.LinuxX11ClipboardPureTests" name="latin1()" time="0.043581" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="twoProcesses()" time="0.169267875" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="concurrentSamePeer()" time="0.163184375" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="renameReplace()" time="0.135287125" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="twoProcessHelper()" time="0.045290583" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="concurrentDifferentPeers()" time="0.347029209" />
+    <testcase classname="LinuxPlatformTests.LinuxTrustedServerStoreAtomicTests" name="leftoverTemporary()" time="0.135616334" />
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="noDisplay()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="keycodes()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="missingXTest()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="pointer()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="autorepeat()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxX11InjectorXvfbTests" name="releaseAllLeavesNothingDown()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11GateSeesDisplay()" >
+      <skipped />
+    </testcase>
+    <testcase classname="LinuxPlatformTests.LinuxHeadlessTestModeTests" name="x11TestsFlag()" time="0.044966833" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="nothingSet()" time="0.044689167" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11TypeWithoutDisplay()" time="0.043724459" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="deterministic()" time="0.04452725" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unrelatedVariables()" time="0.043888834" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="blankValues()" time="0.044396459" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="x11Session()" time="0.044190375" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandDisplay()" time="0.043864625" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="waylandSessionType()" time="0.0438785" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="supportedServers()" time="0.044084583" />
+    <testcase classname="LinuxPlatformTests.LinuxDisplayDetectionTests" name="unknownSessionType()" time="0.043898334" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="joinsInFlight()" time="0.216664375" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="sweepCoversDroppedRelease()" time="0.045517834" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="bounded()" time="0.046093917" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="order()" time="0.046815167" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="clearFromWorker()" time="0.046238625" />
+    <testcase classname="LinuxPlatformTests.LinuxInjectionDrainTests" name="failureStops()" time="0.045347416" />
+    <testcase classname="LinuxPlatformTests.LinuxScreenBackendHeadlessTests" name="unreachableDisplay()" time="0.046078667" />
+    <testcase classname="MacKVMIntegrationTests" name="integrationTestTargetUsesDeclaredFixtureRoots()" time="0.040646917" />
+    <testcase classname="MacKVMIntegrationTests.BarrierClientServerLoopbackIntegrationTests" name="fullSessionCrossesTheWireBothWays()" time="0.1487275" />
+    <testcase classname="MacKVMIntegrationTests.BarrierClientServerLoopbackIntegrationTests" name="serverCloseWithAKeyHeld()" time="0.056579041" />
+    <testcase classname="MacKVMIntegrationTests.M2ServerControlPathIntegrationTests" name="controlPath()" time="0.0554065" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAdmitsEmptyTextUnderTheSmallestLimit()" time="0.046082625" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAdmitsFirstOutboundLocalPayload()" time="0.046434959" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardResetForgetsTheRememberedPayload()" time="0.046465667" />
+    <testcase classname="KVMCoreTests" name="mockTransportRejectsEmptyScriptedInboundChunk()" time="0.039090084" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardComparesHashesAsOpaqueExactValues()" time="0.044546542" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardIsSendable()" time="0.041632416" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAnUnheldKeyIsInjectedButNotRecorded()" time="0.029294542" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="resetForgetsEverything()" time="0.030292875" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theModifierLedgerFollowsInjectedKeyEvents()" time="0.030289166" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aNegativeOrZeroBoundHoldsNothing()" time="0.029247791" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDuplicateDownOfAHeldKeyIsDropped()" time="0.02961775" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="eventsWithoutHeldStateAreIgnored()" time="0.02950975" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aNegativeBoundBehavesAsZero()" time="0.029364625" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="untrackedButtonsAreCountedAndSticky()" time="0.02928725" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsFollowTheSameRules()" time="0.029262083" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="capsLockIsAnOrdinaryHeldKey()" time="0.03082875" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="smallBoundsAreEnforcedForKeys()" time="0.029167667" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAnUnheldKeyIsDropped()" time="0.030714958" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theClipboardTransactionIsTracked()" time="0.029019584" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="theSnapshotCarriesNoKeyOrButtonIdentity()" time="0.029497458" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="keysOverTheBoundAreInjectedCountedAndFlagged()" time="0.030400625" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysMatchTheUnmatchedInjectedDowns(seed:)" time="0.051117166" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aButtonReleaseFreesOnlyItsOwnButton()" time="0.0291725" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aReleaseOfAHeldKeyIsInjectedAndFreed()" time="0.029571834" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="heldKeysKeepPressOrderAndTheModifiersAtThePress()" time="0.029722292" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aDownOfAnUnheldKeyIsInjectedAndHeld()" time="0.029244417" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="aRepeatOfAHeldKeyIsInjected()" time="0.029195792" />
+    <testcase classname="KVMCoreTests.InputStateLedgerTests" name="buttonsOverTheBoundAreInjectedCountedAndFlagged()" time="0.028857708" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardResetIsIdempotent()" time="0.041218417" />
+    <testcase classname="KVMCoreTests.LeaveRemoteFlowTests" name="returnEdge()" time="0.043659334" />
+    <testcase classname="KVMCoreTests.LeaveRemoteFlowTests" name="otherTriggers()" time="0.043883458" />
+    <testcase classname="KVMCoreTests.LeaveRemoteFlowTests" name="sequence()" time="0.044183083" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectionLeavesStateUnchanged()" time="0.045525583" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="repeatOfAModifierChangesNothingAndAnUnheldRepeatIsImplied()" time="0.044731667" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="capsLockFollowsTheFramesLockBitThroughBothTogglePatterns()" time="0.044993333" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="newLedgerHoldsNothingAndAgreesWithAnEmptyReport()" time="0.045237667" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="clearForgetsEveryModifierAndTheLockBitAndIsIdempotent()" time="0.044732458" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="reconcileReportsEveryFieldOnItsOwnAgainstEveryLedgerState()" time="0.049018834" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="ownBitOfAModifierPressOrReleaseIsNotComparedButItsOtherBitsAre()" time="0.044730042" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="staleModifierIsReportedAndStaysHeldUntilItsOwnRelease()" time="0.045017708" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="serverReleasesBeforeLeavingLeaveNothingHeld()" time="0.045426041" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="lockBitChangesThatNoCapsLockEventExplainsAreReportedOnce()" time="0.046194708" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="productionSourceImportsOnlyKVMContractsAndNeverLogs()" time="0.0487415" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="bothSidesOfAModifierCollapseAndTheFirstReleaseReleases()" time="0.046310917" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="ownersOnSeparateTasksAndACancelledTaskGetTheSameResults()" time="0.057290875" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="discrepancyIsEmptyOnlyWhenNoFieldDiffers()" time="0.046938291" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="serverChainRoundTripKeepsTheLedgerOnTheServersState()" time="0.045963125" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="eachModifierKeyHoldsItsOwnFlagFromItsPressToItsRelease()" time="0.044904333" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="eventsOtherThanKeysChangeNothingAndReportNothing()" time="0.044579667" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="randomSequencesFollowTheRulesStatedOverTheWholeHistory()" time="0.133094458" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="otherKeysNeverChangeTheHeldModifiers()" time="0.046257541" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="ledgersAreEquatableValuesThatCopyIndependently()" time="0.045714084" />
+    <testcase classname="KVMCoreTests.ModifierStateLedgerTests" name="modifierHeldAtEnterIsReportedAsImpliedAndNeverSynthesized()" time="0.044597167" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="asyncCallerRuns()" time="0.058941333" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorInFlightTests" name="joinersGetFirstResult()" time="0.061535875" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="invalidLocalSize()" time="0.044999792" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="returnEdge()" time="0.0449625" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="tracking()" time="0.047693125" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="normalized()" time="0.045216041" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="entryPoints()" time="0.045026042" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="otherEdgesClamp()" time="0.045222" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="invalidConfiguration()" time="0.046555875" />
+    <testcase classname="KVMCoreTests.OutboundCoordinateMapperTests" name="offsetClamping()" time="0.0446875" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="oneFailureInATwoStepPlanIsPartial()" time="0.045230875" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheFirstStepStillAttemptsTheRest()" time="0.046178292" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheSecondStepStillAttemptsTheRest()" time="0.044838875" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="twoFailuresInAThreeStepPlanArePartial()" time="0.044973542" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="runningThePlanTwiceIsHarmless()" time="0.047388084" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="planAndExecuteFromHeldInputReleaseEverythingInOrder()" time="0.043962292" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="eachRunAttemptsEachStepExactlyOnce()" time="0.044817542" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aSingleStepPlanIsCompletedOrFailed()" time="0.044323792" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailureOnTheLastStepIsPartial()" time="0.044488875" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="everyStepFailingIsFailedNotPartial()" time="0.044247333" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="aFailedRunCanBeRepeatedAndRetriesEveryStep()" time="0.044812667" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="releasesEveryStepInPlanOrderAndReportsCompleted()" time="0.044724" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysExecuteTests" name="anEmptyPlanIsNotRequiredAndTouchesNothing()" time="0.04499" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="activation()" time="0.044643834" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="rollback()" time="0.0456075" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="invalidLocal()" time="0.043940459" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="routing()" time="0.045626959" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="noTarget()" time="0.044250917" />
+    <testcase classname="KVMCoreTests.ScreenRouterTests" name="linkedEdges()" time="0.045009" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardSuppressesLocalEchoOfAnAppliedInboundPayload()" time="0.039139459" />
+    <testcase classname="KVMCoreTests.ServerFailSafeActiveTargetTests" name="reportsActiveTarget()" time="0.044697541" />
+    <testcase classname="KVMCoreTests" name="mockTransportInjectsTypedTransportFailure()" time="0.046130916" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="overflowWakesConsumer()" time="0.03194925" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="nextWakesConsumer()" time="0.031616375" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="scrollCoalescing()" time="0.026913917" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="closeIsIdempotent()" time="0.031805125" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="cancelledSecondConsumerLeavesTheFirstWaiting()" time="0.033222583" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="invalidCapacity()" time="0.02699725" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="moveCoalescing()" time="0.026936208" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="drainMaximum()" time="0.02728025" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="cancellation()" time="0.032245917" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="secondConsumer()" time="0.0320175" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="wrapAround()" time="0.027376792" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="fullDropsMove()" time="0.027232" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="overflowLatches()" time="0.027553916" />
+    <testcase classname="KVMCoreTests.CaptureQueueTests" name="order()" time="0.027121958" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardSerializesThroughAnOwningActor()" time="0.063615167" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectsTheExactSamePayloadTwice()" time="0.039212125" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectsARepeatedTransactionEvenWithNewContent()" time="0.0436795" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardNeverSendsARemotePayloadBack()" time="0.042794625" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="reset()" time="0.043395375" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="tickActivation()" time="0.04356875" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="cancellation()" time="0.043875584" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="invalidSamples()" time="0.043541333" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="activation()" time="0.043411167" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="configurationBounds()" time="0.043684125" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="rearm()" time="0.043764458" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="unlinked()" time="0.043284875" />
+    <testcase classname="KVMCoreTests.EdgeDetectorTests" name="corners()" time="0.043564792" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAdmitsSuccessiveDistinctPayloadsInBothDirections()" time="0.045695916" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardOversizedRejectionMatchesTheM1052Codec()" time="0.039845833" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAcceptsInboundFromAnyRemoteDevice()" time="0.045266167" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRedactsItsRememberedIdentity()" time="0.043895584" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardChecksSizeBeforeOriginAndIdentity()" time="0.046221083" />
+    <testcase classname="KVMCoreTests" name="mockTransportRecordsOutboundBytesInCallOrder()" time="0.04390775" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAcceptsPayloadExactlyAtTheByteLimit()" time="0.045271459" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="overflowCoveredBySweep()" time="0.052634833" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="concurrent()" time="0.05417" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="planFromLedger()" time="0.052942625" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="droppedReleaseCoveredBySweep()" time="0.052893333" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlan()" time="0.052311917" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="allFailed()" time="0.05272" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="order()" time="0.052478167" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releasePartial()" time="0.052304" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="repeated()" time="0.052468375" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="everyStepAttempted()" time="0.052595458" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="noReportBeforeRecovery()" time="0.052338417" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reportHasNoIdentity()" time="0.053059333" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="reentrancy()" time="0.052470125" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="releaseFailed()" time="0.052329459" />
+    <testcase classname="KVMCoreTests.FailSafeCoordinatorTests" name="emptyPlanAllOthersFail()" time="0.05241475" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="wrongState()" time="0.043987625" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="sendFailure()" time="0.04448425" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="singleWriter()" time="0.055413083" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="lifecycle()" time="0.043464958" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="cancelledQueuedForwardNeverSends()" time="0.054568667" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="enterFailure()" time="0.043763958" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="closeIdempotent()" time="0.043667917" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="peerEventsDelivered()" time="0.043628" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="leaveDuringPendingEnter()" time="0.0530745" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="peerEnd()" time="0.051147666" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="cancelledQueuedEnterSendsNothing()" time="0.055248042" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="cancelledQueuedLeaveIsStillSent()" time="0.054705292" />
+    <testcase classname="KVMCoreTests.ServerSessionTests" name="connectFailure()" time="0.043596833" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="eachKeyReleaseCarriesTheModifiersRecordedAtItsPress()" time="0.042787875" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="everyStepIsARelease()" time="0.043235208" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="capsLockIsAModifierKeyAndReleasesWithTheModifiers()" time="0.042523625" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="nothingHeldMakesAnEmptyPlan()" time="0.042842542" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="anUnclassifiedKeyIsAnOrdinaryKey()" time="0.043426959" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="modifierKeysReleaseNewestFirst()" time="0.043057" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="keysThenButtonsThenModifiersWithEachGroupInReversePressOrder()" time="0.043837708" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="buttonsReleaseNewestFirst()" time="0.0432685" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="planningIsPureAndRepeatable()" time="0.043053542" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="everyModifierKeyReleasesAfterTheButtons()" time="0.04322325" />
+    <testcase classname="KVMCoreTests.ReleaseAllKeysPlanTests" name="nonModifierKeysReleaseNewestFirst()" time="0.042965958" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardSuppressesDuplicateContentFromAnotherRemoteDevice()" time="0.045472292" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardIndependentOwnersDoNotInterfere()" time="0.064792792" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardSuppressesPeerEchoOfAnOutboundPayload()" time="0.047475209" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="tick()" time="0.041727167" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="intent()" time="0.0419015" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="heldInputBlocksSwitch()" time="0.041793583" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="invalid()" time="0.042049875" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="nonLocalStates()" time="0.041773209" />
+    <testcase classname="KVMCoreTests.EnterRemoteTriggerTests" name="noSwitch()" time="0.041913583" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="forcedLocal()" time="0.043634" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="idempotency()" time="0.044781792" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="rollback()" time="0.044037584" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="sessionLossInRemote()" time="0.04424975" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="happyPath()" time="0.044482417" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="staleAndDuplicate()" time="0.044301667" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="suppressionInvariant()" time="0.043918375" />
+    <testcase classname="KVMCoreTests.InputStateReducerTests" name="totality()" time="0.044037583" />
+    <testcase classname="KVMCoreTests" name="mockTransportCleanupCompletesInsideAnAlreadyCancelledTask()" time="0.064951625" />
+    <testcase classname="KVMCoreTests" name="mockTransportRejectsInvalidLifecycleOperations()" time="0.041694959" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAdmitsFirstInboundRemotePayload()" time="0.041480291" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardMeasuresUTF8BytesNotCharacters()" time="0.0452105" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="installFails()" time="0.023792833" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="restartBudget()" time="0.023505667" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="terminate()" time="0.023498792" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="budgetReset()" time="0.023710834" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="idempotent()" time="0.023668875" />
+    <testcase classname="KVMCoreTests.EventTapLifecycleTests" name="invalidBudget()" time="0.023656292" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRemembersOnlyTheLastAdmittedIdentity()" time="0.041581375" />
+    <testcase classname="KVMCoreTests" name="mockTransportInjectsCancellationDomainFailure()" time="0.043880375" />
+    <testcase classname="KVMCoreTests.ServerFailSafeInFlightTests" name="recoverAllJoinsInFlightRecovery()" time="0.033668792" />
+    <testcase classname="KVMCoreTests.ServerFailSafeInFlightTests" name="synchronousCallerNeverWaits()" time="0.032426541" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardCopiesAreIndependentValues()" time="0.048184583" />
+    <testcase classname="KVMCoreTests" name="mockTransportDeliversScriptedInboundChunksInOrder()" time="0.043643917" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardIsDeterministicAcrossRepeatedRuns()" time="0.046283959" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectionsRenderOnlyFixedTaxonomy()" time="0.048521791" />
+    <testcase classname="KVMCoreTests" name="mockTransportTreatsZeroLengthSendAsSuccessfulNoOp()" time="0.046243167" />
+    <testcase classname="KVMCoreTests" name="mockTransportFailsClosedOnBoundedBufferOverflow()" time="0.045408542" />
+    <testcase classname="KVMCoreTests.SessionManagerTests" name="lifecycle()" time="0.045175791" />
+    <testcase classname="KVMCoreTests.SessionManagerTests" name="uniqueActive()" time="0.044106458" />
+    <testcase classname="KVMCoreTests.SessionManagerTests" name="concurrency()" time="0.054304792" />
+    <testcase classname="KVMCoreTests.SessionManagerTests" name="rejections()" time="0.043644417" />
+    <testcase classname="KVMCoreTests.SessionManagerTests" name="closeAll()" time="0.043590916" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRunsOffTheMainThread()" time="0.063873584" />
+    <testcase classname="KVMCoreTests" name="mockTransportRejectsNonPositiveBufferLimit()" time="0.048412542" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectsInboundPayloadClaimingLocalOrigin()" time="0.043174833" />
+    <testcase classname="KVMCoreTests" name="mockTransportInjectsNormalEndOfStreamAfterScriptedChunks()" time="0.044329959" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="manualDisconnectNeverReconnects()" time="0.062718959" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="invalidBackoff()" time="0.0591485" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="retriesUntilConnected()" time="0.063114333" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="newGenerationCancelsOld()" time="0.062118542" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="capsAtFifteenSeconds()" time="0.063133541" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="standardBackoff()" time="0.058798417" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="establishedResetsBackoff()" time="0.062818125" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="nonRetryableStops()" time="0.061611" />
+    <testcase classname="KVMCoreTests.ReconnectManagerTests" name="disconnectIdempotent()" time="0.061532333" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="unqueuedLeaveCompletes()" time="0.045246959" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="enterRollback()" time="0.043500834" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="secureInputBlocksRemote()" time="0.045587042" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="tickCompletesDwell()" time="0.044662208" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="unsupportedInputIsDropped()" time="0.043939292" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="hugeDeltaIsBounded()" time="0.0602535" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="remoteMotion()" time="0.044291125" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="emergencyEscape()" time="0.044440792" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="clientGone()" time="0.044733625" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="unusableClientSize()" time="0.043033708" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="heldInputLocksToClient()" time="0.043435167" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="normalReturnRearms()" time="0.043211958" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="returnEdge()" time="0.043217292" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="forwardOverflowFailsOpen()" time="0.044606167" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="enterPreconditions()" time="0.044193917" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="enter()" time="0.043375416" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="forcedReturnDisarmsTheEdge()" time="0.043496208" />
+    <testcase classname="KVMCoreTests.ServerCoordinatorTests" name="upFollowsDown()" time="0.044491792" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="concurrent()" time="0.057082125" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="recoverAll()" time="0.045216" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="partial()" time="0.045217458" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="order()" time="0.0442035" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="reentrancy()" time="0.044471333" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="repeated()" time="0.0448005" />
+    <testcase classname="KVMCoreTests.ServerFailSafeTests" name="failed()" time="0.045144167" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="duplicateWakeSupersedesThroughTheReconnectManager()" time="0.058369333" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="beforeAnyNetworkSignalTheNetworkCountsAsAvailable()" time="0.05726125" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="signalsAreProcessedOneAtATimeInArrivalOrder()" time="0.059455042" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="repeatedSleepRunsTheCleanupEveryTime()" time="0.058445541" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="productionSourceImportsNoPlatformModuleAndNeverLogs()" time="0.056308" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="networkReportsWithoutAWakeCauseNoEffect()" time="0.059207292" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="sleepAndWakeDriveTheReconnectManager()" time="0.06020725" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="wakeConnectsAtOnceWhenTheNetworkIsAvailable()" time="0.058252583" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="lateNetworkAfterWakeConnectsOnce()" time="0.059558958" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="sleepCancelsAPendingWakeReconnect()" time="0.06006475" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="networkLossWhileConnectedDoesNothing()" time="0.058837709" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="duplicateWakesConnectOncePerWakeAndOncePerOutage()" time="0.059797625" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="sleepRunsTheCleanupHookBeforeDisconnecting()" time="0.059210167" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="wakeWithoutNetworkDoesNotConnect()" time="0.05858875" />
+    <testcase classname="KVMCoreTests.MacRecoveryCoordinatorTests" name="cancelledCallersStillHaveTheirSignalsProcessed()" time="0.059991334" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="failedRecoveryIsReported()" time="0.055778958" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="recoveryRunsOnDedicatedThread()" time="0.05759925" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="roundTrip(trigger:)" time="0.054031042" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="mappingTable()" time="0.054282875" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="hangingDisconnectIsBoundedAndReported()" time="0.056780375" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="newGenerationRunsAgain()" time="0.057017959" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="eachTriggerRunsOnceInOrder(trigger:)" time="0.056422584" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectCancelsTimer()" time="0.056399" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="emptyPlanBoundary()" time="0.056445542" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="outcomeIsPrivacySafe()" time="0.054488625" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="olderGenerationStillRuns()" time="0.056358792" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="throwingClockCountsAsExpired()" time="0.055769541" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="concurrentTriggersRunOnce()" time="0.057474292" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="promptDisconnectIsNotTimedOut()" time="0.055719667" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="secondTriggerSameGenerationDoesNotRun()" time="0.055777292" />
+    <testcase classname="KVMCoreTests.CleanupHooksTests" name="unknownGenerationIsRejected()" time="0.05394375" />
+    <testcase classname="KVMCoreTests" name="mockTransportDisconnectIsIdempotentAndFinishesIncomingBytesOnce()" time="0.037585125" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectsPayloadOneByteOverTheLimitInBothDirections()" time="0.041295083" />
+    <testcase classname="KVMCoreTests.EmergencyEscapeTests" name="nonMatches()" time="0.044419167" />
+    <testcase classname="KVMCoreTests.EmergencyEscapeTests" name="chordMatches()" time="0.046954125" />
+    <testcase classname="KVMCoreTests.EmergencyEscapeTests" name="neverForwarded()" time="0.044773459" />
+    <testcase classname="KVMCoreTests.EmergencyEscapeTests" name="escapeIsLocalFirst()" time="0.044540667" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardRejectsARepeatedHashUnderANewTransaction()" time="0.036335041" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="clientToLocal()" time="0.028222208" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="sameContentNewGeneration()" time="0.028678667" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="forget()" time="0.028381292" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="inboundHashRecomputed()" time="0.028445167" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="noEchoStorm()" time="0.028220458" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="invalidInbound()" time="0.028864584" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="localToClient()" time="0.028523" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="clientCopyAfterLocalChange()" time="0.028402375" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="sizeLimit()" time="0.028471583" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="nothingToSend()" time="0.028402875" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="everyClientOnce()" time="0.028404708" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="redacted()" time="0.029329125" />
+    <testcase classname="KVMCoreTests.ServerClipboardRouterTests" name="failedApplyIsForgotten()" time="0.028500958" />
+    <testcase classname="KVMCoreTests" name="clipboardLoopGuardAdmitsContentAgainOnceOtherContentIntervened()" time="0.043662542" />
+    <testcase classname="KVMCoreTests.ReturnCoordinateMapperTests" name="normalized()" time="0.026451166" />
+    <testcase classname="KVMCoreTests.ReturnCoordinateMapperTests" name="avoidsImmediateReswitch()" time="0.02655475" />
+    <testcase classname="KVMCoreTests.ReturnCoordinateMapperTests" name="invalid()" time="0.026549" />
+    <testcase classname="KVMCoreTests.ReturnCoordinateMapperTests" name="reentry()" time="0.02649225" />
+    <testcase classname="KVMCoreTests.ReturnCoordinateMapperTests" name="cornerClamp()" time="0.026522209" />
+  </testsuite>
+</testsuites>

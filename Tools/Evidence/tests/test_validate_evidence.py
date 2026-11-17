@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import os
 import shutil
 import subprocess
@@ -509,6 +510,61 @@ class TopLevelFieldTests(ValidatorTestCase):
                 document["issueId"] = value
                 self.assert_invalid(document, "issue_id_invalid")
 
+    def test_followup_issue_id_accepted(self):
+        for value in ("M4-036-FOLLOWUP-001", "M5-001-FOLLOWUP-999"):
+            with self.subTest(value=value):
+                self.assertIsNotNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
+
+    def test_followup_issue_id_rejected_forms(self):
+        for value in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-01",
+            "M4-036-FOLLOWUP-0011",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+            "M4-036-followup-001",
+            "M4-036-FOLLOWUP-001\n",
+            "M4-036-FOLLOWUP-00a",
+        ):
+            with self.subTest(value=value):
+                document = passed_document()
+                document["issueId"] = value
+                self.assert_invalid(document, "issue_id_invalid")
+                self.assertIsNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
+
+    def test_followup_issue_end_to_end_with_artifact(self):
+        issue = "M4-036-FOLLOWUP-001"
+        directory = self.root / "evidence/e2e" / issue
+        directory.mkdir(parents=True)
+        (directory / "report.json").write_bytes(ARTIFACT_BYTES)
+        document = passed_document()
+        document["issueId"] = issue
+        document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(issue)
+        self.write_result(document)
+        validate_evidence.validate_result_file(self.result_path, self.root, issue)
+
+    def test_followup_artifact_path_for_wrong_issue_is_mismatch(self):
+        issue = "M4-036-FOLLOWUP-001"
+        for other in ("M4-036", "M4-036-FOLLOWUP-002"):
+            with self.subTest(other=other):
+                directory = self.root / "evidence/e2e" / other
+                directory.mkdir(parents=True, exist_ok=True)
+                (directory / "report.json").write_bytes(ARTIFACT_BYTES)
+                document = passed_document()
+                document["issueId"] = issue
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(other)
+                self.assert_invalid(document, "artifact_path_issue_mismatch")
+
+    def test_artifact_path_rejects_malformed_followup_directory(self):
+        for directory in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+            "M4-036-followup-001",
+        ):
+            with self.subTest(directory=directory):
+                document = passed_document()
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(directory)
+                self.assert_invalid(document, "artifact_path_invalid")
+
     def test_wrong_issue(self):
         document = passed_document()
         document["issueId"] = "M1-998"
@@ -975,6 +1031,28 @@ class SchemaContractTests(unittest.TestCase):
         for schema_pattern, validator_pattern in pairs:
             with self.subTest(pattern=schema_pattern):
                 self.assertEqual(schema_pattern, "^" + validator_pattern.pattern + "$")
+
+    def test_schema_accepts_and_rejects_followup_ids(self):
+        issue_pattern = re.compile(self.schema["properties"]["issueId"]["pattern"])
+        path_pattern = re.compile(
+            self.schema["$defs"]["artifact"]["properties"]["path"]["pattern"]
+        )
+        for issue in ("M4-036-FOLLOWUP-001", "M4-036"):
+            with self.subTest(issue=issue):
+                self.assertIsNotNone(issue_pattern.fullmatch(issue))
+                self.assertIsNotNone(
+                    path_pattern.fullmatch("evidence/e2e/{0}/report.json".format(issue))
+                )
+        for issue in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+            "M4-036-followup-001",
+        ):
+            with self.subTest(issue=issue):
+                self.assertIsNone(issue_pattern.fullmatch(issue))
+                self.assertIsNone(
+                    path_pattern.fullmatch("evidence/e2e/{0}/report.json".format(issue))
+                )
 
 
 if __name__ == "__main__":
