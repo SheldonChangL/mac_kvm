@@ -1,0 +1,88 @@
+{
+ "schemaVersion": 1,
+ "issue": "M1-055-FOLLOWUP-002",
+ "baseCommit": "4c2f0429c9106902f02c2563092c7d7366f34a0b",
+ "date": "2026-11-18",
+ "toolchain": {
+  "swiftVersion": [
+   "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+   "Target: arm64-apple-macosx26.0"
+  ],
+  "macOS": "26.6.2",
+  "architecture": "arm64",
+  "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native) with openssl and Xvfb"
+ },
+ "note": "Run by the implementing agent; outputs filtered to result lines, paths masked. red-base restores origin/main LinuxTLSTransport.swift and drops the two tests that use the new API, then restores. The E2E rerun of clipboard-large-to-client was started but not completed (see e2e-rerun).",
+ "commands": [
+  {
+   "name": "red-base",
+   "command": "git show origin/main:<transport> > <transport>; docker exec <c> swift test --filter 'slowConsumerLargePayload|largeClipboardOnEnter'; restore",
+   "exitCode": 1,
+   "expectedFailure": true,
+   "stdout": "✘ Test \"M1-055-FOLLOWUP-002: a slow consumer receives a 1 MiB payload in order, unended\" recorded an issue at LinuxTLSTransportTests.swift:489:6: Caught error: CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportError\n✘ Test \"M1-055-FOLLOWUP-002: a slow consumer receives a 1 MiB payload in order, unended\" failed after 0.621 seconds with 1 issue.\n\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1416:6: Time limit was exceeded: 60.000 seconds\n\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1450:7: Expectation failed: (clipboard.writes.all → []).contains(text → \"abcdefghijklmnopqrstuvwxyz\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1452:7: Expectation failed: !((output.text → \"starting\n\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1455:7: Expectation failed: await finished(run) == .success\n\nruntime output lines containing 'connection ended (transport.resourceExhausted)': 1\n"
+  },
+  {
+   "name": "mutants",
+   "command": "mutant1: read gate never holds reads; mutant2: resumeReading never re-issues the read; filter slowConsumerLargePayload|stalledConsumerIsBounded|largeClipboardOnEnter",
+   "exitCode": 1,
+   "expectedFailure": true,
+   "stdout": "== mutant1 no-pause\nBuild complete! (9.98s)\n✘ Test \"M1-055-FOLLOWUP-002: a stalled consumer holds socket reads; queued bytes stay bounded\" failed after 0.976 seconds with 1 issue.\n✘ Test \"M1-055-FOLLOWUP-002: a stalled consumer holds socket reads; queued bytes stay bounded\" recorded an issue at LinuxTLSTransportTests.swift:517:6: Caught error: CoreError(code: KVMContracts.CoreErrorCode.transport\n✘ Test run with 3 tests in 2 suites failed after 1.741 seconds with 1 issue.\n== mutant2 no-resume\nBuild complete! (9.19s)\n✘ Test \"M1-055-FOLLOWUP-002: a slow consumer receives a 1 MiB payload in order, unended\" recorded an issue at LinuxTLSTransportTests.swift:489:6: Time limit was exceeded: 60.000 seconds\n✘ Test \"M1-055-FOLLOWUP-002: a slow consumer receives a 1 MiB payload in order, unended\" recorded an issue at LinuxTLSTransportTests.swift:507:7: Expectation failed: (received.count → 376832) == (size → 1048576)\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" failed after 60.046 seconds with 3 issues.\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1416:6: Time limit was exceeded: 60.000 seconds\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1450:7: Expectation failed: (clipboard.writes.all → []).contains(text → \"\n✘ Test \"a 600 KB server clipboard on enter reaches the local clipboard with no reconnect\" recorded an issue at LinuxClientRuntimeTests.swift:1455:7: Expectation failed: await finished(run) == .success"
+  },
+  {
+   "name": "linux-focused",
+   "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors && swift test --filter 'LinuxTLSTransport|LinuxClient'",
+   "exitCode": 0,
+   "stdout": "Build complete!\n✔ Test run with 49 tests in 7 suites passed\n"
+  },
+  {
+   "name": "linux-repeat-10",
+   "command": "10x swift test --filter 'slowConsumerLargePayload|stalledConsumerIsBounded|largeClipboardOnEnter|chunkBound|endOfStream'",
+   "exitCode": 0,
+   "stdout": "     10 ✔ Test run with 5 tests in 2 suites passed after N seconds.\n"
+  },
+  {
+   "name": "linux-full-xvfb",
+   "command": "MACKVM_X11_TESTS=1 xvfb-run ... swift test --xunit-output evidence/issues/M1-055-FOLLOWUP-002/tests/swift-testing-xunit.xml",
+   "exitCode": 0,
+   "stdout": "✔ Test run with 520 tests in 54 suites passed\n"
+  },
+  {
+   "name": "linux-full-xvfb-repeat-3",
+   "command": "3x the same full run",
+   "exitCode": 1,
+   "stdout": "run1: ✘ 'events are injected in order on the drain's own thread' (LinuxX11InjectorTests.swift:544, thread name, unrelated M4-024 flake)\nrun2: ✔ 520 passed\nrun3: ✔ 520 passed\n",
+   "note": "pre-existing flake outside this change"
+  },
+  {
+   "name": "mac-swift-test",
+   "command": "swift test",
+   "exitCode": 0,
+   "stdout": "✔ Test run with 332 tests in 29 suites passed\n"
+  },
+  {
+   "name": "make-verify",
+   "command": "make verify",
+   "exitCode": 0,
+   "stdout": "[PASSED] repository-contract-tests\n[PASSED] swift-test-targets\n[PASSED] native-arm64-build\n"
+  },
+  {
+   "name": "docs-check",
+   "command": "make docs-check",
+   "exitCode": 0,
+   "stdout": "docs check OK\n"
+  },
+  {
+   "name": "backlog",
+   "command": "python3 Tools/Backlog/validate_package.py",
+   "exitCode": 0,
+   "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
+  },
+  {
+   "name": "e2e-rerun",
+   "command": "MACKVM_E2E_CONTAINER=<c> MACKVM_E2E_PORT=24811 bash <PR #371 script>",
+   "exitCode": null,
+   "stdout": "",
+   "note": "NOT COMPLETED: stopped after about 52 min while the client was still building in the container (the Docker VM was heavily throttled). No case ran. clipboard-large-to-client is unverified on this build."
+  }
+ ]
+}
