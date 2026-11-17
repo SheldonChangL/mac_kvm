@@ -1,0 +1,58 @@
+== changed.log
+[09:05:41.970] starting
+[09:05:41.971] connecting to the server
+[09:05:42.010] released held input: completed
+[09:05:42.010] connection ended (security.identityChanged)
+[09:05:42.010] stopped (security.identityChanged)
+WARNING: the server presented a different certificate than the one this client trusts.
+The connection was refused and nothing was changed.
+Trusted SHA-256:   <fingerprint>
+Presented SHA-256: <fingerprint>
+If the Mac's identity was renewed on purpose (`MacKVM fingerprint` shows the new value),
+run `mackvm-client fingerprint forget <host>[:port]` and trust the new value.
+== client-1.log
+[09:05:42.232] starting
+[09:05:42.233] connecting to the server
+[09:05:42.268] connected
+[09:05:47.926] input is on this screen
+[09:06:07.510] input left this screen
+[09:06:09.612] input is on this screen
+[09:06:10.496] input left this screen
+[09:06:11.794] input is on this screen
+[09:06:13.661] input left this screen
+[09:06:17.386] input is on this screen
+[09:06:19.016] stopping on signal 15
+[09:06:19.019] input left this screen
+[09:06:19.021] released held input: completed
+[09:06:19.021] connection ended
+== client-2.log
+[09:06:23.747] starting
+[09:06:23.749] connecting to the server
+[09:06:23.782] connected
+[09:06:29.010] input is on this screen
+[09:06:43.448] input left this screen
+[09:06:44.688] input is on this screen
+[09:06:51.158] input left this screen
+[09:06:52.363] input is on this screen
+[09:06:53.836] input left this screen
+[09:06:53.945] released held input: completed
+[09:06:53.945] connection ended
+[09:06:53.947] reconnecting in 1 s
+[09:06:54.958] connecting to the server
+[09:06:54.987] released held input: completed
+[09:06:54.987] connection ended (transport.refused)
+[09:06:54.987] reconnecting in 2 s
+[09:06:56.995] connecting to the server
+[09:06:57.021] released held input: completed
+[09:06:57.021] connection ended (transport.refused)
+[09:06:57.021] reconnecting in 4 s
+[09:07:01.023] connecting to the server
+[09:07:01.071] connected
+[09:07:11.478] released held input: completed
+[09:07:11.479] connection ended (transport.reset)
+[09:07:11.480] reconnecting in 1 s
+[09:07:12.484] connecting to the server
+[09:07:12.515] released held input: completed
+[09:07:12.515] connection ended (transport.refused)
+[09:07:12.515] reconnecting in 2 s
+[09:07:13.755] stopping on signal 15

@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "issueId": "M4-036-FOLLOWUP-001",
+  "status": "failed",
+  "startedAt": "2026-11-17T09:05:30Z",
+  "endedAt": "2026-11-17T09:07:16Z",
+  "commit": "cc4ccb8edc7d4a72fa028636fafd97a901cc7eea",
+  "toolchain": {
+    "pythonVersion": "3.9.6",
+    "platform": "Darwin",
+    "machine": "arm64"
+  },
+  "environment": {
+    "localOS": "macOS 26.6.2",
+    "peerProduct": "mackvm-client (first-party, DEBUG)",
+    "peerVersion": "cc4ccb8edc7d",
+    "peerRole": "client",
+    "peerOS": "Ubuntu 22.04 arm64 container (swift:6.2.3-jammy), Xvfb 1600x900",
+    "networkScope": "Mac loopback listener via the Docker Desktop host gateway",
+    "tls": "TLS 1.3, server pinned by SHA-256 fingerprint"
+  },
+  "cases": [
+    {
+      "id": "fingerprint-changed-exit-78",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "trusted record differs from the server: mackvm-client exited 78"
+      ]
+    },
+    {
+      "id": "fingerprint-changed-no-bytes",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "server log: no session became ready, so no application byte crossed TLS"
+      ]
+    },
+    {
+      "id": "handshake",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "server: client ready (1600x900); client: connected; identity line and pinned TLS"
+      ]
+    },
+    {
+      "id": "enter",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "enter point at the left edge (1, 450); client: input is on this screen"
+      ]
+    },
+    {
+      "id": "clipboard-to-client",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "fixed probe read back with xclip on the client display"
+      ]
+    },
+    {
+      "id": "move-1",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "+(100, 50) -> (101, 500)"
+      ]
+    },
+    {
+      "id": "move-2",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "+(300, -200) -> (401, 300)"
+      ]
+    },
+    {
+      "id": "held-key-locks",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "a held letter keeps input on the client past the return edge; the probe sees it down"
+      ]
+    },
+    {
+      "id": "return",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "held Shift is released on return; no key down on the client display"
+      ]
+    },
+    {
+      "id": "clipboard-from-client",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "client copy arrived on the leave and matched the fixed probe exactly"
+      ]
+    },
+    {
+      "id": "escape",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "Control held then escape: server local recovery completed; no key down on the client"
+      ]
+    },
+    {
+      "id": "clipboard-not-echoed",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "the next enter did not send the unchanged clipboard again"
+      ]
+    },
+    {
+      "id": "clipboard-large-from-client",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "100 KB client clipboard arrived on the leave and matched exactly"
+      ]
+    },
+    {
+      "id": "kill-client-no-stuck-key",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "client SIGTERM with Shift+a held (2 keys down before): none down after, exit 0, server saw the disconnect"
+      ]
+    },
+    {
+      "id": "reconnect",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "new client process: a new session became ready; enter + (20, 20) -> (21, 470)"
+      ]
+    },
+    {
+      "id": "clipboard-on-reconnect",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "the server clipboard was sent once to the new session"
+      ]
+    },
+    {
+      "id": "keepalive-13s",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "13 s idle, then +(30, 0) -> (51, 470); the client saw no connection end"
+      ]
+    },
+    {
+      "id": "clipboard-large-to-client",
+      "status": "failed",
+      "exitCode": 1,
+      "evidence": [
+        "600 KB server clipboard matched by SHA-256 on the client display, session kept"
+      ]
+    },
+    {
+      "id": "quit-while-remote",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "Shift held, server quit: server stopped; no key down on the client; the client saw the end"
+      ]
+    },
+    {
+      "id": "auto-reconnect",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "the running client reconnected to the restarted server on its own"
+      ]
+    },
+    {
+      "id": "client-sigterm-exit-0",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "SIGTERM ends the client with exit 0"
+      ]
+    },
+    {
+      "id": "x-events",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "X raw key, button and wheel events on the client display (redundant releases dropped) equal the plan list"
+      ]
+    },
+    {
+      "id": "owner-hardware-half",
+      "status": "failed",
+      "exitCode": 69,
+      "evidence": [
+        "not run: needs the owner at both machines and a reviewer sign-off in evidence/issues/M4-036-FOLLOWUP-001/manual.md (pending)"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/e2e/M4-036-FOLLOWUP-001/server.log",
+      "sha256": "9a3037cee7944b29210146d57be238ce769ef844c37d5d7e4b518b5541b43e41",
+      "byteLength": 2079,
+      "kind": "sanitized-log",
+      "reviewStatus": "pending-review"
+    },
+    {
+      "path": "evidence/e2e/M4-036-FOLLOWUP-001/client.log",
+      "sha256": "95ad0c050c47a46c0aaad9ad6464cfa6b971f30cfe6635ab7e8637b19fb61bb3",
+      "byteLength": 2335,
+      "kind": "sanitized-log",
+      "reviewStatus": "pending-review"
+    },
+    {
+      "path": "evidence/e2e/M4-036-FOLLOWUP-001/x-events.txt",
+      "sha256": "4059896790dfa8aeb516207270bad8b76dea9d072960696f872186674366f814",
+      "byteLength": 878,
+      "kind": "sanitized-log",
+      "reviewStatus": "pending-review"
+    }
+  ],
+  "privacy": {
+    "containsSensitiveData": false,
+    "containsTypedText": false,
+    "containsClipboardPayload": false,
+    "containsCredentials": false,
+    "containsKeyMaterial": false,
+    "containsHostnames": false,
+    "containsIPAddresses": false,
+    "rawCaptureCommitted": false,
+    "sanitizationReviewed": true
+  },
+  "approvedDecisionRef": null
+}
