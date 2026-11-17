@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-021-FOLLOWUP-001",
+  "date": "2026-11-17",
+  "baseline": {
+    "exitCode": 0,
+    "passed": true,
+    "failedTests": [],
+    "tail": ""
+  },
+  "mutants": [
+    {
+      "id": "M1",
+      "rule": "a directory mode wider than 0700 is refused",
+      "mutation": "group and other bits allowed on the directory",
+      "killers": [
+        "a directory with a mode wider than 0700 is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a directory with a mode wider than 0700 is refused"
+      ]
+    },
+    {
+      "id": "M2",
+      "rule": "a file mode wider than 0600 is refused",
+      "mutation": "group and other read bits allowed on the record file",
+      "killers": [
+        "a record file with a mode wider than 0600 is refused",
+        "first use: a storage failure is a failure, never a prompt"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a record file with a mode wider than 0600 is refused",
+        "first use: a storage failure is a failure, never a prompt"
+      ]
+    },
+    {
+      "id": "M3",
+      "rule": "a symbolic link in place of the record file is refused",
+      "mutation": "record file looked up and opened following links",
+      "killers": [
+        "a symbolic link in place of the record file is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a symbolic link in place of the record file is refused"
+      ]
+    },
+    {
+      "id": "M4",
+      "rule": "a symbolic link in place of the directory is refused",
+      "mutation": "directory checked with stat and opened following links",
+      "killers": [
+        "a symbolic link in place of the directory is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a symbolic link in place of the directory is refused"
+      ]
+    },
+    {
+      "id": "M5",
+      "rule": "another owner is refused",
+      "mutation": "owner check removed",
+      "killers": [
+        "a record file owned by another user is refused (injected stat)",
+        "a directory owned by another user is refused (injected stat)"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a directory owned by another user is refused (injected stat)",
+        "a record file owned by another user is refused (injected stat)"
+      ]
+    },
+    {
+      "id": "M6",
+      "rule": "an unknown line rejects the whole file",
+      "mutation": "a line that is not two fields is skipped",
+      "killers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ]
+    },
+    {
+      "id": "M7",
+      "rule": "a second record for one server rejects the file",
+      "mutation": "duplicate keys accepted (last wins)",
+      "killers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ]
+    },
+    {
+      "id": "M8",
+      "rule": "only normalized host:port keys are accepted",
+      "mutation": "a key that normalizes to another spelling is accepted",
+      "killers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a malformed line rejects the whole file and nothing is rewritten",
+        "anything that is not exactly a list of records is refused"
+      ]
+    },
+    {
+      "id": "M9",
+      "rule": "writes go to a temporary file, then rename",
+      "mutation": "the record file is rewritten in place",
+      "killers": [
+        "a write replaces the file by rename and leaves no temporary file"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a write replaces the file by rename and leaves no temporary file"
+      ]
+    },
+    {
+      "id": "M10",
+      "rule": "the record file is created 0600",
+      "mutation": "the new file is created 0644",
+      "killers": [
+        "insert, load and remove round-trip through a 0600 file in a 0700 directory",
+        "a write replaces the file by rename and leaves no temporary file"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a write replaces the file by rename and leaves no temporary file",
+        "insert, load and remove round-trip through a 0600 file in a 0700 directory"
+      ]
+    },
+    {
+      "id": "M11",
+      "rule": "the directory is created 0700",
+      "mutation": "the directory is created 0755",
+      "killers": [
+        "insert, load and remove round-trip through a 0600 file in a 0700 directory"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "insert, load and remove round-trip through a 0600 file in a 0700 directory"
+      ]
+    },
+    {
+      "id": "M12",
+      "rule": "concurrent inserts keep one record (flock on the directory)",
+      "mutation": "the directory lock is not taken",
+      "killers": [
+        "concurrent inserts for one server from separate instances keep exactly one record",
+        "concurrent inserts for different servers lose no record"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "concurrent inserts for different servers lose no record",
+        "concurrent inserts for one server from separate instances keep exactly one record"
+      ]
+    },
+    {
+      "id": "M13",
+      "rule": "an existing record is never replaced",
+      "mutation": "insert overwrites an existing record",
+      "killers": [
+        "a duplicate insert returns the existing record and changes nothing",
+        "first use: trust never replaces a different record and reports the change"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a duplicate insert returns the existing record and changes nothing",
+        "first use: trust never replaces a different record and reports the change"
+      ]
+    },
+    {
+      "id": "M14",
+      "rule": "policy: a presented fingerprint that is not 32 bytes rejects",
+      "mutation": "presented length not checked",
+      "killers": [
+        "the policy table"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "the policy table"
+      ]
+    },
+    {
+      "id": "M15",
+      "rule": "policy: a different fingerprint is identityChanged",
+      "mutation": "any stored 32-byte fingerprint allows",
+      "killers": [
+        "the policy table",
+        "first use: trust never replaces a different record and reports the change"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "first use: trust never replaces a different record and reports the change",
+        "the policy table"
+      ]
+    },
+    {
+      "id": "M16",
+      "rule": "the change warning is redacted",
+      "mutation": "the warning's description and mirror show the displays",
+      "killers": [
+        "the change warning is redacted everywhere but its two display fields"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "the change warning is redacted everywhere but its two display fields"
+      ]
+    },
+    {
+      "id": "M17",
+      "rule": "first use inserts if absent and re-reads",
+      "mutation": "trust answers allow without re-reading",
+      "killers": [
+        "first use: trust never replaces a different record and reports the change"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "first use: trust never replaces a different record and reports the change"
+      ]
+    },
+    {
+      "id": "M18",
+      "rule": "a load or insert from a cancelled task does nothing",
+      "mutation": "insert skips the cancellation check",
+      "killers": [
+        "load and insert from a cancelled task do nothing; remove still runs"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "load and insert from a cancelled task do nothing; remove still runs"
+      ]
+    }
+  ],
+  "allKilled": true
+}
