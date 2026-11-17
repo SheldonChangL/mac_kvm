@@ -1,0 +1,22 @@
+# mackvm-client: the first-party Barrier-compatible client for Linux (X11).
+# Install to ~/.config/systemd/user/ and the binary to ~/.local/bin/. Edit <host> and <name>
+# (the name must equal the Mac's --client), then:
+#   systemctl --user import-environment DISPLAY XAUTHORITY
+#   systemctl --user daemon-reload && systemctl --user enable --now mackvm-client
+# Trust the Mac once from a terminal first (mackvm-client fingerprint trust ...): this unit runs
+# --non-interactive and exits 78 on an unknown or changed server identity. Run it as your own
+# user, never as root (not supported as root). Exit codes 64, 69 and 78 do not restart.
+[Unit]
+Description=MacKVM Barrier-compatible client
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/mackvm-client connect <host> --name <name> --non-interactive
+Restart=on-failure
+RestartSec=5
+RestartPreventExitStatus=64 69 78
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=graphical-session.target
