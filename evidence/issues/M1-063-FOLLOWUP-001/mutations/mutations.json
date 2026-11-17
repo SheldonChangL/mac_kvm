@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-063-FOLLOWUP-001",
+  "source": "Packages/KVMCore/Sources/KVMCore/ClientCoordinator.swift",
+  "results": [
+    {
+      "id": "M1",
+      "mutation": "enter does not move the pointer first",
+      "killingTest": "enterMovesThePointerFirstThenBecomesActive",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M2",
+      "mutation": "key and button input accepted while inactive",
+      "killingTest": "inputWhileInactiveIsDroppedAndCounted",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M3",
+      "mutation": "unpaired repeat injected",
+      "killingTest": "unpairedRepeatIsNeverInjected",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M4",
+      "mutation": "duplicate down injected",
+      "killingTest": "duplicateDownIsDropped",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M5",
+      "mutation": "leave injects no releases",
+      "killingTest": "leaveReleasesInPlanOrderThenResetsAndBecomesInactive",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M6",
+      "mutation": "leave releases in reverse of the plan order",
+      "killingTest": "leaveReleasesInPlanOrderThenResetsAndBecomesInactive",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M7",
+      "mutation": "leave does not reset the ledger",
+      "killingTest": "leaveReleasesInPlanOrderThenResetsAndBecomesInactive",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M8",
+      "mutation": "inbound clipboard skips the loop guard",
+      "killingTest": "inboundClipboardPassesTheLoopGuardBeforeItIsApplied",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M9",
+      "mutation": "inject failure ignored",
+      "killingTest": "injectFailureFailsClosed",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M10",
+      "mutation": "terminate does not close the session",
+      "killingTest": "terminateReleasesEverything",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M11",
+      "mutation": "terminate skips the cleanup hooks",
+      "killingTest": "streamEndReleasesEverything",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M12",
+      "mutation": "old generation events accepted",
+      "killingTest": "oldGenerationStreamCannotInjectIntoTheNewSession",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M13",
+      "mutation": "new session allowed while the old one is open",
+      "killingTest": "newGenerationStartsOnlyAfterTheOldCleanup",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M14",
+      "mutation": "a finished stream is not terminated",
+      "killingTest": "streamEndReleasesEverything",
+      "exitCode": 1,
+      "status": "killed"
+    }
+  ]
+}
