@@ -121,14 +121,27 @@ certificate that names no host, and the pin is a stronger check than a name.
   amount of data in order without the session ending (a 600 KB clipboard
   previously overflowed the old 16-chunk `bufferingOldest` stream and ended
   with `resourceExhausted`, issue #372).
-- One socket read already in flight can still land after the pause, so the
-  queue may pass the high-water mark by about one read. `maximumBufferedBytes`
+- The gate holds only the next `read` request. A read event already under way
+  (NIO's `maxMessagesPerRead`, 4 by default, of up to 64 KiB each) still
+  lands, and NIOSSL can issue its own reads past the gate, so the queue can
+  pass the high-water mark by a few hundred KiB. The tests pin the peak under
+  high water + 512 KiB. `maximumBufferedBytes`
   (1 MiB) is a hard ceiling: a read that would pass it ends the stream with
   `transport(.resourceExhausted)` after the chunks already queued, in order.
   Nothing is silently dropped. Protocol and clipboard size limits (1 MiB
   clipboard) are enforced above the transport and are unchanged.
-- A cancelled consumer task ends the lifecycle (the channel closes); a second
+- Known limitation: the 1 MiB ceiling counts payload bytes only. Per-chunk
+  overhead (one `Data` per decrypted read, so tiny TLS records cost more) is
+  not counted. It stays bounded at a few MiB, which is acceptable.
+- Behaviour change from M1-055-FOLLOWUP-001: a cancelled consumer task ends the
+  lifecycle (the channel closes), but dropping the iterator or breaking out of
+  the loop no longer ends it with a consumer-gone close. The connection stays
+  open, with reads paused once the queue fills, until `disconnect()`. A second
   concurrent consumer is refused with `internalFailure(.preconditionFailed)`.
+- The transport has no read timeout. A peer that goes silent is bounded by the
+  client protocol session's keepalive timeout:
+  `BarrierClientProtocolSession` checks every second and fails with
+  `timeout(.keepalive)` after 9 silent checks.
 - The peer closing the connection with a TLS `close_notify` finishes the
   stream normally, once, after the data it sent (plan a.5: a clean end that the
   reconnect manager retries). A bare TCP FIN after the handshake, without

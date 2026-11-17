@@ -83,6 +83,19 @@
    "exitCode": null,
    "stdout": "",
    "note": "NOT COMPLETED: stopped after about 52 min while the client was still building in the container (the Docker VM was heavily throttled). No case ran. clipboard-large-to-client is unverified on this build."
+  },
+  {
+   "name": "review-notes-linux-focused",
+   "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors && swift test --filter 'LinuxTLSTransport|LinuxClient'",
+   "exitCode": 0,
+   "stdout": "Build complete!\n✔ Test run with 49 tests in 7 suites passed\n",
+   "note": "after review notes: overshoot assertion added to stalledConsumerIsBounded"
+  },
+  {
+   "name": "review-notes-mac",
+   "command": "swift test; make docs-check; python3 Tools/Backlog/validate_package.py",
+   "exitCode": 0,
+   "stdout": "✔ Test run with 332 tests in 29 suites passed\ndocs check OK\nPACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
   }
  ]
 }

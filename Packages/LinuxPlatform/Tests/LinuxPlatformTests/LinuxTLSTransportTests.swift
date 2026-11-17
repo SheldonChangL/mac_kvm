@@ -530,6 +530,8 @@
       #expect(transport.bufferedByteCount >= LinuxTLSTransport.inboundHighWaterBytes)
       #expect(transport.peakBufferedByteCount < LinuxTLSTransport.maximumBufferedBytes)
       #expect(transport.peakBufferedByteCount < size / 4)
+      #expect(
+        transport.peakBufferedByteCount <= LinuxTLSTransport.inboundHighWaterBytes + 512 * 1024)
 
       var received = Data()
       for try await chunk in transport.incomingBytes {

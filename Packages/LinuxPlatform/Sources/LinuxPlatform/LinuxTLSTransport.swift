@@ -45,10 +45,19 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
 /// Decrypted bytes wait in a byte-counted queue; once it holds
 /// `inboundHighWaterBytes` the channel stops issuing socket reads (the read
 /// event is held, so TCP flow control pushes back on the peer), and reading
-/// resumes when the consumer drains it below `inboundLowWaterBytes`. One socket
-/// read can still land after the pause, so the queue may pass the high-water
-/// mark by at most one read; `maximumBufferedBytes` is a hard ceiling that
-/// ends the stream with `resourceExhausted` rather than grow without bound.
+/// resumes when the consumer drains it below `inboundLowWaterBytes`. The gate
+/// cannot stop a read event already under way (NIO's `maxMessagesPerRead`, 4 by
+/// default, of up to 64 KiB each) nor reads NIOSSL issues itself, so the queue
+/// can pass the high-water mark by a few hundred KiB (tests pin it under
+/// high water + 512 KiB); `maximumBufferedBytes` is a hard ceiling that ends
+/// the stream with `resourceExhausted` rather than grow without bound. The
+/// ceiling counts payload bytes only, not per-chunk overhead.
+///
+/// Leaving the `for try await` loop over `incomingBytes` without cancelling
+/// does not end the lifecycle: the connection stays open with reads paused
+/// once the queue fills, until `disconnect()`. Only cancelling the consuming
+/// task ends it. The transport has no read timeout; a silent peer is bounded
+/// by the client protocol session's keepalive timeout.
 ///
 /// State lives behind one `NSLock`, which is why the class is
 /// `@unchecked Sendable`. No closure, continuation, channel call, stream yield
