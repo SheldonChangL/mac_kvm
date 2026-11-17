@@ -100,6 +100,13 @@ MUTANTS = [
     ("M34", "h.5: a wake ends the old generation first (second line: beginSession waits)",
      APP + "ClientRuntime.swift",
      "    await runtime.endGeneration(.cancelled)\n", "", None),
+    ("M35", "review: the cleanup never joins a parked drain without a bound",
+     APP + "ClientEffects.swift",
+     "    guard !isDisplayLost else { return }\n    guard\n      Self.bounded(Self.drainJoinTimeout, { [drain = currentDrain] in drain.clearTransientState() })\n    else {",
+     "    currentDrain.clearTransientState()\n    guard true else {", None),
+    ("M36", "review: a signal interrupts the trust prompt", APP + "ClientRuntime.swift",
+     "    endingContinuation.yield(.terminated(signal: signal))\n    promptGate.interrupt()\n",
+     "    endingContinuation.yield(.terminated(signal: signal))\n", None),
 ]
 
 

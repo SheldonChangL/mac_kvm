@@ -152,11 +152,13 @@ final class ClientEffects: ClientCoordinatorEffects, ClientInputSafety, @uncheck
   // MARK: ClientCoordinatorEffects
 
   func inject(_ event: KVMEvent) -> Bool {
-    currentDrain.enqueue(event)
+    guard !isDisplayLost else { return false }
+    return currentDrain.enqueue(event)
   }
 
   func moveLocalPointer(to position: NormalizedPoint) -> Bool {
-    currentDrain.enqueue(.mouseMove(position: position))
+    guard !isDisplayLost else { return false }
+    return currentDrain.enqueue(.mouseMove(position: position))
   }
 
   func applyClipboard(_ payload: ClipboardPayload) -> Bool {
@@ -173,9 +175,54 @@ final class ClientEffects: ClientCoordinatorEffects, ClientInputSafety, @uncheck
 
   // MARK: ClientInputSafety
 
+  /// How long the terminal path waits for the drain worker to stop.
+  static let drainJoinTimeout: DispatchTimeInterval = .seconds(2)
+
+  /// Stops and joins the drain (h.6), bounded. After a display loss the worker may be parked
+  /// for good in Xlib's I/O error handler, so it is not joined at all: `inject` already refuses
+  /// everything, and no release follows (`requireDisplay`). A join that times out fails the
+  /// step (`cleanupPartial`) instead of blocking the cleanup forever.
   func clearTransientState() throws(CoreError) {
-    currentDrain.clearTransientState()
     clipboard.dropPending()
+    guard !isDisplayLost else { return }
+    guard
+      Self.bounded(Self.drainJoinTimeout, { [drain = currentDrain] in drain.clearTransientState() })
+    else {
+      throw CoreError(
+        code: .inputSafety(.cleanupPartial), severity: .error, retryDisposition: .never,
+        cleanupDisposition: .partial)
+    }
+  }
+
+  /// Runs `body` on its own thread and waits at most `timeout`. `false` when it did not
+  /// finish; the thread is then abandoned.
+  static func bounded(_ timeout: DispatchTimeInterval, _ body: @escaping @Sendable () -> Void)
+    -> Bool
+  {
+    let done = DispatchSemaphore(value: 0)
+    Thread {
+      body()
+      done.signal()
+    }.start()
+    return done.wait(timeout: .now() + timeout) == .success
+  }
+
+  /// The shutdown's first step: releases everything the injector holds, bounded, before any
+  /// step that can block (review of PR #370). Skipped after a display loss. `false` when it
+  /// failed or timed out.
+  func sweepBeforeShutdown(timeout: DispatchTimeInterval = .seconds(1)) -> Bool {
+    guard !isDisplayLost else { return true }
+    let injector = injector
+    let result = ClientResultBox()
+    let finished = Self.bounded(timeout) {
+      do throws(CoreError) {
+        try injector.releaseRemaining()
+        result.set(true)
+      } catch {
+        result.set(false)
+      }
+    }
+    return finished && result.value
   }
 
   func release(_ event: KVMEvent) throws(CoreError) {
@@ -226,9 +273,28 @@ final class ClientEffects: ClientCoordinatorEffects, ClientInputSafety, @uncheck
     guard let drain else { return .success(()) }
     clipboard.stop()
     guard !gone else { return .success(()) }
-    drain.clearTransientState()
-    return injector.close()
+    let injector = injector
+    let result = ClientResultBox()
+    let finished = Self.bounded(Self.drainJoinTimeout) {
+      drain.clearTransientState()
+      if case .success = injector.close() { result.set(true) }
+    }
+    return finished && result.value
+      ? .success(())
+      : .failure(
+        CoreError(
+          code: .inputSafety(.cleanupPartial), severity: .error, retryDisposition: .never,
+          cleanupDisposition: .partial))
   }
+}
+
+/// A flag set from another thread.
+final class ClientResultBox: @unchecked Sendable {
+  private let lock = NSLock()
+  private var stored = false
+
+  func set(_ value: Bool) { lock.withLock { stored = value } }
+  var value: Bool { lock.withLock { stored } }
 }
 
 // MARK: - Xlib process setup (plan a.3, h.8)

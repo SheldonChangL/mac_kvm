@@ -80,6 +80,13 @@
 
     func failNextInjection(with error: CoreError) { lock.withLock { failNext = error } }
 
+    /// When set, the next injection runs this hook and then blocks its thread for good, as a
+    /// drain worker parked in Xlib's I/O error handler does.
+    private var parkHook: (@Sendable () -> Void)?
+    func parkNextInjection(after hook: @escaping @Sendable () -> Void) {
+      lock.withLock { parkHook = hook }
+    }
+
     var heldCount: Int { lock.withLock { heldKeys.count + heldButtons.count } }
 
     private func track(_ event: KVMEvent) {
@@ -104,6 +111,13 @@
     }
 
     func inject(_ event: KVMEvent) -> CoreResult<InjectionOutcome> {
+      if let hook = lock.withLock({ () -> (@Sendable () -> Void)? in
+        defer { parkHook = nil }
+        return parkHook
+      }) {
+        hook()
+        DispatchSemaphore(value: 0).wait()
+      }
       if let error = lock.withLock({ () -> CoreError? in
         defer { failNext = nil }
         return failNext
@@ -790,6 +804,21 @@
       #expect(await finished(run) == .unavailable)
     }
 
+    @Test("review: a drain worker parked by a display loss does not hang the cleanup; exit 69")
+    func displayLossParksTheDrainWorker() async throws {
+      let harness = Harness()
+      let run = harness.start()
+      let server = try await harness.readyServer(0)
+      try await server.session.enter(at: NormalizedPoint(x: 0.5, y: 0.5))
+      try await server.session.forward(key(8, .down))
+      await harness.injected(key(8, .down))
+      let runtime = harness.runtime
+      harness.injector.parkNextInjection { runtime.displayLost() }
+      try await server.session.forward(key(7, .down))
+      #expect(await finished(run) == .unavailable)
+      #expect(harness.runtime.coordinator.diagnostics.cleanupsRun == 1)
+    }
+
     @Test("a lost display reported by Xlib's I/O error handler ends with exit 69")
     func displayLossFromXlib() async throws {
       let harness = Harness()
@@ -837,6 +866,38 @@
       #expect(harness.store.stored(harness.server.peerKey) == serverFingerprint)
       harness.runtime.requestTermination(signal: SIGTERM)
       #expect(await finished(run) == .success)
+    }
+
+    @Test(
+      "review: a signal or a display loss while the prompt waits declines and exits",
+      arguments: [false, true])
+    func promptInterrupted(byDisplayLoss: Bool) async {
+      let harness = Harness(
+        trusted: nil, interactive: true,
+        prompt: {
+          try? await Task.sleep(nanoseconds: 3_600_000_000_000)
+          return "trust"
+        })
+      let run = harness.start()
+      await harness.output.lines.wait { lines in
+        lines.contains { entry in
+          if case .message(let text) = entry { text.contains("Type trust") } else { false }
+        }
+      }
+      if byDisplayLoss {
+        harness.runtime.displayLost()
+      } else {
+        harness.runtime.requestTermination(signal: SIGINT)
+      }
+      #expect(await finished(run) == (byDisplayLoss ? .unavailable : .success))
+      #expect(harness.store.writes == 0)
+    }
+
+    @Test("interactive: stdin closed without an answer stores nothing and exits 78")
+    func promptEndOfInput() async {
+      let harness = Harness(trusted: nil, interactive: true, prompt: { nil })
+      #expect(await finished(harness.start()) == .trustDecisionNeeded)
+      #expect(harness.store.writes == 0)
     }
 
     @Test("interactive: any other answer stores nothing and exits 78")
@@ -1179,11 +1240,17 @@
       #expect(service["Restart"] == "on-failure")
       #expect(service["RestartSec"] == "5")
       #expect(service["RestartPreventExitStatus"] == "64 69 78")
-      #expect(service["Environment"] == "DISPLAY=:0")
+      #expect(service["Environment"] == nil)
+      #expect(service["NoNewPrivileges"] == "yes")
+      #expect(service["LockPersonality"] == "yes")
+      #expect(service["RestrictSUIDSGID"] == "yes")
+      #expect(service["RestrictAddressFamilies"] == "AF_UNIX AF_INET AF_INET6")
+      #expect(service["UMask"] == "0077")
       #expect(service["User"] == nil)
       #expect(
         Set(service.keys) == [
-          "ExecStart", "Restart", "RestartSec", "RestartPreventExitStatus", "Environment",
+          "ExecStart", "Restart", "RestartSec", "RestartPreventExitStatus", "NoNewPrivileges",
+          "LockPersonality", "RestrictSUIDSGID", "RestrictAddressFamilies", "UMask",
         ])
       #expect(sections["Install"] == ["WantedBy": "graphical-session.target"])
       #expect(text.contains("not supported as root") || text.contains("never as root"))

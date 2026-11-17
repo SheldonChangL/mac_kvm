@@ -429,11 +429,38 @@
       "failingTests": [],
       "seconds": 12.0,
       "note": "Expected survivor: h.5 holds by a second line; prepareGeneration waits for beginSession(), which needs the old cleanup to have returned, so the wake test still passes with this line removed."
+    },
+    {
+      "id": "M35",
+      "rule": "review: the cleanup never joins a parked drain without a bound",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "killing the server stream releases every held key and starts the next generation",
+        "review: a drain worker parked by a display loss does not hang the cleanup; exit 69"
+      ],
+      "seconds": 145.8,
+      "note": "added for the PR #370 review fixes"
+    },
+    {
+      "id": "M36",
+      "rule": "review: a signal interrupts the trust prompt",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "review: a signal or a display loss while the prompt waits declines and exits"
+      ],
+      "seconds": 71.8,
+      "note": "added for the PR #370 review fixes"
     }
   ],
   "summary": {
-    "total": 34,
-    "killed": 33,
+    "total": 36,
+    "killed": 35,
     "survived": [
       "M34"
     ]

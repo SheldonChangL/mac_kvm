@@ -96,7 +96,9 @@ mackvm-client fingerprint forget <host>[:port]
   release plan, the injector sweep, the ledger clear, a bounded disconnect.
 - The runtime records every terminate it starts. Before the next generation it
   awaits them; `beginSession() == false` means "wait, then retry", never a
-  failure. A later terminate that returns `skipped` does not wait.
+  failure. The retry polls every 5 ms for at most 10 s; on expiry the attempt
+  reports a superseded `backoff` failure and the manager retries later. A later
+  terminate that returns `skipped` does not wait.
 - A wake ends the current generation (awaiting its cleanup) before
   `ReconnectManager.connect()`, so the old generation's input is released before
   the new session injects (h.5).
@@ -125,10 +127,22 @@ mackvm-client fingerprint forget <host>[:port]
 ### Shutdown (h.3, h.8)
 
 `finish` runs once: it refuses `connect()` from then on, stops the lifecycle
-monitor, ends the current generation and waits for its cleanup, disconnects the
-manager, stops the screen and clipboard, and closes the injector (`close()`
-releases what it still holds; its `deinit` does not). It is bounded by 5 s;
-the process exits with its code either way.
+monitor, first releases everything the injector holds (its own 1 s bound, so no
+later step that blocks can leave input held), ends the current generation and
+waits for its cleanup, disconnects the manager, stops the screen and clipboard,
+and closes the injector (`close()` releases what it still holds; its `deinit`
+does not). The whole shutdown is bounded by 5 s; when the bound fires the
+status line "the shutdown did not finish in time; exiting" is printed, and the
+process exits with its code either way.
+
+The drain join of the terminal path is bounded (2 s, then `cleanupPartial`).
+After a display loss the drain is not joined at all: its worker may be parked in
+Xlib's I/O error handler for good, `inject` already refuses everything, and no
+release touches Xlib.
+
+A signal or a display loss while the interactive trust prompt waits is a
+decline: nothing is stored, and the client exits with that ending's code (0 for
+a signal, 69 for a display loss). End of input at the prompt exits 78.
 
 Display loss is detected three ways: an injector failure with
 `lifecycle.subsystemUnavailable`, a screen or clipboard stream that ends without
@@ -181,7 +195,12 @@ dependency:
   `After=` and `PartOf=graphical-session.target`.
 - `[Service]`: `ExecStart=%h/.local/bin/mackvm-client connect <host> --name <name> --non-interactive`,
   `Restart=on-failure`, `RestartSec=5`, `RestartPreventExitStatus=64 69 78`,
-  `Environment=DISPLAY=:0`.
+  and hardening: `NoNewPrivileges=yes`, `LockPersonality=yes`,
+  `RestrictSUIDSGID=yes`, `RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6`,
+  `UMask=0077`. `DISPLAY` and `XAUTHORITY` are not set in the unit; they come
+  from `import-environment`. `MemoryDenyWriteExecute`, `ProtectHome` and
+  `ProtectSystem` are not used (unverified with the Swift runtime, and the trust
+  store lives in the home directory).
 - `[Install]`: `WantedBy=graphical-session.target`.
 
 The owner edits `<host>` and `<name>`, runs
@@ -227,9 +246,10 @@ needs only `libx11-6 libxtst6 libxrandr2 libxfixes3` and an X11 session.
   after resume, by the cleanup of the old connection.
 - A crash of the process runs no cleanup; XTest-held input stays pressed
   (plan f.9).
-- A cleanup step that hangs (for example a drain worker parked in Xlib's I/O
-  error handler) is cut by the 5 s shutdown bound; the process then exits
-  without the rest of the shutdown.
+- A shutdown step that hangs is cut by the 5 s bound; the process then exits
+  without the rest of the shutdown. The release sweep runs first, so input
+  held by this client is released before any step that can block. A bounded
+  step that times out leaves its thread running until the process exits.
 - Only `CLIPBOARD` UTF-8 text is synchronized; only US-layout key positions are
   claimed (M4-024, M4-026).
 - Real-desktop behavior (a real X session, suspend and resume, network changes,

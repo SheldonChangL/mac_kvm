@@ -118,7 +118,6 @@ enum ClientEnding: Equatable, Sendable {
   case terminated(signal: Int32)
   case displayLost
   case stopped(CoreErrorCode)
-  case trustDeclined
 }
 
 /// The composition root of one `mackvm-client connect`.
@@ -138,6 +137,7 @@ final class ClientRuntime: @unchecked Sendable {
   private(set) var recovery: RecoveryCoordinator!
 
   private let lock = NSLock()
+  private let promptGate = ClientPromptGate()
   private let slot: ClientSessionSlot
   private let terminations = ClientTerminations()
   private var freshGeneration = true
@@ -192,6 +192,11 @@ final class ClientRuntime: @unchecked Sendable {
   /// What an attempt throws when it was cancelled, or when its generation was ended from
   /// outside (a wake, a sleep, a termination). `backoff`, so a manager that was not superseded
   /// yet waits instead of stopping; the `connect()` or `disconnect()` that follows takes over.
+  /// Bound of the `beginSession()` retry in `prepareGeneration` (5 ms each, 10 s in all). On
+  /// expiry the attempt reports a superseded `backoff` failure and the manager retries later;
+  /// it never polls forever.
+  static let maximumBeginPolls = 2_000
+
   static let cancelled = CoreError(
     code: .cancellation(.superseded), severity: .info, retryDisposition: .backoff,
     cleanupDisposition: .completed)
@@ -211,8 +216,6 @@ final class ClientRuntime: @unchecked Sendable {
         return await finish(.termination, code: .success)
       case .displayLost:
         return await finish(.displayLost, code: .unavailable)
-      case .trustDeclined:
-        return await finish(.termination, code: .trustDecisionNeeded)
       case .stopped(let code):
         if let next = await handleStop(code) { return next }
       }
@@ -224,6 +227,7 @@ final class ClientRuntime: @unchecked Sendable {
   func requestTermination(signal: Int32) {
     output.status(.stopping(signal: signal))
     endingContinuation.yield(.terminated(signal: signal))
+    promptGate.interrupt()
   }
 
   /// A backend reported that the X display is gone (h.8).
@@ -231,6 +235,7 @@ final class ClientRuntime: @unchecked Sendable {
     guard effects.markDisplayLost() else { return }
     output.status(.displayLost)
     endingContinuation.yield(.displayLost)
+    promptGate.interrupt()
   }
 
   /// Starts a reconnect generation unless the runtime is terminating (h.3).
@@ -262,8 +267,14 @@ final class ClientRuntime: @unchecked Sendable {
         return await finish(.termination, code: .trustDecisionNeeded)
       }
       output.message(ClientTrustText.unknownPrompt(presented: presented))
-      let answer = await prompt()
-      guard answer?.trimmingCharacters(in: .whitespaces) == "trust" else {
+      // A signal or a display loss while the prompt waits is a decline: nothing is stored, and
+      // the run loop then handles that ending with its own exit code.
+      guard let answer = await promptGate.ask(prompt) else {
+        output.message(ClientTrustText.notTrusted)
+        if promptGate.wasInterrupted { return nil }
+        return await finish(.termination, code: .trustDecisionNeeded)
+      }
+      guard answer.trimmingCharacters(in: .whitespaces) == "trust" else {
         output.message(ClientTrustText.notTrusted)
         return await finish(.termination, code: .trustDecisionNeeded)
       }
@@ -411,6 +422,7 @@ final class ClientRuntime: @unchecked Sendable {
       return freshGeneration
     }
     if fresh { return !lock.withLock({ refusing }) }
+    var polls = 0
     while true {
       if lock.withLock({ refusing }) || Task.isCancelled { return false }
       if coordinator.beginSession() {
@@ -424,6 +436,8 @@ final class ClientRuntime: @unchecked Sendable {
       }
       // The claimed cleanup was started by a terminate this runtime did not track (the
       // coordinator's own `run`, already awaited, never leaves one behind); poll briefly.
+      polls += 1
+      if polls >= Self.maximumBeginPolls { return false }
       try? await Task.sleep(nanoseconds: 5_000_000)
     }
   }
@@ -577,7 +591,10 @@ final class ClientRuntime: @unchecked Sendable {
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
           let timer = Task {
             try? await clock.sleep(for: timeout)
-            if gate.claim() { continuation.resume() }
+            if gate.claim() {
+              self.output.status(.shutdownTimedOut)
+              continuation.resume()
+            }
           }
           Task {
             await self.shutdown(trigger)
@@ -597,6 +614,9 @@ final class ClientRuntime: @unchecked Sendable {
 
   private func shutdown(_ trigger: CleanupTrigger) async {
     backends.lifecycle.stop()
+    // Release first, with its own bound, so a later step that blocks cannot leave input held
+    // when the shutdown bound cuts it (review of PR #370). The cleanup below releases again.
+    if !effects.sweepBeforeShutdown() { output.status(.cleanup(.partial)) }
     await endGeneration(trigger)
     await manager.disconnect()
     await terminations.waitForAll()
@@ -944,5 +964,51 @@ final class ClientDisplayLossRelay: @unchecked Sendable {
       return self.handler
     }
     handler?()
+  }
+}
+
+/// Races the interactive trust prompt against a signal or a display loss.
+final class ClientPromptGate: @unchecked Sendable {
+  private let lock = NSLock()
+  private var waiter: CheckedContinuation<String?, Never>?
+  private var interrupted = false
+
+  /// The answer, or `nil` when interrupted (or when stdin ended). The prompt's own read keeps
+  /// running on its thread and is ignored.
+  func ask(_ prompt: @escaping @Sendable () async -> String?) async -> String? {
+    await withCheckedContinuation { (continuation: CheckedContinuation<String?, Never>) in
+      let now = lock.withLock { () -> Bool in
+        if interrupted { return true }
+        waiter = continuation
+        return false
+      }
+      if now {
+        continuation.resume(returning: nil)
+        return
+      }
+      Task {
+        let answer = await prompt()
+        self.resolve(answer)
+      }
+    }
+  }
+
+  var wasInterrupted: Bool { lock.withLock { interrupted } }
+
+  func interrupt() {
+    let waiting = lock.withLock { () -> CheckedContinuation<String?, Never>? in
+      interrupted = true
+      defer { waiter = nil }
+      return waiter
+    }
+    waiting?.resume(returning: nil)
+  }
+
+  private func resolve(_ answer: String?) {
+    let waiting = lock.withLock { () -> CheckedContinuation<String?, Never>? in
+      defer { waiter = nil }
+      return waiter
+    }
+    waiting?.resume(returning: answer)
   }
 }

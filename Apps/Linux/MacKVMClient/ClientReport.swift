@@ -28,6 +28,7 @@ enum ClientStatus: Equatable, Sendable {
   case stopping(signal: Int32)
   case stopped(CoreErrorCode)
   case trustStoreUnavailable
+  case shutdownTimedOut
 
   var text: String {
     switch self {
@@ -46,6 +47,7 @@ enum ClientStatus: Equatable, Sendable {
     case .displayLost: "the X display was lost; exiting"
     case .stopping(let signal): "stopping on signal \(signal)"
     case .stopped(let code): "stopped" + Self.suffix(code)
+    case .shutdownTimedOut: "the shutdown did not finish in time; exiting"
     case .trustStoreUnavailable:
       "the trust store is unusable: its directory must be a private 0700 directory owned by you"
         + " below an existing configuration directory"
