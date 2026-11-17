@@ -65,6 +65,13 @@ MUTANTS = [
      "    return await terminate(trigger, generation: generation)\n  }\n\n  private func terminate",
      "    _ = trigger\n    return .skipped\n  }\n\n  private func terminate",
      "streamEndReleasesEverything"),
+    ("M15", "new session allowed during the old cleanup (review note 1)",
+     "      guard current.claimed, !current.cleaning else { return false }",
+     "      guard current.claimed else { return false }",
+     "beginSessionWaitsForAnInFlightCleanup"),
+    ("M16", "run keeps reading a closed generation's stream (review note 3)",
+     "        if !stillOpen { break }", "        _ = stillOpen",
+     "runStopsReadingOnceItsGenerationIsClosed"),
 ]
 
 
@@ -85,12 +92,16 @@ def main() -> int:
                 print(mid, "NOT APPLIED", flush=True)
                 continue
             path.write_text(original.replace(old, new))
-            proc = subprocess.run(
-                ["swift", "test", "--filter", f"ClientCoordinatorTests.*{test}"],
-                cwd=repo, capture_output=True, text=True, timeout=900)
-            killed = proc.returncode != 0
+            try:
+                proc = subprocess.run(
+                    ["swift", "test", "--filter", f"ClientCoordinatorTests.*{test}"],
+                    cwd=repo, capture_output=True, text=True, timeout=900)
+                code = proc.returncode
+            except subprocess.TimeoutExpired:
+                code = "timeout"  # a hang is a detected failure, recorded as such
+            killed = code != 0
             results.append({"id": mid, "mutation": desc, "killingTest": test,
-                            "exitCode": proc.returncode,
+                            "exitCode": code,
                             "status": "killed" if killed else "survived"})
             print(mid, "killed" if killed else "SURVIVED", flush=True)
     finally:

@@ -142,7 +142,15 @@ private final class Platform: @unchecked Sendable {
 
   func releaseNow(_ event: KVMEvent) { lock.withLock { applyLocked(event) } }
 
+  /// When set, `sweep` signals `sweepEntered` and blocks until the gate is signalled.
+  var sweepGate: DispatchSemaphore?
+  let sweepEntered = DispatchSemaphore(value: 0)
+
   func sweep() {
+    if let sweepGate {
+      sweepEntered.signal()
+      sweepGate.wait()
+    }
     lock.withLock {
       guard sweepEnabled else { return }
       heldSet = []
@@ -623,6 +631,64 @@ struct ClientCoordinatorTests {
     #expect(coordinator.diagnostics.cleanupsRun == 1)
   }
 
+  @Test func beginSessionWaitsForAnInFlightCleanup() async {
+    let fixture = Fixture()
+    let gate = DispatchSemaphore(value: 0)
+    fixture.platform.sweepGate = gate
+    fixture.feed(Self.heldScript)
+    let coordinator = fixture.coordinator
+    let cleanup = Task { await coordinator.terminate(.cancelled) }
+    // Wait (off the cooperative pool) until the cleanup is inside the injector sweep.
+    let entered = fixture.platform.sweepEntered
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+      Thread {
+        entered.wait()
+        continuation.resume()
+      }.start()
+    }
+    let late = await coordinator.terminate(.termination)
+    #expect(!late.ran)
+    #expect(!coordinator.beginSession(), "a session began during the old cleanup")
+    gate.signal()
+    let outcome = await cleanup.value
+    #expect(outcome.ran)
+    #expect(fixture.platform.held.isEmpty)
+    fixture.platform.reopen()
+    #expect(coordinator.beginSession())
+  }
+
+  @Test func runStopsReadingOnceItsGenerationIsClosed() async {
+    let fixture = Fixture()
+    let coordinator = fixture.coordinator
+    let (events, feed) = AsyncThrowingStream.makeStream(of: KVMEvent.self)
+    let finished = Flag()
+    let running = Task {
+      let outcome = await coordinator.run(events)
+      finished.set()
+      return outcome
+    }
+    feed.yield(enter)
+    var spins = 0
+    while fixture.platform.effects.isEmpty, spins < 100_000 {
+      spins += 1
+      await Task.yield()
+    }
+    let cleanup = await coordinator.terminate(.termination)
+    #expect(cleanup.ran)
+    // One more event of the closed generation; the stream itself stays open.
+    feed.yield(down(.letter(1)))
+    spins = 0
+    while !finished.value, spins < 200_000 {
+      spins += 1
+      await Task.yield()
+    }
+    #expect(finished.value, "run kept reading a closed generation's stream")
+    feed.finish()
+    let outcome = await running.value
+    #expect(!outcome.ran)
+    #expect(fixture.platform.injected.isEmpty)
+  }
+
   // MARK: Diagnostics
 
   @Test func diagnosticsHoldNoIdentifiers() {
@@ -695,6 +761,13 @@ struct ClientCoordinatorTests {
       return .clipboard(inbound("c", hash: "h\(id)", id: id))
     }
   }
+}
+
+private final class Flag: @unchecked Sendable {
+  private let lock = NSLock()
+  private var raised = false
+  var value: Bool { lock.withLock { raised } }
+  func set() { lock.withLock { raised = true } }
 }
 
 private struct SplitMix64 {

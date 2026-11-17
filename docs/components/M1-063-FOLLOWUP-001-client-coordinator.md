@@ -26,7 +26,7 @@ only (Frozen Decision 8).
 | `run(_:) async -> CleanupOutcome` | Consumes one stream, then terminates it with the trigger below |
 | `beginSession() -> Bool` | Opens the next generation once the previous cleanup has returned |
 | `releasePlan()`, `clearLedger()` | Read by `CleanupHooks` at cleanup time |
-| `diagnostics`, `ledgerSnapshot`, `lastFailSafeReport` | Counts and flags only |
+| `diagnostics`, `ledgerSnapshot`, `lastFailSafeReport` | Counts and flags; `ledgerSnapshot` also carries the opaque last clipboard transaction ID, not for logging |
 
 Additions beyond b.8, and why:
 
@@ -80,7 +80,12 @@ closes the session (no later event is injected) and leaves `.active`. Then
 queue reset, the ledger's release plan, the injector sweep `releaseRemaining()`
 (h.1, h.6), the ledger clear and a bounded disconnect. The sweep covers
 releases a queue reset or overflow dropped after the ledger counted them. A
-second `terminate`, concurrent or later, returns `ran == false`.
+second `terminate`, concurrent or later, returns `ran == false` at once and does not
+wait for an in-flight cleanup (documented choice, review note 2). The
+composition root therefore awaits the `terminate` it started before calling
+`beginSession()`, and treats `beginSession() == false` as "wait, then retry".
+`run(_:)` stops reading a stream as soon as its generation is closed by
+another caller.
 
 ## Diagnostics
 

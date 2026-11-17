@@ -100,6 +100,20 @@
       "killingTest": "streamEndReleasesEverything",
       "exitCode": 1,
       "status": "killed"
+    },
+    {
+      "id": "M15",
+      "mutation": "new session allowed during the old cleanup (review note 1)",
+      "killingTest": "beginSessionWaitsForAnInFlightCleanup",
+      "exitCode": 1,
+      "status": "killed"
+    },
+    {
+      "id": "M16",
+      "mutation": "run keeps reading a closed generation's stream (review note 3)",
+      "killingTest": "runStopsReadingOnceItsGenerationIsClosed",
+      "exitCode": 1,
+      "status": "killed"
     }
   ]
 }

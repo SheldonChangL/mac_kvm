@@ -168,7 +168,8 @@ package final class ClientCoordinator: @unchecked Sendable {
     lock.withLock { current.diagnostics }
   }
 
-  /// Counts and flags of the ledger, without identities.
+  /// Counts and flags of the ledger. No key or button identity; it does carry the last clipboard
+  /// transaction ID, an opaque UUID, so callers must not log it as is.
   package var ledgerSnapshot: InputStateSnapshot {
     lock.withLock { current.ledger.snapshot() }
   }
@@ -195,7 +196,8 @@ package final class ClientCoordinator: @unchecked Sendable {
   }
 
   /// Opens the next session generation. Returns `false`, changing nothing, while the current
-  /// session is open or its cleanup has not returned.
+  /// session is open or its cleanup has not returned. The owner treats `false` after a
+  /// `terminate` as "wait": it awaits the `terminate` call that ran the cleanup, then retries.
   package func beginSession() -> Bool {
     lock.withLock {
       guard current.claimed, !current.cleaning else { return false }
@@ -236,7 +238,9 @@ package final class ClientCoordinator: @unchecked Sendable {
 
   /// Ends the current session generation with its one cleanup: queue reset, the ledger's release
   /// plan, the injector sweep, the ledger clear and a bounded disconnect. The only cleanup entry.
-  /// A second call for the same generation runs nothing and returns `ran == false`.
+  /// A second call for the same generation runs nothing and returns `ran == false` at once, even
+  /// while the first call's cleanup is still running; it does not wait for that cleanup. Only the
+  /// caller that got `ran == true` knows the cleanup has finished.
   package func terminate(_ trigger: CleanupTrigger) async -> CleanupOutcome {
     let generation = lock.withLock { current.generation }
     return await terminate(trigger, generation: generation)
@@ -252,11 +256,16 @@ package final class ClientCoordinator: @unchecked Sendable {
       var failed = false
       for try await event in events {
         if Task.isCancelled { break }
-        let outcome = lock.withLock { handleLocked(event, generation: generation) }
+        let (outcome, stillOpen) = lock.withLock {
+          let outcome = handleLocked(event, generation: generation)
+          return (outcome, current.open && current.generation == generation)
+        }
         if outcome == .failedClosed {
           failed = true
           break
         }
+        // Terminated from elsewhere, or superseded: stop reading the old stream.
+        if !stillOpen { break }
       }
       if failed {
         trigger = Self.injectionFailureTrigger
