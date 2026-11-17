@@ -70,6 +70,28 @@ private final class TemporaryConfig {
   }
 }
 
+/// A status hook that changes the inode of the second status seen for `object`: the object
+/// opened is then not the one checked.
+private func secondStatusChanged(
+  for object: LinuxTrustedStoreObject
+) -> @Sendable (LinuxTrustedStoreObject, inout stat) -> Void {
+  let calls = StatusCallCounter()
+  return { seen, status in
+    if seen == object, calls.next() == 2 { status.st_ino &+= 1 }
+  }
+}
+
+private final class StatusCallCounter: @unchecked Sendable {
+  private let lock = NSLock()
+  private var count = 0
+  func next() -> Int {
+    lock.lock()
+    defer { lock.unlock() }
+    count += 1
+    return count
+  }
+}
+
 private func permissions(_ path: String) -> mode_t {
   var status = stat()
   precondition(lstat(path, &status) == 0)
@@ -363,6 +385,50 @@ struct LinuxTrustedServerStoreRefusalTests {
     await expectEveryOperationFails(store, with: unavailable)
   }
 
+  @Test("a record file replaced between lstat and open is refused (injected stat)")
+  func fileSwappedAfterCheck() async {
+    let config = TemporaryConfig()
+    config.write("mac.local:24800 \(hex5A)\n")
+    let store = config.store(adjustStatus: secondStatusChanged(for: .recordFile))
+    let load = await store.loadTrustedFingerprint(for: server)
+    #expect(failureCode(load) == unavailable)
+  }
+
+  @Test("a directory replaced between lstat and open is refused (injected stat)")
+  func directorySwappedAfterCheck() async {
+    let config = TemporaryConfig()
+    config.write("mac.local:24800 \(hex5A)\n")
+    let store = config.store(adjustStatus: secondStatusChanged(for: .directory))
+    let load = await store.loadTrustedFingerprint(for: server)
+    #expect(failureCode(load) == unavailable)
+  }
+
+  @Test("a configuration directory writable by group or other is refused unless sticky")
+  func writableParent() async throws {
+    let config = TemporaryConfig()
+    config.write("mac.local:24800 \(hex5A)\n")
+    for mode in [0o777, 0o770, 0o722] {
+      #expect(chmod(config.base, mode_t(mode)) == 0)
+      await expectEveryOperationFails(config.store(), with: unavailable)
+    }
+    #expect(chmod(config.base, 0o1777) == 0)
+    #expect(try await config.store().loadTrustedFingerprint(for: server).get() == fingerprint(0x5A))
+    #expect(chmod(config.base, 0o755) == 0)
+    #expect(try await config.store().loadTrustedFingerprint(for: server).get() == fingerprint(0x5A))
+    #expect(chmod(config.base, 0o700) == 0)
+  }
+
+  @Test("a missing parent of the configuration directory fails closed and creates nothing")
+  func missingParent() async {
+    let config = TemporaryConfig()
+    let store = LinuxTrustedServerStore(
+      environment: LinuxTrustedServerStoreEnvironment(
+        variables: ["XDG_CONFIG_HOME": config.base + "/missing/config"]))
+    let insert = await store.insertTrustedFingerprintIfAbsent(fingerprint(1), for: server)
+    #expect(failureCode(insert) == unavailable)
+    #expect(!config.exists(config.base + "/missing"))
+  }
+
   @Test("a malformed line rejects the whole file and nothing is rewritten")
   func malformedLine() async {
     let lines = [
@@ -447,6 +513,37 @@ struct LinuxTrustedServerRecordFileTests {
   }
 }
 
+private let helperBaseVariable = "MACKVM_TRUST_HELPER_BASE"
+private let helperByteVariable = "MACKVM_TRUST_HELPER_BYTE"
+private let helperGoVariable = "MACKVM_TRUST_HELPER_GO"
+
+/// Starts this test binary again, running only the helper test, which inserts `byte` into the
+/// store under `base` once `go` exists. Returns the child's pid, or -1.
+private func spawnHelper(base: String, byte: UInt8, go: String) -> pid_t {
+  let executable = "/proc/self/exe"
+  let arguments = [
+    executable, "--testing-library", "swift-testing", "--filter", "twoProcessHelper",
+  ]
+  var variables = ProcessInfo.processInfo.environment
+  variables[helperBaseVariable] = base
+  variables[helperByteVariable] = String(byte)
+  variables[helperGoVariable] = go
+  let argv: [UnsafeMutablePointer<CChar>?] = arguments.map { strdup($0) } + [nil]
+  let envp: [UnsafeMutablePointer<CChar>?] =
+    variables.map { strdup("\($0.key)=\($0.value)") } + [nil]
+  defer {
+    for pointer in argv + envp { free(pointer) }
+  }
+  var actions = posix_spawn_file_actions_t()
+  posix_spawn_file_actions_init(&actions)
+  defer { posix_spawn_file_actions_destroy(&actions) }
+  posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0)
+  posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0)
+  var pid: pid_t = -1
+  guard posix_spawn(&pid, executable, &actions, nil, argv, envp) == 0 else { return -1 }
+  return pid
+}
+
 @Suite("M4-021-FOLLOWUP-001 trusted-server store: atomic replace and concurrency")
 struct LinuxTrustedServerStoreAtomicTests {
   @Test("a write replaces the file by rename and leaves no temporary file")
@@ -477,6 +574,59 @@ struct LinuxTrustedServerStoreAtomicTests {
     #expect(try await store.loadTrustedFingerprint(for: otherServer).get() == nil)
     _ = try await store.insertTrustedFingerprintIfAbsent(fingerprint(0xA5), for: otherServer).get()
     #expect(config.content() == "10.0.0.2:24800 \(hexA5)\nmac.local:24800 \(hex5A)\n")
+    #expect(config.entries() == ["trusted-servers"])
+  }
+
+  @Test("concurrent inserts from separate processes for one server keep exactly one record")
+  func twoProcesses() throws {
+    for _ in 0..<3 {
+      let config = TemporaryConfig()
+      let bytes: [UInt8] = [1, 2, 3, 4]
+      let go = config.base + "/go"
+      let children = bytes.map { spawnHelper(base: config.base, byte: $0, go: go) }
+      #expect(children.allSatisfy { $0 > 0 })
+      #expect(FileManager.default.createFile(atPath: go, contents: Data()))
+      for child in children where child > 0 {
+        var status: Int32 = 0
+        _ = waitpid(child, &status, 0)
+        #expect(status == 0, "helper process failed")
+      }
+      let results = bytes.map { byte in
+        FileManager.default.contents(atPath: config.base + "/result-\(byte)")
+          .map { String(decoding: $0, as: UTF8.self) } ?? "missing"
+      }
+      let winners = bytes.indices.filter { results[$0] == "inserted" }
+      #expect(winners.count == 1, "\(results)")
+      guard winners.count == 1 else { continue }
+      let winnerHex = LinuxFingerprintText.lowercaseHex(of: fingerprint(bytes[winners[0]]))!
+      for index in bytes.indices where index != winners[0] {
+        #expect(results[index] == "existing " + winnerHex)
+      }
+      #expect(config.content() == "mac.local:24800 \(winnerHex)\n")
+    }
+  }
+
+  @Test("helper for the two-process test: one insert, only when spawned by it")
+  func twoProcessHelper() async {
+    let environment = ProcessInfo.processInfo.environment
+    guard let base = environment[helperBaseVariable], let go = environment[helperGoVariable],
+      let text = environment[helperByteVariable], let byte = UInt8(text)
+    else { return }
+    let deadline = Date().addingTimeInterval(20)
+    while !FileManager.default.fileExists(atPath: go), Date() < deadline {
+      usleep(1000)
+    }
+    let store = LinuxTrustedServerStore(
+      environment: LinuxTrustedServerStoreEnvironment(variables: ["XDG_CONFIG_HOME": base]))
+    let result: String
+    switch await store.insertTrustedFingerprintIfAbsent(fingerprint(byte), for: server) {
+    case .success(.inserted): result = "inserted"
+    case .success(.existing(let stored)):
+      result = "existing " + (LinuxFingerprintText.lowercaseHex(of: stored) ?? "?")
+    case .failure: result = "failure"
+    }
+    _ = FileManager.default.createFile(
+      atPath: base + "/result-\(byte)", contents: Data(result.utf8))
   }
 
   @Test("concurrent inserts for one server from separate instances keep exactly one record")

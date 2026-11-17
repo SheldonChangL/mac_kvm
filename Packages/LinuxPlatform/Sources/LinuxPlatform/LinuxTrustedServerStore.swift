@@ -310,21 +310,44 @@ package struct LinuxTrustedServerStore: SecureStorageBackend {
         lstat(directoryPath, &seen) == 0
       else { return .failure(Self.unavailable) }
     }
+    guard isParentProtected(configurationPath) else { return .failure(Self.unavailable) }
+    seen = adjusted(seen, as: .directory)
     guard isProtected(seen, as: .directory) else { return .failure(Self.unavailable) }
 
     let descriptor = open(directoryPath, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
     guard descriptor >= 0 else { return .failure(Self.unavailable) }
     defer { close(descriptor) }
     var opened = stat()
-    guard fstat(descriptor, &opened) == 0, isProtected(opened, as: .directory),
-      Self.isSameObject(seen, opened), lock(descriptor, exclusive: exclusive)
+    guard fstat(descriptor, &opened) == 0 else { return .failure(Self.unavailable) }
+    opened = adjusted(opened, as: .directory)
+    guard isProtected(opened, as: .directory), Self.isSameObject(seen, opened),
+      lock(descriptor, exclusive: exclusive)
     else { return .failure(Self.unavailable) }
     return body(descriptor)
   }
 
-  /// Creates a 0700 directory; an existing one is left for the checks that follow.
+  /// Creates one 0700 directory level; an existing one is left for the checks that follow.
+  /// Intermediate directories are never created: a missing parent of the configuration
+  /// directory fails closed.
   private func makeDirectory(_ path: String) -> Bool {
     mkdir(path, 0o700) == 0 || errno == EEXIST
+  }
+
+  /// The configuration directory (followed if it is a link, as `~/.config` often is) must be a
+  /// directory that group and other cannot write, unless it is sticky: otherwise another user
+  /// could rename `mackvm` away and put their own in its place. Its own parents are not
+  /// checked.
+  private func isParentProtected(_ path: String) -> Bool {
+    var status = stat()
+    guard stat(path, &status) == 0, status.st_mode & S_IFMT == S_IFDIR else { return false }
+    return status.st_mode & 0o022 == 0 || status.st_mode & S_ISVTX != 0
+  }
+
+  /// `status` after the environment's test hook.
+  private func adjusted(_ status: stat, as object: LinuxTrustedStoreObject) -> stat {
+    var status = status
+    environment.adjustStatus(object, &status)
+    return status
   }
 
   private func lock(_ descriptor: Int32, exclusive: Bool) -> Bool {
@@ -335,8 +358,6 @@ package struct LinuxTrustedServerStore: SecureStorageBackend {
   }
 
   private func isProtected(_ status: stat, as object: LinuxTrustedStoreObject) -> Bool {
-    var status = status
-    environment.adjustStatus(object, &status)
     let type: mode_t
     let forbidden: mode_t
     switch object {
@@ -361,14 +382,16 @@ package struct LinuxTrustedServerStore: SecureStorageBackend {
     if fstatat(directory, Self.fileName, &seen, AT_SYMLINK_NOFOLLOW) != 0 {
       return errno == ENOENT ? .success([:]) : .failure(Self.unavailable)
     }
+    seen = adjusted(seen, as: .recordFile)
     guard isProtected(seen, as: .recordFile) else { return .failure(Self.unavailable) }
     let descriptor = openat(
       directory, Self.fileName, O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK)
     guard descriptor >= 0 else { return .failure(Self.unavailable) }
     defer { close(descriptor) }
     var opened = stat()
-    guard fstat(descriptor, &opened) == 0, isProtected(opened, as: .recordFile),
-      Self.isSameObject(seen, opened),
+    guard fstat(descriptor, &opened) == 0 else { return .failure(Self.unavailable) }
+    opened = adjusted(opened, as: .recordFile)
+    guard isProtected(opened, as: .recordFile), Self.isSameObject(seen, opened),
       let bytes = readAll(descriptor),
       let records = LinuxTrustedServerRecordFile.parse(bytes)
     else { return .failure(Self.unavailable) }
@@ -394,6 +417,7 @@ package struct LinuxTrustedServerStore: SecureStorageBackend {
 
   /// Writes `records` to a new 0600 file in `directory` and renames it over the record file.
   private func replaceRecords(_ records: [PeerKey: Data], in directory: Int32) -> CoreResult<Void> {
+    removeStaleTemporaryFiles(in: directory)
     let temporary = ".\(Self.fileName).\(String(UInt64.random(in: .min ... .max), radix: 16)).tmp"
     let descriptor = openat(
       directory,
@@ -415,6 +439,21 @@ package struct LinuxTrustedServerStore: SecureStorageBackend {
     // in place, so it is not reported as a failed write.
     _ = fsync(directory)
     return .success(())
+  }
+
+  /// Removes temporary files a crashed writer left behind. Every writer holds the exclusive
+  /// lock while its temporary file exists, so under that lock any such file is stale.
+  private func removeStaleTemporaryFiles(in directory: Int32) {
+    guard let directoryPath,
+      let names = try? FileManager.default.contentsOfDirectory(atPath: directoryPath)
+    else { return }
+    for name in names where Self.isTemporaryName(name) {
+      unlinkat(directory, name, 0)
+    }
+  }
+
+  static func isTemporaryName(_ name: String) -> Bool {
+    name.hasPrefix("." + fileName + ".") && name.hasSuffix(".tmp")
   }
 
   private func writeAll(_ bytes: [UInt8], to descriptor: Int32) -> Bool {

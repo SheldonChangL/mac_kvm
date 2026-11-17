@@ -15,7 +15,7 @@
     "architecture": "arm64",
     "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native); the pinned amd64 make verify-linux evidence is the CI verify-linux job"
   },
-  "note": "Run by the implementing agent. Expected failure: the RED entry (stub implementation). Paths masked.",
+  "note": "Run by the implementing agent. Expected failure: the RED entry (stub implementation). Paths masked. Entries noted 'Review fix' rerun the gates after the PR #367 review notes were addressed.",
   "commands": [
     {
       "command": "docker exec m4021 bash -c 'cd /src && timeout 300 swift test --skip-build --scratch-path /scratch --filter \"LinuxTrust|LinuxFirstUse\"'",
@@ -116,6 +116,114 @@
       "stdout": "✔ Test run with 428 tests in 45 suites passed after 0.241 seconds.\n",
       "stderr": "",
       "note": "Linux (native arm64 swift:6.2.3-jammy container, built with -warnings-as-errors): every root-package test, xUnit written"
+    },
+    {
+      "command": "docker exec m4021 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch -Xswiftc -warnings-as-errors 2>&1 | tail -1 && timeout 300 swift test --skip-build --scratch-path /scratch --filter \"LinuxTrust|LinuxFirstUse\" 2>&1 | grep -E \"✘|Test run with\"; exit ${PIPESTATUS[0]}'",
+      "startedAt": "2026-11-17T03:36:04+00:00",
+      "endedAt": "2026-11-17T03:36:21+00:00",
+      "exitCode": 0,
+      "stdout": "Build complete! (15.23s)\n✔ Test run with 37 tests in 5 suites passed after 0.195 seconds.\n",
+      "stderr": "",
+      "note": "Review fix: focused Linux tests as root (native arm64 swift:6.2.3-jammy, -warnings-as-errors)"
+    },
+    {
+      "command": "docker exec m4021 bash -c 'chmod -R o+rx /scratch/debug && su tester -c \"cd /tmp && /scratch/debug/MacKVMPackageTests.xctest --testing-library swift-testing --filter \\\"LinuxTrust|LinuxFirstUse\\\" 2>&1 | grep -E \\\"✘|Test run with\\\"; exit \\${PIPESTATUS[0]}\"'",
+      "startedAt": "2026-11-17T03:36:21+00:00",
+      "endedAt": "2026-11-17T03:36:22+00:00",
+      "exitCode": 2,
+      "stdout": "✔ Test run with 37 tests in 5 suites passed after 0.279 seconds.\n",
+      "stderr": "sh: 1: Bad substitution\n",
+      "note": "Review fix: focused Linux tests as a non-root user; exit 2 came from the command line itself (the su shell is sh, which has no PIPESTATUS); the tests passed, as the stdout shows. Rerun below without the pipe."
+    },
+    {
+      "command": "docker exec m4021 bash -c 'cd /src && timeout 900 swift test --skip-build --scratch-path /scratch --xunit-output /src/evidence/issues/M4-021-FOLLOWUP-001/tests/swift-testing-xunit.xml 2>&1 | grep -E \"Test run with|error:\"; exit ${PIPESTATUS[0]}'",
+      "startedAt": "2026-11-17T03:36:22+00:00",
+      "endedAt": "2026-11-17T03:36:23+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 434 tests in 45 suites passed after 0.353 seconds.\n",
+      "stderr": "",
+      "note": "Review fix: full Linux run, xUnit written"
+    },
+    {
+      "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T03:36:23+00:00",
+      "endedAt": "2026-11-17T03:36:24+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 301 tests in 28 suites passed after 0.143 seconds.\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T03:36:24+00:00",
+      "endedAt": "2026-11-17T03:36:35+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 301 tests in 28 suites passed after 0.144 seconds.\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxTrustedServerStoreTests.swift",
+      "startedAt": "2026-11-17T03:36:35+00:00",
+      "endedAt": "2026-11-17T03:36:35+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-17T03:36:35+00:00",
+      "endedAt": "2026-11-17T03:36:38+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-11-17T03:36:38+00:00",
+      "endedAt": "2026-11-17T03:36:38+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-11-17T03:36:38+00:00",
+      "endedAt": "2026-11-17T03:36:39+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-17T03:36:39+00:00",
+      "endedAt": "2026-11-17T03:36:39+00:00",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "mkdir -p <producer-scratch>/m4-021-followup-001 && make verify REPORT=<producer-scratch>/m4-021-followup-001/verify-review.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T03:36:39+00:00",
+      "endedAt": "2026-11-17T03:38:41+00:00",
+      "exitCode": 0,
+      "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=91366\n[PASSED] swift-test-targets exit=0 durationMs=1749\n[PASSED] native-arm64-build exit=0 durationMs=1294\nCI report: <producer-scratch>/m4-021-followup-001/verify-review.json\n",
+      "stderr": "",
+      "note": "Review fix: rerun"
+    },
+    {
+      "command": "docker exec m4021 su tester -c 'cd /tmp && /scratch/debug/MacKVMPackageTests.xctest --testing-library swift-testing --filter \"LinuxTrust|LinuxFirstUse\" > /tmp/nonroot.log 2>&1; s=$?; grep -E \"✘|Test run with\" /tmp/nonroot.log; exit $s'",
+      "startedAt": "2026-11-17T03:38:54+00:00",
+      "endedAt": "2026-11-17T03:38:54+00:00",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 37 tests in 5 suites passed after 0.191 seconds.\n",
+      "stderr": "",
+      "note": "Review fix: focused Linux tests as a non-root user"
     }
   ]
 }

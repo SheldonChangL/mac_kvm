@@ -48,33 +48,42 @@ requires. With none of them, every operation fails with
 ## File rules
 
 1. The `mackvm` directory is created 0700 on the first insert (the
-   configuration directory too, 0700, if it is missing). A load or a remove
+   configuration directory too, 0700, if it is missing). Only those two levels
+   are ever created: if the configuration directory's own parent is missing
+   (for example `XDG_CONFIG_HOME=/missing/config`), the insert fails closed with
+   `security(.secureStorageUnavailable)` and creates nothing. A load or a remove
    never creates anything; with no directory, a load finds no record and a
    remove succeeds.
-2. Every operation first checks the directory with `lstat`. It must be a
+2. The configuration directory itself (followed if it is a link, as
+   `~/.config` often is) must be a directory that group and other cannot
+   write, unless its sticky bit is set; otherwise another user could rename
+   `mackvm` away and substitute their own. Its own parents are not checked.
+3. Every operation first checks the directory with `lstat`. It must be a
    directory, not a symbolic link, owned by the effective user, with no mode
    bit outside 0700 (group, other, setuid, setgid and sticky bits refuse).
    It is then opened with `O_DIRECTORY|O_NOFOLLOW`, and `fstat` of the
    descriptor must pass the same checks and name the same device and inode.
-3. The record file is checked the same way with `fstatat(…, AT_SYMLINK_NOFOLLOW)`
+4. The record file is checked the same way with `fstatat(…, AT_SYMLINK_NOFOLLOW)`
    relative to the directory descriptor and opened with `O_NOFOLLOW`: a regular
    file, owned by the effective user, with no mode bit outside 0600. A missing
    file holds no records.
-4. Any refusal is `security(.secureStorageUnavailable)` with
+5. Any refusal is `security(.secureStorageUnavailable)` with
    `retryDisposition: .userActionRequired`, and nothing is read or written. A
    storage problem never looks like an unknown server.
-5. Writes create a fresh `.trusted-servers.<random>.tmp` in the same directory
+6. Writes create a fresh `.trusted-servers.<random>.tmp` in the same directory
    with `O_CREAT|O_EXCL|O_NOFOLLOW` and mode 0600 (then `fchmod` 0600, so the
    umask cannot change it), write the whole new content, `fsync` it, `rename`
    it over `trusted-servers` and `fsync` the directory. A reader sees the old
    file or the new file, never a mixture. A temporary file left by a crash is
-   never read, and the next write does not reuse its name.
-6. Every operation holds `flock` on the directory descriptor: shared for a
+   never read. Every writer holds the exclusive lock while its temporary file
+   exists, so the next write, under that lock, removes any
+   `.trusted-servers.*.tmp` left behind as stale.
+7. Every operation holds `flock` on the directory descriptor: shared for a
    load, exclusive for an insert or remove (read, change, replace). This
    serializes threads and processes, so of concurrent inserts for one server
    exactly one reports `.inserted`, and concurrent inserts for different
    servers lose no record.
-7. File work runs on a global dispatch queue, off the caller's executor.
+8. File work runs on a global dispatch queue, off the caller's executor.
 
 ## Record format
 
@@ -161,12 +170,17 @@ temporary `XDG_CONFIG_HOME`, passed through the store's environment):
 - malformed files rejected whole and left unchanged; the parser's table;
 - the rename replace (new inode, no temporary file left) and a leftover
   temporary file ignored;
-- concurrent inserts from separate instances (separate descriptors, so the
-  same `flock` semantics as separate processes) for one server and for many;
+- concurrent inserts from four separate processes (the test binary re-invoked
+  with `posix_spawn`, running only a helper test that inserts once a start
+  file appears) keep exactly one record; concurrent inserts from separate
+  instances in one process for one server and for many;
+- a file or directory replaced between `lstat` and `open` (the injected hook
+  changes the second status's inode); a group-writable configuration
+  directory refused unless sticky; a missing parent failing closed;
 - the policy table with 31- and 33-byte presented fingerprints, the warning's
   redaction by reflection, and the first-use flow.
 
-The tests also pass as a non-root user. Eighteen mutants, one or more per
+The tests also pass as a non-root user. Twenty-three mutants, one or more per
 rule, are recorded under `evidence/issues/M4-021-FOLLOWUP-001/mutations/`.
 
 ## Known limitations
@@ -176,9 +190,10 @@ rule, are recorded under `evidence/issues/M4-021-FOLLOWUP-001/mutations/`.
   left to M3-014.
 - The C-009 policy is duplicated from the Mac app's internal `TrustPolicy`; it
   moves to `KVMCore` when M3-014 arrives.
-- The concurrency test uses separate store instances in one process, not two
-  processes; `flock` locks open file descriptions, so the behavior is the same.
-- The parent configuration directory itself is not checked (it is commonly a
-  link into a dotfiles tree); the `mackvm` directory and the file are.
+- Only the configuration directory is checked for group/other write access;
+  the path components above it (for example `$HOME`) are not checked.
+- The ownership rule is "owned by the effective user". A client run as root
+  therefore accepts root-owned state, for example in `/root/.config`; running
+  the client as root is not supported.
 - Network file systems where `flock` is advisory-only or emulated are not
   supported.

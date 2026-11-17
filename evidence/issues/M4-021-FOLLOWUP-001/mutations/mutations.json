@@ -214,7 +214,8 @@
       "mutation": "the directory lock is not taken",
       "killers": [
         "concurrent inserts for one server from separate instances keep exactly one record",
-        "concurrent inserts for different servers lose no record"
+        "concurrent inserts for different servers lose no record",
+        "concurrent inserts from separate processes for one server keep exactly one record"
       ],
       "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
       "exitCode": 1,
@@ -224,7 +225,93 @@
       "restoredCleanly": true,
       "failedKillers": [
         "concurrent inserts for different servers lose no record",
-        "concurrent inserts for one server from separate instances keep exactly one record"
+        "concurrent inserts for one server from separate instances keep exactly one record",
+        "concurrent inserts from separate processes for one server keep exactly one record"
+      ]
+    },
+    {
+      "id": "M19",
+      "rule": "the opened record file must be the one lstat checked",
+      "mutation": "file same-object check removed",
+      "killers": [
+        "a record file replaced between lstat and open is refused (injected stat)"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a record file replaced between lstat and open is refused (injected stat)"
+      ]
+    },
+    {
+      "id": "M20",
+      "rule": "the opened directory must be the one lstat checked",
+      "mutation": "directory same-object check removed",
+      "killers": [
+        "a directory replaced between lstat and open is refused (injected stat)"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a directory replaced between lstat and open is refused (injected stat)"
+      ]
+    },
+    {
+      "id": "M21",
+      "rule": "a group/other-writable, non-sticky configuration directory is refused",
+      "mutation": "parent check removed",
+      "killers": [
+        "a configuration directory writable by group or other is refused unless sticky"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a configuration directory writable by group or other is refused unless sticky"
+      ]
+    },
+    {
+      "id": "M22",
+      "rule": "a sticky configuration directory is accepted",
+      "mutation": "sticky bit not honored",
+      "killers": [
+        "a configuration directory writable by group or other is refused unless sticky"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a configuration directory writable by group or other is refused unless sticky"
+      ]
+    },
+    {
+      "id": "M23",
+      "rule": "stale temporary files are removed under the exclusive lock",
+      "mutation": "stale temporary files kept",
+      "killers": [
+        "a temporary file left behind by a crash is ignored"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTrustedServerStore.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a temporary file left behind by a crash is ignored"
       ]
     },
     {
