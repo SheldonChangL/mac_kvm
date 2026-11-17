@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-055-FOLLOWUP-001",
+  "date": "2026-11-17",
+  "baseline": {
+    "exitCode": 0,
+    "passed": true,
+    "failedTests": [],
+    "tail": ""
+  },
+  "mutants": [
+    {
+      "id": "M1",
+      "rule": "any evaluator outcome but accept fails the handshake (required mutant)",
+      "mutation": "the verify callback answers certificateVerified on a reject",
+      "killers": [
+        "an unknown identity fails closed with identityUnknown and no application byte",
+        "a changed identity fails closed with identityChanged",
+        "a wrong digest length from the evaluator fails closed with trustRejected"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a changed identity fails closed with identityChanged",
+        "a wrong digest length from the evaluator fails closed with trustRejected",
+        "an unknown identity fails closed with identityUnknown and no application byte"
+      ]
+    },
+    {
+      "id": "M2",
+      "rule": "minimum TLS 1.2 (required mutant)",
+      "mutation": "the minimum TLS version is lowered to TLS 1.0",
+      "killers": [
+        "a server limited to TLS 1.1 is refused and the evaluator is never asked"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a server limited to TLS 1.1 is refused and the evaluator is never asked"
+      ]
+    },
+    {
+      "id": "M3",
+      "rule": "the pin is the SHA-256 of the leaf DER (required mutant)",
+      "mutation": "the digest covers the whole presented chain instead of the leaf",
+      "killers": [
+        "the evaluator receives the SHA-256 of the leaf DER, not of the chain"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "the evaluator receives the SHA-256 of the leaf DER, not of the chain"
+      ]
+    },
+    {
+      "id": "M4",
+      "rule": "the presented fingerprint is kept after a rejection",
+      "mutation": "the fingerprint is not kept on a reject",
+      "killers": [
+        "an unknown identity fails closed with identityUnknown and no application byte",
+        "a changed identity fails closed with identityChanged"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a changed identity fails closed with identityChanged",
+        "an unknown identity fails closed with identityUnknown and no application byte"
+      ]
+    },
+    {
+      "id": "M5",
+      "rule": "the presented fingerprint is kept only after a rejection",
+      "mutation": "the fingerprint is also kept on accept",
+      "killers": [
+        "a matching pin connects and carries bytes both ways in order"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a matching pin connects and carries bytes both ways in order"
+      ]
+    },
+    {
+      "id": "M6",
+      "rule": "TCP_NODELAY is set",
+      "mutation": "TCP_NODELAY is set to 0",
+      "killers": [
+        "a matching pin connects and carries bytes both ways in order"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a matching pin connects and carries bytes both ways in order"
+      ]
+    },
+    {
+      "id": "M7",
+      "rule": "connect has a timeout that covers the handshake",
+      "mutation": "the connect deadline is one hour",
+      "killers": [
+        "a handshake that never completes times out"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": true,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a handshake that never completes times out"
+      ]
+    },
+    {
+      "id": "M8",
+      "rule": "an instance is used once",
+      "mutation": "a second connect is not refused",
+      "killers": [
+        "a second connect is refused: the instance is single-use"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a second connect is refused: the instance is single-use"
+      ]
+    },
+    {
+      "id": "M9",
+      "rule": "send before connect fails closed",
+      "mutation": "send before connect is treated as connected",
+      "killers": [
+        "send before connect is a precondition failure and sends nothing"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "send before connect is a precondition failure and sends nothing"
+      ]
+    },
+    {
+      "id": "M10",
+      "rule": "disconnect and every terminal path close the channel",
+      "mutation": "terminate does not close the channel",
+      "killers": [
+        "disconnect twice is idempotent and finishes the stream once, normally"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "disconnect twice is idempotent and finishes the stream once, normally"
+      ]
+    },
+    {
+      "id": "M11",
+      "rule": "cancellation during connect ends it promptly and closes the socket",
+      "mutation": "task cancellation is ignored during connect",
+      "killers": [
+        "cancelling the task during connect fails with cancellation and closes the socket"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "cancelling the task during connect fails with cancellation and closes the socket"
+      ]
+    },
+    {
+      "id": "M12",
+      "rule": "the incoming buffer is bounded",
+      "mutation": "the incoming stream buffer is unbounded",
+      "killers": [
+        "a slow consumer ends the stream with resourceExhausted, keeping the buffered order"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": true,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a slow consumer ends the stream with resourceExhausted, keeping the buffered order"
+      ]
+    },
+    {
+      "id": "M13",
+      "rule": "the end of stream finishes incomingBytes once, normally",
+      "mutation": "the peer's close fails the stream",
+      "killers": [
+        "the end of the server's stream finishes the incoming bytes once, after the data"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "the end of the server's stream finishes the incoming bytes once, after the data"
+      ]
+    },
+    {
+      "id": "M14",
+      "rule": "one yielded chunk is at most 16 KiB (review condition 1)",
+      "mutation": "large reads are not split",
+      "killers": [
+        "a large read is yielded in chunks of at most 16 KiB, in order"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a large read is yielded in chunks of at most 16 KiB, in order"
+      ]
+    },
+    {
+      "id": "M15",
+      "rule": "a TLS error after the handshake is transport(.reset) with back-off (review note 2)",
+      "mutation": "a TLS error after the handshake keeps the security code",
+      "killers": [
+        "a TLS error after the handshake ends the stream with reset and back-off"
+      ],
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift",
+      "exitCode": 1,
+      "built": true,
+      "killed": true,
+      "timedOut": false,
+      "killedByTimeLimit": false,
+      "restoredCleanly": true,
+      "failedKillers": [
+        "a TLS error after the handshake ends the stream with reset and back-off"
+      ]
+    }
+  ],
+  "allKilled": true
+}

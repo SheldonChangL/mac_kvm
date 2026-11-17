@@ -1,0 +1,139 @@
+{
+ "schemaVersion": 1,
+ "issue": "M1-055-FOLLOWUP-001",
+ "baseCommit": "777d4ef14062c79e94f7103ffa9db884895de2df",
+ "date": "2026-11-17",
+ "toolchain": {
+  "swiftVersion": [
+   "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+   "Target: arm64-apple-macosx26.0",
+   "swift-driver version: 1.127.14.1 "
+  ],
+  "target": "arm64-apple-macosx26.0",
+  "python": "3.9.6",
+  "macOS": "26.6.2",
+  "architecture": "arm64",
+  "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native) with openssl and Xvfb; the pinned amd64 make verify-linux evidence is the CI verify-linux job"
+ },
+ "note": "Run by the implementing agent. Expected failure: red-stub (the RED stub, restored afterwards). mac-loopback-pin starts the MacKVM smoke server with a throwaway identity, runs the optional loopback suite against it from the Linux container with the pin passed in the environment (never printed or recorded), and deletes the identity. Paths masked.",
+ "commands": [
+  {
+   "name": "red-stub",
+   "command": "cp Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift <producer-scratch>/impl.swift && cp <producer-scratch>/stub.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift && docker exec m1055 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch 2>&1 | tail -1 && timeout 300 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with\"; exit ${PIPESTATUS[0]}'; rc=$?; cp <producer-scratch>/impl.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift; exit $rc",
+   "startedAt": "2026-11-17T04:50:45Z",
+   "endedAt": "2026-11-17T04:51:38Z",
+   "exitCode": 1,
+   "stdout": "Build complete! (13.51s)\n✘ Test run with 19 tests in 2 suites failed after 37.336 seconds with 29 issues.\n",
+   "stderr": "",
+   "expectedFailure": true
+  },
+  {
+   "name": "linux-focused",
+   "command": "docker exec m1055 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch -Xswiftc -warnings-as-errors 2>&1 | tail -1 && timeout 300 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with|✘\"; exit ${PIPESTATUS[0]}'",
+   "startedAt": "2026-11-17T04:51:38Z",
+   "endedAt": "2026-11-17T04:51:55Z",
+   "exitCode": 0,
+   "stdout": "Build complete! (13.87s)\n✔ Test run with 19 tests in 2 suites passed after 1.424 seconds.\n",
+   "stderr": ""
+  },
+  {
+   "name": "linux-repeat-30",
+   "command": "docker exec m1055 bash -c 'cd /src && for i in $(seq 1 30); do timeout 120 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with\" | sed -E \"s/after [0-9.]+ seconds/after N seconds/\"; done | sort | uniq -c'",
+   "startedAt": "2026-11-17T04:46:35Z",
+   "endedAt": "2026-11-17T04:47:26Z",
+   "exitCode": 0,
+   "stdout": "     30 ✔ Test run with 19 tests in 2 suites passed after N seconds.\n",
+   "stderr": ""
+  },
+  {
+   "name": "linux-full-xvfb",
+   "command": "docker exec m1055 bash -c 'cd /src && MACKVM_X11_TESTS=1 xvfb-run -a -s \"-screen 0 1600x900x24 +extension RANDR\" timeout 900 swift test --skip-build --scratch-path /scratch --xunit-output /src/evidence/issues/M1-055-FOLLOWUP-001/tests/swift-testing-xunit.xml 2>&1 | grep -E \"Test run with|Executed .* tests|✘\"; exit ${PIPESTATUS[0]}'",
+   "startedAt": "2026-11-17T04:47:26Z",
+   "endedAt": "2026-11-17T04:47:35Z",
+   "exitCode": 0,
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n✔ Test run with 416 tests in 42 suites passed after 6.308 seconds.\n",
+   "stderr": ""
+  },
+  {
+   "name": "mac-loopback-pin",
+   "command": "swift build 2>&1 | tail -1 && bash <producer-scratch>/loopback.sh",
+   "startedAt": "2026-11-17T04:47:35Z",
+   "endedAt": "2026-11-17T04:48:16Z",
+   "exitCode": 0,
+   "stdout": "Build complete! (0.32s)\nidentity digest length: 64\n✔ Test \"the pinned Mac server identity is accepted and a different pin is rejected\" passed after 0.065 seconds.\n✔ Suite \"LinuxTLSTransport against a Mac server identity\" passed after 0.066 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.066 seconds.\nNew, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384\nPeer signature type: ECDSA\nServer public key is 256 bit\n[04:47:42.555] server identity removed; clients must trust the next one\n",
+   "stderr": ""
+  },
+  {
+   "name": "swift-test",
+   "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+   "startedAt": "2026-11-17T04:48:16Z",
+   "endedAt": "2026-11-17T04:48:18Z",
+   "exitCode": 0,
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.140 seconds.\n",
+   "stderr": ""
+  },
+  {
+   "name": "swift-test-werror",
+   "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+   "startedAt": "2026-11-17T04:48:18Z",
+   "endedAt": "2026-11-17T04:48:29Z",
+   "exitCode": 0,
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.142 seconds.\n",
+   "stderr": ""
+  },
+  {
+   "name": "format-own",
+   "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxTLSTransportTests.swift",
+   "startedAt": "2026-11-17T04:48:29Z",
+   "endedAt": "2026-11-17T04:48:29Z",
+   "exitCode": 0,
+   "stdout": "",
+   "stderr": ""
+  },
+  {
+   "name": "format-repo",
+   "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+   "startedAt": "2026-11-17T04:48:29Z",
+   "endedAt": "2026-11-17T04:48:32Z",
+   "exitCode": 0,
+   "stdout": "",
+   "stderr": ""
+  },
+  {
+   "name": "docs-check",
+   "command": "make docs-check",
+   "startedAt": "2026-11-17T04:48:32Z",
+   "endedAt": "2026-11-17T04:48:33Z",
+   "exitCode": 0,
+   "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
+   "stderr": ""
+  },
+  {
+   "name": "architecture-check",
+   "command": "make architecture-check",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:48:33Z",
+   "exitCode": 0,
+   "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
+   "stderr": ""
+  },
+  {
+   "name": "validate-package",
+   "command": "python3 Tools/Backlog/validate_package.py",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:48:33Z",
+   "exitCode": 0,
+   "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
+   "stderr": ""
+  },
+  {
+   "name": "make-verify",
+   "command": "mkdir -p <producer-scratch>/verify && make verify REPORT=<producer-scratch>/verify/verify.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:50:23Z",
+   "exitCode": 0,
+   "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=83516\n[PASSED] swift-test-targets exit=0 durationMs=1283\n[PASSED] native-arm64-build exit=0 durationMs=1251\nCI report: <producer-scratch>/verify/verify.json\n",
+   "stderr": ""
+  }
+ ]
+}
