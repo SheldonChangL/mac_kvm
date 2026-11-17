@@ -53,8 +53,11 @@ STATUS_EXIT_CODES = {
     "cancelled": EXIT_CANCELLED,
 }
 
-ISSUE_PATTERN = re.compile(r"M[1-5]-[0-9]{3}")
-SCRIPT_NAME_PATTERN = re.compile(r"M[1-5]-[0-9]{3}-[A-Za-z0-9_-][A-Za-z0-9._-]{0,127}\.sh")
+ISSUE_PATTERN = re.compile(r"M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?")
+SCRIPT_NAME_PATTERN = re.compile(
+    r"M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?-[A-Za-z0-9_-][A-Za-z0-9._-]{0,127}\.sh"
+)
+FOLLOWUP_SCRIPT_INFIX = re.compile(r"FOLLOWUP-[0-9]{3}-")
 COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
 
@@ -212,12 +215,19 @@ def resolve_script(issue, repository_root):
     root = Path(repository_root)
     script_directory = _require_real_directory(root, SCRIPT_ROOT, "script_root")
     prefix = issue + "-"
+    # A base id must not claim the scripts of its FOLLOWUP ids (M4-036 vs M4-036-FOLLOWUP-001).
+    excludes_followup = "-FOLLOWUP-" not in issue
     try:
         with os.scandir(script_directory) as entries:
             matches = sorted(
                 entry.name
                 for entry in entries
-                if entry.name.startswith(prefix) and entry.name.endswith(".sh")
+                if entry.name.startswith(prefix)
+                and entry.name.endswith(".sh")
+                and not (
+                    excludes_followup
+                    and FOLLOWUP_SCRIPT_INFIX.match(entry.name, len(prefix))
+                )
             )
     except OSError:
         raise RunnerError("script_root_unreadable", EXIT_UNSAFE_PATH) from None
