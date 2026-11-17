@@ -112,6 +112,21 @@
     case flood(count: Int, size: Int)
     /// Write the bytes, then close the connection.
     case sendThenClose(Data)
+    /// Write one large buffer, which NIOSSL sends as several TLS records.
+    case bulk(Int)
+    /// Write bytes that are not a TLS record straight to the socket.
+    case garbageAfterHandshake
+  }
+
+  /// Sits in front of the TLS handler, so its writes reach the socket unencrypted.
+  final class RawInjector: ChannelOutboundHandler, @unchecked Sendable {
+    typealias OutboundIn = ByteBuffer
+    private var context: ChannelHandlerContext?
+    func handlerAdded(context: ChannelHandlerContext) { self.context = context }
+    func inject(_ bytes: [UInt8]) {
+      guard let context else { return }
+      context.writeAndFlush(NIOAny(context.channel.allocator.buffer(bytes: bytes)), promise: nil)
+    }
   }
 
   final class ServerRecord: @unchecked Sendable {
@@ -137,10 +152,12 @@
 
     let script: ServerScript
     let record: ServerRecord
+    let injector: RawInjector
 
-    init(script: ServerScript, record: ServerRecord) {
+    init(script: ServerScript, record: ServerRecord, injector: RawInjector) {
       self.script = script
       self.record = record
+      self.injector = injector
     }
 
     func channelActive(context: ChannelHandlerContext) {
@@ -168,6 +185,11 @@
           let buffer = context.channel.allocator.buffer(bytes: data)
           context.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
           context.close(promise: nil)
+        case .bulk(let size):
+          let buffer = context.channel.allocator.buffer(repeating: 0x33, count: size)
+          context.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
+        case .garbageAfterHandshake:
+          injector.inject(Array(repeating: 0xEE, count: 64))
         }
       }
       context.fireUserInboundEventTriggered(event)
@@ -227,10 +249,12 @@
         .childChannelInitializer { channel in
           channel.eventLoop.makeCompletedFuture {
             if let sslContext {
+              let injector = RawInjector()
+              try channel.pipeline.syncOperations.addHandler(injector)
               try channel.pipeline.syncOperations.addHandler(
                 NIOSSLServerHandler(context: sslContext))
               try channel.pipeline.syncOperations.addHandler(
-                ServerHandler(script: script, record: record))
+                ServerHandler(script: script, record: record, injector: injector))
             } else {
               try channel.pipeline.syncOperations.addHandler(SilentHandler(record: record))
             }
@@ -309,7 +333,7 @@
 
   // MARK: - Suite
 
-  @Suite("LinuxTLSTransport", .serialized)
+  @Suite("LinuxTLSTransport", .serialized, .timeLimit(.minutes(1)))
   struct LinuxTLSTransportTests {
     let group = MultiThreadedEventLoopGroup.singleton
 
@@ -479,6 +503,50 @@
       await server.stop()
     }
 
+    @Test("a large read is yielded in chunks of at most 16 KiB, in order")
+    func chunkBound() async throws {
+      let identity = try Openssl.selfSigned()
+      let size = 200_000
+      let server = try await TestServer.start(group: group, identity: identity, script: .bulk(size))
+      let transport = makeTransport(
+        port: server.port, group: group, evaluator: pinning(identity.leafPin))
+
+      try await transport.connect()
+      var total = 0
+      var largest = 0
+      for try await chunk in transport.incomingBytes {
+        #expect(chunk.allSatisfy { $0 == 0x33 })
+        largest = max(largest, chunk.count)
+        total += chunk.count
+        if total >= size { break }
+      }
+      #expect(total == size)
+      #expect(largest <= LinuxTLSTransport.maximumChunkLength)
+      #expect(LinuxTLSTransport.maximumChunkLength == 16_384)
+      await transport.disconnect()
+      await server.stop()
+    }
+
+    @Test("a TLS error after the handshake ends the stream with reset and back-off")
+    func tlsErrorAfterHandshake() async throws {
+      let identity = try Openssl.selfSigned()
+      let server = try await TestServer.start(
+        group: group, identity: identity, script: .garbageAfterHandshake)
+      let transport = makeTransport(
+        port: server.port, group: group, evaluator: pinning(identity.leafPin))
+
+      try await transport.connect()
+      do {
+        for try await _ in transport.incomingBytes {}
+        Issue.record("the stream finished without an error")
+      } catch let error as CoreError {
+        #expect(error.code == .transport(.reset))
+        #expect(error.retryDisposition == .backoff)
+      }
+      await transport.disconnect()
+      await server.stop()
+    }
+
     @Test("send before connect is a precondition failure and sends nothing")
     func sendBeforeConnect() async throws {
       let identity = try Openssl.selfSigned()
@@ -624,7 +692,8 @@
 
   @Suite(
     "LinuxTLSTransport against a Mac server identity",
-    .enabled(if: ProcessInfo.processInfo.environment["MACKVM_TLS_LOOPBACK_ENDPOINT"] != nil))
+    .enabled(if: ProcessInfo.processInfo.environment["MACKVM_TLS_LOOPBACK_ENDPOINT"] != nil),
+    .timeLimit(.minutes(1)))
   struct LinuxTLSTransportLoopbackTests {
     let group = MultiThreadedEventLoopGroup.singleton
 

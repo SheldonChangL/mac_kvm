@@ -50,9 +50,12 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
 /// TLS diagnostic. The presented fingerprint is kept only after a rejection,
 /// for the command line to display.
 package final class LinuxTLSTransport: Transport, @unchecked Sendable {
-  /// Maximum number of chunks buffered for a slow consumer. A chunk is at most
-  /// one TLS record (16 KiB of plaintext), so the buffer holds at most 256 KiB.
+  /// Maximum number of chunks buffered for a slow consumer.
   package static let incomingChunkBufferLimit = 16
+
+  /// Maximum size of one yielded chunk. A NIOSSL read can carry several TLS
+  /// records, so larger reads are split; the buffer holds at most 256 KiB.
+  package static let maximumChunkLength = 16_384
 
   /// Maximum number of certificates accepted in a presented chain.
   static let maximumPeerCertificateCount = 10
@@ -274,6 +277,11 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
           channel.close(promise: nil)
           return
         }
+        // Ordering: the connect promise completes on the channel's own event
+        // loop when the TCP connect finishes, and this callback runs there and
+        // then. The handshake needs further round trips on that same loop, so
+        // the channel is always stored before `.connected` can be reached and
+        // before `send` can look for it.
         let owned: Bool = self.lock.withLock {
           switch self.state.phase {
           case .connecting, .connected:
@@ -386,14 +394,22 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
       return false
     }
     guard open, !data.isEmpty else { return }
-    let result = continuation.yield(data)
-    if case .enqueued = result { return }
-    if case .terminated = result {
-      terminate(.consumerGone)
+    var offset = data.startIndex
+    while offset < data.endIndex {
+      let end =
+        data.index(offset, offsetBy: Self.maximumChunkLength, limitedBy: data.endIndex)
+        ?? data.endIndex
+      let result = continuation.yield(data.subdata(in: offset..<end))
+      offset = end
+      if case .enqueued = result { continue }
+      if case .terminated = result {
+        terminate(.consumerGone)
+        return
+      }
+      // `.dropped`: the finite buffer is full. Buffered chunks stay in order.
+      terminate(.failed(Self.resourceExhaustedFailure))
       return
     }
-    // `.dropped`: the finite buffer is full. Buffered chunks stay in order.
-    terminate(.failed(Self.resourceExhaustedFailure))
   }
 
   fileprivate func failed(_ error: any Error) {
@@ -416,7 +432,10 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
   }
 
   /// The peer closed: before the handshake this is a failed connect; after
-  /// it, a normal end of stream that finishes `incomingBytes` once.
+  /// it, a normal end of stream that finishes `incomingBytes` once. Only a
+  /// close that sent `close_notify` ends cleanly; a bare TCP FIN after the
+  /// handshake is reported by NIOSSL as an unclean shutdown error first, which
+  /// `failed` maps to `transport(.reset)`.
   fileprivate func closed() {
     let connecting: Bool = lock.withLock {
       if case .connecting = state.phase { return true }

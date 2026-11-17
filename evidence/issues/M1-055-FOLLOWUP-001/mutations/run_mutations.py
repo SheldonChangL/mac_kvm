@@ -16,7 +16,8 @@ text must occur exactly once. A mutant is killed when the build succeeded and ev
 `killers` list failed: it printed a failure line, or it started and never finished because the
 mutant made it wait and the `timeout` in the test command ended the run (exit 124, recorded as
 `timedOut`, counted when no killer printed a pass). After each mutant the file is restored from
-a backup and compared byte for byte. A baseline run on the unmodified tree must pass first.
+a backup and compared byte for byte. The suites carry `.timeLimit(.minutes(1))`, so a mutant that
+makes a test wait now fails that test; `killedByTimeLimit` records which runs hit the limit. A baseline run on the unmodified tree must pass first.
 Exit 0 only when the baseline passes, every mutant is killed and every restore is clean. The
 JSON holds repository-relative paths only.
 """
@@ -45,7 +46,9 @@ SINGLE_USE = "a second connect is refused: the instance is single-use"
 CANCEL = "cancelling the task during connect fails with cancellation and closes the socket"
 TIMEOUT = "a handshake that never completes times out"
 DISCONNECT_TWICE = "disconnect twice is idempotent and finishes the stream once, normally"
-SEND_EARLY = "send before connect is a precondition failure and sends nothing"
+CHUNK = "a large read is yielded in chunks of at most 16 KiB, in order"
+POST_HANDSHAKE = "a TLS error after the handshake ends the stream with reset and back-off"
+SEND_EARLY ="send before connect is a precondition failure and sends nothing"
 
 MUTANTS = [
     {
@@ -162,6 +165,22 @@ MUTANTS = [
         ),
         "killers": [EOF_TEST],
     },
+    {
+        "id": "M14",
+        "rule": "one yielded chunk is at most 16 KiB (review condition 1)",
+        "mutation": "large reads are not split",
+        "find": "data.index(offset, offsetBy: Self.maximumChunkLength, limitedBy: data.endIndex)",
+        "replace": "data.index(offset, offsetBy: Int.max / 2, limitedBy: data.endIndex)",
+        "killers": [CHUNK],
+    },
+    {
+        "id": "M15",
+        "rule": "a TLS error after the handshake is transport(.reset) with back-off (review note 2)",
+        "mutation": "a TLS error after the handshake keeps the security code",
+        "find": "if case .security = failure.code {",
+        "replace": "if case .security = failure.code, false {",
+        "killers": [POST_HANDSHAKE],
+    },
 ]
 
 
@@ -220,7 +239,8 @@ def main():
             timed_out or all(k in failed for k in mutant["killers"]))
         restored = source.read_bytes() == original
         entry.update(
-            exitCode=code, built=built, killed=killed, timedOut=timed_out, restoredCleanly=restored,
+            exitCode=code, built=built, killed=killed, timedOut=timed_out,
+            killedByTimeLimit="Time limit was exceeded" in output, restoredCleanly=restored,
             failedKillers=sorted(k for k in mutant["killers"] if k in failed))
         ok = ok and killed and restored
         results.append(entry)

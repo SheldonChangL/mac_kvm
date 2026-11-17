@@ -28,6 +28,7 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
 }
 package final class LinuxTLSTransport: Transport, @unchecked Sendable {
   package static let incomingChunkBufferLimit: Int  // 16 chunks
+  package static let maximumChunkLength: Int  // 16 KiB
   package init(request: LinuxTLSConnectionRequest, group: any EventLoopGroup,
                trustEvaluator: @escaping @Sendable (Data) -> LinuxTLSTrustDecision)
   package let incomingBytes: AsyncThrowingStream<Data, any Error>
@@ -68,7 +69,11 @@ runs on the event loop inside the handshake.
 | any TLS failure (protocol version, alert, bad record) before the handshake completes | `security(.trustRejected)` |
 
 7. A handshake that completes without an accepted verification fails closed
-   with `trustRejected`, as a second line behind the callback.
+   with `trustRejected`, as a second line behind the callback. This guard is
+   defense in depth and not reachable through swift-nio-ssl today: a handshake
+   cannot complete unless the callback answered `.certificateVerified`, and the
+   callback answers that only after an accept. No test reaches it, so no mutant
+   of it is recorded.
 8. After a rejection the presented fingerprint is kept in `presentedFingerprint`
    so the command line can display it next to the stored one (plan a.7). It is
    never kept after an accept, and nothing logs it.
@@ -101,13 +106,21 @@ certificate that names no host, and the pin is a stronger check than a name.
 
 ## Incoming bytes
 
-- `incomingBytes` buffers at most 16 chunks (`bufferingOldest`). A chunk is at
-  most one TLS record, 16 KiB of plaintext, so at most 256 KiB wait for a slow
-  consumer.
+- `incomingBytes` buffers at most 16 chunks (`bufferingOldest`). One NIOSSL
+  read can carry several TLS records, so the transport splits every read into
+  chunks of at most `maximumChunkLength` (16 KiB) before yielding. At most
+  256 KiB therefore wait for a slow consumer.
 - A full buffer ends the stream with `transport(.resourceExhausted)` after the
   chunks already buffered, in order. Nothing is silently dropped.
-- The peer closing the connection finishes the stream normally, once, after the
-  data it sent (plan a.5: a clean end that the reconnect manager retries).
+- The peer closing the connection with a TLS `close_notify` finishes the
+  stream normally, once, after the data it sent (plan a.5: a clean end that the
+  reconnect manager retries). A bare TCP FIN after the handshake, without
+  `close_notify`, is an unclean shutdown: NIOSSL reports it as an error, and
+  the stream ends with `transport(.reset)`.
+- The channel is stored when the TCP connect completes, on the channel's event
+  loop. The handshake needs further round trips on that loop, so the channel
+  is always stored before the phase becomes connected and before `send` looks
+  for it.
 - A TLS or socket error after the handshake ends the stream with
   `transport(.reset)` or the mapped network code, never with a security code,
   so a broken connection is retried with back-off.
@@ -163,13 +176,24 @@ in a temporary directory (`openssl` is installed by `verify-linux`):
 - a server limited to TLS 1.1: refused, the evaluator is never asked;
 - end of stream, a slow consumer, send before connect, a second connect, task
   cancellation and `disconnect()` during connect, a handshake timeout, a refused
-  connection, and `disconnect()` twice, also from a cancelled task.
+  connection, and `disconnect()` twice, also from a cancelled task;
+- a 200,000-byte server write arrives in chunks of at most 16 KiB, in order;
+- bytes that are not a TLS record, written after the handshake, end the stream
+  with `transport(.reset)` and `.backoff`.
+
+Both suites have a one-minute time limit, so a mutant that makes a test wait
+fails instead of hanging.
 
 ## Privacy
 
 Nothing in this file logs. The fingerprint is exposed only through
 `presentedFingerprint` after a rejection, for the deliberate display described
-in plan a.7. The tests use ephemeral certificates and no real host's
+in plan a.7. It is for display only: callers must never log it, put it in an
+error or send it anywhere.
+
+The cipher suites are swift-nio-ssl's defaults for a client configuration;
+only the minimum version (TLS 1.2) is set here. A change of the swift-nio-ssl
+pin can change the suites and needs a security look. The tests use ephemeral certificates and no real host's
 fingerprint.
 
 ## Known limitations

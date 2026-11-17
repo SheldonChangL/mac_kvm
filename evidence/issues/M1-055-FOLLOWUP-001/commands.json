@@ -1,7 +1,7 @@
 {
  "schemaVersion": 1,
  "issue": "M1-055-FOLLOWUP-001",
- "baseCommit": "e4c87697326f42902db3a3ac06b9330cc809ad6b",
+ "baseCommit": "777d4ef14062c79e94f7103ffa9db884895de2df",
  "date": "2026-11-17",
  "toolchain": {
   "swiftVersion": [
@@ -20,72 +20,72 @@
   {
    "name": "red-stub",
    "command": "cp Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift <producer-scratch>/impl.swift && cp <producer-scratch>/stub.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift && docker exec m1055 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch 2>&1 | tail -1 && timeout 300 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with\"; exit ${PIPESTATUS[0]}'; rc=$?; cp <producer-scratch>/impl.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift; exit $rc",
-   "startedAt": "2026-11-17T03:36:52Z",
-   "endedAt": "2026-11-17T03:37:37Z",
+   "startedAt": "2026-11-17T04:50:45Z",
+   "endedAt": "2026-11-17T04:51:38Z",
    "exitCode": 1,
-   "stdout": "Build complete! (8.34s)\n✘ Test run with 17 tests in 2 suites failed after 34.190 seconds with 27 issues.\n",
+   "stdout": "Build complete! (13.51s)\n✘ Test run with 19 tests in 2 suites failed after 37.336 seconds with 29 issues.\n",
    "stderr": "",
    "expectedFailure": true
   },
   {
    "name": "linux-focused",
    "command": "docker exec m1055 bash -c 'cd /src && swift build --build-tests --scratch-path /scratch -Xswiftc -warnings-as-errors 2>&1 | tail -1 && timeout 300 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with|✘\"; exit ${PIPESTATUS[0]}'",
-   "startedAt": "2026-11-17T03:37:37Z",
-   "endedAt": "2026-11-17T03:38:01Z",
+   "startedAt": "2026-11-17T04:51:38Z",
+   "endedAt": "2026-11-17T04:51:55Z",
    "exitCode": 0,
-   "stdout": "Build complete! (18.41s)\n✔ Test run with 17 tests in 2 suites passed after 1.948 seconds.\n",
+   "stdout": "Build complete! (13.87s)\n✔ Test run with 19 tests in 2 suites passed after 1.424 seconds.\n",
    "stderr": ""
   },
   {
    "name": "linux-repeat-30",
    "command": "docker exec m1055 bash -c 'cd /src && for i in $(seq 1 30); do timeout 120 swift test --skip-build --scratch-path /scratch --filter LinuxTLSTransport 2>&1 | grep -E \"Test run with\" | sed -E \"s/after [0-9.]+ seconds/after N seconds/\"; done | sort | uniq -c'",
-   "startedAt": "2026-11-17T03:38:01Z",
-   "endedAt": "2026-11-17T03:38:50Z",
+   "startedAt": "2026-11-17T04:46:35Z",
+   "endedAt": "2026-11-17T04:47:26Z",
    "exitCode": 0,
-   "stdout": "     30 ✔ Test run with 17 tests in 2 suites passed after N seconds.\n",
+   "stdout": "     30 ✔ Test run with 19 tests in 2 suites passed after N seconds.\n",
    "stderr": ""
   },
   {
    "name": "linux-full-xvfb",
    "command": "docker exec m1055 bash -c 'cd /src && MACKVM_X11_TESTS=1 xvfb-run -a -s \"-screen 0 1600x900x24 +extension RANDR\" timeout 900 swift test --skip-build --scratch-path /scratch --xunit-output /src/evidence/issues/M1-055-FOLLOWUP-001/tests/swift-testing-xunit.xml 2>&1 | grep -E \"Test run with|Executed .* tests|✘\"; exit ${PIPESTATUS[0]}'",
-   "startedAt": "2026-11-17T03:38:50Z",
-   "endedAt": "2026-11-17T03:38:59Z",
+   "startedAt": "2026-11-17T04:47:26Z",
+   "endedAt": "2026-11-17T04:47:35Z",
    "exitCode": 0,
-   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n✔ Test run with 414 tests in 42 suites passed after 6.331 seconds.\n",
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n✔ Test run with 416 tests in 42 suites passed after 6.308 seconds.\n",
    "stderr": ""
   },
   {
    "name": "mac-loopback-pin",
    "command": "swift build 2>&1 | tail -1 && bash <producer-scratch>/loopback.sh",
-   "startedAt": "2026-11-17T03:38:59Z",
-   "endedAt": "2026-11-17T03:39:46Z",
+   "startedAt": "2026-11-17T04:47:35Z",
+   "endedAt": "2026-11-17T04:48:16Z",
    "exitCode": 0,
-   "stdout": "Build complete! (6.02s)\nidentity digest length: 64\n✔ Test \"the pinned Mac server identity is accepted and a different pin is rejected\" passed after 0.063 seconds.\n✔ Suite \"LinuxTLSTransport against a Mac server identity\" passed after 0.064 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.064 seconds.\nNew, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384\nPeer signature type: ECDSA\nServer public key is 256 bit\n[03:39:11.995] server identity removed; clients must trust the next one\n",
+   "stdout": "Build complete! (0.32s)\nidentity digest length: 64\n✔ Test \"the pinned Mac server identity is accepted and a different pin is rejected\" passed after 0.065 seconds.\n✔ Suite \"LinuxTLSTransport against a Mac server identity\" passed after 0.066 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.066 seconds.\nNew, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384\nPeer signature type: ECDSA\nServer public key is 256 bit\n[04:47:42.555] server identity removed; clients must trust the next one\n",
    "stderr": ""
   },
   {
    "name": "swift-test",
    "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
-   "startedAt": "2026-11-17T03:39:46Z",
-   "endedAt": "2026-11-17T03:39:52Z",
+   "startedAt": "2026-11-17T04:48:16Z",
+   "endedAt": "2026-11-17T04:48:18Z",
    "exitCode": 0,
-   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.142 seconds.\n",
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.140 seconds.\n",
    "stderr": ""
   },
   {
    "name": "swift-test-werror",
    "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
-   "startedAt": "2026-11-17T03:39:52Z",
-   "endedAt": "2026-11-17T03:40:01Z",
+   "startedAt": "2026-11-17T04:48:18Z",
+   "endedAt": "2026-11-17T04:48:29Z",
    "exitCode": 0,
-   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.135 seconds.\n",
+   "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n✔ Test run with 301 tests in 28 suites passed after 0.142 seconds.\n",
    "stderr": ""
   },
   {
    "name": "format-own",
    "command": "swift format lint --strict --no-color-diagnostics Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxTLSTransport.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxTLSTransportTests.swift",
-   "startedAt": "2026-11-17T03:40:01Z",
-   "endedAt": "2026-11-17T03:40:01Z",
+   "startedAt": "2026-11-17T04:48:29Z",
+   "endedAt": "2026-11-17T04:48:29Z",
    "exitCode": 0,
    "stdout": "",
    "stderr": ""
@@ -93,8 +93,8 @@
   {
    "name": "format-repo",
    "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
-   "startedAt": "2026-11-17T03:40:01Z",
-   "endedAt": "2026-11-17T03:40:04Z",
+   "startedAt": "2026-11-17T04:48:29Z",
+   "endedAt": "2026-11-17T04:48:32Z",
    "exitCode": 0,
    "stdout": "",
    "stderr": ""
@@ -102,8 +102,8 @@
   {
    "name": "docs-check",
    "command": "make docs-check",
-   "startedAt": "2026-11-17T03:40:04Z",
-   "endedAt": "2026-11-17T03:40:04Z",
+   "startedAt": "2026-11-17T04:48:32Z",
+   "endedAt": "2026-11-17T04:48:33Z",
    "exitCode": 0,
    "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK\n",
    "stderr": ""
@@ -111,8 +111,8 @@
   {
    "name": "architecture-check",
    "command": "make architecture-check",
-   "startedAt": "2026-11-17T03:40:04Z",
-   "endedAt": "2026-11-17T03:40:05Z",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:48:33Z",
    "exitCode": 0,
    "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK\n",
    "stderr": ""
@@ -120,8 +120,8 @@
   {
    "name": "validate-package",
    "command": "python3 Tools/Backlog/validate_package.py",
-   "startedAt": "2026-11-17T03:40:05Z",
-   "endedAt": "2026-11-17T03:40:05Z",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:48:33Z",
    "exitCode": 0,
    "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n",
    "stderr": ""
@@ -129,10 +129,10 @@
   {
    "name": "make-verify",
    "command": "mkdir -p <producer-scratch>/verify && make verify REPORT=<producer-scratch>/verify/verify.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
-   "startedAt": "2026-11-17T03:40:05Z",
-   "endedAt": "2026-11-17T03:42:58Z",
+   "startedAt": "2026-11-17T04:48:33Z",
+   "endedAt": "2026-11-17T04:50:23Z",
    "exitCode": 0,
-   "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=82933\n[PASSED] swift-test-targets exit=0 durationMs=1952\n[PASSED] native-arm64-build exit=0 durationMs=1268\nCI report: <producer-scratch>/verify/verify.json\n",
+   "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=83516\n[PASSED] swift-test-targets exit=0 durationMs=1283\n[PASSED] native-arm64-build exit=0 durationMs=1251\nCI report: <producer-scratch>/verify/verify.json\n",
    "stderr": ""
   }
  ]
