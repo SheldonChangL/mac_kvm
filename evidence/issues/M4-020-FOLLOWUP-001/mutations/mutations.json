@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020-FOLLOWUP-001",
+  "filter": "LinuxClient|LinuxLifecycle",
+  "mutants": [
+    {
+      "id": "M01",
+      "rule": "parser: default port",
+      "file": "Apps/Linux/MacKVMClient/ClientConfiguration.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "the parser accepts the documented forms"
+      ],
+      "seconds": 78.6
+    },
+    {
+      "id": "M02",
+      "rule": "parser: screen name at most 64",
+      "file": "Apps/Linux/MacKVMClient/ClientConfiguration.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "the parser rejects malformed command lines"
+      ],
+      "seconds": 100.4
+    },
+    {
+      "id": "M03",
+      "rule": "parser: no extra fingerprint arguments",
+      "file": "Apps/Linux/MacKVMClient/ClientConfiguration.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "exit codes: usage 64, root refused, no X11 display 69",
+        "the parser rejects malformed command lines"
+      ],
+      "seconds": 11.4,
+      "note": "rerun with the final tests (first run: exit 1)"
+    },
+    {
+      "id": "M04",
+      "rule": "root is refused",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "exit codes: usage 64, root refused, no X11 display 69"
+      ],
+      "seconds": 31.4
+    },
+    {
+      "id": "M05",
+      "rule": "no X11 display exits 69",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "exit codes: usage 64, root refused, no X11 display 69"
+      ],
+      "seconds": 14.0
+    },
+    {
+      "id": "M06",
+      "rule": "h.8: handlers installed before any display",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "connect runs the runtime after the bootstrap and ends on a signal with 0",
+        "h.8: XInitThreads, then the handlers, then the displays; missing XTest exits 69"
+      ],
+      "seconds": 11.5
+    },
+    {
+      "id": "M07",
+      "rule": "h.8: a failed XInitThreads opens no display",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.8: a failed XInitThreads opens no display"
+      ],
+      "seconds": 14.0
+    },
+    {
+      "id": "M08",
+      "rule": "h.8: the previous error handler is kept and restored",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.8: the root handlers keep the previous ones, ignore protocol errors and restore"
+      ],
+      "seconds": 26.1
+    },
+    {
+      "id": "M09",
+      "rule": "h.8: display loss reported once",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "a lost display reported by Xlib's I/O error handler ends with exit 69"
+      ],
+      "seconds": 10.3
+    },
+    {
+      "id": "M10",
+      "rule": "trust: non-interactive prints instructions, never prompts",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "an unknown fingerprint exits 78 with instructions that name no host; nothing written"
+      ],
+      "seconds": 10.6
+    },
+    {
+      "id": "M11",
+      "rule": "trust: an unknown identity is never accepted",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "an unknown fingerprint exits 78 with instructions that name no host; nothing written",
+        "interactive: any other answer stores nothing and exits 78",
+        "interactive: trust stores the presented fingerprint once and connects",
+        "the evaluator accepts only the stored value"
+      ],
+      "seconds": 191.7,
+      "note": "rerun with the final tests (first run: exit 124)"
+    },
+    {
+      "id": "M12",
+      "rule": "trust: a changed identity is never accepted",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "a changed fingerprint is refused, both shown, nothing replaced, exit 78",
+        "the evaluator accepts only the stored value"
+      ],
+      "seconds": 71.2,
+      "note": "rerun with the final tests (first run: exit 124)"
+    },
+    {
+      "id": "M13",
+      "rule": "trust: interactive trust stores the fingerprint",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "interactive: trust stores the presented fingerprint once and connects"
+      ],
+      "seconds": 73.2
+    },
+    {
+      "id": "M14",
+      "rule": "cleanup: the ledger's releases reach the injector",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.5: a wake while connected releases the old input before the new session injects",
+        "killing the server stream releases every held key and starts the next generation"
+      ],
+      "seconds": 71.2
+    },
+    {
+      "id": "M15",
+      "rule": "cleanup: the injector sweep runs (h.1)",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "killing the server stream releases every held key and starts the next generation"
+      ],
+      "seconds": 72.2
+    },
+    {
+      "id": "M16",
+      "rule": "next generation gets a new drain",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.5: a wake while connected releases the old input before the new session injects"
+      ],
+      "seconds": 71.7
+    },
+    {
+      "id": "M17",
+      "rule": "next generation begins a new coordinator session",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.3: a cancelled connection attempt runs the cleanup and closes its transport",
+        "h.5: a wake while connected releases the old input before the new session injects",
+        "killing the server stream releases every held key and starts the next generation"
+      ],
+      "seconds": 71.6
+    },
+    {
+      "id": "M18",
+      "rule": "h.3: network state reported before each wake",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.3: the network state is reported before each wake"
+      ],
+      "seconds": 75.7,
+      "note": "rerun with the final tests (first run: exit 124)"
+    },
+    {
+      "id": "M19",
+      "rule": "h.3: a cancelled attempt runs the cleanup",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.3: a cancelled connection attempt runs the cleanup and closes its transport",
+        "interactive: trust stores the presented fingerprint once and connects"
+      ],
+      "seconds": 71.7
+    },
+    {
+      "id": "M20",
+      "rule": "h.3: termination refuses connect()",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "h.3: termination stops the monitors and refuses later connects"
+      ],
+      "seconds": 11.8
+    },
+    {
+      "id": "M21",
+      "rule": "h.3: termination stops the monitors",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "enter, move, key, button, leave and clipboard both ways through the composition root",
+        "h.3: termination stops the monitors and refuses later connects"
+      ],
+      "seconds": 12.9
+    },
+    {
+      "id": "M22",
+      "rule": "display loss exits 69",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "a lost display reported by Xlib's I/O error handler ends with exit 69",
+        "a screen stream that ends without a stop is a display loss: exit 69",
+        "an injection failure that loses the display runs the cleanup and exits 69"
+      ],
+      "seconds": 11.2
+    },
+    {
+      "id": "M23",
+      "rule": "an injector display loss ends the runtime",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "an injection failure that loses the display runs the cleanup and exits 69"
+      ],
+      "seconds": 71.7,
+      "note": "rerun with the final tests (first run: exit 124)"
+    },
+    {
+      "id": "M24",
+      "rule": "a screen stream end is a display loss",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "a screen stream that ends without a stop is a display loss: exit 69"
+      ],
+      "seconds": 71.2,
+      "note": "rerun with the final tests (first run: exit 124)"
+    },
+    {
+      "id": "M25",
+      "rule": "shutdown closes the injector (deinit does not sweep)",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "enter, move, key, button, leave and clipboard both ways through the composition root"
+      ],
+      "seconds": 12.3
+    },
+    {
+      "id": "M26",
+      "rule": "no Xlib after a display loss",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "an injection failure that loses the display runs the cleanup and exits 69"
+      ],
+      "seconds": 10.7
+    },
+    {
+      "id": "M27",
+      "rule": "an unusable trust store fails closed",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "an unusable trust store fails closed with exit 78"
+      ],
+      "seconds": 11.4
+    },
+    {
+      "id": "M28",
+      "rule": "fingerprint trust never replaces another value",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "fingerprint trust, forget and show"
+      ],
+      "seconds": 11.1
+    },
+    {
+      "id": "M29",
+      "rule": "h.8: handlers restored after the runtime",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "connect runs the runtime after the bootstrap and ends on a signal with 0"
+      ],
+      "seconds": 10.3
+    },
+    {
+      "id": "M30",
+      "rule": "lifecycle: resume needs a jump over the threshold",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "a boot-time jump over 5 s between ticks is one resume; smaller drift is not"
+      ],
+      "seconds": 12.4
+    },
+    {
+      "id": "M31",
+      "rule": "lifecycle: only changes are network edges",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "network edges are polled only while armed, and the poll takes a fresh baseline",
+        "network samples make edges only on change, never on the baseline"
+      ],
+      "seconds": 10.3
+    },
+    {
+      "id": "M32",
+      "rule": "lifecycle: network polled only while armed",
+      "file": "Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "network edges are polled only while armed, and the poll takes a fresh baseline"
+      ],
+      "seconds": 10.1
+    },
+    {
+      "id": "M33",
+      "rule": "unit: exit codes 64 69 78 never restart",
+      "file": "Apps/Linux/systemd/mackvm-client.service",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "the systemd user unit has the required keys and nothing unexpected"
+      ],
+      "seconds": 10.4
+    },
+    {
+      "id": "M34",
+      "rule": "h.5: a wake ends the old generation first (second line: beginSession waits)",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 0,
+      "killed": false,
+      "buildFailed": false,
+      "failingTests": [],
+      "seconds": 12.0,
+      "note": "Expected survivor: h.5 holds by a second line; prepareGeneration waits for beginSession(), which needs the old cleanup to have returned, so the wake test still passes with this line removed."
+    },
+    {
+      "id": "M35",
+      "rule": "review: the cleanup never joins a parked drain without a bound",
+      "file": "Apps/Linux/MacKVMClient/ClientEffects.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "killing the server stream releases every held key and starts the next generation",
+        "review: a drain worker parked by a display loss does not hang the cleanup; exit 69"
+      ],
+      "seconds": 145.8,
+      "note": "added for the PR #370 review fixes"
+    },
+    {
+      "id": "M36",
+      "rule": "review: a signal interrupts the trust prompt",
+      "file": "Apps/Linux/MacKVMClient/ClientRuntime.swift",
+      "exitCode": 1,
+      "killed": true,
+      "buildFailed": false,
+      "failingTests": [
+        "review: a signal or a display loss while the prompt waits declines and exits"
+      ],
+      "seconds": 71.8,
+      "note": "added for the PR #370 review fixes"
+    }
+  ],
+  "summary": {
+    "total": 36,
+    "killed": 35,
+    "survived": [
+      "M34"
+    ]
+  }
+}

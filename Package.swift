@@ -132,6 +132,9 @@ let package = Package(
         .product(name: "NIOCore", package: "swift-nio"),
         .product(name: "NIOPosix", package: "swift-nio"),
         .product(name: "NIOSSL", package: "swift-nio-ssl"),
+        // LinuxTLSTransport imports NIOTLS for the handshake-completed event; declared here by
+        // M4-020-FOLLOWUP-001, the manifest's owner after M1-055-FOLLOWUP-001.
+        .product(name: "NIOTLS", package: "swift-nio"),
         .product(name: "Crypto", package: "swift-crypto"),
         // Named so the exact pins above are used directly (SwiftPM warns about unused
         // dependencies); swift-nio and swift-crypto use these packages anyway.
@@ -146,5 +149,27 @@ let package = Package(
       dependencies: ["KVMContracts", "LinuxPlatform"],
       path: "Packages/LinuxPlatform/Tests/LinuxPlatformTests"
     ),
+    // M4-020-FOLLOWUP-001: the Linux client app (composition root, CLI, systemd user unit).
+    .executableTarget(
+      name: "MacKVMClient",
+      dependencies: [
+        "KVMContracts",
+        "KVMCore",
+        "BarrierCompatibility",
+        "LinuxPlatform",
+        "CX11",
+        .product(name: "NIOCore", package: "swift-nio"),
+        .product(name: "NIOPosix", package: "swift-nio"),
+      ],
+      path: "Apps/Linux/MacKVMClient"
+    ),
   ]
+  package.products += [
+    .executable(name: "mackvm-client", targets: ["MacKVMClient"])
+  ]
+  // The Linux runtime test (Tests/Integration/LinuxClientRuntimeTests.swift) drives the app's
+  // composition root, so on Linux the integration target depends on it too.
+  for target in package.targets where target.name == "MacKVMIntegrationTests" {
+    target.dependencies += ["MacKVMClient", "LinuxPlatform"]
+  }
 #endif

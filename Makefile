@@ -93,3 +93,37 @@ verify-linux:
 	  -v "$(CURDIR)":/src:ro -v "$(CURDIR)/.build-linux":/scratch -v "$(CURDIR)/artifacts":/artifacts \
 	  -e ISSUE="$$issue" -e SOURCE_COMMIT="$$commit" -e VERIFY_LINUX_SCRIPT \
 	  $(LINUX_IMAGE) bash -ec "$$VERIFY_LINUX_SCRIPT"
+
+# M4-020-FOLLOWUP-001: the release binary for the owner's Ubuntu 22.04 x86_64 PC, built in the
+# pinned image with the static Swift standard library (docs/platform/linux/M4-020-FOLLOWUP-001-linux-client-app.md).
+# Writes artifacts/linux/mackvm-client, the systemd user unit and SHA256SUMS. Not stripped (M4-035).
+define DIST_LINUX_SCRIPT
+set -o pipefail
+swift --version 2>&1
+echo "source commit: $$SOURCE_COMMIT"
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq
+apt-get install -y -qq --no-install-recommends libx11-dev libxtst-dev libxrandr-dev libxfixes-dev >/dev/null
+mkdir -p /work /artifacts/linux
+tar -C /src --exclude=./.build --exclude=./.build-linux --exclude=./artifacts --exclude=./.git -cf - . | tar -C /work -xf -
+cd /work
+swift build -c release --static-swift-stdlib --product mackvm-client --scratch-path /scratch/release
+bin=$$(swift build -c release --static-swift-stdlib --product mackvm-client --scratch-path /scratch/release --show-bin-path)
+rm -f /artifacts/linux/mackvm-client /artifacts/linux/mackvm-client.service /artifacts/linux/SHA256SUMS
+cp "$$bin/mackvm-client" /artifacts/linux/mackvm-client
+cp Apps/Linux/systemd/mackvm-client.service /artifacts/linux/mackvm-client.service
+cd /artifacts/linux
+sha256sum mackvm-client mackvm-client.service > SHA256SUMS
+cat SHA256SUMS
+echo "dist-linux OK"
+endef
+export DIST_LINUX_SCRIPT
+
+.PHONY: dist-linux
+dist-linux:
+	@mkdir -p .build-linux artifacts/linux; \
+	commit=$$(git rev-parse HEAD 2>/dev/null || echo unknown); \
+	$(DOCKER) run --rm --platform linux/amd64 \
+	  -v "$(CURDIR)":/src:ro -v "$(CURDIR)/.build-linux":/scratch -v "$(CURDIR)/artifacts":/artifacts \
+	  -e SOURCE_COMMIT="$$commit" -e DIST_LINUX_SCRIPT \
+	  $(LINUX_IMAGE) bash -ec "$$DIST_LINUX_SCRIPT"

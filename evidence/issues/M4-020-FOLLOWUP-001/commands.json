@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-020-FOLLOWUP-001",
+  "baseCommit": "944608e8c87f6936ba6f546f5e4ca6de1e933c9f",
+  "date": "2026-11-17",
+  "toolchain": {
+    "swiftVersion": [
+      "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0"
+    ],
+    "target": "arm64-apple-macosx26.0",
+    "python": "3.9.6",
+    "macOS": "26.6.2",
+    "architecture": "arm64",
+    "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native) via <producer-scratch>/dl.sh; dist-linux ran the pinned linux/amd64 image"
+  },
+  "note": "Run by the implementing agent. Expected failure: the RED entry. Paths masked. Local `make verify-linux` (linux/amd64 under emulation) stalled in the compiler for over an hour and was not completed; the CI verify-linux job is the amd64 record.",
+  "commands": [
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"rm Apps/Linux/MacKVMClient/Client*.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift; echo 'print(1)' > Apps/Linux/MacKVMClient/main.swift; swift build --build-tests --scratch-path /scratch/red 2>&1 | grep -E 'error: cannot find' | sort -u | head -20; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:19:20+00:00",
+      "endedAt": "2026-11-17T07:19:36+00:00",
+      "exitCode": 1,
+      "stdout": "     |                                                                      `- error: cannot find type 'ClientExitCode' in scope\n     |                                              `- error: cannot find type 'ClientExitCode' in scope\n     |                                          `- error: cannot find type 'ClientConnector' in scope\n     |                                        `- error: cannot find type 'ClientOutput' in scope\n     |                                      `- error: cannot find type 'ClientLifecycle' in scope\n     |                                     `- error: cannot find type 'ClientExitCode' in scope\n     |                                     `- error: cannot find type 'ClientInjector' in scope\n     |                                     `- error: cannot find type 'ClientXlibSetup' in scope\n     |                              `- error: cannot find 'ClientServerAddress' in scope\n     |                            `- error: cannot find type 'ClientExitCode' in scope\n     |                           `- error: cannot find type 'ClientExitCode' in scope\n     |                           `- error: cannot find type 'ClientStatus' in scope\n     |                          `- error: cannot find type 'ClientExitCode' in scope\n     |                         `- error: cannot find 'ClientTrustObservation' in scope\n     |                       `- error: cannot find 'ClientServerAddress' in scope\n     |                       `- error: cannot find type 'ClientProcess' in scope\n     |                       `- error: cannot find type 'ClientXErrorHandlers' in scope\n     |                      `- error: cannot find 'ClientRuntimeSettings' in scope\n     |                     `- error: cannot find 'ClientBackendFactory' in scope\n     |                     `- error: cannot find 'ClientGeometryCache' in scope",
+      "stderr": "",
+      "note": "RED (expected failure): the new tests against the base without the implementation files; missing types."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift build --build-tests --scratch-path /scratch/g -Xswiftc -warnings-as-errors 2>&1 | tail -1; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:19:36+00:00",
+      "endedAt": "2026-11-17T07:22:21+00:00",
+      "exitCode": 0,
+      "stdout": "Build complete! (158.06s)",
+      "stderr": "",
+      "note": "Linux (native arm64 container): build with warnings as errors."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"timeout 300 swift test --skip-build --scratch-path /scratch/g --filter 'LinuxClient|LinuxLifecycle' 2>&1 | grep -E '\u2718|Test run with'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:22:21+00:00",
+      "endedAt": "2026-11-17T07:22:36+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 30 tests in 5 suites passed after 0.029 seconds.",
+      "stderr": "",
+      "note": "GREEN: focused suites."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"for i in \\$(seq 1 20); do timeout 300 swift test --skip-build --scratch-path /scratch/g --filter 'LinuxClient|LinuxLifecycle' 2>&1 | grep -E '\u2718|Test run with' || exit 1; done\"",
+      "startedAt": "2026-11-17T07:22:36+00:00",
+      "endedAt": "2026-11-17T07:22:55+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.020 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.030 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.026 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.025 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.027 seconds.\n\u2714 Test run with 30 tests in 5 suites passed after 0.025 seconds.",
+      "stderr": "",
+      "note": "Focused suites repeated 20 times (flakiness check)."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"mkdir -p /scratch/xunit && timeout 900 swift test --skip-build --scratch-path /scratch/g --xunit-output /scratch/xunit/swift-testing-xunit.xml 2>&1 | grep -E '\u2718|Test run with|Executed'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:22:55+00:00",
+      "endedAt": "2026-11-17T07:23:09+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 514 tests in 53 suites passed after 1.555 seconds.",
+      "stderr": "",
+      "note": "Full root package on Linux; xUnit copied to evidence/issues/M4-020-FOLLOWUP-001/tests/."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"(Xvfb :9 -screen 0 1600x900x24 +extension RANDR >/dev/null 2>&1 &) ; sleep 1; DISPLAY=:9 MACKVM_X11_TESTS=1 timeout 900 swift test --skip-build --scratch-path /scratch/g 2>&1 | grep -E '\u2718|Test run with'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:23:09+00:00",
+      "endedAt": "2026-11-17T07:23:27+00:00",
+      "exitCode": 1,
+      "stdout": "\u2718 Test \"events are injected in order on the drain's own thread\" recorded an issue at LinuxX11InjectorTests.swift:544:5: Expectation failed: (injector.threadNames \u2192 [\"MacKVMPackageTe\"]) == ([LinuxInjectionDrain.threadName] \u2192 [\"mackvm-inject\"])\n\u2718 Test \"events are injected in order on the drain's own thread\" failed after 0.049 seconds with 1 issue.\n\u2718 Suite \"M4-024 injection drain on a dedicated thread\" failed after 0.229 seconds with 1 issue.\n\u2718 Test run with 514 tests in 53 suites failed after 6.379 seconds with 1 issue.",
+      "stderr": "",
+      "note": "Full root package on Linux with Xvfb and MACKVM_X11_TESTS=1 (the X11 backends' tests run in the same process as the client tests). One existing M4-024 test failed once: the drain names its thread from inside the thread, which races on Linux (thread name read as the process name). Not in this issue's files; rerun below."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"(Xvfb :9 -screen 0 1600x900x24 +extension RANDR >/dev/null 2>&1 &) ; sleep 1; for i in 1 2 3; do DISPLAY=:9 MACKVM_X11_TESTS=1 timeout 900 swift test --skip-build --scratch-path /scratch/g 2>&1 | grep -E '\u2718 Test |Test run with' || exit 1; done\"",
+      "startedAt": "2026-11-17T07:26:12+00:00",
+      "endedAt": "2026-11-17T07:26:46+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 514 tests in 53 suites passed after 6.381 seconds.\n\u2714 Test run with 514 tests in 53 suites passed after 6.377 seconds.\n\u2714 Test run with 514 tests in 53 suites passed after 6.367 seconds.",
+      "stderr": "",
+      "note": "Rerun of the Xvfb full run, three times."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift test --package-path /work/Packages/KVMContracts --scratch-path /scratch/contracts 2>&1 | grep -E 'Test run with|Executed' | tail -2; swift test --package-path /work/Packages/BarrierCompatibility --scratch-path /scratch/barrier 2>&1 | grep -E 'Test run with|Executed' | tail -2\"",
+      "startedAt": "2026-11-17T07:23:27+00:00",
+      "endedAt": "2026-11-17T07:24:34+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 118 tests in 2 suites passed after 0.011 seconds.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 374 tests in 15 suites passed after 8.647 seconds.",
+      "stderr": "",
+      "note": "Child packages on Linux, as verify-linux runs them."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift build --scratch-path /scratch/g >/dev/null 2>&1; timeout 200 bash /scratch/smoke.sh\"",
+      "startedAt": "2026-11-17T07:24:34+00:00",
+      "endedAt": "2026-11-17T07:25:14+00:00",
+      "exitCode": 0,
+      "stdout": "== usage\nexit=64\n== root refused\nexit=1\n== no display\nexit=69\n== TLS server (openssl s_server, self-signed P-256)\nopenssl fingerprint: C6:6A:E8:59:D7:4D:0C:0B:75:F2:4B:4B:FA:6C:39:DE:0D:D2:A0:33:43:30:1C:56:AF:D4:13:42:B4:D8:D7:2F\n== fingerprint show\nexit=0\nshow matches openssl\n== connect, unknown identity, non-interactive\nexit=78\nlines naming the host: 0\ninstructions present\ntrust file not written\n== trust and connect (TLS accepted; s_server speaks no Barrier, so the handshake times out and the client backs off); SIGTERM ends it\ntrusted\nexit=0\nexit after SIGTERM=0\n[07:24:56.635] starting\n[07:24:56.636] connecting to the server\n[07:24:56.657] released held input: completed\n[07:24:56.657] connection ended (transport.disconnected)\n[07:24:56.658] reconnecting in 1 s\n[07:24:57.659] connecting to the server\n[07:24:57.678] released held input: completed\n[07:24:57.678] connection ended (transport.disconnected)\n[07:24:57.678] reconnecting in 2 s\n[07:24:59.681] connecting to the server\n[07:24:59.700] released held input: completed\n[07:24:59.700] connection ended (transport.disconnected)\n[07:24:59.700] reconnecting in 4 s\n[07:25:03.701] connecting to the server\n[07:25:03.724] released held input: completed\n[07:25:03.724] connection ended (transport.disconnected)\n[07:25:03.724] reconnecting in 8 s\n[07:25:10.643] stopping on signal 15\n== display loss: kill Xvfb under a running client\nexit after display loss=69\n[07:25:11.745] connection ended (transport.refused)\n[07:25:11.745] reconnecting in 2 s\n[07:25:13.664] the X display was lost; exiting",
+      "stderr": "usage: mackvm-client connect <host>[:port] --name <screen-name> [--display <:n>]\n                             [--non-interactive]\n       mackvm-client fingerprint show <host>[:port]\n       mackvm-client fingerprint trust <host>[:port] <sha256>\n       mackvm-client fingerprint forget <host>[:port]\nThe default port is 24800. The screen name is 1 to 64 of [A-Za-z0-9_-] and must equal\nthe Mac's --client. <sha256> is AA:BB:... or 64 hex digits. Running as root is not\nsupported.\nmackvm-client does not run as root: the trust store accepts only the running user's files.\nno X11 display: set DISPLAY or pass --display (Wayland is not supported)",
+      "note": "Real-binary smoke: usage 64, root refused, no display 69, fingerprint show against openssl s_server equals openssl's SHA-256, unknown identity non-interactive exits 78 with no host and no trust file, trust then connect over real TLS, SIGTERM exits 0, killing Xvfb exits 69."
+    },
+    {
+      "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T06:10:16+00:00",
+      "endedAt": "2026-11-17T06:10:43+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds\n\u25c7 Test streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u2714 Test streamErrorReleasesEverything(error:expected:) with 3 test cases passed after 0.014 seconds.\n\u2714 Test run with 332 tests in 29 suites passed after 0.169 seconds.",
+      "stderr": ""
+    },
+    {
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T06:10:43+00:00",
+      "endedAt": "2026-11-17T06:10:59+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u25c7 Test streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u2714 Test streamErrorReleasesEverything(error:expected:) with 3 test cases passed after 0.020 seconds.\n\u2714 Test run with 332 tests in 29 suites passed after 0.176 seconds.",
+      "stderr": ""
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Package.swift Apps/Linux/MacKVMClient/*.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxLifecycleMonitorTests.swift Tests/Integration/LinuxClientRuntimeTests.swift",
+      "startedAt": "2026-11-17T06:10:59+00:00",
+      "endedAt": "2026-11-17T06:11:00+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-17T06:11:00+00:00",
+      "endedAt": "2026-11-17T06:11:03+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-11-17T06:11:03+00:00",
+      "endedAt": "2026-11-17T06:11:04+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK",
+      "stderr": ""
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-11-17T06:11:04+00:00",
+      "endedAt": "2026-11-17T06:11:04+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK",
+      "stderr": ""
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-17T06:11:04+00:00",
+      "endedAt": "2026-11-17T06:11:04+00:00",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "stderr": ""
+    },
+    {
+      "command": "mkdir -p <producer-scratch>/m4-020-followup-001 && make verify REPORT=<producer-scratch>/m4-020-followup-001/verify.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T06:11:04+00:00",
+      "endedAt": "2026-11-17T06:16:40+00:00",
+      "exitCode": 0,
+      "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=151775\n[PASSED] swift-test-targets exit=0 durationMs=3118\n[PASSED] native-arm64-build exit=0 durationMs=1452\nCI report: <producer-scratch>/m4-020-followup-001/verify.json",
+      "stderr": ""
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T06:16:40+00:00",
+      "endedAt": "2026-11-17T06:16:59+00:00",
+      "exitCode": 0,
+      "stdout": "\n** BUILD SUCCEEDED **\n",
+      "stderr": ""
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"rm Apps/Linux/MacKVMClient/Client*.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift; echo 'print(1)' > Apps/Linux/MacKVMClient/main.swift; swift build --build-tests --scratch-path /scratch/red 2>&1 | grep -E 'error: cannot find' | sort -u | head -20; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:46:27+00:00",
+      "endedAt": "2026-11-17T07:46:43+00:00",
+      "exitCode": 1,
+      "stdout": "     |                                                                      `- error: cannot find type 'ClientExitCode' in scope\n     |                                              `- error: cannot find type 'ClientExitCode' in scope\n     |                                          `- error: cannot find type 'ClientConnector' in scope\n     |                                        `- error: cannot find type 'ClientOutput' in scope\n     |                                      `- error: cannot find type 'ClientLifecycle' in scope\n     |                                     `- error: cannot find type 'ClientExitCode' in scope\n     |                                     `- error: cannot find type 'ClientInjector' in scope\n     |                                     `- error: cannot find type 'ClientXlibSetup' in scope\n     |                              `- error: cannot find 'ClientServerAddress' in scope\n     |                            `- error: cannot find type 'ClientExitCode' in scope\n     |                           `- error: cannot find type 'ClientExitCode' in scope\n     |                           `- error: cannot find type 'ClientStatus' in scope\n     |                          `- error: cannot find type 'ClientExitCode' in scope\n     |                         `- error: cannot find 'ClientTrustObservation' in scope\n     |                       `- error: cannot find type 'ClientProcess' in scope\n     |                       `- error: cannot find type 'ClientXErrorHandlers' in scope\n     |                      `- error: cannot find 'ClientRuntimeSettings' in scope\n     |                     `- error: cannot find 'ClientBackendFactory' in scope\n     |                     `- error: cannot find 'ClientGeometryCache' in scope\n     |                     `- error: cannot find type 'ClientXErrorHandlers' in scope",
+      "stderr": "",
+      "note": "Review fix (PR #370): RED (expected failure): the new tests against the base without the implementation files; missing types."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift build --build-tests --scratch-path /scratch/g -Xswiftc -warnings-as-errors 2>&1 | tail -1; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:46:43+00:00",
+      "endedAt": "2026-11-17T07:47:18+00:00",
+      "exitCode": 0,
+      "stdout": "Build complete! (28.42s)",
+      "stderr": "",
+      "note": "Review fix (PR #370): Linux (native arm64 container): build with warnings as errors."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"timeout 300 swift test --skip-build --scratch-path /scratch/g --filter 'LinuxClient|LinuxLifecycle' 2>&1 | grep -E '\u2718|Test run with'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:47:18+00:00",
+      "endedAt": "2026-11-17T07:47:29+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 33 tests in 5 suites passed after 0.034 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370): GREEN: focused suites."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"for i in \\$(seq 1 20); do timeout 300 swift test --skip-build --scratch-path /scratch/g --filter 'LinuxClient|LinuxLifecycle' 2>&1 | grep -E '\u2718|Test run with' || exit 1; done\"",
+      "startedAt": "2026-11-17T07:47:29+00:00",
+      "endedAt": "2026-11-17T07:47:51+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 33 tests in 5 suites passed after 0.034 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.034 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.035 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.034 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.033 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.030 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.023 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.030 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.030 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.028 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.031 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.029 seconds.\n\u2714 Test run with 33 tests in 5 suites passed after 0.053 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370): Focused suites repeated 20 times (flakiness check)."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"mkdir -p /scratch/xunit && timeout 900 swift test --skip-build --scratch-path /scratch/g --xunit-output /scratch/xunit/swift-testing-xunit.xml 2>&1 | grep -E '\u2718|Test run with|Executed'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:47:51+00:00",
+      "endedAt": "2026-11-17T07:48:03+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 517 tests in 53 suites passed after 1.534 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370): Full root package on Linux; xUnit copied to evidence/issues/M4-020-FOLLOWUP-001/tests/."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"(Xvfb :9 -screen 0 1600x900x24 +extension RANDR >/dev/null 2>&1 &) ; sleep 1; DISPLAY=:9 MACKVM_X11_TESTS=1 timeout 900 swift test --skip-build --scratch-path /scratch/g 2>&1 | grep -E '\u2718|Test run with'; exit \\${PIPESTATUS[0]}\"",
+      "startedAt": "2026-11-17T07:48:03+00:00",
+      "endedAt": "2026-11-17T07:48:20+00:00",
+      "exitCode": 0,
+      "stdout": "\u2714 Test run with 517 tests in 53 suites passed after 6.375 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370): Full root package on Linux with Xvfb and MACKVM_X11_TESTS=1 (the X11 backends' tests run in the same process as the client tests)."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift test --package-path /work/Packages/KVMContracts --scratch-path /scratch/contracts 2>&1 | grep -E 'Test run with|Executed' | tail -2; swift test --package-path /work/Packages/BarrierCompatibility --scratch-path /scratch/barrier 2>&1 | grep -E 'Test run with|Executed' | tail -2\"",
+      "startedAt": "2026-11-17T07:48:20+00:00",
+      "endedAt": "2026-11-17T07:48:35+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 118 tests in 2 suites passed after 0.048 seconds.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\n\u2714 Test run with 374 tests in 15 suites passed after 7.765 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370): Child packages on Linux, as verify-linux runs them."
+    },
+    {
+      "command": "<producer-scratch>/dl.sh <repository> \"swift build --scratch-path /scratch/g >/dev/null 2>&1; timeout 200 bash /scratch/smoke.sh\"",
+      "startedAt": "2026-11-17T07:48:35+00:00",
+      "endedAt": "2026-11-17T07:49:13+00:00",
+      "exitCode": 0,
+      "stdout": "== usage\nexit=64\n== root refused\nexit=1\n== no display\nexit=69\n== TLS server (openssl s_server, self-signed P-256)\nopenssl fingerprint: 5A:BA:84:CE:34:1A:08:51:B0:D4:C7:0B:84:EB:1C:E6:40:42:8E:CA:80:F3:9C:27:13:63:D7:E0:96:91:00:32\n== fingerprint show\nexit=0\nshow matches openssl\n== connect, unknown identity, non-interactive\nexit=78\nlines naming the host: 0\ninstructions present\ntrust file not written\n== trust and connect (TLS accepted; s_server speaks no Barrier, so the handshake times out and the client backs off); SIGTERM ends it\ntrusted\nexit=0\nexit after SIGTERM=0\n[07:48:56.361] starting\n[07:48:56.362] connecting to the server\n[07:48:56.382] released held input: completed\n[07:48:56.382] connection ended (transport.disconnected)\n[07:48:56.383] reconnecting in 1 s\n[07:48:57.389] connecting to the server\n[07:48:57.416] released held input: completed\n[07:48:57.416] connection ended (transport.disconnected)\n[07:48:57.416] reconnecting in 2 s\n[07:48:59.420] connecting to the server\n[07:48:59.444] released held input: completed\n[07:48:59.444] connection ended (transport.disconnected)\n[07:48:59.444] reconnecting in 4 s\n[07:49:03.448] connecting to the server\n[07:49:03.473] released held input: completed\n[07:49:03.473] connection ended (transport.disconnected)\n[07:49:03.473] reconnecting in 8 s\n[07:49:10.356] stopping on signal 15\n== display loss: kill Xvfb under a running client\nexit after display loss=69\n[07:49:11.430] connection ended (transport.refused)\n[07:49:11.430] reconnecting in 2 s\n[07:49:13.368] the X display was lost; exiting",
+      "stderr": "usage: mackvm-client connect <host>[:port] --name <screen-name> [--display <:n>]\n                             [--non-interactive]\n       mackvm-client fingerprint show <host>[:port]\n       mackvm-client fingerprint trust <host>[:port] <sha256>\n       mackvm-client fingerprint forget <host>[:port]\nThe default port is 24800. The screen name is 1 to 64 of [A-Za-z0-9_-] and must equal\nthe Mac's --client. <sha256> is AA:BB:... or 64 hex digits. Running as root is not\nsupported.\nmackvm-client does not run as root: the trust store accepts only the running user's files.\nno X11 display: set DISPLAY or pass --display (Wayland is not supported)",
+      "note": "Review fix (PR #370): Real-binary smoke: usage 64, root refused, no display 69, fingerprint show against openssl s_server equals openssl's SHA-256, unknown identity non-interactive exits 78 with no host and no trust file, trust then connect over real TLS, SIGTERM exits 0, killing Xvfb exits 69."
+    },
+    {
+      "command": "timeout 900 swift test 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T07:49:18+00:00",
+      "endedAt": "2026-11-17T07:49:20+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds\n\u25c7 Test streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u2714 Test streamErrorReleasesEverything(error:expected:) with 3 test cases passed after 0.016 seconds.\n\u2714 Test run with 332 tests in 29 suites passed after 0.177 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "timeout 900 swift test -Xswiftc -warnings-as-errors 2>&1 | grep -E 'Test run with|Executed|error:'; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T07:49:20+00:00",
+      "endedAt": "2026-11-17T07:49:35+00:00",
+      "exitCode": 0,
+      "stdout": "\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n\u25c7 Test streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.transport(KVMContracts.TransportErrorCode.reset), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.protocolViolation(KVMContracts.ProtocolErrorCode.malformed), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u25c7 Test case passing 2 arguments error \u2192 CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil), expected \u2192 .failure(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.timeout(KVMContracts.TimeoutErrorCode.keepalive), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.backoff, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil)) to streamErrorReleasesEverything(error:expected:) started.\n\u2714 Test streamErrorReleasesEverything(error:expected:) with 3 test cases passed after 0.018 seconds.\n\u2714 Test run with 332 tests in 29 suites passed after 0.172 seconds.",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "swift format lint --strict --no-color-diagnostics Package.swift Apps/Linux/MacKVMClient/*.swift Packages/LinuxPlatform/Sources/LinuxPlatform/LinuxLifecycleMonitor.swift Packages/LinuxPlatform/Tests/LinuxPlatformTests/LinuxLifecycleMonitorTests.swift Tests/Integration/LinuxClientRuntimeTests.swift",
+      "startedAt": "2026-11-17T07:49:35+00:00",
+      "endedAt": "2026-11-17T07:49:35+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "swift format lint --recursive --strict --no-color-diagnostics Package.swift Apps Packages Tests reference",
+      "startedAt": "2026-11-17T07:49:35+00:00",
+      "endedAt": "2026-11-17T07:49:39+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "make docs-check",
+      "startedAt": "2026-11-17T07:49:39+00:00",
+      "endedAt": "2026-11-17T07:49:39+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "make architecture-check",
+      "startedAt": "2026-11-17T07:49:39+00:00",
+      "endedAt": "2026-11-17T07:49:40+00:00",
+      "exitCode": 0,
+      "stdout": "python3 Tools/architecture-check/architecture-check.py --repository-root .\narchitecture check OK",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "startedAt": "2026-11-17T07:49:40+00:00",
+      "endedAt": "2026-11-17T07:49:40+00:00",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "mkdir -p <producer-scratch>/m4-020-followup-001 && make verify REPORT=<producer-scratch>/m4-020-followup-001/verify.json 2>&1 | tail -4; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T07:49:40+00:00",
+      "endedAt": "2026-11-17T07:51:42+00:00",
+      "exitCode": 0,
+      "stdout": "[PASSED] repository-contract-tests exit=0 durationMs=86037\n[PASSED] swift-test-targets exit=0 durationMs=1190\n[PASSED] native-arm64-build exit=0 durationMs=1280\nCI report: <producer-scratch>/m4-020-followup-001/verify.json",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "xcodebuild -workspace MacKVM.xcworkspace -scheme MacKVM -destination platform=macOS build 2>&1 | tail -3; exit ${PIPESTATUS[0]}",
+      "startedAt": "2026-11-17T07:51:42+00:00",
+      "endedAt": "2026-11-17T07:51:46+00:00",
+      "exitCode": 0,
+      "stdout": "\n** BUILD SUCCEEDED **\n",
+      "stderr": "",
+      "note": "Review fix (PR #370):"
+    },
+    {
+      "command": "make dist-linux",
+      "startedAt": "2026-11-17",
+      "endedAt": "2026-11-17",
+      "exitCode": 0,
+      "stdout": "Build of product 'mackvm-client' complete! (504.03s)\n54d6c22d4a621589f4b9cdc96c59130d5bb8838f13be84aa2591858cefabc5df  mackvm-client\na10aea88a2556c4bab56dead9a0486c89c0694bb36c41bfcb57072a89e6a58fa  mackvm-client.service\ndist-linux OK\ndist exit=0",
+      "stderr": "",
+      "note": "linux/amd64 pinned image, release, --static-swift-stdlib"
+    }
+  ]
+}
