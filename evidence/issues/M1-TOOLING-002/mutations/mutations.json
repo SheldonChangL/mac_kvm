@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "issue": "M1-TOOLING-002",
+  "date": "2026-11-17T03:01:34Z",
+  "command": "python3 -I -m unittest discover -s Tools/Evidence/tests",
+  "baselineExitCode": 0,
+  "mutants": [
+    {
+      "id": "1",
+      "file": "Tools/Evidence/run_e2e.py",
+      "requirement": "runner accepts FOLLOWUP ids",
+      "description": "runner ISSUE_PATTERN loses the FOLLOWUP group",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_followup_script_is_resolved_and_run (test_run_e2e.FollowupIssueTests)",
+        "test_issue_pattern_accepts_and_rejects (test_run_e2e.FollowupIssueTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "2",
+      "file": "Tools/Evidence/run_e2e.py",
+      "requirement": "two suffixes rejected",
+      "description": "runner ISSUE_PATTERN allows repeated suffixes",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_issue_pattern_accepts_and_rejects (test_run_e2e.FollowupIssueTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "3",
+      "file": "Tools/Evidence/run_e2e.py",
+      "requirement": "FOLLOWUP without digits rejected",
+      "description": "runner ISSUE_PATTERN accepts zero digits",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_issue_pattern_accepts_and_rejects (test_run_e2e.FollowupIssueTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "4",
+      "file": "Tools/Evidence/run_e2e.py",
+      "requirement": "lower case rejected",
+      "description": "runner ISSUE_PATTERN is case-insensitive",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_invalid_issue_is_rejected_before_path_resolution (test_run_e2e.IssueValidationTests)",
+        "test_issue_pattern_accepts_and_rejects (test_run_e2e.FollowupIssueTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "6",
+      "file": "Tools/Evidence/run_e2e.py",
+      "requirement": "base id does not claim FOLLOWUP scripts",
+      "description": "resolve_script no longer excludes FOLLOWUP scripts for a base id",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_base_issue_does_not_resolve_followup_script (test_run_e2e.FollowupIssueTests)",
+        "test_base_issue_resolves_only_its_own_script_beside_followup (test_run_e2e.FollowupIssueTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "7",
+      "file": "Tools/Evidence/validate_evidence.py",
+      "requirement": "validator accepts FOLLOWUP ids",
+      "description": "validator ISSUE_PATTERN loses the FOLLOWUP group",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_followup_artifact_path_for_wrong_issue_is_mismatch (test_validate_evidence.TopLevelFieldTests)",
+        "test_followup_issue_end_to_end_with_artifact (test_validate_evidence.TopLevelFieldTests)",
+        "test_followup_issue_id_accepted (test_validate_evidence.TopLevelFieldTests)",
+        "test_followup_script_is_resolved_and_run (test_run_e2e.FollowupIssueTests)",
+        "test_schema_patterns_match_validator (test_validate_evidence.SchemaContractTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "8",
+      "file": "Tools/Evidence/validate_evidence.py",
+      "requirement": "two suffixes rejected",
+      "description": "validator ISSUE_PATTERN allows repeated suffixes",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_followup_issue_id_rejected_forms (test_validate_evidence.TopLevelFieldTests)",
+        "test_schema_patterns_match_validator (test_validate_evidence.SchemaContractTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "9",
+      "file": "Tools/Evidence/validate_evidence.py",
+      "requirement": "FOLLOWUP without digits rejected",
+      "description": "validator ISSUE_PATTERN accepts zero digits",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_followup_issue_id_rejected_forms (test_validate_evidence.TopLevelFieldTests)",
+        "test_schema_patterns_match_validator (test_validate_evidence.SchemaContractTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "10",
+      "file": "Tools/Evidence/validate_evidence.py",
+      "requirement": "artifact path accepts FOLLOWUP directory",
+      "description": "validator ARTIFACT_PATH_PATTERN loses the FOLLOWUP group",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_followup_artifact_path_for_wrong_issue_is_mismatch (test_validate_evidence.TopLevelFieldTests)",
+        "test_followup_issue_end_to_end_with_artifact (test_validate_evidence.TopLevelFieldTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "11",
+      "file": "Tools/Evidence/validate_evidence.py",
+      "requirement": "artifact path rejects two suffixes",
+      "description": "validator ARTIFACT_PATH_PATTERN allows repeated suffixes",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_artifact_path_rejects_malformed_followup_directory (test_validate_evidence.TopLevelFieldTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "12",
+      "file": "MacKVM_Implementation_Package_v2/schemas/e2e-result.schema.json",
+      "requirement": "schema issueId accepts FOLLOWUP ids",
+      "description": "schema issueId pattern loses the FOLLOWUP group",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_schema_accepts_and_rejects_followup_ids (test_validate_evidence.SchemaContractTests)",
+        "test_schema_patterns_match_validator (test_validate_evidence.SchemaContractTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    },
+    {
+      "id": "13",
+      "file": "MacKVM_Implementation_Package_v2/schemas/e2e-result.schema.json",
+      "requirement": "schema artifact path accepts FOLLOWUP directory",
+      "description": "schema artifact path pattern loses the FOLLOWUP group",
+      "applied": true,
+      "exitCode": 1,
+      "killingTests": [
+        "test_schema_accepts_and_rejects_followup_ids (test_validate_evidence.SchemaContractTests)"
+      ],
+      "killed": true,
+      "restoredClean": true
+    }
+  ],
+  "allKilled": true
+}
