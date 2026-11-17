@@ -78,13 +78,6 @@
    "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
   },
   {
-   "name": "e2e-rerun",
-   "command": "MACKVM_E2E_CONTAINER=<c> MACKVM_E2E_PORT=24811 bash <PR #371 script>",
-   "exitCode": null,
-   "stdout": "",
-   "note": "NOT COMPLETED: stopped after about 52 min while the client was still building in the container (the Docker VM was heavily throttled). No case ran. clipboard-large-to-client is unverified on this build."
-  },
-  {
    "name": "review-notes-linux-focused",
    "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors && swift test --filter 'LinuxTLSTransport|LinuxClient'",
    "exitCode": 0,
@@ -96,6 +89,15 @@
    "command": "swift test; make docs-check; python3 Tools/Backlog/validate_package.py",
    "exitCode": 0,
    "stdout": "✔ Test run with 332 tests in 29 suites passed\ndocs check OK\nPACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
+  },
+  {
+   "name": "e2e-rerun",
+   "command": "timeout 2400 env MACKVM_E2E_CONTAINER=<arm64 swift:6.2.3-jammy container> MACKVM_E2E_PORT=24811 bash <PR #371 Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-client-e2-e.sh> (Xvfb :93, Mac smoke server loopback-only)",
+   "sourceCommit": "656ef69",
+   "exitCode": 0,
+   "stdout": "... 17 earlier cases pass (incl. clipboard-large-from-client, keepalive-13s) ...\nM4-036 e2e: clipboard-large-to-client=fail\nM4-036 e2e: quit-while-remote=pass\nM4-036 e2e: auto-reconnect=pass\nM4-036 e2e: x-events=pass\nM4-036 e2e: automated=1 failed of 22\nM4-036 e2e: owner-hardware-half=pending\n",
+   "logExcerpt": "server: [t+0.0] input is now remote / clipboard sent to the client (600 KB) ... [t+6.4] input is local again\nclient-2: [t+0.0] input is on this screen ... [t+6.4] input left this screen (no 'connection ended' and no resourceExhausted until the scripted quit)",
+   "note": "clipboard-large-to-client still FAILS, with a different symptom than PR #371. The session is kept: the client log has no resourceExhausted and no connection end during the case, so the #372 transport defect does not reproduce. But xclip on the client display did not return the 600 KB text's SHA-256 within the script's 3 s window. Root cause not diagnosed (candidates: the X11 clipboard write/INCR serving of 600 KB under Xvfb, or the 3 s window). The host clock jumped during the run (log gaps of about 17 min), so the timings are unreliable. Raw logs not committed."
   }
  ]
 }
