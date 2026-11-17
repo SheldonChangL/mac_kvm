@@ -81,7 +81,7 @@ ARTIFACT_KINDS = frozenset(
 )
 REVIEW_STATUSES = frozenset({"reviewed", "pending-review"})
 
-ISSUE_PATTERN = re.compile(r"M[1-5]-[0-9]{3}")
+ISSUE_PATTERN = re.compile(r"M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?")
 COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
 TIMESTAMP_PATTERN = re.compile(
@@ -92,7 +92,7 @@ METADATA_TEXT_PATTERN = re.compile(r"[!-~](?:[ -~]{0,126}[!-~])?")
 DESCRIPTION_PATTERN = re.compile(r"[!-~](?:[ -~]{0,198}[!-~])?")
 DECISION_REF_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._#/-]{0,159}")
 ARTIFACT_PATH_PATTERN = re.compile(
-    r"(?:evidence/e2e/M[1-5]-[0-9]{3}|Tests/Fixtures)"
+    r"(?:evidence/e2e/M[1-5]-[0-9]{3}(?:-FOLLOWUP-[0-9]{3})?|Tests/Fixtures)"
     r"(?:/[A-Za-z0-9_-][A-Za-z0-9._-]{0,127})+"
 )
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="31" failures="0" skipped="0" time="0.14483275">
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="injectFailureFailsClosed()" time="0.00098575" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="runTerminatesWithTheInjectionFailureTrigger()" time="0.002519625" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="inboundClipboardPassesTheLoopGuardBeforeItIsApplied()" time="0.001082416" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="localClipboardWhileInactiveIsNotSent()" time="0.001007833" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="newGenerationStartsOnlyAfterTheOldCleanup()" time="0.001923" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="clipboardApplyFailureIsCountedAndTheSessionGoesOn()" time="0.001068625" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="randomStreamsCutAtRandomPointsKeepTheInvariants()" time="0.144285916" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="leaveForAnotherScreenChangesNothing()" time="0.001244" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="failedLeaveReleaseFailsClosedAndCleanupReleases()" time="0.001918125" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="duplicateDownIsDropped()" time="0.001449875" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="beginSessionWaitsForAnInFlightCleanup()" time="0.001755125" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="repeatOfAHeldKeyIsInjected()" time="0.001081375" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="leaveReleasesInPlanOrderThenResetsAndBecomesInactive()" time="0.001161584" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="localClipboardEchoOfAppliedPayloadIsRejected()" time="0.001048167" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="sweepReleasesWhatTheQueueResetDropped()" time="0.002452" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="oldGenerationStreamCannotInjectIntoTheNewSession()" time="0.0016" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="unpairedRepeatIsNeverInjected()" time="0.001176875" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="streamEndReleasesEverything()" time="0.001883417" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="runStopsReadingOnceItsGenerationIsClosed()" time="0.001677542" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="oversizedInboundClipboardIsRejected()" time="0.001098834" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="enterMovesThePointerFirstThenBecomesActive()" time="0.001082375" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="pointerMovesAndScrollsAreInjected()" time="0.001056167" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="terminateReleasesEverything(trigger:)" time="0.002640459" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="enterForAnotherScreenIsDroppedAndCounted()" time="0.00118825" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="cancelledRunTerminatesAsCancelled()" time="0.002010833" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="unheldReleaseIsInjectedButNotRecorded()" time="0.001225" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="streamErrorReleasesEverything(error:expected:)" time="0.002681167" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="pointerMoveFailureFailsClosed()" time="0.001988791" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="concurrentTerminatesRunOneCleanup()" time="0.001490042" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="inputWhileInactiveIsDroppedAndCounted()" time="0.001061375" />
+    <testcase classname="KVMCoreTests.ClientCoordinatorTests" name="diagnosticsHoldNoIdentifiers()" time="0.001819542" />
+  </testsuite>
+</testsuites>
