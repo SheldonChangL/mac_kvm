@@ -170,6 +170,14 @@ let package = Package(
   // The Linux runtime test (Tests/Integration/LinuxClientRuntimeTests.swift) drives the app's
   // composition root, so on Linux the integration target depends on it too.
   for target in package.targets where target.name == "MacKVMIntegrationTests" {
-    target.dependencies += ["MacKVMClient", "LinuxPlatform"]
+    target.dependencies += [
+      "MacKVMClient", "LinuxPlatform",
+      // M1-055-FOLLOWUP-002: an in-process TLS server for the runtime over LinuxTLSTransport.
+      .product(name: "NIOCore", package: "swift-nio"),
+      .product(name: "NIOPosix", package: "swift-nio"),
+      .product(name: "NIOSSL", package: "swift-nio-ssl"),
+      .product(name: "NIOTLS", package: "swift-nio"),
+      .product(name: "Crypto", package: "swift-crypto"),
+    ]
   }
 #endif

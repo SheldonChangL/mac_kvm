@@ -1,12 +1,17 @@
 #if os(Linux)
   import BarrierCompatibility
   import CX11
+  import Crypto
   import Foundation
   import Glibc
   import KVMContracts
   import KVMCore
   import LinuxPlatform
   @testable import MacKVMClient
+  import NIOCore
+  import NIOPosix
+  import NIOSSL
+  import NIOTLS
   import Testing
 
   // M4-020-FOLLOWUP-001: the Linux client app. The parser matrix and exit codes; the composition
@@ -1254,6 +1259,202 @@
         ])
       #expect(sections["Install"] == ["WantedBy": "graphical-session.target"])
       #expect(text.contains("not supported as root") || text.contains("never as root"))
+    }
+  }
+
+  // MARK: - M1-055-FOLLOWUP-002: real TLS transport
+
+  /// The server end of an accepted NIOSSL child channel as a `Transport`, for the in-process
+  /// Barrier server. Test-only: its inbound stream is unbounded because the client side under
+  /// test sends only small messages.
+  private final class ChannelEnd: Transport, @unchecked Sendable {
+    let incomingBytes: AsyncThrowingStream<Data, any Error>
+    let inbox: AsyncThrowingStream<Data, any Error>.Continuation
+    let channel: any Channel
+
+    init(channel: any Channel) {
+      self.channel = channel
+      (incomingBytes, inbox) = AsyncThrowingStream<Data, any Error>.makeStream()
+    }
+
+    func connect() async throws(CoreError) {}
+
+    func send(_ data: Data) async throws(CoreError) {
+      guard !data.isEmpty else { return }
+      // Not awaited, as a completion-based server send is not: a large clipboard reaches the
+      // socket as fast as the loopback takes it.
+      channel.writeAndFlush(ByteBuffer(bytes: data), promise: nil)
+    }
+
+    func disconnect() async {
+      inbox.finish()
+      try? await channel.close()
+    }
+  }
+
+  private final class ChannelEndHandler: ChannelInboundHandler, @unchecked Sendable {
+    typealias InboundIn = ByteBuffer
+    let end: ChannelEnd
+    let ready: @Sendable (ChannelEnd) -> Void
+
+    init(end: ChannelEnd, ready: @escaping @Sendable (ChannelEnd) -> Void) {
+      self.end = end
+      self.ready = ready
+    }
+
+    func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {
+      if case .handshakeCompleted = event as? TLSUserEvent { ready(end) }
+      context.fireUserInboundEventTriggered(event)
+    }
+
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+      end.inbox.yield(Data(unwrapInboundIn(data).readableBytesView))
+    }
+
+    func channelInactive(context: ChannelHandlerContext) {
+      end.inbox.finish()
+      context.fireChannelInactive()
+    }
+
+    func errorCaught(context: ChannelHandlerContext, error: any Error) {
+      context.close(promise: nil)
+    }
+  }
+
+  /// One Barrier server connection over TLS.
+  private final class TLSServerSide: @unchecked Sendable {
+    let barrier: BarrierServerProtocolSession
+    let session: ServerSession
+    let started: Task<Bool, Never>
+
+    init(barrier: BarrierServerProtocolSession) {
+      self.barrier = barrier
+      let session = ServerSession(id: SessionID(), screen: ScreenID(), protocolSession: barrier)
+      self.session = session
+      started = Task {
+        do {
+          try await session.start()
+        } catch {
+          return false
+        }
+        Task { _ = await session.monitorPeer { _ in } }
+        return true
+      }
+    }
+  }
+
+  /// An in-process NIOSSL server on 127.0.0.1 with an ephemeral `openssl` identity, running a
+  /// first-party `BarrierServerProtocolSession` on each accepted connection.
+  private struct TLSBarrierServer {
+    let channel: any Channel
+    let servers: Recorder<TLSServerSide>
+    let leafPin: Data
+    var port: UInt16 { UInt16(channel.localAddress!.port!) }
+
+    static func start(group: any EventLoopGroup) async throws -> TLSBarrierServer {
+      let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("m1-055-followup-002-\(UUID().uuidString)")
+      try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+      defer { try? FileManager.default.removeItem(at: directory) }
+      let process = Process()
+      process.executableURL = URL(fileURLWithPath: "/usr/bin/openssl")
+      process.arguments = [
+        "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1", "-nodes",
+        "-keyout", "key.pem", "-out", "cert.pem", "-days", "1", "-subj", "/CN=m1-055-f2-test",
+      ]
+      process.currentDirectoryURL = directory
+      process.standardOutput = FileHandle.nullDevice
+      process.standardError = FileHandle.nullDevice
+      try process.run()
+      process.waitUntilExit()
+      guard process.terminationStatus == 0 else { throw CocoaError(.fileWriteUnknown) }
+      let chain = try NIOSSLCertificate.fromPEMFile(
+        directory.appendingPathComponent("cert.pem").path)
+      let key = try NIOSSLPrivateKey(
+        file: directory.appendingPathComponent("key.pem").path, format: .pem)
+      let leafPin = Data(SHA256.hash(data: try chain[0].toDERBytes()))
+      let context = try NIOSSLContext(
+        configuration: TLSConfiguration.makeServerConfiguration(
+          certificateChain: chain.map { .certificate($0) }, privateKey: .privateKey(key)))
+      let servers = Recorder<TLSServerSide>()
+      let channel = try await ServerBootstrap(group: group)
+        .serverChannelOption(.socketOption(.so_reuseaddr), value: 1)
+        .childChannelInitializer { channel in
+          channel.eventLoop.makeCompletedFuture {
+            let end = ChannelEnd(channel: channel)
+            try channel.pipeline.syncOperations.addHandler(NIOSSLServerHandler(context: context))
+            try channel.pipeline.syncOperations.addHandler(
+              ChannelEndHandler(end: end) { end in
+                let barrier = BarrierServerProtocolSession(
+                  transport: end, expectedScreenNames: [screenName], clock: ManualClock(),
+                  handshakeTimeout: .seconds(30))!
+                servers.append(TLSServerSide(barrier: barrier))
+              })
+          }
+        }
+        .bind(host: "127.0.0.1", port: 0).get()
+      return TLSBarrierServer(channel: channel, servers: servers, leafPin: leafPin)
+    }
+  }
+
+  /// The production connector, counting the transports it makes: one per connection attempt.
+  private final class CountingConnector: ClientConnector, @unchecked Sendable {
+    let inner: ClientTLSConnector
+    let made = Recorder<Bool>()
+    init(inner: ClientTLSConnector) { self.inner = inner }
+    func makeTransport(evaluator: @escaping @Sendable (Data) -> LinuxTLSTrustDecision)
+      -> any Transport
+    {
+      made.append(true)
+      return inner.makeTransport(evaluator: evaluator)
+    }
+  }
+
+  @Suite(
+    "M1-055-FOLLOWUP-002 Linux client runtime over LinuxTLSTransport", .serialized,
+    .timeLimit(.minutes(1)))
+  struct LinuxClientTLSLargeClipboardTests {
+    @Test("a 600 KB server clipboard on enter reaches the local clipboard with no reconnect")
+    func largeClipboardOnEnter() async throws {
+      let group = MultiThreadedEventLoopGroup.singleton
+      let tlsServer = try await TLSBarrierServer.start(group: group)
+      let address = try #require(ClientServerAddress("127.0.0.1:\(tlsServer.port)"))
+      let connector = CountingConnector(
+        inner: ClientTLSConnector(server: address, group: group))
+      let clipboard = FakeClipboard()
+      let lifecycle = FakeLifecycle()
+      let output = RecordingOutput()
+      var settings = ClientRuntimeSettings(
+        server: address, screenName: screenName, interactive: false)
+      settings.clock = ManualClock()
+      let runtime = ClientRuntime(
+        settings: settings,
+        backends: ClientBackends(
+          injector: FakeInjector(), screen: FakeScreen(), clipboard: clipboard,
+          lifecycle: lifecycle, geometry: ClientGeometryCache(testGeometry)),
+        connector: connector,
+        trustStore: FakeStore([address.peerKey: tlsServer.leafPin]),
+        output: output, prompt: { nil })
+      let run = Task { await runtime.run() }
+
+      await tlsServer.servers.wait { !$0.isEmpty }
+      let server = try #require(tlsServer.servers.all.first)
+      #expect(await server.started.value)
+      await runtime.manager.waitForState { $0 == .connected }
+
+      // 600 KB of text below the 1 MiB clipboard limit, sent on enter as the Mac server does.
+      let text = String(
+        (0..<600_000).map { Character(UnicodeScalar(UInt8(0x61 + $0 % 26))) })
+      try await server.session.enter(at: NormalizedPoint(x: 0.5, y: 0.5))
+      try await server.session.forward(.clipboard(clipboardPayload(text)))
+      await clipboard.writes.wait { $0.contains(text) }
+      #expect(clipboard.writes.all.contains(text))
+      #expect(connector.made.all.count == 1)
+      #expect(!output.text.contains("resourceExhausted"))
+
+      runtime.requestTermination(signal: SIGTERM)
+      #expect(await finished(run) == .success)
+      try? await tlsServer.channel.close()
     }
   }
 #endif

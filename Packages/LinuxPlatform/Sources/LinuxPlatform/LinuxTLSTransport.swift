@@ -41,6 +41,24 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
 /// application byte is ever sent to an unaccepted peer. The minimum protocol
 /// version is TLS 1.2 and `TCP_NODELAY` is set.
 ///
+/// Inbound flow control (M1-055-FOLLOWUP-002): `incomingBytes` is pull-driven.
+/// Decrypted bytes wait in a byte-counted queue; once it holds
+/// `inboundHighWaterBytes` the channel stops issuing socket reads (the read
+/// event is held, so TCP flow control pushes back on the peer), and reading
+/// resumes when the consumer drains it below `inboundLowWaterBytes`. The gate
+/// cannot stop a read event already under way (NIO's `maxMessagesPerRead`, 4 by
+/// default, of up to 64 KiB each) nor reads NIOSSL issues itself, so the queue
+/// can pass the high-water mark by a few hundred KiB (tests pin it under
+/// high water + 512 KiB); `maximumBufferedBytes` is a hard ceiling that ends
+/// the stream with `resourceExhausted` rather than grow without bound. The
+/// ceiling counts payload bytes only, not per-chunk overhead.
+///
+/// Leaving the `for try await` loop over `incomingBytes` without cancelling
+/// does not end the lifecycle: the connection stays open with reads paused
+/// once the queue fills, until `disconnect()`. Only cancelling the consuming
+/// task ends it. The transport has no read timeout; a silent peer is bounded
+/// by the client protocol session's keepalive timeout.
+///
 /// State lives behind one `NSLock`, which is why the class is
 /// `@unchecked Sendable`. No closure, continuation, channel call, stream yield
 /// or finish runs while the lock is held. The event loop group is borrowed and
@@ -50,11 +68,19 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
 /// TLS diagnostic. The presented fingerprint is kept only after a rejection,
 /// for the command line to display.
 package final class LinuxTLSTransport: Transport, @unchecked Sendable {
-  /// Maximum number of chunks buffered for a slow consumer.
-  package static let incomingChunkBufferLimit = 16
+  /// Queued bytes at which socket reads pause until the consumer catches up.
+  package static let inboundHighWaterBytes = 256 * 1024
+
+  /// Queued bytes below which paused socket reads resume.
+  package static let inboundLowWaterBytes = 64 * 1024
+
+  /// Hard ceiling on queued bytes. Reaching it ends the stream with
+  /// `resourceExhausted`; with reads paused at the high-water mark, an honest
+  /// peer cannot reach it (one socket read is far smaller than the margin).
+  package static let maximumBufferedBytes = 1024 * 1024
 
   /// Maximum size of one yielded chunk. A NIOSSL read can carry several TLS
-  /// records, so larger reads are split; the buffer holds at most 256 KiB.
+  /// records, so larger reads are split.
   package static let maximumChunkLength = 16_384
 
   /// Maximum number of certificates accepted in a presented chain.
@@ -75,7 +101,7 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
     case failed(CoreError)
   }
 
-  private enum Ending {
+  private enum Ending: Sendable {
     case finished
     case failed(CoreError)
     /// The single consumer already ended the stream.
@@ -97,12 +123,23 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
     var timeout: Scheduled<Void>?
     var verification: Verification = .notAsked
     var presentedFingerprint: Data?
+    /// Decrypted chunks the consumer has not taken yet, and their total size.
+    var queue = CircularBuffer<Data>()
+    var queuedBytes = 0
+    var peakQueuedBytes = 0
+    /// Set while socket reads are held back for the consumer.
+    var readsPaused = false
+    var inbound: InboundHandler?
+    /// The single consumer, waiting for a chunk or the end.
+    var consumerWaiter: CheckedContinuation<Data?, any Error>?
+    /// How the stream ends once the queue is drained; delivered once.
+    var ending: Ending?
+    var endingDelivered = false
   }
 
   private let request: LinuxTLSConnectionRequest
   private let group: any EventLoopGroup
   private let trustEvaluator: @Sendable (Data) -> LinuxTLSTrustDecision
-  private let continuation: AsyncThrowingStream<Data, any Error>.Continuation
   private let lock = NSLock()
   private var state = State()
 
@@ -115,17 +152,16 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
     self.request = request
     self.group = group
     self.trustEvaluator = trustEvaluator
-    let (stream, continuation) = AsyncThrowingStream.makeStream(
-      of: Data.self,
-      throwing: (any Error).self,
-      bufferingPolicy: .bufferingOldest(Self.incomingChunkBufferLimit)
-    )
-    incomingBytes = stream
-    self.continuation = continuation
-    continuation.onTermination = { [weak self] termination in
-      if case .cancelled = termination { self?.terminate(.consumerGone) }
-    }
+    let source = PullSource()
+    incomingBytes = AsyncThrowingStream(unfolding: { try await source.transport?.nextChunk() })
+    source.transport = self
   }
+
+  /// Bytes queued for the consumer now. Read by tests; never needed by callers.
+  package var bufferedByteCount: Int { lock.withLock { state.queuedBytes } }
+
+  /// The most bytes ever queued at once. Read by tests; never needed by callers.
+  package var peakBufferedByteCount: Int { lock.withLock { state.peakQueuedBytes } }
 
   /// The leaf fingerprint the server presented, set only when the evaluator
   /// rejected it. Read by the command line to display; never logged.
@@ -265,7 +301,9 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
               promise.succeed(self.verifyPeer(certificates) ? .certificateVerified : .failed)
             })
           try channel.pipeline.syncOperations.addHandler(handler)
-          try channel.pipeline.syncOperations.addHandler(InboundHandler(transport: self))
+          let inbound = InboundHandler(transport: self)
+          self.lock.withLock { self.state.inbound = inbound }
+          try channel.pipeline.syncOperations.addHandler(inbound)
         }
       }
 
@@ -388,27 +426,161 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
     resolveConnect(.ready)
   }
 
+  /// Queues decrypted bytes for the consumer, split into chunks of at most
+  /// `maximumChunkLength`, and hands the first one to a waiting consumer.
+  /// Runs on the channel's event loop.
   fileprivate func received(_ data: Data) {
-    let open: Bool = lock.withLock {
-      if case .connected = state.phase { return true }
-      return false
+    guard !data.isEmpty else { return }
+    enum Outcome {
+      case ignored
+      case queued(CheckedContinuation<Data?, any Error>?, Data?)
+      case exhausted
     }
-    guard open, !data.isEmpty else { return }
-    var offset = data.startIndex
-    while offset < data.endIndex {
-      let end =
-        data.index(offset, offsetBy: Self.maximumChunkLength, limitedBy: data.endIndex)
-        ?? data.endIndex
-      let result = continuation.yield(data.subdata(in: offset..<end))
-      offset = end
-      if case .enqueued = result { continue }
-      if case .terminated = result {
-        terminate(.consumerGone)
-        return
+    let outcome: Outcome = lock.withLock {
+      guard case .connected = state.phase else { return .ignored }
+      guard state.queuedBytes + data.count <= Self.maximumBufferedBytes else { return .exhausted }
+      var offset = data.startIndex
+      while offset < data.endIndex {
+        let end =
+          data.index(offset, offsetBy: Self.maximumChunkLength, limitedBy: data.endIndex)
+          ?? data.endIndex
+        state.queue.append(data.subdata(in: offset..<end))
+        offset = end
       }
-      // `.dropped`: the finite buffer is full. Buffered chunks stay in order.
-      terminate(.failed(Self.resourceExhaustedFailure))
+      state.queuedBytes += data.count
+      state.peakQueuedBytes = max(state.peakQueuedBytes, state.queuedBytes)
+      var handed: Data?
+      let waiter = state.consumerWaiter
+      if waiter != nil {
+        state.consumerWaiter = nil
+        handed = Self.dequeue(&state)
+      }
+      if state.queuedBytes >= Self.inboundHighWaterBytes { state.readsPaused = true }
+      return .queued(waiter, handed)
+    }
+    switch outcome {
+    case .ignored:
       return
+    case .exhausted:
+      terminate(.failed(Self.resourceExhaustedFailure))
+    case .queued(let waiter, let chunk):
+      waiter?.resume(returning: chunk)
+    }
+  }
+
+  /// Whether the channel should hold back its next socket read.
+  fileprivate var readsPaused: Bool {
+    lock.withLock { state.readsPaused }
+  }
+
+  /// Takes the oldest chunk off the queue. Called with the lock held.
+  private static func dequeue(_ state: inout State) -> Data? {
+    guard let chunk = state.queue.popFirst() else { return nil }
+    state.queuedBytes -= chunk.count
+    return chunk
+  }
+
+  /// Resumes held reads once the queue is below the low-water mark. Called
+  /// with the lock held; returns the handler and channel to resume, if any.
+  private static func resumption(
+    _ state: inout State
+  ) -> (InboundHandler, any Channel)? {
+    guard state.readsPaused, state.queuedBytes < Self.inboundLowWaterBytes,
+      let inbound = state.inbound, let channel = state.channel
+    else { return nil }
+    state.readsPaused = false
+    return (inbound, channel)
+  }
+
+  /// The pull behind `incomingBytes`: the next chunk, or the end once the
+  /// queue is drained. A second concurrent consumer is refused.
+  fileprivate func nextChunk() async throws -> Data? {
+    enum Step {
+      case chunk(Data, (InboundHandler, any Channel)?)
+      case end(Ending?)
+      case wait
+      case misuse
+    }
+    let step: Step = lock.withLock {
+      if let chunk = Self.dequeue(&state) { return .chunk(chunk, Self.resumption(&state)) }
+      if let ending = state.ending {
+        if state.endingDelivered { return .end(nil) }
+        state.endingDelivered = true
+        return .end(ending)
+      }
+      if state.consumerWaiter != nil { return .misuse }
+      return .wait
+    }
+    switch step {
+    case .chunk(let chunk, let resume):
+      if let (inbound, channel) = resume {
+        channel.eventLoop.execute { inbound.resumeReading() }
+      }
+      return chunk
+    case .end(let ending):
+      return try Self.deliver(ending)
+    case .misuse:
+      throw Self.misuseFailure
+    case .wait:
+      break
+    }
+
+    let next: Data? = try await withTaskCancellationHandler {
+      try await withCheckedThrowingContinuation { (waiter: CheckedContinuation<Data?, any Error>) in
+        enum Install {
+          case installed
+          case chunk(Data)
+          case end(Ending?)
+          case cancelled
+        }
+        let install: Install = lock.withLock {
+          if let chunk = Self.dequeue(&state) { return .chunk(chunk) }
+          if let ending = state.ending {
+            if state.endingDelivered { return .end(nil) }
+            state.endingDelivered = true
+            return .end(ending)
+          }
+          if Task.isCancelled { return .cancelled }
+          state.consumerWaiter = waiter
+          return .installed
+        }
+        switch install {
+        case .installed:
+          return
+        case .chunk(let chunk):
+          waiter.resume(returning: chunk)
+        case .end(let ending):
+          waiter.resume(with: Result { try Self.deliver(ending) })
+        case .cancelled:
+          terminate(.consumerGone)
+          waiter.resume(returning: nil)
+        }
+      }
+    } onCancel: { [weak self] in
+      self?.consumerCancelled()
+    }
+    // A chunk handed straight from `received` may have left the queue low.
+    let resume = lock.withLock { Self.resumption(&state) }
+    if let (inbound, channel) = resume {
+      channel.eventLoop.execute { inbound.resumeReading() }
+    }
+    return next
+  }
+
+  /// The consumer's task was cancelled: it is gone, so the lifecycle ends.
+  private func consumerCancelled() {
+    let waiter: CheckedContinuation<Data?, any Error>? = lock.withLock {
+      defer { state.consumerWaiter = nil }
+      return state.consumerWaiter
+    }
+    terminate(.consumerGone)
+    waiter?.resume(returning: nil)
+  }
+
+  private static func deliver(_ ending: Ending?) throws -> Data? {
+    switch ending {
+    case .failed(let error)?: throw error
+    case .finished?, .consumerGone?, nil: return nil
     }
   }
 
@@ -455,6 +627,7 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
   /// stream. Returns `false` when the lifecycle had already ended.
   @discardableResult
   private func terminate(_ ending: Ending) -> Bool {
+    var consumer: CheckedContinuation<Data?, any Error>?
     let released:
       (
         channel: (any Channel)?,
@@ -464,6 +637,17 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
         if case .terminated = state.phase { return nil }
         state.phase = .terminated
         let released = (state.channel, state.connectWaiter, state.timeout)
+        state.ending = ending
+        if case .consumerGone = ending {
+          state.queue.removeAll()
+          state.queuedBytes = 0
+        }
+        // A waiting consumer implies an empty queue: it gets the end now.
+        consumer = state.consumerWaiter
+        state.consumerWaiter = nil
+        if consumer != nil { state.endingDelivered = true }
+        state.inbound = nil
+        state.readsPaused = false
         state.channel = nil
         state.connectWaiter = nil
         state.timeout = nil
@@ -477,14 +661,7 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
     released.timeout?.cancel()
     released.channel?.close(promise: nil)
     released.waiter?.resume(returning: .failed(Self.cancellationFailure))
-    switch ending {
-    case .finished:
-      continuation.finish()
-    case .failed(let error):
-      continuation.finish(throwing: error)
-    case .consumerGone:
-      break
-    }
+    consumer?.resume(with: Result { try Self.deliver(ending) })
     return true
   }
 
@@ -570,17 +747,50 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
   }
 }
 
+/// Lets the pull closure reach the transport, which does not exist yet when
+/// the stream is made. Written once in `init`, before the stream is shared.
+private final class PullSource: @unchecked Sendable {
+  weak var transport: LinuxTLSTransport?
+}
+
 // MARK: - Channel handler
 
 /// Forwards handshake completion, plaintext reads, errors and closure to the
 /// transport. Holds the transport weakly so a dropped transport closes cleanly.
-private final class InboundHandler: ChannelInboundHandler, @unchecked Sendable {
+///
+/// It is also the read gate: it sits after the TLS handler, so a `read` it
+/// holds back never reaches the socket. While the transport's queue is above
+/// the high-water mark the read is held; `resumeReading` re-issues it. Its own
+/// state is touched only on the channel's event loop.
+private final class InboundHandler: ChannelDuplexHandler, @unchecked Sendable {
   typealias InboundIn = ByteBuffer
+  typealias OutboundIn = Never
 
   private weak var transport: LinuxTLSTransport?
+  private var context: ChannelHandlerContext?
+  private var heldRead = false
 
   init(transport: LinuxTLSTransport) {
     self.transport = transport
+  }
+
+  func handlerAdded(context: ChannelHandlerContext) { self.context = context }
+
+  func handlerRemoved(context: ChannelHandlerContext) { self.context = nil }
+
+  func read(context: ChannelHandlerContext) {
+    if transport?.readsPaused == true {
+      heldRead = true
+      return
+    }
+    context.read()
+  }
+
+  /// Runs on the event loop once the consumer drained the queue.
+  func resumeReading() {
+    guard heldRead, let context, transport?.readsPaused != true else { return }
+    heldRead = false
+    context.read()
   }
 
   func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {
