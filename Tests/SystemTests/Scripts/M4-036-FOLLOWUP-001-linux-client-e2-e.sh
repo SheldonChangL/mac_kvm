@@ -23,7 +23,8 @@ set -uo pipefail
 issue=M4-036-FOLLOWUP-001
 container=${MACKVM_E2E_CONTAINER:?set MACKVM_E2E_CONTAINER to a running arm64 swift:6.2.3-jammy container}
 port=${MACKVM_E2E_PORT:-24811}
-[ "$port" = 24800 ] && { echo "M4-036 e2e: port 24800 is reserved" >&2; exit 64; }
+case $port in ''|*[!0-9]*) echo "M4-036 e2e: the port must be a number" >&2; exit 64;; esac
+[ "$((10#$port))" -eq 24800 ] && { echo "M4-036 e2e: port 24800 is reserved" >&2; exit 64; }
 display=:93
 name=m4-smoke
 gateway=host.docker.internal
@@ -53,7 +54,15 @@ check() {
   [ -n "${MACKVM_E2E_DEBUG:-}" ] && [ "${#2}" -lt 200 ] && printf 'debug %s: [%s] want [%s]\n' "$1" "$2" "$3" >&2
   if [ "$2" = "$3" ]; then record "$1" pass "$4"; else record "$1" fail "$4"; fi
 }
-send() { printf '%s\n' "$1" >"$work/cmd"; sleep 0.3; }
+# Writes one smoke command. Opening the FIFO blocks while no server reads it, so a dead
+# server must not hang the run: the write gets 5 s, then it is killed and reported.
+send() {
+  (printf '%s\n' "$1" >"$work/cmd") & local w=$! i
+  for i in $(seq 50); do kill -0 "$w" 2>/dev/null || break; sleep 0.1; done
+  if kill -0 "$w" 2>/dev/null; then kill "$w" 2>/dev/null; say "smoke-driver-write=timeout"; fi
+  wait "$w" 2>/dev/null
+  sleep 0.3
+}
 pointer() { rx "xdotool getmouselocation --shell" | tr '\n' ' ' | awk '{print $1 $2}'; }
 count() { grep -c "$1" "$work/server.log"; }
 ccount() { rx "grep -c '$1' $remote/$2 || true"; }
@@ -108,8 +117,9 @@ rx "mackvm-client connect $gateway:$port --name $name --display $display --non-i
   >changed.log 2>&1; echo \$? >changed.exit"
 check fingerprint-changed-exit-78 "$(rx 'cat changed.exit')" 78 \
   "trusted record differs from the server: mackvm-client exited 78"
-check fingerprint-changed-no-bytes "$(count 'ready (') $(count 'input is now remote')" "0 0" \
-  "server log: no session became ready, so no application byte crossed TLS"
+check fingerprint-changed-no-bytes \
+  "$(count 'connection refused before the handshake') $(count 'ready (') $(count 'input is now remote')" \
+  "1 0 0" "server log: the connection was refused before the handshake; no session became ready"
 rx "mackvm-client fingerprint forget $gateway:$port >/dev/null 2>&1; \
   mackvm-client fingerprint trust $gateway:$port $hex >/dev/null 2>&1"
 
@@ -189,13 +199,18 @@ check keepalive-13s "$(pointer) $(ccount 'connection ended' client-2.log)" "X=51
 
 # 600 KB out runs late: a failure ends the session, and the client reconnects by itself.
 send "move -500 0"; sleep 0.5
+e0=$(ccount 'connection ended' client-2.log); d0=$(count 'client disconnected')
 send "copy $large_to_client"
 send edge; sleep 3
 check clipboard-large-to-client \
-  "$(rx "xclip -selection clipboard -o | sha256sum | cut -c1-64") $(ccount 'resourceExhausted' client-2.log)" \
-  "$(printf '%s' "$large_to_client" | shasum -a 256 | cut -c1-64) 0" \
-  "600 KB server clipboard matched by SHA-256 on the client display, session kept"
+  "$(rx "xclip -selection clipboard -o | sha256sum | cut -c1-64") $(($(ccount 'connection ended' client-2.log) - e0)) $(($(count 'client disconnected') - d0))" \
+  "$(printf '%s' "$large_to_client" | shasum -a 256 | cut -c1-64) 0 0" \
+  "600 KB server clipboard matched by SHA-256 on the client display; no connection end on either side"
+# A later, small server clipboard must replace it on the same session (#376).
 sleep 3; send "move -500 0"; sleep 0.5; send "copy $to_client"; send edge; sleep 0.5
+check clipboard-later-to-client \
+  "$(rx "xclip -selection clipboard -o") $(($(ccount 'connection ended' client-2.log) - e0))" \
+  "$to_client 0" "a later small server clipboard replaced the 600 KB one on the same session"
 
 e0=$(ccount 'connection ended' client-2.log)
 send "key shift down"; sleep 0.3; send quit; sleep 3
