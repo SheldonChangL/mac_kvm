@@ -114,6 +114,8 @@
     case sendThenClose(Data)
     /// Write one large buffer, which NIOSSL sends as several TLS records.
     case bulk(Int)
+    /// Write `count` bytes of the pattern `index % 251` in one buffer, then stay open.
+    case pattern(Int)
     /// Write bytes that are not a TLS record straight to the socket.
     case garbageAfterHandshake
   }
@@ -187,6 +189,9 @@
           context.close(promise: nil)
         case .bulk(let size):
           let buffer = context.channel.allocator.buffer(repeating: 0x33, count: size)
+          context.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
+        case .pattern(let size):
+          let buffer = context.channel.allocator.buffer(bytes: patternBytes(size))
           context.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
         case .garbageAfterHandshake:
           injector.inject(Array(repeating: 0xEE, count: 64))
@@ -268,6 +273,11 @@
   }
 
   // MARK: - Helpers
+
+  /// `count` bytes whose value is the index modulo 251, so a drop or reorder shows.
+  func patternBytes(_ count: Int) -> [UInt8] {
+    (0..<count).map { UInt8($0 % 251) }
+  }
 
   /// Records every digest the transport hands to the evaluator and answers with `decision`.
   final class EvaluatorProbe: @unchecked Sendable {
@@ -476,31 +486,69 @@
       await server.stop()
     }
 
-    @Test("a slow consumer ends the stream with resourceExhausted, keeping the buffered order")
-    func slowConsumer() async throws {
+    @Test("M1-055-FOLLOWUP-002: a slow consumer receives a 1 MiB payload in order, unended")
+    func slowConsumerLargePayload() async throws {
       let identity = try Openssl.selfSigned()
+      let size = 1 << 20
       let server = try await TestServer.start(
-        group: group, identity: identity, script: .flood(count: 256, size: 1024))
+        group: group, identity: identity, script: .pattern(size))
       let transport = makeTransport(
         port: server.port, group: group, evaluator: pinning(identity.leafPin))
 
       try await transport.connect()
+      // The consumer is stalled while the server writes everything it can.
       try await Task.sleep(for: .milliseconds(500))
-      var received = 0
-      do {
-        for try await chunk in transport.incomingBytes {
-          #expect(chunk.allSatisfy { $0 == 0x5A })
-          received += chunk.count
-        }
-        Issue.record("the stream finished without an error")
-      } catch let error as CoreError {
-        #expect(error.code == .transport(.resourceExhausted))
+      var received = Data()
+      for try await chunk in transport.incomingBytes {
+        received.append(chunk)
+        if received.count >= size { break }
+        try await Task.sleep(for: .microseconds(200))
       }
-      #expect(received > 0)
-      #expect(received < 256 * 1024)
-      #expect(received <= LinuxTLSTransport.incomingChunkBufferLimit * 16_384)
+      #expect(received.count == size)
+      #expect(received == Data(patternBytes(size)))
+      // The connection is still usable after the payload.
+      try await transport.send(Data([7]))
+      await waitUntil { server.record.bytes == Data([7]) }
+      #expect(server.record.bytes == Data([7]))
       await transport.disconnect()
       await server.stop()
+    }
+
+    @Test("M1-055-FOLLOWUP-002: a stalled consumer holds socket reads; queued bytes stay bounded")
+    func stalledConsumerIsBounded() async throws {
+      let identity = try Openssl.selfSigned()
+      let size = 4 << 20
+      let server = try await TestServer.start(
+        group: group, identity: identity, script: .pattern(size))
+      let transport = makeTransport(
+        port: server.port, group: group, evaluator: pinning(identity.leafPin))
+
+      try await transport.connect()
+      await waitUntil { transport.bufferedByteCount >= LinuxTLSTransport.inboundHighWaterBytes }
+      try await Task.sleep(for: .milliseconds(500))
+      // Paused: far less than the 4 MiB on the wire is queued, and the session is alive.
+      #expect(transport.bufferedByteCount >= LinuxTLSTransport.inboundHighWaterBytes)
+      #expect(transport.peakBufferedByteCount < LinuxTLSTransport.maximumBufferedBytes)
+      #expect(transport.peakBufferedByteCount < size / 4)
+      #expect(
+        transport.peakBufferedByteCount <= LinuxTLSTransport.inboundHighWaterBytes + 512 * 1024)
+
+      var received = Data()
+      for try await chunk in transport.incomingBytes {
+        received.append(chunk)
+        if received.count >= size { break }
+      }
+      #expect(received == Data(patternBytes(size)))
+      #expect(transport.peakBufferedByteCount < LinuxTLSTransport.maximumBufferedBytes)
+      await transport.disconnect()
+      await server.stop()
+    }
+
+    @Test("M1-055-FOLLOWUP-002: the flow-control limits keep their values")
+    func flowControlLimits() {
+      #expect(LinuxTLSTransport.inboundHighWaterBytes == 256 * 1024)
+      #expect(LinuxTLSTransport.inboundLowWaterBytes == 64 * 1024)
+      #expect(LinuxTLSTransport.maximumBufferedBytes == 1024 * 1024)
     }
 
     @Test("a large read is yielded in chunks of at most 16 KiB, in order")

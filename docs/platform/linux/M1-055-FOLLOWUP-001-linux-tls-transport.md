@@ -27,7 +27,9 @@ package struct LinuxTLSConnectionRequest: Equatable, Sendable {
   package init(host: String, port: UInt16, connectTimeout: Duration)
 }
 package final class LinuxTLSTransport: Transport, @unchecked Sendable {
-  package static let incomingChunkBufferLimit: Int  // 16 chunks
+  package static let inboundHighWaterBytes: Int  // 256 KiB: socket reads pause (M1-055-FOLLOWUP-002)
+  package static let inboundLowWaterBytes: Int  // 64 KiB: socket reads resume
+  package static let maximumBufferedBytes: Int  // 1 MiB: hard ceiling, resourceExhausted
   package static let maximumChunkLength: Int  // 16 KiB
   package init(request: LinuxTLSConnectionRequest, group: any EventLoopGroup,
                trustEvaluator: @escaping @Sendable (Data) -> LinuxTLSTrustDecision)
@@ -37,6 +39,8 @@ package final class LinuxTLSTransport: Transport, @unchecked Sendable {
   package func disconnect() async
   package var presentedFingerprint: Data? { get }
   package func isNoDelayEnabled() async -> Bool  // for tests
+  package var bufferedByteCount: Int { get }  // for tests
+  package var peakBufferedByteCount: Int { get }  // for tests
 }
 ```
 
@@ -106,12 +110,38 @@ certificate that names no host, and the pin is a stronger check than a name.
 
 ## Incoming bytes
 
-- `incomingBytes` buffers at most 16 chunks (`bufferingOldest`). One NIOSSL
-  read can carry several TLS records, so the transport splits every read into
-  chunks of at most `maximumChunkLength` (16 KiB) before yielding. At most
-  256 KiB therefore wait for a slow consumer.
-- A full buffer ends the stream with `transport(.resourceExhausted)` after the
-  chunks already buffered, in order. Nothing is silently dropped.
+- `incomingBytes` is pull-driven (M1-055-FOLLOWUP-002). Decrypted bytes wait
+  in a byte-counted queue, split into chunks of at most `maximumChunkLength`
+  (16 KiB); each `next()` takes the oldest chunk.
+- Backpressure: once the queue holds `inboundHighWaterBytes` (256 KiB), the
+  inbound handler (after the TLS handler) holds the channel's `read` event, so
+  no further socket read happens and TCP flow control slows the peer. When the
+  consumer drains the queue below `inboundLowWaterBytes` (64 KiB), the held
+  read is re-issued on the event loop. A slow consumer therefore receives any
+  amount of data in order without the session ending (a 600 KB clipboard
+  previously overflowed the old 16-chunk `bufferingOldest` stream and ended
+  with `resourceExhausted`, issue #372).
+- The gate holds only the next `read` request. A read event already under way
+  (NIO's `maxMessagesPerRead`, 4 by default, of up to 64 KiB each) still
+  lands, and NIOSSL can issue its own reads past the gate, so the queue can
+  pass the high-water mark by a few hundred KiB. The tests pin the peak under
+  high water + 512 KiB. `maximumBufferedBytes`
+  (1 MiB) is a hard ceiling: a read that would pass it ends the stream with
+  `transport(.resourceExhausted)` after the chunks already queued, in order.
+  Nothing is silently dropped. Protocol and clipboard size limits (1 MiB
+  clipboard) are enforced above the transport and are unchanged.
+- Known limitation: the 1 MiB ceiling counts payload bytes only. Per-chunk
+  overhead (one `Data` per decrypted read, so tiny TLS records cost more) is
+  not counted. It stays bounded at a few MiB, which is acceptable.
+- Behaviour change from M1-055-FOLLOWUP-001: a cancelled consumer task ends the
+  lifecycle (the channel closes), but dropping the iterator or breaking out of
+  the loop no longer ends it with a consumer-gone close. The connection stays
+  open, with reads paused once the queue fills, until `disconnect()`. A second
+  concurrent consumer is refused with `internalFailure(.preconditionFailed)`.
+- The transport has no read timeout. A peer that goes silent is bounded by the
+  client protocol session's keepalive timeout:
+  `BarrierClientProtocolSession` checks every second and fails with
+  `timeout(.keepalive)` after 9 silent checks.
 - The peer closing the connection with a TLS `close_notify` finishes the
   stream normally, once, after the data it sent (plan a.5: a clean end that the
   reconnect manager retries). A bare TCP FIN after the handshake, without
@@ -136,7 +166,7 @@ certificate that names no host, and the pin is a stronger check than a name.
 | no handshake within `connectTimeout` | `timeout(.connect)` | `.backoff` |
 | peer closed before the handshake completed | `transport(.disconnected)` | `.backoff` |
 | trust rejection or TLS failure | `security(...)`, see Pinning | `.userActionRequired` |
-| full incoming buffer | `transport(.resourceExhausted)` | `.backoff` |
+| queue past `maximumBufferedBytes` (1 MiB) | `transport(.resourceExhausted)` | `.backoff` |
 | cancelled | `cancellation(.requested)` | `.never` |
 | misuse | `internalFailure(.preconditionFailed)` | `.never` |
 
@@ -174,10 +204,17 @@ in a temporary directory (`openssl` is installed by `verify-linux`):
   security error, the server never completes the handshake and receives no
   application byte, and the fingerprint is kept;
 - a server limited to TLS 1.1: refused, the evaluator is never asked;
-- end of stream, a slow consumer, send before connect, a second connect, task
+- end of stream, send before connect, a second connect, task
   cancellation and `disconnect()` during connect, a handshake timeout, a refused
   connection, and `disconnect()` twice, also from a cancelled task;
 - a 200,000-byte server write arrives in chunks of at most 16 KiB, in order;
+- M1-055-FOLLOWUP-002: a consumer stalled for 500 ms then reading slowly
+  receives a 1 MiB patterned payload in order with the session still usable;
+  a stalled consumer facing 4 MiB keeps the queue at the high-water mark,
+  well under the 1 MiB ceiling, then receives all 4 MiB in order; and the
+  Linux client runtime (`Tests/Integration/LinuxClientRuntimeTests.swift`) over
+  the real `LinuxTLSTransport` and an in-process first-party Barrier server
+  writes a 600 KB server clipboard sent on enter, with no reconnect;
 - bytes that are not a TLS record, written after the handshake, end the stream
   with `transport(.reset)` and `.backoff`.
 

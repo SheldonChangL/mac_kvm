@@ -22,6 +22,44 @@ COMMIT = "0123456789abcdef0123456789abcdef01234567"
 SCRIPT_RELATIVE = "Tests/SystemTests/Scripts/M1-999-linux-e2e.sh"
 RESULT_RELATIVE = "evidence/e2e/M1-999/result.json"
 
+# M1-TOOLING-002: an Issue id is Mx-nnn with at most one -FOLLOWUP-nnn suffix.
+FOLLOWUP_ISSUE = "M4-036-FOLLOWUP-001"
+FOLLOWUP_SCRIPT_NAME = "M4-036-FOLLOWUP-001-linux-client-e2-e.sh"
+FOLLOWUP_SCRIPT_RELATIVE = "Tests/SystemTests/Scripts/" + FOLLOWUP_SCRIPT_NAME
+FOLLOWUP_RESULT_RELATIVE = "evidence/e2e/M4-036-FOLLOWUP-001/result.json"
+ACCEPTED_ISSUES = (
+    "M1-001",
+    "M1-999",
+    "M4-036",
+    "M5-999",
+    "M4-036-FOLLOWUP-001",
+    "M1-001-FOLLOWUP-999",
+    "M2-029-FOLLOWUP-000",
+)
+REJECTED_ISSUES = (
+    "M4-036-FOLLOWUP-",
+    "M4-036-FOLLOWUP-1",
+    "M4-036-FOLLOWUP-01",
+    "M4-036-FOLLOWUP-001-FOLLOWUP-001",
+    "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+    "m4-036-followup-001",
+    "M4-036-followup-001",
+    "M4-036-FOLLOWUP-0001",
+    "M4-036-FOLLOWUP-00a",
+    "M4-036-FOLLOWUP-001-",
+    "M4-036-FOLLOWUP-001\n",
+    "M4-036-FOLLOWUP-001/../x",
+    "M4-036FOLLOWUP-001",
+    "M4-036--FOLLOWUP-001",
+    "M4-036-FOLLOWUP--001",
+    "M4-FOLLOWUP-001",
+    "FOLLOWUP-001",
+    "M6-001",
+    "M6-001-FOLLOWUP-001",
+    "M0-001-FOLLOWUP-001",
+    "M4-036-FOLLOWUP-١٢٣",  # not [0-9]
+)
+
 
 def load_tool():
     specification = importlib.util.spec_from_file_location("run_e2e_under_test", TOOL_PATH)
@@ -205,78 +243,32 @@ class IssueValidationTests(RunnerTestCase):
         self.assertFalse((self.root / "pwned").exists())
 
 
-class FollowupIssueTests(RunnerTestCase):
-    VALID = ("M4-036-FOLLOWUP-001", "M1-999", "M5-001-FOLLOWUP-999")
-    INVALID = (
-        "M4-036-FOLLOWUP-",
-        "M4-036-FOLLOWUP-01",
-        "M4-036-FOLLOWUP-0011",
-        "M4-036-FOLLOWUP-001-FOLLOWUP-002",
-        "M4-036-followup-001",
-        "m4-036-FOLLOWUP-001",
-        "M4-036-FOLLOWUP-001\n",
-        "M4-036-FOLLOWUP-00a",
-        "M4-036-FOLLOWUP-001-x",
-    )
-
-    def test_issue_pattern_accepts_and_rejects(self):
-        for issue in self.VALID:
+class IssueIdFormTests(RunnerTestCase):
+    def test_accepted_issue_ids(self):
+        for issue in ACCEPTED_ISSUES:
             with self.subTest(issue=issue):
                 self.assertEqual(run_e2e.validate_issue(issue), issue)
-        for issue in self.INVALID:
+                self.assertIsNotNone(run_e2e.ISSUE_PATTERN.fullmatch(issue))
+
+    def test_rejected_issue_ids(self):
+        for issue in REJECTED_ISSUES:
             with self.subTest(issue=issue):
+                self.assertIsNone(run_e2e.ISSUE_PATTERN.fullmatch(issue))
                 with self.assertRaises(run_e2e.RunnerError) as context:
                     run_e2e.validate_issue(issue)
                 self.assertEqual(context.exception.code, "invalid_issue")
+                self.assertEqual(context.exception.exit_code, 64)
 
-    def test_script_name_pattern(self):
-        pattern = run_e2e.SCRIPT_NAME_PATTERN
-        for name in (
-            "M4-036-FOLLOWUP-001-linux-e2e.sh",
-            "M1-999-linux-e2e.sh",
-        ):
-            with self.subTest(name=name):
-                self.assertIsNotNone(pattern.fullmatch(name))
-        for name in (
-            "M6-001-x.sh",
-            "M4-036.sh",
-            "m4-036-FOLLOWUP-001-x.sh",
-            "M4-036-FOLLOWUP-001-has space.sh",
-        ):
-            with self.subTest(name=name):
-                self.assertIsNone(pattern.fullmatch(name))
-
-    def test_followup_script_is_resolved_and_run(self):
-        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
-        result = self.root / "evidence/e2e/M4-036-FOLLOWUP-001/result.json"
-        document = result_document(issue="M4-036-FOLLOWUP-001")
-
-        def write():
-            result.parent.mkdir(parents=True, exist_ok=True)
-            result.write_text(json.dumps(document), encoding="utf-8")
-
-        popen = FakePopen(action=write)
-        exit_code, stdout, stderr = self.run_runner(popen, issue="M4-036-FOLLOWUP-001")
-        self.assertEqual((exit_code, stderr), (0, ""))
-        self.assertEqual(
-            popen.calls[0][0][-1],
-            "Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-e2e.sh",
-        )
-
-    def test_base_issue_does_not_resolve_followup_script(self):
-        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
-        popen = FakePopen()
-        exit_code, _, stderr = self.run_runner(popen, issue="M4-036")
-        self.assertEqual(exit_code, 66)
-        self.assertEqual(stderr, "e2e error: script_missing\n")
-        self.assertEqual(popen.calls, [])
-
-
-    def test_base_issue_resolves_only_its_own_script_beside_followup(self):
-        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
-        self.write_script(name="M4-036-linux-e2e.sh")
-        resolved = run_e2e.resolve_script("M4-036", self.root)
-        self.assertEqual(resolved.name, "M4-036-linux-e2e.sh")
+    def test_rejected_issue_ids_stop_before_path_resolution(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        for issue in REJECTED_ISSUES:
+            with self.subTest(issue=issue):
+                popen = FakePopen()
+                exit_code, stdout, stderr = self.run_runner(popen, issue=issue)
+                self.assertEqual(exit_code, 64)
+                self.assertEqual(popen.calls, [])
+                self.assertEqual(stderr, "e2e error: invalid_issue\n")
+                self.assertEqual(stdout, "e2e disposition: error\ne2e exit: 64\n")
 
 
 class ScriptResolutionTests(RunnerTestCase):
@@ -344,6 +336,92 @@ class ScriptResolutionTests(RunnerTestCase):
 
         with mock.patch.object(run_e2e.os.path, "realpath", side_effect=fake_realpath):
             self.assert_resolution_error("script_outside_root", 77)
+
+
+class FollowupScriptResolutionTests(RunnerTestCase):
+    def resolve(self, issue):
+        return run_e2e.resolve_script(issue, self.root)
+
+    def assert_resolves(self, issue, name):
+        self.assertEqual(self.resolve(issue), Path("Tests/SystemTests/Scripts") / name)
+
+    def assert_resolution_error(self, issue, code, exit_code):
+        with self.assertRaises(run_e2e.RunnerError) as context:
+            self.resolve(issue)
+        self.assertEqual(context.exception.code, code)
+        self.assertEqual(context.exception.exit_code, exit_code)
+
+    def test_followup_issue_resolves_its_own_script(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        self.assertEqual(self.resolve(FOLLOWUP_ISSUE), Path(FOLLOWUP_SCRIPT_RELATIVE))
+
+    def test_followup_script_name_stays_well_formed(self):
+        limit_name = FOLLOWUP_ISSUE + "-" + "a" * 128 + ".sh"
+        for name, code in (
+            (limit_name, None),
+            (FOLLOWUP_ISSUE + "-" + "a" * 129 + ".sh", "script_name_invalid"),
+            (FOLLOWUP_ISSUE + "-has space.sh", "script_name_invalid"),
+            (FOLLOWUP_ISSUE + "-bad;name.sh", "script_name_invalid"),
+        ):
+            with self.subTest(name=name[:40], length=len(name)):
+                for existing in self.script_root.iterdir():
+                    existing.unlink()
+                self.write_script(name=name)
+                if code is None:
+                    self.assert_resolves(FOLLOWUP_ISSUE, name)
+                else:
+                    self.assert_resolution_error(FOLLOWUP_ISSUE, code, 65)
+
+    def test_base_issue_does_not_select_a_followup_script(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        self.assert_resolution_error("M4-036", "script_missing", 66)
+        popen = FakePopen()
+        exit_code, stdout, stderr = self.run_runner(popen, issue="M4-036")
+        self.assertEqual(exit_code, 66)
+        self.assertEqual(stderr, "e2e error: script_missing\n")
+        self.assertNotIn("e2e script:", stdout)
+        self.assertEqual(popen.calls, [])
+
+    def test_followup_script_does_not_make_the_base_script_ambiguous(self):
+        self.write_script(name="M4-036-linux-client-e2-e.sh")
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        self.assert_resolves("M4-036", "M4-036-linux-client-e2-e.sh")
+        self.assert_resolves(FOLLOWUP_ISSUE, FOLLOWUP_SCRIPT_NAME)
+
+    def test_followup_scripts_of_one_base_issue_do_not_collide(self):
+        self.write_script(name="M4-036-FOLLOWUP-001-a.sh")
+        self.write_script(name="M4-036-FOLLOWUP-002-b.sh")
+        self.assert_resolves("M4-036-FOLLOWUP-001", "M4-036-FOLLOWUP-001-a.sh")
+        self.assert_resolves("M4-036-FOLLOWUP-002", "M4-036-FOLLOWUP-002-b.sh")
+        self.assert_resolution_error("M4-036", "script_missing", 66)
+        self.assert_resolution_error("M4-036-FOLLOWUP-003", "script_missing", 66)
+
+    def test_two_scripts_of_one_followup_issue_are_ambiguous(self):
+        self.write_script(name="M4-036-FOLLOWUP-001-a.sh")
+        self.write_script(name="M4-036-FOLLOWUP-001-b.sh")
+        self.assert_resolution_error(FOLLOWUP_ISSUE, "script_ambiguous", 65)
+
+    def test_a_name_that_only_resembles_a_suffix_stays_a_base_issue_script(self):
+        for name in (
+            "M4-036-FOLLOWUP-1-x.sh",
+            "M4-036-FOLLOWUP-01-x.sh",
+            "M4-036-FOLLOWUP-0001-x.sh",
+            "M4-036-followup-001-x.sh",
+            "M4-036-FOLLOWUP-x.sh",
+            "M4-036-FOLLOWUP-001.sh",
+        ):
+            with self.subTest(name=name):
+                for existing in self.script_root.iterdir():
+                    existing.unlink()
+                self.write_script(name=name)
+                self.assert_resolves("M4-036", name)
+
+    def test_a_second_followup_segment_is_part_of_the_slug(self):
+        name = "M4-036-FOLLOWUP-001-FOLLOWUP-002-x.sh"
+        self.write_script(name=name)
+        self.assert_resolves(FOLLOWUP_ISSUE, name)
+        self.assert_resolution_error("M4-036", "script_missing", 66)
+        self.assert_resolution_error("M4-036-FOLLOWUP-002", "script_missing", 66)
 
 
 class ExecutionTests(RunnerTestCase):
@@ -562,6 +640,137 @@ class ExecutionTests(RunnerTestCase):
         self.assertEqual(exit_code, 66)
         self.assertEqual(stderr, "e2e error: bash_unavailable\n")
         self.assert_terminal(stdout, "error", 66)
+
+
+class FollowupExecutionTests(RunnerTestCase):
+    def setUp(self):
+        super().setUp()
+        self.result_path = self.root / FOLLOWUP_RESULT_RELATIVE
+
+    def writer_with_artifact(self, data=b"sanitized machine report\n"):
+        def action():
+            self.result_path.parent.mkdir(parents=True, exist_ok=True)
+            (self.result_path.parent / "report.json").write_bytes(data)
+            document = result_document(issue=FOLLOWUP_ISSUE)
+            document["artifacts"] = [
+                {
+                    "path": "evidence/e2e/" + FOLLOWUP_ISSUE + "/report.json",
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "byteLength": len(data),
+                    "kind": "machine-report",
+                    "reviewStatus": "reviewed",
+                }
+            ]
+            self.write_result(document)
+
+        return action
+
+    def test_followup_issue_runs_its_script_and_gates_its_result(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        popen = FakePopen(action=self.writer(result_document(issue=FOLLOWUP_ISSUE)))
+        exit_code, stdout, stderr = self.run_runner(popen, issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 0, stderr)
+        self.assertEqual(stderr, "")
+        empty_digest = hashlib.sha256(b"").hexdigest()
+        self.assertEqual(
+            stdout.splitlines(),
+            [
+                "e2e runner version: 1",
+                "e2e issue: " + FOLLOWUP_ISSUE,
+                "e2e commit: " + COMMIT,
+                "e2e python: " + platform.python_version(),
+                "e2e script: " + FOLLOWUP_SCRIPT_RELATIVE,
+                "e2e stdout: lines=0 sha256=" + empty_digest,
+                "e2e stderr: lines=0 sha256=" + empty_digest,
+                "e2e script exit: 0",
+                "e2e disposition: passed",
+                "e2e exit: 0",
+            ],
+        )
+        self.assertEqual(len(popen.calls), 1)
+        args, kwargs = popen.calls[0]
+        self.assertEqual(args, ["bash", FOLLOWUP_SCRIPT_RELATIVE])
+        self.assertEqual(kwargs["env"]["MACKVM_E2E_ISSUE"], FOLLOWUP_ISSUE)
+        self.assertEqual(kwargs["env"]["MACKVM_E2E_RESULT"], FOLLOWUP_RESULT_RELATIVE)
+
+    def test_followup_result_may_list_artifacts_under_its_own_directory(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        popen = FakePopen(action=self.writer_with_artifact())
+        exit_code, stdout, stderr = self.run_runner(popen, issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 0, stderr)
+        self.assert_terminal(stdout, "passed", 0)
+
+    def test_followup_result_may_not_list_artifacts_of_the_base_issue(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        data = b"sanitized machine report\n"
+
+        def action():
+            base_directory = self.root / "evidence/e2e/M4-036"
+            base_directory.mkdir(parents=True)
+            (base_directory / "report.json").write_bytes(data)
+            document = result_document(issue=FOLLOWUP_ISSUE)
+            document["artifacts"] = [
+                {
+                    "path": "evidence/e2e/M4-036/report.json",
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "byteLength": len(data),
+                    "kind": "machine-report",
+                    "reviewStatus": "reviewed",
+                }
+            ]
+            self.write_result(document)
+
+        exit_code, stdout, stderr = self.run_runner(FakePopen(action=action), issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 65)
+        self.assertEqual(stderr, "e2e error: artifact_path_issue_mismatch\n")
+        self.assertNotIn("passed", stdout)
+
+    def test_followup_issue_rejects_a_result_for_the_base_issue(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        popen = FakePopen(action=self.writer(result_document(issue="M4-036")))
+        exit_code, stdout, stderr = self.run_runner(popen, issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 65)
+        self.assertEqual(stderr, "e2e error: issue_mismatch\n")
+        self.assertNotIn("passed", stdout)
+
+    def test_base_issue_rejects_a_result_for_the_followup_issue(self):
+        self.write_script(name="M4-036-linux-client-e2-e.sh")
+        self.result_path = self.root / "evidence/e2e/M4-036/result.json"
+        popen = FakePopen(action=self.writer(result_document(issue=FOLLOWUP_ISSUE)))
+        exit_code, stdout, stderr = self.run_runner(popen, issue="M4-036")
+        self.assertEqual(exit_code, 65)
+        self.assertEqual(stderr, "e2e error: issue_mismatch\n")
+        self.assertNotIn("passed", stdout)
+
+    def test_stale_followup_result_is_rejected(self):
+        self.write_script(name=FOLLOWUP_SCRIPT_NAME)
+        self.write_result(result_document(issue=FOLLOWUP_ISSUE))
+        exit_code, stdout, stderr = self.run_runner(FakePopen(), issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 65)
+        self.assertEqual(stderr, "e2e error: result_not_updated\n")
+        self.assertNotIn("passed", stdout)
+
+    def test_real_passing_followup_script(self):
+        if shutil.which("bash") is None:
+            self.skipTest("bash unavailable")
+        template = self.root / "template.json"
+        template.write_text(json.dumps(result_document(issue=FOLLOWUP_ISSUE)), encoding="utf-8")
+        self.write_script(
+            name=FOLLOWUP_SCRIPT_NAME,
+            body=(
+                'mkdir -p "$(dirname "$MACKVM_E2E_RESULT")"\n'
+                'cp template.json "$MACKVM_E2E_RESULT"\n'
+                'printf "%s" "$MACKVM_E2E_ISSUE" > seen-issue.txt\n'
+            ),
+        )
+        exit_code, stdout, stderr = self.run_runner(subprocess.Popen, issue=FOLLOWUP_ISSUE)
+        self.assertEqual(exit_code, 0, stderr)
+        self.assert_terminal(stdout, "passed", 0)
+        self.assertIn("e2e script: " + FOLLOWUP_SCRIPT_RELATIVE + "\n", stdout)
+        self.assertEqual(
+            (self.root / "seen-issue.txt").read_text(encoding="utf-8"), FOLLOWUP_ISSUE
+        )
+        self.assertTrue(self.result_path.is_file())
 
 
 class TerminationTests(RunnerTestCase):
@@ -1070,6 +1279,30 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(stderr, "e2e error: invalid_issue\n")
         self.assertEqual(stdout, "e2e disposition: error\ne2e exit: 64\n")
 
+    def test_malformed_followup_issues_are_rejected_via_main(self):
+        for issue in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-1",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-001",
+            "m4-036-followup-001",
+            "M4-036-FOLLOWUP-0001",
+            "M6-001",
+        ):
+            with self.subTest(issue=issue):
+                exit_code, stdout, stderr = self.run_main(["--issue", issue])
+                self.assertEqual(exit_code, 64)
+                self.assertEqual(stderr, "e2e error: invalid_issue\n")
+                self.assertEqual(stdout, "e2e disposition: error\ne2e exit: 64\n")
+
+    def test_followup_issue_passes_the_issue_gate_via_main(self):
+        # No script exists for this id, so the run stops at script resolution,
+        # which is past the Issue id gate.
+        exit_code, stdout, stderr = self.run_main(["--issue", "M1-999-FOLLOWUP-999"])
+        self.assertEqual(exit_code, 66)
+        self.assertEqual(stderr, "e2e error: script_missing\n")
+        self.assertIn("e2e issue: M1-999-FOLLOWUP-999\n", stdout)
+        self.assertNotIn("e2e script:", stdout)
+
     def test_signal_handlers_are_restored(self):
         before = signal.getsignal(signal.SIGTERM)
         self.run_main(["--issue", "bad"])
@@ -1136,6 +1369,101 @@ class MakefileTests(unittest.TestCase):
                     self.assertNotEqual(completed.returncode, 0)
                     self.assertIn("e2e error: invalid_issue", completed.stderr)
                     self.assertFalse(marker.exists())
+
+    def test_followup_issue_reaches_script_resolution_through_make(self):
+        make = shutil.which("make")
+        if make is None:
+            self.skipTest("make unavailable")
+        # No script exists for this id: the run stops at script resolution,
+        # which is past the Issue id gate.
+        completed = subprocess.run(
+            [make, "-s", "--no-print-directory", "e2e", "ISSUE=M1-999-FOLLOWUP-999",
+             "PYTHON=" + sys.executable],
+            cwd=str(REPOSITORY_ROOT),
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("e2e error: script_missing", completed.stderr)
+        self.assertNotIn("invalid_issue", completed.stderr)
+        self.assertIn("e2e issue: M1-999-FOLLOWUP-999", completed.stdout)
+
+
+class FollowupIssueBaselineTests(RunnerTestCase):
+    VALID = ("M4-036-FOLLOWUP-001", "M1-999", "M5-001-FOLLOWUP-999")
+    INVALID = (
+        "M4-036-FOLLOWUP-",
+        "M4-036-FOLLOWUP-01",
+        "M4-036-FOLLOWUP-0011",
+        "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+        "M4-036-followup-001",
+        "m4-036-FOLLOWUP-001",
+        "M4-036-FOLLOWUP-001\n",
+        "M4-036-FOLLOWUP-00a",
+        "M4-036-FOLLOWUP-001-x",
+    )
+
+    def test_issue_pattern_accepts_and_rejects(self):
+        for issue in self.VALID:
+            with self.subTest(issue=issue):
+                self.assertEqual(run_e2e.validate_issue(issue), issue)
+        for issue in self.INVALID:
+            with self.subTest(issue=issue):
+                with self.assertRaises(run_e2e.RunnerError) as context:
+                    run_e2e.validate_issue(issue)
+                self.assertEqual(context.exception.code, "invalid_issue")
+
+    def test_script_name_pattern(self):
+        pattern = run_e2e.SCRIPT_NAME_PATTERN
+        for name in (
+            "M4-036-FOLLOWUP-001-linux-e2e.sh",
+            "M1-999-linux-e2e.sh",
+        ):
+            with self.subTest(name=name):
+                self.assertIsNotNone(pattern.fullmatch(name))
+        for name in (
+            "M6-001-x.sh",
+            "M4-036.sh",
+            "m4-036-FOLLOWUP-001-x.sh",
+            "M4-036-FOLLOWUP-001-has space.sh",
+        ):
+            with self.subTest(name=name):
+                self.assertIsNone(pattern.fullmatch(name))
+
+    def test_followup_script_is_resolved_and_run(self):
+        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
+        result = self.root / "evidence/e2e/M4-036-FOLLOWUP-001/result.json"
+        document = result_document(issue="M4-036-FOLLOWUP-001")
+
+        def write():
+            result.parent.mkdir(parents=True, exist_ok=True)
+            result.write_text(json.dumps(document), encoding="utf-8")
+
+        popen = FakePopen(action=write)
+        exit_code, stdout, stderr = self.run_runner(popen, issue="M4-036-FOLLOWUP-001")
+        self.assertEqual((exit_code, stderr), (0, ""))
+        self.assertEqual(
+            popen.calls[0][0][-1],
+            "Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-e2e.sh",
+        )
+
+    def test_base_issue_does_not_resolve_followup_script(self):
+        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
+        popen = FakePopen()
+        exit_code, _, stderr = self.run_runner(popen, issue="M4-036")
+        self.assertEqual(exit_code, 66)
+        self.assertEqual(stderr, "e2e error: script_missing\n")
+        self.assertEqual(popen.calls, [])
+
+
+    def test_base_issue_resolves_only_its_own_script_beside_followup(self):
+        self.write_script(name="M4-036-FOLLOWUP-001-linux-e2e.sh")
+        self.write_script(name="M4-036-linux-e2e.sh")
+        resolved = run_e2e.resolve_script("M4-036", self.root)
+        self.assertEqual(resolved.name, "M4-036-linux-e2e.sh")
 
 
 if __name__ == "__main__":

@@ -4,8 +4,8 @@ import hashlib
 import importlib.util
 import io
 import json
-import re
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -22,6 +22,52 @@ SCHEMA_PATH = (
 ISSUE = "M1-999"
 COMMIT = "0123456789abcdef0123456789abcdef01234567"
 ARTIFACT_BYTES = b"sanitized machine report\n"
+
+# M1-TOOLING-002: an Issue id is Mx-nnn with at most one -FOLLOWUP-nnn suffix.
+FOLLOWUP_ISSUE = "M4-036-FOLLOWUP-001"
+ACCEPTED_ISSUE_IDS = (
+    "M1-001",
+    "M1-999",
+    "M4-036",
+    "M5-999",
+    "M4-036-FOLLOWUP-001",
+    "M1-001-FOLLOWUP-999",
+    "M2-029-FOLLOWUP-000",
+)
+REJECTED_ISSUE_IDS = (
+    "M4-036-FOLLOWUP-",
+    "M4-036-FOLLOWUP-1",
+    "M4-036-FOLLOWUP-01",
+    "M4-036-FOLLOWUP-001-FOLLOWUP-001",
+    "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+    "m4-036-followup-001",
+    "M4-036-followup-001",
+    "M4-036-FOLLOWUP-0001",
+    "M4-036-FOLLOWUP-00a",
+    "M4-036-FOLLOWUP-001-",
+    "M4-036-FOLLOWUP-001\n",
+    "M4-036-FOLLOWUP-001/../x",
+    "M4-036FOLLOWUP-001",
+    "M4-036--FOLLOWUP-001",
+    "M4-036-FOLLOWUP--001",
+    "M4-FOLLOWUP-001",
+    "FOLLOWUP-001",
+    "M6-001",
+    "M6-001-FOLLOWUP-001",
+    "M0-001-FOLLOWUP-001",
+    "M4-036-FOLLOWUP-١٢٣",  # not [0-9]
+)
+# Issue id directories that are never valid under evidence/e2e/.
+REJECTED_ARTIFACT_ISSUE_DIRECTORIES = (
+    "M4-036-FOLLOWUP-",
+    "M4-036-FOLLOWUP-1",
+    "M4-036-FOLLOWUP-001-FOLLOWUP-001",
+    "m4-036-followup-001",
+    "M4-036-followup-001",
+    "M4-036-FOLLOWUP-0001",
+    "M4-036-FOLLOWUP-001-extra",
+    "M6-001",
+)
 
 
 def load_tool():
@@ -114,6 +160,17 @@ def status_document(status, exit_code):
             "evidence": ["Terminal state recorded by the E2E script"],
         }
     ]
+    return document
+
+
+def followup_document(document=None, issue=FOLLOWUP_ISSUE):
+    """Re-home a result document (default: passed) under another Issue id."""
+    document = copy.deepcopy(passed_document() if document is None else document)
+    document["issueId"] = issue
+    for artifact in document["artifacts"]:
+        artifact["path"] = artifact["path"].replace(
+            "evidence/e2e/{0}/".format(ISSUE), "evidence/e2e/{0}/".format(issue)
+        )
     return document
 
 
@@ -510,61 +567,6 @@ class TopLevelFieldTests(ValidatorTestCase):
                 document["issueId"] = value
                 self.assert_invalid(document, "issue_id_invalid")
 
-    def test_followup_issue_id_accepted(self):
-        for value in ("M4-036-FOLLOWUP-001", "M5-001-FOLLOWUP-999"):
-            with self.subTest(value=value):
-                self.assertIsNotNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
-
-    def test_followup_issue_id_rejected_forms(self):
-        for value in (
-            "M4-036-FOLLOWUP-",
-            "M4-036-FOLLOWUP-01",
-            "M4-036-FOLLOWUP-0011",
-            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
-            "M4-036-followup-001",
-            "M4-036-FOLLOWUP-001\n",
-            "M4-036-FOLLOWUP-00a",
-        ):
-            with self.subTest(value=value):
-                document = passed_document()
-                document["issueId"] = value
-                self.assert_invalid(document, "issue_id_invalid")
-                self.assertIsNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
-
-    def test_followup_issue_end_to_end_with_artifact(self):
-        issue = "M4-036-FOLLOWUP-001"
-        directory = self.root / "evidence/e2e" / issue
-        directory.mkdir(parents=True)
-        (directory / "report.json").write_bytes(ARTIFACT_BYTES)
-        document = passed_document()
-        document["issueId"] = issue
-        document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(issue)
-        self.write_result(document)
-        validate_evidence.validate_result_file(self.result_path, self.root, issue)
-
-    def test_followup_artifact_path_for_wrong_issue_is_mismatch(self):
-        issue = "M4-036-FOLLOWUP-001"
-        for other in ("M4-036", "M4-036-FOLLOWUP-002"):
-            with self.subTest(other=other):
-                directory = self.root / "evidence/e2e" / other
-                directory.mkdir(parents=True, exist_ok=True)
-                (directory / "report.json").write_bytes(ARTIFACT_BYTES)
-                document = passed_document()
-                document["issueId"] = issue
-                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(other)
-                self.assert_invalid(document, "artifact_path_issue_mismatch")
-
-    def test_artifact_path_rejects_malformed_followup_directory(self):
-        for directory in (
-            "M4-036-FOLLOWUP-",
-            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
-            "M4-036-followup-001",
-        ):
-            with self.subTest(directory=directory):
-                document = passed_document()
-                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(directory)
-                self.assert_invalid(document, "artifact_path_invalid")
-
     def test_wrong_issue(self):
         document = passed_document()
         document["issueId"] = "M1-998"
@@ -637,6 +639,61 @@ class TopLevelFieldTests(ValidatorTestCase):
                     document = passed_document()
                     document["privacy"][key] = value
                     self.assert_invalid(document, "privacy_violation")
+
+    def test_artifact_path_rejects_malformed_followup_directory(self):
+        for directory in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+            "M4-036-followup-001",
+        ):
+            with self.subTest(directory=directory):
+                document = passed_document()
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(directory)
+                self.assert_invalid(document, "artifact_path_invalid")
+
+    def test_followup_artifact_path_for_wrong_issue_is_mismatch(self):
+        issue = "M4-036-FOLLOWUP-001"
+        for other in ("M4-036", "M4-036-FOLLOWUP-002"):
+            with self.subTest(other=other):
+                directory = self.root / "evidence/e2e" / other
+                directory.mkdir(parents=True, exist_ok=True)
+                (directory / "report.json").write_bytes(ARTIFACT_BYTES)
+                document = passed_document()
+                document["issueId"] = issue
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(other)
+                self.assert_invalid(document, "artifact_path_issue_mismatch")
+
+    def test_followup_issue_end_to_end_with_artifact(self):
+        issue = "M4-036-FOLLOWUP-001"
+        directory = self.root / "evidence/e2e" / issue
+        directory.mkdir(parents=True)
+        (directory / "report.json").write_bytes(ARTIFACT_BYTES)
+        document = passed_document()
+        document["issueId"] = issue
+        document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(issue)
+        self.write_result(document)
+        validate_evidence.validate_result_file(self.result_path, self.root, issue)
+
+    def test_followup_issue_id_accepted(self):
+        for value in ("M4-036-FOLLOWUP-001", "M5-001-FOLLOWUP-999"):
+            with self.subTest(value=value):
+                self.assertIsNotNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
+
+    def test_followup_issue_id_rejected_forms(self):
+        for value in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-01",
+            "M4-036-FOLLOWUP-0011",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-002",
+            "M4-036-followup-001",
+            "M4-036-FOLLOWUP-001\n",
+            "M4-036-FOLLOWUP-00a",
+        ):
+            with self.subTest(value=value):
+                document = passed_document()
+                document["issueId"] = value
+                self.assert_invalid(document, "issue_id_invalid")
+                self.assertIsNone(validate_evidence.ISSUE_PATTERN.fullmatch(value))
 
 
 class CaseTests(ValidatorTestCase):
@@ -952,6 +1009,123 @@ class ArtifactTests(ValidatorTestCase):
         self.assert_invalid(document, "artifact_invalid_type")
 
 
+class FollowupIssueTests(ValidatorTestCase):
+    def setUp(self):
+        super().setUp()
+        self.issue_directory = self.root / "evidence/e2e" / FOLLOWUP_ISSUE
+        self.issue_directory.mkdir(parents=True)
+        (self.issue_directory / "report.json").write_bytes(ARTIFACT_BYTES)
+        self.result_path = self.issue_directory / "result.json"
+
+    def make_artifact_directory(self, issue):
+        directory = self.root / "evidence/e2e" / issue
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "report.json").write_bytes(ARTIFACT_BYTES)
+
+    def test_accepted_issue_ids(self):
+        for issue in ACCEPTED_ISSUE_IDS:
+            with self.subTest(issue=issue):
+                self.assertIsNotNone(validate_evidence.ISSUE_PATTERN.fullmatch(issue))
+
+    def test_rejected_issue_ids(self):
+        for issue in REJECTED_ISSUE_IDS:
+            with self.subTest(issue=issue):
+                self.assertIsNone(validate_evidence.ISSUE_PATTERN.fullmatch(issue))
+
+    def test_followup_result_with_its_own_artifact_is_valid(self):
+        document = followup_document()
+        self.assertEqual(
+            document["artifacts"][0]["path"], "evidence/e2e/M4-036-FOLLOWUP-001/report.json"
+        )
+        self.assertEqual(self.validate(document), (FOLLOWUP_ISSUE, "passed"))
+        self.assertEqual(self.validate(document, FOLLOWUP_ISSUE), (FOLLOWUP_ISSUE, "passed"))
+
+    def test_every_status_is_valid_for_a_followup_issue(self):
+        for document, status in (
+            (status_document("failed", 1), "failed"),
+            (status_document("timed_out", None), "timed_out"),
+            (status_document("cancelled", None), "cancelled"),
+            (not_executed_document(), "not_executed"),
+        ):
+            with self.subTest(status=status):
+                self.assertEqual(
+                    self.validate(followup_document(document)), (FOLLOWUP_ISSUE, status)
+                )
+
+    def test_malformed_followup_issue_ids_are_invalid(self):
+        for value in REJECTED_ISSUE_IDS + (1, None):
+            with self.subTest(value=value):
+                document = passed_document()
+                document["issueId"] = value
+                self.assert_invalid(document, "issue_id_invalid")
+
+    def test_artifact_directories_of_malformed_ids_are_invalid(self):
+        for directory in REJECTED_ARTIFACT_ISSUE_DIRECTORIES:
+            with self.subTest(directory=directory):
+                document = followup_document()
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(
+                    directory
+                )
+                self.assert_invalid(document, "artifact_path_invalid")
+
+    def test_artifact_paths_of_another_issue_are_a_mismatch(self):
+        for document_issue, path_issue in (
+            (FOLLOWUP_ISSUE, "M4-036"),
+            (FOLLOWUP_ISSUE, "M4-036-FOLLOWUP-002"),
+            ("M4-036", FOLLOWUP_ISSUE),
+        ):
+            with self.subTest(document_issue=document_issue, path_issue=path_issue):
+                self.make_artifact_directory(path_issue)
+                document = followup_document(issue=document_issue)
+                document["artifacts"][0]["path"] = "evidence/e2e/{0}/report.json".format(
+                    path_issue
+                )
+                self.assert_invalid(document, "artifact_path_issue_mismatch")
+
+    def test_followup_result_cannot_list_itself(self):
+        document = followup_document()
+        document["artifacts"][0]["path"] = "evidence/e2e/{0}/result.json".format(
+            FOLLOWUP_ISSUE
+        )
+        self.assert_invalid(document, "artifact_is_result")
+
+    def test_expected_issue_accepts_a_followup_id_on_the_command_line(self):
+        self.write_result(followup_document())
+        exit_code, stdout, stderr = self.run_main(
+            [str(self.result_path), "--expected-issue", FOLLOWUP_ISSUE, "--require-passed"]
+        )
+        self.assertEqual(exit_code, 0, stderr)
+        self.assertEqual(stdout, "evidence valid: issue=M4-036-FOLLOWUP-001 status=passed\n")
+        self.assertEqual(stderr, "")
+
+    def test_expected_issue_rejects_malformed_followup_ids_on_the_command_line(self):
+        self.write_result(followup_document())
+        for value in (
+            "M4-036-FOLLOWUP-",
+            "M4-036-FOLLOWUP-1",
+            "M4-036-FOLLOWUP-001-FOLLOWUP-001",
+            "m4-036-followup-001",
+            "M4-036-FOLLOWUP-0001",
+            "M6-001",
+        ):
+            with self.subTest(value=value):
+                exit_code, stdout, stderr = self.run_main(
+                    [str(self.result_path), "--expected-issue", value]
+                )
+                self.assertEqual(exit_code, 64)
+                self.assertEqual(stdout, "")
+                self.assertEqual(stderr, "evidence validation failed: invalid_arguments\n")
+
+    def test_expected_base_issue_does_not_match_a_followup_result(self):
+        self.write_result(followup_document())
+        exit_code, stdout, stderr = self.run_main(
+            [str(self.result_path), "--expected-issue", "M4-036"]
+        )
+        self.assertEqual(exit_code, 65)
+        self.assertEqual(stdout, "")
+        self.assertEqual(stderr, "evidence validation failed: issue_mismatch\n")
+
+
 class SchemaContractTests(unittest.TestCase):
     def setUp(self):
         self.schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -1031,6 +1205,45 @@ class SchemaContractTests(unittest.TestCase):
         for schema_pattern, validator_pattern in pairs:
             with self.subTest(pattern=schema_pattern):
                 self.assertEqual(schema_pattern, "^" + validator_pattern.pattern + "$")
+
+    def schema_pattern_matches(self, pattern, value):
+        # JSON Schema patterns are ECMA-262 and unanchored unless they say so;
+        # these use only constructs Python's re reads the same way. Python's `$`
+        # also matches before a trailing newline, so anchor with fullmatch.
+        self.assertTrue(pattern.startswith("^") and pattern.endswith("$"))
+        return re.fullmatch(pattern[1:-1], value) is not None
+
+    def test_schema_issue_id_pattern_accepts_exactly_the_followup_forms(self):
+        pattern = self.schema["properties"]["issueId"]["pattern"]
+        for value in ACCEPTED_ISSUE_IDS:
+            with self.subTest(value=value):
+                self.assertTrue(self.schema_pattern_matches(pattern, value))
+        for value in REJECTED_ISSUE_IDS:
+            with self.subTest(value=value):
+                self.assertFalse(self.schema_pattern_matches(pattern, value))
+
+    def test_schema_artifact_path_pattern_accepts_exactly_the_followup_roots(self):
+        pattern = self.schema["$defs"]["artifact"]["properties"]["path"]["pattern"]
+        for issue in ACCEPTED_ISSUE_IDS:
+            path = "evidence/e2e/{0}/report.json".format(issue)
+            with self.subTest(path=path):
+                self.assertTrue(self.schema_pattern_matches(pattern, path))
+        for directory in REJECTED_ARTIFACT_ISSUE_DIRECTORIES:
+            path = "evidence/e2e/{0}/report.json".format(directory)
+            with self.subTest(path=path):
+                self.assertFalse(self.schema_pattern_matches(pattern, path))
+        self.assertTrue(
+            self.schema_pattern_matches(pattern, "Tests/Fixtures/Barrier/linux-handshake.bin")
+        )
+
+    def test_schema_artifact_path_pattern_matches_validator(self):
+        pattern = self.schema["$defs"]["artifact"]["properties"]["path"]["pattern"]
+        self.assertTrue(pattern.startswith("^") and pattern.endswith("$"))
+        # The schema's groups capture; the validator's do not. Nothing else may differ.
+        self.assertEqual(
+            re.sub(r"\((?!\?)", "(?:", pattern[1:-1]),
+            validate_evidence.ARTIFACT_PATH_PATTERN.pattern,
+        )
 
     def test_schema_accepts_and_rejects_followup_ids(self):
         issue_pattern = re.compile(self.schema["properties"]["issueId"]["pattern"])
