@@ -655,6 +655,33 @@
       }
     }
 
+    // M4-026-FOLLOWUP-001: the protocol session leaves an inbound clipboard's content hash
+    // empty, so before the fix every server clipboard after the first in a session compared
+    // equal to the first in the loop guard and was dropped as `loopRejected`.
+    @Test("M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied")
+    func secondServerClipboardInOneSession() async throws {
+      let harness = Harness()
+      let run = harness.start()
+      let server = try await harness.readyServer(0)
+      try await server.session.enter(at: NormalizedPoint(x: 0, y: 0.5))
+      await harness.injected(.mouseMove(position: NormalizedPoint(x: 0, y: 450.0 / 899)))
+
+      try await server.session.forward(.clipboard(clipboardPayload("first")))
+      await harness.clipboard.writes.wait { $0.contains("first") }
+      let large = String(
+        (0..<600_000).map { Character(UnicodeScalar(UInt8(0x61 + $0 % 26))) })
+      try await server.session.forward(.clipboard(clipboardPayload(large)))
+      await harness.clipboard.writes.wait { $0.contains(large) }
+      // Content seen earlier in the session is applied again once the clipboard has moved on.
+      try await server.session.forward(.clipboard(clipboardPayload("first")))
+      await harness.clipboard.writes.wait { $0.filter { $0 == "first" }.count == 2 }
+      #expect(harness.clipboard.writes.all.count == 3)
+      #expect(harness.runtime.coordinator.diagnostics.inboundClipboardLoopRejected == 0)
+
+      harness.runtime.requestTermination(signal: SIGTERM)
+      #expect(await finished(run) == .success)
+    }
+
     @Test("killing the server stream releases every held key and starts the next generation")
     func serverStreamKilled() async throws {
       let harness = Harness()
