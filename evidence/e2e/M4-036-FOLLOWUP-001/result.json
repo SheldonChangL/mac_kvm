@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issueId": "M4-036-FOLLOWUP-001",
   "status": "failed",
-  "startedAt": "2026-11-17T09:05:30Z",
-  "endedAt": "2026-11-17T09:07:16Z",
-  "commit": "cc4ccb8edc7d4a72fa028636fafd97a901cc7eea",
+  "startedAt": "2026-11-19T03:35:20Z",
+  "endedAt": "2026-11-19T03:37:11Z",
+  "commit": "65379c49f7828be5a883b400fc97586ba8bdc167",
   "toolchain": {
     "pythonVersion": "3.9.6",
     "platform": "Darwin",
@@ -13,7 +13,7 @@
   "environment": {
     "localOS": "macOS 26.6.2",
     "peerProduct": "mackvm-client (first-party, DEBUG)",
-    "peerVersion": "cc4ccb8edc7d",
+    "peerVersion": "65379c49f782",
     "peerRole": "client",
     "peerOS": "Ubuntu 22.04 arm64 container (swift:6.2.3-jammy), Xvfb 1600x900",
     "networkScope": "Mac loopback listener via the Docker Desktop host gateway",
@@ -158,8 +158,8 @@
     },
     {
       "id": "clipboard-large-to-client",
-      "status": "failed",
-      "exitCode": 1,
+      "status": "passed",
+      "exitCode": 0,
       "evidence": [
         "600 KB server clipboard matched by SHA-256 on the client display, session kept"
       ]
@@ -208,14 +208,14 @@
   "artifacts": [
     {
       "path": "evidence/e2e/M4-036-FOLLOWUP-001/server.log",
-      "sha256": "9a3037cee7944b29210146d57be238ce769ef844c37d5d7e4b518b5541b43e41",
+      "sha256": "c1c05380a71bb96a25b1ebefd088c7cd4373d846c133a1b99db5f52727216e7f",
       "byteLength": 2079,
       "kind": "sanitized-log",
       "reviewStatus": "pending-review"
     },
     {
       "path": "evidence/e2e/M4-036-FOLLOWUP-001/client.log",
-      "sha256": "95ad0c050c47a46c0aaad9ad6464cfa6b971f30cfe6635ab7e8637b19fb61bb3",
+      "sha256": "8fb299b100c23912eb7eb3137311d4f9648bd1fada0bc5ab5c3e89cfb45f2196",
       "byteLength": 2335,
       "kind": "sanitized-log",
       "reviewStatus": "pending-review"

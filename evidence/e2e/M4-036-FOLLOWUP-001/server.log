@@ -1,37 +1,37 @@
-[09:05:38.657] server certificate SHA-256: <fingerprint>
-[09:05:38.658] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
-[09:05:38.660] listening on loopback only; the client is beyond the right edge
-[09:05:42.017] connection refused before the handshake: connectFailed(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.security(KVMContracts.SecurityErrorCode.trustRejected), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.userActionRequired, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil))
-[09:05:42.270] client ready (1600x900)
-[09:05:47.923] input is now remote
-[09:05:47.923] clipboard sent to the client
-[09:06:04.680] clipboard received from the client
-[09:06:07.505] input is local again
-[09:06:09.236] smoke: clipboard matches
-[09:06:09.611] input is now remote
-[09:06:10.495] local recovery: completed
-[09:06:11.794] input is now remote
-[09:06:12.673] clipboard received from the client
-[09:06:13.658] input is local again
-[09:06:17.002] smoke: clipboard matches
-[09:06:17.386] input is now remote
-[09:06:19.024] local recovery: completed
-[09:06:19.024] client disconnected: failed (transport(KVMContracts.TransportErrorCode.disconnected))
-[09:06:22.834] smoke: not remote
-[09:06:23.784] client ready (1600x900)
-[09:06:29.011] input is now remote
-[09:06:29.013] clipboard sent to the client
-[09:06:43.447] input is local again
-[09:06:44.688] input is now remote
-[09:06:44.706] clipboard sent to the client
-[09:06:51.158] input is local again
-[09:06:52.362] input is now remote
-[09:06:52.362] clipboard sent to the client
-[09:06:53.833] local recovery: completed
-[09:06:53.937] stopped
-[09:06:57.372] server certificate SHA-256: <fingerprint>
-[09:06:57.372] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
-[09:06:57.374] listening on loopback only; the client is beyond the right edge
-[09:07:01.072] client ready (1600x900)
-[09:07:11.360] local recovery: completed
-[09:07:11.467] stopped
+[03:35:33.468] server certificate SHA-256: <fingerprint>
+[03:35:33.468] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
+[03:35:33.475] listening on loopback only; the client is beyond the right edge
+[03:35:37.115] connection refused before the handshake: connectFailed(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.security(KVMContracts.SecurityErrorCode.trustRejected), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.userActionRequired, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil))
+[03:35:37.422] client ready (1600x900)
+[03:35:43.082] input is now remote
+[03:35:43.082] clipboard sent to the client
+[03:35:59.961] clipboard received from the client
+[03:36:02.855] input is local again
+[03:36:04.607] smoke: clipboard matches
+[03:36:05.001] input is now remote
+[03:36:05.854] local recovery: completed
+[03:36:07.159] input is now remote
+[03:36:08.041] clipboard received from the client
+[03:36:09.020] input is local again
+[03:36:12.358] smoke: clipboard matches
+[03:36:12.751] input is now remote
+[03:36:14.411] local recovery: completed
+[03:36:14.411] client disconnected: failed (transport(KVMContracts.TransportErrorCode.disconnected))
+[03:36:18.172] smoke: not remote
+[03:36:19.120] client ready (1600x900)
+[03:36:24.349] input is now remote
+[03:36:24.352] clipboard sent to the client
+[03:36:38.835] input is local again
+[03:36:40.050] input is now remote
+[03:36:40.061] clipboard sent to the client
+[03:36:46.584] input is local again
+[03:36:47.766] input is now remote
+[03:36:47.767] clipboard sent to the client
+[03:36:49.240] local recovery: completed
+[03:36:49.352] stopped
+[03:36:52.794] server certificate SHA-256: <fingerprint>
+[03:36:52.795] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
+[03:36:52.796] listening on loopback only; the client is beyond the right edge
+[03:36:56.494] client ready (1600x900)
+[03:37:06.767] local recovery: completed
+[03:37:06.870] stopped

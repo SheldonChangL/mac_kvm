@@ -62,7 +62,7 @@ Result is `pass`, `fail` or `not run`.
 | X7 | Unknown fingerprint, first run | with no trust record: interactive prompt shows the fingerprint; `trust` stores it; anything else exits 78 and stores nothing; `--non-interactive` exits 78 | | |
 | X8 | `systemd --user` start and stop | `systemctl --user start mackvm-client` connects; `stop` exits 0 and releases input | | |
 | X9 | Reconnect after a Linux reboot | after reboot and login the unit starts and reconnects without action | | |
-| X10 | Large clipboard to Linux | a ~600 KB Mac copy pastes on Linux (automated case `clipboard-large-to-client` currently fails; expect fail until fixed) | | |
+| X10 | Large clipboard to Linux | a ~600 KB Mac copy pastes on Linux (automated case `clipboard-large-to-client` passes since #373 and #376) | | |
 
 Stopped early? (case number and reason): ______
 

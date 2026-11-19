@@ -1,38 +1,31 @@
 {
   "schemaVersion": 1,
   "issue": "M4-036-FOLLOWUP-001",
-  "baseCommit": "4c2f0429c9106902f02c2563092c7d7366f34a0b",
-  "date": "2026-11-17",
-  "note": "Run by the implementing agent. Paths masked. The automated half ran five more times during development (all reached clipboard-large-to-client and failed it); only the gate run is recorded here.",
+  "baseCommit": "a555a07cc6c22b82375a7b433731a5cc72dc24d1",
+  "date": "2026-11-19",
+  "note": "Run by an agent. Paths masked. Rerun after merging main (a555a07), which carries #373 (TLS inbound backpressure) and #376 (inbound clipboard hashing). The first attempt at 03:30:58Z stopped at the client build (script exit 1, disposition script_failed) because the fresh container lacked the libX11/libXtst/libXfixes/libXrandr headers; after installing them the gate run below passed all 22 automated cases. The earlier gate of record at cc4ccb8 (2026-11-17, clipboard-large-to-client failed) is superseded and kept in git history.",
   "commands": [
     {
-      "command": "MACKVM_E2E_CONTAINER=<arm64 swift:6.2.3-jammy container> make e2e ISSUE=M4-036-FOLLOWUP-001",
-      "startedAt": "2026-11-17T09:05:30Z",
-      "endedAt": "2026-11-17T09:07:16Z",
+      "command": "MACKVM_E2E_CONTAINER=<arm64 swift:6.2.3-jammy container> MACKVM_E2E_PORT=24811 make e2e ISSUE=M4-036-FOLLOWUP-001",
+      "startedAt": "2026-11-19T03:35:20Z",
+      "endedAt": "2026-11-19T03:37:11Z",
       "exitCode": 2,
-      "stdout": "python3 Tools/Evidence/run_e2e.py --issue 'M4-036-FOLLOWUP-001'\ne2e runner version: 1\ne2e issue: M4-036-FOLLOWUP-001\ne2e commit: cc4ccb8edc7d4a72fa028636fafd97a901cc7eea\ne2e python: 3.9.6\ne2e script: Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-client-e2-e.sh\ne2e stdout: lines=25 sha256=0987eebbeb07d1c79899bd97bded39a40f236d917167462b34320158733f8292\ne2e stderr: lines=0 sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ne2e script exit: 0\ne2e disposition: failed\ne2e exit: 1\nmake: *** [e2e] Error 1\n",
-      "note": "gate of record at cc4ccb8; make exits 2 because run_e2e.py exits 1 for status=failed (clipboard-large-to-client failed; owner-hardware-half pending)"
+      "stdout": "python3 Tools/Evidence/run_e2e.py --issue 'M4-036-FOLLOWUP-001'\ne2e runner version: 1\ne2e issue: M4-036-FOLLOWUP-001\ne2e commit: 65379c49f7828be5a883b400fc97586ba8bdc167\ne2e python: 3.9.6\ne2e script: Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-client-e2-e.sh\ne2e stdout: lines=25 sha256=8a87c00b5c2ee471df54d04e491be82c67e00545efc5b5d960f4f36e46fbc766\ne2e stderr: lines=0 sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ne2e script exit: 0\ne2e disposition: failed\ne2e exit: 1\nmake: *** [e2e] Error 1\n",
+      "note": "gate of record at 65379c4; 22 of 22 automated cases passed; make exits 2 because run_e2e.py exits 1 for status=failed (owner-hardware-half pending)"
     },
     {
-      "command": "make verify",
-      "startedAt": "2026-11-17T09:08:14Z",
-      "endedAt": "2026-11-17T09:11:28Z",
+      "command": "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M4-036-FOLLOWUP-001/result.json",
+      "startedAt": "2026-11-19T03:37:23Z",
+      "endedAt": "2026-11-19T03:37:23Z",
       "exitCode": 0,
-      "stdout": "[PASSED] swift-package-test:KVMContracts exit=0 durationMs=13338\n[PASSED] swift-package-test:MacPlatform exit=0 durationMs=26888\n[PASSED] swift-package-test:BarrierCompatibility exit=0 durationMs=39156\n[PASSED] repository-contract-tests exit=0 durationMs=83421\n[PASSED] swift-test-targets exit=0 durationMs=1891\n[PASSED] native-arm64-build exit=0 durationMs=1259"
+      "stdout": "evidence valid: issue=M4-036-FOLLOWUP-001 status=failed"
     },
     {
       "command": "make docs-check",
-      "startedAt": "2026-11-17T09:11:28Z",
-      "endedAt": "2026-11-17T09:11:28Z",
+      "startedAt": "2026-11-19T03:37:52Z",
+      "endedAt": "2026-11-19T03:37:52Z",
       "exitCode": 0,
       "stdout": "python3 Tools/docs-check/docs-check.py --repository-root .\ndocs check OK"
-    },
-    {
-      "command": "python3 Tools/Backlog/validate_package.py",
-      "startedAt": "2026-11-17T09:11:28Z",
-      "endedAt": "2026-11-17T09:11:28Z",
-      "exitCode": 0,
-      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics"
     }
   ]
 }
