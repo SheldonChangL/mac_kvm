@@ -384,7 +384,9 @@ final class ClientRuntime: @unchecked Sendable {
     let (relay, relayContinuation) = AsyncThrowingStream<KVMEvent, any Error>.makeStream()
     let pump = Task {
       do {
-        for try await event in session.events { relayContinuation.yield(event) }
+        for try await event in session.events {
+          relayContinuation.yield(Self.withContentHash(event))
+        }
         relayContinuation.finish()
       } catch {
         ending.set(error)
@@ -522,6 +524,19 @@ final class ClientRuntime: @unchecked Sendable {
         height: geometry.height, cursorX: geometry.cursorX, cursorY: geometry.cursorY)
     else { return }
     try? await slot.current?.updateScreen(screen)
+  }
+
+  /// An inbound clipboard with the content hash the loop guard compares (M4-026-FOLLOWUP-001).
+  /// The protocol session leaves it empty, so without this every server clipboard after the
+  /// first in a session matched the first and was dropped as `loopRejected`. It is made the
+  /// way the X11 backend hashes a local read (C-015 SHA-256), so both directions agree.
+  static func withContentHash(_ event: KVMEvent) -> KVMEvent {
+    guard case .clipboard(let payload) = event else { return event }
+    return .clipboard(
+      ClipboardPayload(
+        transactionID: payload.transactionID, origin: payload.origin,
+        utf8Text: payload.utf8Text,
+        contentHash: LinuxX11ClipboardRules.contentHash(of: payload.utf8Text)))
   }
 
   /// A local copy while input is on this screen is offered to the server (a.8). The text is

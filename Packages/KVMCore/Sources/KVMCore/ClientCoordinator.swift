@@ -419,6 +419,13 @@ package final class ClientCoordinator: @unchecked Sendable {
   }
 
   private func applyInbound(_ payload: ClipboardPayload, event: KVMEvent) -> ClientHandleOutcome {
+    // The owner hashes inbound text the way it hashes local reads; an empty hash would match
+    // every later inbound payload in the loop guard (M4-026-FOLLOWUP-001).
+    guard !payload.contentHash.isEmpty else {
+      assertionFailure("inbound clipboard without a content hash")
+      current.diagnostics.inboundClipboardLoopRejected += 1
+      return .dropped
+    }
     do throws(CoreError) {
       try current.clipboardGuard.admitInbound(payload, limit: clipboardLimit)
     } catch {

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-026-FOLLOWUP-001",
+  "githubIssue": 375,
+  "baseCommit": "42a7691feb7b",
+  "date": "2026-11-19",
+  "toolchain": {
+    "swiftVersion": [
+      "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+      "Target: arm64-apple-macosx26.0"
+    ],
+    "macOS": "26.6.2",
+    "architecture": "arm64",
+    "linuxLocal": "swift:6.2.3-jammy linux/arm64 container (native) with Xvfb and xclip"
+  },
+  "note": "Run by the implementing agent; outputs filtered to result lines, paths and fingerprints masked. The diagnosis runs used temporary stderr instrumentation and a probe test that were removed before the fix; neither is committed. The E2E script is a copy of PR #371's Tests/SystemTests/Scripts/M4-036-FOLLOWUP-001-linux-client-e2-e.sh (branch codex/m4-036-followup-001-linux-client-e2e), not committed here; its evidence/e2e output was discarded because it belongs to M4-036-FOLLOWUP-001.",
+  "commands": [
+    {
+      "name": "diagnose-e2e-baseline",
+      "command": "MACKVM_E2E_DEBUG=1 MACKVM_E2E_CONTAINER=<arm64 container> MACKVM_E2E_PORT=24811 <PR #371 E2E script>",
+      "sourceCommit": "42a7691feb7b (origin/main, unchanged)",
+      "exitCode": 0,
+      "expectedFailure": true,
+      "stdout": "... 17 earlier cases pass ...\nM4-036 e2e: clipboard-large-to-client=fail\n... 4 later cases pass ...\nM4-036 e2e: automated=1 failed of 22\nM4-036 e2e: owner-hardware-half=pending\n",
+      "note": "Reproduces #375 locally. Server log: 'clipboard sent to the client' right after 'input is now remote'; client log: no 'connection ended' during the case."
+    },
+    {
+      "name": "diagnose-x11-serving",
+      "command": "temporary probe test under xvfb-run: LinuxX11Clipboard.writePlainText(N bytes) then `timeout 5 xclip -selection clipboard -o`, N in 60000, 70000, 200000, 262000, 263000, 300000, 600015",
+      "exitCode": 0,
+      "stdout": "ZZ size 60000 got 60000 status 0\nZZ size 70000 got 70000 status 0\nZZ size 200000 got 200000 status 0\nZZ size 262000 got 262000 status 0\nZZ size 263000 got 263000 status 0\nZZ size 300000 got 300000 status 0\nZZ size 600015 got 600015 status 0 secs 0.0078\n",
+      "note": "Rules out the X11 layer: LinuxX11Clipboard serves 600 KB to real xclip through INCR, byte count exact, in under 10 ms."
+    },
+    {
+      "name": "diagnose-instrumented-repro",
+      "command": "focused repro (Mac smoke server on 24811, client in the container, Xvfb :94): copy small, edge, check; move away; copy 600 KB, edge; poll `xclip -o | wc -c` every ~0.7 s for 28 s. Temporary stderr lines in the client protocol session (DCLP complete), ClientCoordinator.applyInbound (admit refused) and ClientClipboardWriter (write start/done).",
+      "exitCode": 0,
+      "expectedFailure": true,
+      "stdout": "small: <synthetic small text, matched>\nt=0.51 bytes=11 match=no\n... 38 more polls ...\nt=28.2 bytes=11 match=no\nclient stderr:\nZZDBG dclp complete 23\nZZDBG write start 11\nZZDBG write done success()\nZZDBG dclp complete 600027\nZZDBG admit refused clipboard(KVMContracts.ClipboardErrorCode.loopRejected)\n",
+      "note": "Root cause: the 600 KB transfer is fully reassembled by the protocol session, but ClientCoordinator's ClipboardLoopGuard rejects it as loopRejected, so it never reaches the clipboard writer; the display keeps the previous 11-byte text indefinitely (not a timing issue). BarrierClientProtocolSession emits inbound payloads with contentHash \"\", and the guard's rule 4 (equal hash) rejects every server clipboard after the first in a session. In the E2E the session first receives the reconnect clipboard, so the 600 KB one is the second."
+    },
+    {
+      "name": "red",
+      "command": "docker exec <c> swift test --scratch-path /build --filter secondServerClipboardInOneSession (new test, origin/main sources)",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" recorded an issue at LinuxClientRuntimeTests.swift:661:6: Time limit was exceeded: 60.000 seconds\n✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" failed after 60.024 seconds with 1 issue.\n✘ Test run with 1 test in 1 suite failed after 60.025 seconds with 1 issue.\n"
+    },
+    {
+      "name": "green",
+      "command": "docker exec <c> swift test --skip-build --scratch-path /build --filter secondServerClipboardInOneSession",
+      "exitCode": 0,
+      "stdout": "✔ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" passed after 0.134 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.135 seconds.\n"
+    },
+    {
+      "name": "linux-focused",
+      "command": "docker exec <c> swift build --build-tests --scratch-path /build -Xswiftc -warnings-as-errors && swift test --skip-build --filter 'secondServerClipboardInOneSession|LinuxClient|ClientCoordinator|ClipboardLoopGuard'",
+      "exitCode": 0,
+      "stdout": "Build complete! (23.04s)\n✔ Test run with 92 tests in 6 suites passed after 0.186 seconds.\n"
+    },
+    {
+      "name": "linux-full-xvfb",
+      "command": "docker exec -e MACKVM_X11_TESTS=1 <c> xvfb-run -a swift test --skip-build --scratch-path /build --xunit-output evidence/issues/M4-026-FOLLOWUP-001/tests/swift-testing-xunit.xml",
+      "sourceCommit": "f1cd4a6 (superseded by review-followup-linux-full-xvfb)",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 521 tests in 54 suites passed after 6.340 seconds.\n"
+    },
+    {
+      "name": "review-followup-red",
+      "command": "review notes F1/F2/F4 applied to the tests and coordinator; ClientRuntime.swift and ClientCoordinator.swift temporarily restored from origin/main; docker exec <c> swift test --filter 'secondServerClipboardInOneSession|appliedServerClipboardIsNotEchoed'; restored",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" recorded an issue at LinuxClientRuntimeTests.swift:609:9: Expectation failed: applied\n↳ inbound clipboards applied 1 of 2, loopRejected 1\n✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" failed after 5.111 seconds with 1 issue.\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" recorded an issue at LinuxClientRuntimeTests.swift:738:7: Expectation failed: (coordinator.diagnostics.outboundClipboardAdmitted → 1) == 0\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" failed after 5.033 seconds with 3 issues.\n✘ Test run with 2 tests in 1 suite failed after 10.147 seconds with 4 issues.\n",
+      "note": "F4: the RED now fails within 5 s and names the counters instead of hitting the 60 s time limit."
+    },
+    {
+      "name": "review-followup-mutant-other-hash",
+      "command": "withContentHash hashes `text + \"-mutant\"` with the same rule (any hash other than a local read's); same filter; restored",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✔ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" passed after 0.162 seconds.\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" recorded an issue at LinuxClientRuntimeTests.swift:738:7: Expectation failed: (coordinator.diagnostics.outboundClipboardAdmitted → 1) == 0\n✘ Test run with 2 tests in 1 suite failed after 5.185 seconds with 3 issues.\n",
+      "note": "F1: killed by appliedServerClipboardIsNotEchoed; the earlier test alone did not pin the hash function."
+    },
+    {
+      "name": "review-followup-linux-focused",
+      "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors && swift test --filter 'secondServerClipboardInOneSession|appliedServerClipboardIsNotEchoed' && swift test --filter 'LinuxClient|ClientCoordinator|ClipboardLoopGuard'",
+      "exitCode": 0,
+      "stdout": "Build complete! (10.95s)\n✔ Test run with 2 tests in 1 suite passed after 0.168 seconds.\n✔ Test run with 93 tests in 6 suites passed after 0.211 seconds.\n"
+    },
+    {
+      "name": "review-followup-linux-full-xvfb",
+      "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors; docker exec -e MACKVM_X11_TESTS=1 <c> xvfb-run -a swift test --skip-build --scratch-path /build --xunit-output evidence/issues/M4-026-FOLLOWUP-001/tests/swift-testing-xunit.xml",
+      "exitCode": 0,
+      "stdout": "Build complete! (20.73s)\n✔ Test run with 522 tests in 54 suites passed after 6.372 seconds.\n",
+      "note": "The XML header reads tests=\"521\" failures=\"0\" skipped=\"1\" with 522 testcase elements (same counting difference as M1-055-FOLLOWUP-002). The report is written as tests/swift-testing-xunit-swift-testing.xml."
+    },
+    {
+      "name": "review-followup-mac-swift-test",
+      "command": "swift test (with the ClientCoordinator empty-hash check)",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 332 tests in 29 suites passed after 0.177 seconds.\n"
+    },
+    {
+      "name": "mac-swift-test",
+      "command": "swift test",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 332 tests in 29 suites passed after 0.167 seconds.\n",
+      "note": "The changed runtime and its test are Linux-only, so the macOS count is unchanged."
+    },
+    {
+      "name": "make-verify",
+      "command": "make verify",
+      "exitCode": 0,
+      "stdout": "[PASSED] repository-contract-tests exit=0\n[PASSED] swift-test-targets exit=0\n[PASSED] native-arm64-build exit=0\n"
+    },
+    {
+      "name": "docs-check",
+      "command": "make docs-check",
+      "exitCode": 0,
+      "stdout": "docs check OK\n"
+    },
+    {
+      "name": "backlog",
+      "command": "python3 Tools/Backlog/validate_package.py",
+      "exitCode": 0,
+      "stdout": "PACKAGE OK: 217 issues, 5 milestones, 17 epics\n"
+    },
+    {
+      "name": "e2e-rerun",
+      "command": "MACKVM_E2E_CONTAINER=<arm64 swift:6.2.3-jammy container> MACKVM_E2E_PORT=24811 <PR #371 E2E script> (Xvfb :93, Mac smoke server loopback-only)",
+      "sourceCommit": "42a7691feb7b plus the f1cd4a6 fix (working tree; the client is built from it by the script). Not rerun after the review follow-up, which adds tests and an empty-hash check in ClientCoordinator that the runtime path never reaches.",
+      "exitCode": 0,
+      "stdout": "M4-036 e2e: fingerprint-changed-exit-78=pass\nM4-036 e2e: fingerprint-changed-no-bytes=pass\nM4-036 e2e: handshake=pass\nM4-036 e2e: enter=pass\nM4-036 e2e: clipboard-to-client=pass\nM4-036 e2e: move-1=pass\nM4-036 e2e: move-2=pass\nM4-036 e2e: held-key-locks=pass\nM4-036 e2e: return=pass\nM4-036 e2e: clipboard-from-client=pass\nM4-036 e2e: escape=pass\nM4-036 e2e: clipboard-not-echoed=pass\nM4-036 e2e: clipboard-large-from-client=pass\nM4-036 e2e: kill-client-no-stuck-key=pass\nM4-036 e2e: reconnect=pass\nM4-036 e2e: clipboard-on-reconnect=pass\nM4-036 e2e: keepalive-13s=pass\nM4-036 e2e: clipboard-large-to-client=pass\nM4-036 e2e: quit-while-remote=pass\nM4-036 e2e: auto-reconnect=pass\nM4-036 e2e: client-sigterm-exit-0=pass\nM4-036 e2e: x-events-redundant-releases=2\nM4-036 e2e: x-events=pass\nM4-036 e2e: automated=0 failed of 22\nM4-036 e2e: owner-hardware-half=pending\n"
+    },
+    {
+      "name": "e2e-result-validate",
+      "command": "python3 Tools/Evidence/validate_evidence.py evidence/e2e/M4-036-FOLLOWUP-001/result.json --expected-issue M4-036-FOLLOWUP-001 (the rerun's result, not committed)",
+      "exitCode": 0,
+      "stdout": "evidence valid: issue=M4-036-FOLLOWUP-001 status=failed\n",
+      "note": "status=failed only because the owner-hardware-half case is pending by design; 22 of 23 cases passed."
+    },
+    {
+      "name": "evidence-tool-tests",
+      "command": "python3 -m unittest discover -s Tools/Evidence/tests",
+      "exitCode": 0,
+      "stdout": "Ran 246 tests\nOK\n"
+    }
+  ]
+}

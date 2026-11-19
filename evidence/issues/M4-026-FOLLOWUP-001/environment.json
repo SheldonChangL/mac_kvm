@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "issue": "M4-026-FOLLOWUP-001",
+  "githubIssue": 375,
+  "baseCommit": "42a7691feb7b",
+  "date": "2026-11-19",
+  "source": "Implementing agent (Claude Opus). Only reported facts are recorded; no host name, address, user name, typed text or clipboard content beyond synthetic test strings.",
+  "mac": {
+    "os": "macOS 26.6.2 (25G83)",
+    "architecture": "arm64",
+    "swift": "swift-driver version: 1.127.14.1 Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)",
+    "server": "MacKVM smoke (DEBUG), loopback-only listener on test port 24811 (never 24800), disposable Keychain identity removed after each run; the Mac pasteboard was not touched"
+  },
+  "linux": {
+    "container": "swift:6.2.3-jammy linux/arm64 (native, Docker Desktop 29.4.0); not the emulated linux/amd64 image",
+    "os": "Ubuntu 22.04.5 LTS (aarch64)",
+    "swift": "Swift version 6.2.3 (swift-6.2.3-RELEASE)",
+    "packages": [
+      "xvfb 2:21.1.4-2ubuntu1.7~22.04.16",
+      "xclip 0.13-2",
+      "xdotool 1:3.20160805.1-4",
+      "xinput 1.6.3-1build2"
+    ],
+    "display": "private Xvfb displays only (xvfb-run -a for the suites, :93 for the E2E script, :94 for the focused repro); never a real display",
+    "user": "non-root container user for the client (the client refuses root)"
+  },
+  "network": {
+    "exercised": true,
+    "note": "client -> Docker Desktop host gateway -> Mac loopback listener; TLS 1.3, server pinned by SHA-256. The TLS transport and protocol session were not changed."
+  },
+  "manualVerification": {
+    "required": false,
+    "performed": false,
+    "note": "The owner-hardware half of M4-036-FOLLOWUP-001 is outside this issue."
+  }
+}
