@@ -11,7 +11,7 @@
       "clipboard": "smoke driver in-memory stand-in; the Mac pasteboard was not touched"
     },
     "client": {
-      "binary": "mackvm-client (DEBUG) built from the same commit (65379c4)",
+      "binary": "mackvm-client (DEBUG) built from the same commit (4378b81)",
       "container": "swift:6.2.3-jammy linux/arm64 (native, Docker Desktop 29.4.0); not the emulated linux/amd64 image",
       "os": "Ubuntu 22.04.5 LTS",
       "packages": [
@@ -21,7 +21,6 @@
         "xclip 0.13-2",
         "libx11-dev 2:1.7.5-1ubuntu0.4",
         "libxtst-dev 2:1.2.3-1ubuntu0.22.04.1",
-        "libxi-dev 2:1.8-1build1",
         "libxfixes-dev 1:6.0.0-1",
         "libxrandr-dev 2:1.5.2-1build1"
       ],
@@ -29,7 +28,7 @@
       "user": "non-root container user (the client refuses root)"
     },
     "network": "client -> Docker Desktop host gateway -> Mac loopback listener; TLS, server pinned by SHA-256",
-    "linuxTestHost": "reachable over SSH but has no Swift toolchain; installing one was not authorized, so it was not used. Its barrierc, display and trust list were not touched."
+    "linuxTestHost": "reachable over SSH but has no Swift toolchain; installing one was not authorized, so it was not used. Its barrierc, display and trust list were not touched. Deviation from #351 (which names Xvfb on the Linux host): the automated half ran in a Mac-local container; not yet confirmed by the owner on #351."
   },
   "ownerHardwareHalf": "not run (manual.md is an unsigned template)"
 }

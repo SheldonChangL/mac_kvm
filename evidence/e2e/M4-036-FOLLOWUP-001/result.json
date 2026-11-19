@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issueId": "M4-036-FOLLOWUP-001",
   "status": "failed",
-  "startedAt": "2026-11-19T03:35:20Z",
-  "endedAt": "2026-11-19T03:37:11Z",
-  "commit": "65379c49f7828be5a883b400fc97586ba8bdc167",
+  "startedAt": "2026-11-19T03:45:54Z",
+  "endedAt": "2026-11-19T03:50:19Z",
+  "commit": "4378b81f403451da852d667de8363c73fd95e6f8",
   "toolchain": {
     "pythonVersion": "3.9.6",
     "platform": "Darwin",
@@ -13,7 +13,7 @@
   "environment": {
     "localOS": "macOS 26.6.2",
     "peerProduct": "mackvm-client (first-party, DEBUG)",
-    "peerVersion": "65379c49f782",
+    "peerVersion": "4378b81f4034",
     "peerRole": "client",
     "peerOS": "Ubuntu 22.04 arm64 container (swift:6.2.3-jammy), Xvfb 1600x900",
     "networkScope": "Mac loopback listener via the Docker Desktop host gateway",
@@ -33,7 +33,7 @@
       "status": "passed",
       "exitCode": 0,
       "evidence": [
-        "server log: no session became ready, so no application byte crossed TLS"
+        "server log: the connection was refused before the handshake; no session became ready"
       ]
     },
     {
@@ -161,7 +161,15 @@
       "status": "passed",
       "exitCode": 0,
       "evidence": [
-        "600 KB server clipboard matched by SHA-256 on the client display, session kept"
+        "600 KB server clipboard matched by SHA-256 on the client display; no connection end on either side"
+      ]
+    },
+    {
+      "id": "clipboard-later-to-client",
+      "status": "passed",
+      "exitCode": 0,
+      "evidence": [
+        "a later small server clipboard replaced the 600 KB one on the same session"
       ]
     },
     {
@@ -208,14 +216,14 @@
   "artifacts": [
     {
       "path": "evidence/e2e/M4-036-FOLLOWUP-001/server.log",
-      "sha256": "c1c05380a71bb96a25b1ebefd088c7cd4373d846c133a1b99db5f52727216e7f",
+      "sha256": "96b90235a00b118af5c069321560f6257fc25c5fa8849c220932b5466e3b3e67",
       "byteLength": 2079,
       "kind": "sanitized-log",
       "reviewStatus": "pending-review"
     },
     {
       "path": "evidence/e2e/M4-036-FOLLOWUP-001/client.log",
-      "sha256": "8fb299b100c23912eb7eb3137311d4f9648bd1fada0bc5ab5c3e89cfb45f2196",
+      "sha256": "b3f64f74ff641581134354202417de88ae2b7c61d82682c439f690ec5a45c5e2",
       "byteLength": 2335,
       "kind": "sanitized-log",
       "reviewStatus": "pending-review"
