@@ -200,7 +200,11 @@
 
     func readPlainText(limit: ClipboardByteLimit) async -> CoreResult<PlatformClipboardText?> {
       let value = lock.withLock { text }
-      return .success(value.map { PlatformClipboardText(text: $0, contentHash: "h-\($0.count)") })
+      // The X11 backend's rule, so inbound and local hashes compare (M4-026-FOLLOWUP-001).
+      return .success(
+        value.map {
+          PlatformClipboardText(text: $0, contentHash: LinuxX11ClipboardRules.contentHash(of: $0))
+        })
     }
 
     func writePlainText(_ text: String, limit: ClipboardByteLimit) async -> CoreResult<Void> {
@@ -584,6 +588,32 @@
     return box.code
   }
 
+  /// Polls `condition` every 10 ms for at most `seconds`; `false` when it never held.
+  private func within(seconds: Int, _ condition: () -> Bool) async -> Bool {
+    let deadline = ContinuousClock.now + .seconds(seconds)
+    while ContinuousClock.now < deadline {
+      if condition() { return true }
+      try? await Task.sleep(for: .milliseconds(10))
+    }
+    return condition()
+  }
+
+  /// Fails within 5 s, naming the coordinator's clipboard counters, unless `count` inbound
+  /// clipboards have been applied (M4-026-FOLLOWUP-001).
+  private func requireApplied(_ harness: Harness, count: Int) async throws {
+    let coordinator = harness.runtime.coordinator
+    let applied = await within(seconds: 5) {
+      coordinator.diagnostics.inboundClipboardApplied >= count
+    }
+    let counts = coordinator.diagnostics
+    try #require(
+      applied,
+      """
+      inbound clipboards applied \(counts.inboundClipboardApplied) of \(count), \
+      loopRejected \(counts.inboundClipboardLoopRejected)
+      """)
+  }
+
   private func key(_ index: UInt8, _ phase: KeyPhase) -> KVMEvent {
     .key(key: .letter(index), phase: phase, modifiers: none)
   }
@@ -657,26 +687,59 @@
 
     // M4-026-FOLLOWUP-001: the protocol session leaves an inbound clipboard's content hash
     // empty, so before the fix every server clipboard after the first in a session compared
-    // equal to the first in the loop guard and was dropped as `loopRejected`.
+    // equal to the first in the loop guard and was dropped as `loopRejected`. Each step waits
+    // at most 5 s on the coordinator's counters, so a regression fails fast and names them.
     @Test("M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied")
     func secondServerClipboardInOneSession() async throws {
       let harness = Harness()
       let run = harness.start()
+      defer { harness.runtime.requestTermination(signal: SIGTERM) }
       let server = try await harness.readyServer(0)
       try await server.session.enter(at: NormalizedPoint(x: 0, y: 0.5))
       await harness.injected(.mouseMove(position: NormalizedPoint(x: 0, y: 450.0 / 899)))
 
-      try await server.session.forward(.clipboard(clipboardPayload("first")))
-      await harness.clipboard.writes.wait { $0.contains("first") }
       let large = String(
         (0..<600_000).map { Character(UnicodeScalar(UInt8(0x61 + $0 % 26))) })
-      try await server.session.forward(.clipboard(clipboardPayload(large)))
-      await harness.clipboard.writes.wait { $0.contains(large) }
-      // Content seen earlier in the session is applied again once the clipboard has moved on.
-      try await server.session.forward(.clipboard(clipboardPayload("first")))
-      await harness.clipboard.writes.wait { $0.filter { $0 == "first" }.count == 2 }
-      #expect(harness.clipboard.writes.all.count == 3)
+      // The last one: content seen earlier is applied again once the clipboard has moved on.
+      for (index, text) in ["first", large, "first"].enumerated() {
+        try await server.session.forward(.clipboard(clipboardPayload(text)))
+        try await requireApplied(harness, count: index + 1)
+        await harness.clipboard.writes.wait { $0.count == index + 1 }
+      }
+      #expect(harness.clipboard.writes.all == ["first", large, "first"])
       #expect(harness.runtime.coordinator.diagnostics.inboundClipboardLoopRejected == 0)
+
+      harness.runtime.requestTermination(signal: SIGTERM)
+      #expect(await finished(run) == .success)
+    }
+
+    // M4-026-FOLLOWUP-001 review F1: the inbound hash must equal the one a local read of the
+    // same text carries (the fake reads with the X11 backend's rule), or another application
+    // re-owning the applied text would send it back to the server.
+    @Test("M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed")
+    func appliedServerClipboardIsNotEchoed() async throws {
+      let harness = Harness()
+      let run = harness.start()
+      defer { harness.runtime.requestTermination(signal: SIGTERM) }
+      let server = try await harness.readyServer(0)
+      try await server.session.enter(at: NormalizedPoint(x: 0, y: 0.5))
+      await harness.injected(.mouseMove(position: NormalizedPoint(x: 0, y: 450.0 / 899)))
+
+      try await server.session.forward(.clipboard(clipboardPayload("from the mac")))
+      try await requireApplied(harness, count: 1)
+      await harness.clipboard.writes.wait { $0.contains("from the mac") }
+      harness.clipboard.setLocalText("from the mac")
+      harness.clipboard.continuation.yield()
+      let coordinator = harness.runtime.coordinator
+      let rejected = await within(seconds: 5) {
+        coordinator.diagnostics.outboundClipboardLoopRejected == 1
+      }
+      #expect(rejected, "the echo was not rejected")
+      #expect(coordinator.diagnostics.outboundClipboardAdmitted == 0)
+      #expect(
+        !server.inbound.all.contains {
+          if case .clipboard = $0 { true } else { false }
+        })
 
       harness.runtime.requestTermination(signal: SIGTERM)
       #expect(await finished(run) == .success)

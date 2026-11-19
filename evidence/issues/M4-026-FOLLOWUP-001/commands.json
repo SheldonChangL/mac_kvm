@@ -61,9 +61,44 @@
     {
       "name": "linux-full-xvfb",
       "command": "docker exec -e MACKVM_X11_TESTS=1 <c> xvfb-run -a swift test --skip-build --scratch-path /build --xunit-output evidence/issues/M4-026-FOLLOWUP-001/tests/swift-testing-xunit.xml",
+      "sourceCommit": "f1cd4a6 (superseded by review-followup-linux-full-xvfb)",
       "exitCode": 0,
-      "stdout": "✔ Test run with 521 tests in 54 suites passed after 6.340 seconds.\n",
-      "note": "The XML header reads tests=\"520\" failures=\"0\" skipped=\"1\" with 521 testcase elements (same counting difference as M1-055-FOLLOWUP-002). The report is written as tests/swift-testing-xunit-swift-testing.xml."
+      "stdout": "✔ Test run with 521 tests in 54 suites passed after 6.340 seconds.\n"
+    },
+    {
+      "name": "review-followup-red",
+      "command": "review notes F1/F2/F4 applied to the tests and coordinator; ClientRuntime.swift and ClientCoordinator.swift temporarily restored from origin/main; docker exec <c> swift test --filter 'secondServerClipboardInOneSession|appliedServerClipboardIsNotEchoed'; restored",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" recorded an issue at LinuxClientRuntimeTests.swift:609:9: Expectation failed: applied\n↳ inbound clipboards applied 1 of 2, loopRejected 1\n✘ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" failed after 5.111 seconds with 1 issue.\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" recorded an issue at LinuxClientRuntimeTests.swift:738:7: Expectation failed: (coordinator.diagnostics.outboundClipboardAdmitted → 1) == 0\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" failed after 5.033 seconds with 3 issues.\n✘ Test run with 2 tests in 1 suite failed after 10.147 seconds with 4 issues.\n",
+      "note": "F4: the RED now fails within 5 s and names the counters instead of hitting the 60 s time limit."
+    },
+    {
+      "name": "review-followup-mutant-other-hash",
+      "command": "withContentHash hashes `text + \"-mutant\"` with the same rule (any hash other than a local read's); same filter; restored",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "stdout": "✔ Test \"M4-026-FOLLOWUP-001: a second server clipboard in one session, 600 KB, is applied\" passed after 0.162 seconds.\n✘ Test \"M4-026-FOLLOWUP-001: a local re-read of an applied server clipboard is not echoed\" recorded an issue at LinuxClientRuntimeTests.swift:738:7: Expectation failed: (coordinator.diagnostics.outboundClipboardAdmitted → 1) == 0\n✘ Test run with 2 tests in 1 suite failed after 5.185 seconds with 3 issues.\n",
+      "note": "F1: killed by appliedServerClipboardIsNotEchoed; the earlier test alone did not pin the hash function."
+    },
+    {
+      "name": "review-followup-linux-focused",
+      "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors && swift test --filter 'secondServerClipboardInOneSession|appliedServerClipboardIsNotEchoed' && swift test --filter 'LinuxClient|ClientCoordinator|ClipboardLoopGuard'",
+      "exitCode": 0,
+      "stdout": "Build complete! (10.95s)\n✔ Test run with 2 tests in 1 suite passed after 0.168 seconds.\n✔ Test run with 93 tests in 6 suites passed after 0.211 seconds.\n"
+    },
+    {
+      "name": "review-followup-linux-full-xvfb",
+      "command": "docker exec <c> swift build --build-tests -Xswiftc -warnings-as-errors; docker exec -e MACKVM_X11_TESTS=1 <c> xvfb-run -a swift test --skip-build --scratch-path /build --xunit-output evidence/issues/M4-026-FOLLOWUP-001/tests/swift-testing-xunit.xml",
+      "exitCode": 0,
+      "stdout": "Build complete! (20.73s)\n✔ Test run with 522 tests in 54 suites passed after 6.372 seconds.\n",
+      "note": "The XML header reads tests=\"521\" failures=\"0\" skipped=\"1\" with 522 testcase elements (same counting difference as M1-055-FOLLOWUP-002). The report is written as tests/swift-testing-xunit-swift-testing.xml."
+    },
+    {
+      "name": "review-followup-mac-swift-test",
+      "command": "swift test (with the ClientCoordinator empty-hash check)",
+      "exitCode": 0,
+      "stdout": "✔ Test run with 332 tests in 29 suites passed after 0.177 seconds.\n"
     },
     {
       "name": "mac-swift-test",
@@ -93,7 +128,7 @@
     {
       "name": "e2e-rerun",
       "command": "MACKVM_E2E_CONTAINER=<arm64 swift:6.2.3-jammy container> MACKVM_E2E_PORT=24811 <PR #371 E2E script> (Xvfb :93, Mac smoke server loopback-only)",
-      "sourceCommit": "42a7691feb7b plus this fix (working tree; the client is built from it by the script)",
+      "sourceCommit": "42a7691feb7b plus the f1cd4a6 fix (working tree; the client is built from it by the script). Not rerun after the review follow-up, which adds tests and an empty-hash check in ClientCoordinator that the runtime path never reaches.",
       "exitCode": 0,
       "stdout": "M4-036 e2e: fingerprint-changed-exit-78=pass\nM4-036 e2e: fingerprint-changed-no-bytes=pass\nM4-036 e2e: handshake=pass\nM4-036 e2e: enter=pass\nM4-036 e2e: clipboard-to-client=pass\nM4-036 e2e: move-1=pass\nM4-036 e2e: move-2=pass\nM4-036 e2e: held-key-locks=pass\nM4-036 e2e: return=pass\nM4-036 e2e: clipboard-from-client=pass\nM4-036 e2e: escape=pass\nM4-036 e2e: clipboard-not-echoed=pass\nM4-036 e2e: clipboard-large-from-client=pass\nM4-036 e2e: kill-client-no-stuck-key=pass\nM4-036 e2e: reconnect=pass\nM4-036 e2e: clipboard-on-reconnect=pass\nM4-036 e2e: keepalive-13s=pass\nM4-036 e2e: clipboard-large-to-client=pass\nM4-036 e2e: quit-while-remote=pass\nM4-036 e2e: auto-reconnect=pass\nM4-036 e2e: client-sigterm-exit-0=pass\nM4-036 e2e: x-events-redundant-releases=2\nM4-036 e2e: x-events=pass\nM4-036 e2e: automated=0 failed of 22\nM4-036 e2e: owner-hardware-half=pending\n"
     },
