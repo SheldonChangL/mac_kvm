@@ -1,0 +1,37 @@
+[03:48:40.516] server certificate SHA-256: <fingerprint>
+[03:48:40.516] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
+[03:48:40.525] listening on loopback only; the client is beyond the right edge
+[03:48:43.845] connection refused before the handshake: connectFailed(KVMContracts.CoreError(code: KVMContracts.CoreErrorCode.security(KVMContracts.SecurityErrorCode.trustRejected), severity: KVMContracts.CoreErrorSeverity.error, retryDisposition: KVMContracts.RetryDisposition.userActionRequired, cleanupDisposition: KVMContracts.CleanupDisposition.completed, underlyingDiagnosticCode: nil))
+[03:48:44.110] client ready (1600x900)
+[03:48:49.906] input is now remote
+[03:48:49.906] clipboard sent to the client
+[03:49:06.827] clipboard received from the client
+[03:49:09.711] input is local again
+[03:49:11.445] smoke: clipboard matches
+[03:49:11.821] input is now remote
+[03:49:12.695] local recovery: completed
+[03:49:14.096] input is now remote
+[03:49:14.974] clipboard received from the client
+[03:49:15.963] input is local again
+[03:49:19.305] smoke: clipboard matches
+[03:49:19.780] input is now remote
+[03:49:21.454] local recovery: completed
+[03:49:21.455] client disconnected: failed (transport(KVMContracts.TransportErrorCode.disconnected))
+[03:49:25.266] smoke: not remote
+[03:49:26.242] client ready (1600x900)
+[03:49:31.489] input is now remote
+[03:49:31.498] clipboard sent to the client
+[03:49:45.998] input is local again
+[03:49:47.407] input is now remote
+[03:49:47.428] clipboard sent to the client
+[03:49:53.887] input is local again
+[03:49:55.091] input is now remote
+[03:49:55.091] clipboard sent to the client
+[03:49:56.679] local recovery: completed
+[03:49:56.797] stopped
+[03:50:00.202] server certificate SHA-256: <fingerprint>
+[03:50:00.203] Barrier client trust line (SSL/Fingerprints/TrustedServers.txt): v2:sha256:<fingerprint>
+[03:50:00.204] listening on loopback only; the client is beyond the right edge
+[03:50:03.941] client ready (1600x900)
+[03:50:14.194] local recovery: completed
+[03:50:14.298] stopped
